@@ -4,6 +4,7 @@ import {
   getMonthlyRadiationForAngle,
   type TableRadiationComponent,
 } from '@/components/climate/OptimalAnnualStudyPanel';
+import { themeManager } from '@/services/theme/themeManager';
 
 export type GraphComponentChoice = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -104,6 +105,18 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
       ? `Gains of ${compName} radiation for annual optimal tilt`
       : `Ganancias de radiación ${compName} para la inclinación óptima anual`;
 
+    const isDark = themeManager.isDark();
+    const plotBg = isDark ? '#0b171f' : '#ffffff';
+    const plotBorder = isDark ? 'rgba(255,255,255,0.3)' : '#94a3b8';
+    const titleColor = isDark ? '#f8fafc' : '#0f172a';
+    const labelColor = isDark ? '#cbd5e1' : '#1e293b';
+    const tickColor = isDark ? '#94a3b8' : '#334155';
+    const gridStroke = isDark ? 'rgba(255,255,255,0.12)' : '#e2e8f0';
+    const zeroLineStroke = isDark ? '#ffffff' : '#0f172a';
+    const legendBg = isDark ? 'rgba(15, 23, 42, 0.92)' : '#ffffff';
+    const legendBorder = isDark ? 'rgba(255,255,255,0.2)' : '#cbd5e1';
+    const legendText = isDark ? '#f8fafc' : '#0f172a';
+
     // -------------------------------------------------------------
     // SVG 1: Top Plot (Line Chart of Radiation vs Months)
     // -------------------------------------------------------------
@@ -127,15 +140,15 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
       const v = (maxRadiationY / yTicksCount) * i;
       const y = yTop(v);
       if (gridTopEnabled) {
-        gridLinesTop += `<line x1="${pad.left}" y1="${y}" x2="${pad.left + innerW}" y2="${y}" stroke="rgba(255,255,255,0.12)" stroke-dasharray="2,3" />`;
+        gridLinesTop += `<line x1="${pad.left}" y1="${y}" x2="${pad.left + innerW}" y2="${y}" stroke="${gridStroke}" stroke-dasharray="2,3" />`;
       }
-      gridLinesTop += `<text x="${pad.left - 6}" y="${y + 4}" fill="#94a3b8" font-size="10" text-anchor="end" font-family="monospace">${Math.round(v)}</text>`;
+      gridLinesTop += `<text x="${pad.left - 6}" y="${y + 4}" fill="${tickColor}" font-size="10" text-anchor="end" font-family="monospace">${Math.round(v)}</text>`;
     }
 
     if (gridTopEnabled) {
       for (let i = 0; i < 12; i++) {
         const x = xMonth(i);
-        gridLinesTop += `<line x1="${x}" y1="${pad.top}" x2="${x}" y2="${pad.top + innerH}" stroke="rgba(255,255,255,0.12)" stroke-dasharray="2,3" />`;
+        gridLinesTop += `<line x1="${x}" y1="${pad.top}" x2="${x}" y2="${pad.top + innerH}" stroke="${gridStroke}" stroke-dasharray="2,3" />`;
       }
     }
 
@@ -155,7 +168,7 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
           ? '#84cc16' // Lime
           : selectedComponent === 'albedo'
           ? '#f59e0b' // Amber/Orange
-          : '#38bdf8'; // Light Cyan (Global)
+          : '#0284c7'; // Vivid Cyan (Global)
 
       const colorZero =
         selectedComponent === 'beam'
@@ -173,22 +186,22 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
 
       topLegendHtml = `
         <g transform="translate(${pad.left + innerW + 10}, ${pad.top + 5})">
-          <rect x="0" y="0" width="76" height="42" fill="rgba(15, 23, 42, 0.85)" stroke="rgba(255,255,255,0.2)" rx="3" />
+          <rect x="0" y="0" width="76" height="42" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
           <line x1="8" y1="14" x2="26" y2="14" stroke="${colorOpt}" stroke-width="2.5" />
-          <text x="32" y="17" fill="#f8fafc" font-size="10.5" font-weight="600">${isEn ? 'Opt. ann.' : 'Ópt. anu.'}</text>
+          <text x="32" y="17" fill="${legendText}" font-size="10.5" font-weight="600">${isEn ? 'Opt. ann.' : 'Ópt. anu.'}</text>
           <line x1="8" y1="30" x2="26" y2="30" stroke="${colorZero}" stroke-width="2.5" />
-          <text x="32" y="33" fill="#f8fafc" font-size="10.5" font-weight="600">0°</text>
+          <text x="32" y="33" fill="${legendText}" font-size="10.5" font-weight="600">0°</text>
         </g>
       `;
     } else {
       // 8 curves for "Todas" (Figura 5.2.109 - Image 3)
       topSeriesHtml = `
         <!-- Gdm -->
-        <path d="${makeLineD(allData.global.radOpt)}" fill="none" stroke="#5dade2" stroke-width="2.4" />
-        <path d="${makeLineD(allData.global.rad0)}" fill="none" stroke="#1a5276" stroke-width="2.4" />
+        <path d="${makeLineD(allData.global.radOpt)}" fill="none" stroke="#0284c7" stroke-width="2.4" />
+        <path d="${makeLineD(allData.global.rad0)}" fill="none" stroke="#0369a1" stroke-width="2.4" />
         <!-- Bdm -->
-        <path d="${makeLineD(allData.beam.radOpt)}" fill="none" stroke="#e74c3c" stroke-width="2.4" />
-        <path d="${makeLineD(allData.beam.rad0)}" fill="none" stroke="#f1948a" stroke-width="2.4" />
+        <path d="${makeLineD(allData.beam.radOpt)}" fill="none" stroke="#ef4444" stroke-width="2.4" />
+        <path d="${makeLineD(allData.beam.rad0)}" fill="none" stroke="#f87171" stroke-width="2.4" />
         <!-- Ddm -->
         <path d="${makeLineD(allData.diffuse.radOpt)}" fill="none" stroke="#d4ac0d" stroke-width="2.4" />
         <path d="${makeLineD(allData.diffuse.rad0)}" fill="none" stroke="#27ae60" stroke-width="2.4" />
@@ -199,27 +212,27 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
 
       topLegendHtml = `
         <g transform="translate(${pad.left + innerW + 8}, ${pad.top - 12})">
-          <rect x="0" y="0" width="80" height="152" fill="rgba(15, 23, 42, 0.9)" stroke="rgba(255,255,255,0.2)" rx="3" />
+          <rect x="0" y="0" width="80" height="152" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
           <!-- Gdm -->
-          <line x1="6" y1="14" x2="22" y2="14" stroke="#5dade2" stroke-width="2.5" />
-          <text x="26" y="17" fill="#f8fafc" font-size="9.5" font-weight="600">Gdm(ópt)</text>
-          <line x1="6" y1="32" x2="22" y2="32" stroke="#1a5276" stroke-width="2.5" />
-          <text x="26" y="35" fill="#f8fafc" font-size="9.5" font-weight="600">Gdm(0°)</text>
+          <line x1="6" y1="14" x2="22" y2="14" stroke="#0284c7" stroke-width="2.5" />
+          <text x="26" y="17" fill="${legendText}" font-size="9.5" font-weight="600">Gdm(ópt)</text>
+          <line x1="6" y1="32" x2="22" y2="32" stroke="#0369a1" stroke-width="2.5" />
+          <text x="26" y="35" fill="${legendText}" font-size="9.5" font-weight="600">Gdm(0°)</text>
           <!-- Bdm -->
-          <line x1="6" y1="50" x2="22" y2="50" stroke="#e74c3c" stroke-width="2.5" />
-          <text x="26" y="53" fill="#f8fafc" font-size="9.5" font-weight="600">Bdm(ópt)</text>
-          <line x1="6" y1="68" x2="22" y2="68" stroke="#f1948a" stroke-width="2.5" />
-          <text x="26" y="71" fill="#f8fafc" font-size="9.5" font-weight="600">Bdm(0°)</text>
+          <line x1="6" y1="50" x2="22" y2="50" stroke="#ef4444" stroke-width="2.5" />
+          <text x="26" y="53" fill="${legendText}" font-size="9.5" font-weight="600">Bdm(ópt)</text>
+          <line x1="6" y1="68" x2="22" y2="68" stroke="#f87171" stroke-width="2.5" />
+          <text x="26" y="71" fill="${legendText}" font-size="9.5" font-weight="600">Bdm(0°)</text>
           <!-- Ddm -->
           <line x1="6" y1="86" x2="22" y2="86" stroke="#d4ac0d" stroke-width="2.5" />
-          <text x="26" y="89" fill="#f8fafc" font-size="9.5" font-weight="600">Ddm(ópt)</text>
+          <text x="26" y="89" fill="${legendText}" font-size="9.5" font-weight="600">Ddm(ópt)</text>
           <line x1="6" y1="104" x2="22" y2="104" stroke="#27ae60" stroke-width="2.5" />
-          <text x="26" y="107" fill="#f8fafc" font-size="9.5" font-weight="600">Ddm(0°)</text>
+          <text x="26" y="107" fill="${legendText}" font-size="9.5" font-weight="600">Ddm(0°)</text>
           <!-- Rdm -->
           <line x1="6" y1="122" x2="22" y2="122" stroke="#e67e22" stroke-width="2.5" />
-          <text x="26" y="125" fill="#f8fafc" font-size="9.5" font-weight="600">Rdm(ópt)</text>
+          <text x="26" y="125" fill="${legendText}" font-size="9.5" font-weight="600">Rdm(ópt)</text>
           <line x1="6" y1="140" x2="22" y2="140" stroke="#7e5109" stroke-width="2.5" />
-          <text x="26" y="143" fill="#f8fafc" font-size="9.5" font-weight="600">Rdm(0°)</text>
+          <text x="26" y="143" fill="${legendText}" font-size="9.5" font-weight="600">Rdm(0°)</text>
         </g>
       `;
     }
@@ -227,26 +240,26 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
     const topSvgHtml = `
       <svg viewBox="0 0 ${plotW} ${plotH}" class="matlab-plot-svg" id="svg-matlab-rad-top">
         <!-- Title -->
-        <text x="${pad.left + innerW / 2}" y="18" fill="#f8fafc" font-size="12" font-weight="700" text-anchor="middle">
+        <text x="${pad.left + innerW / 2}" y="18" fill="${titleColor}" font-size="12" font-weight="700" text-anchor="middle">
           ${topPlotTitle}
         </text>
 
         <!-- Plot Area Box -->
-        <rect x="${pad.left}" y="${pad.top}" width="${innerW}" height="${innerH}" fill="#0b171f" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
+        <rect x="${pad.left}" y="${pad.top}" width="${innerW}" height="${innerH}" fill="${plotBg}" stroke="${plotBorder}" stroke-width="1" />
 
         <!-- Grid Lines & Ticks -->
         ${gridLinesTop}
 
         <!-- X Axis Month Ticks -->
         ${[1, 3, 5, 7, 9, 11].map((mIdx) => `
-          <text x="${xMonth(mIdx)}" y="${pad.top + innerH + 16}" fill="#94a3b8" font-size="10" text-anchor="middle">${mIdx + 1}</text>
+          <text x="${xMonth(mIdx)}" y="${pad.top + innerH + 16}" fill="${tickColor}" font-size="10" text-anchor="middle">${mIdx + 1}</text>
         `).join('')}
 
         <!-- Axis Labels -->
-        <text x="${pad.left + innerW / 2}" y="${plotH - 4}" fill="#cbd5e1" font-size="11" text-anchor="middle">
+        <text x="${pad.left + innerW / 2}" y="${plotH - 4}" fill="${labelColor}" font-size="11" text-anchor="middle" font-weight="600">
           ${isEn ? 'Months' : 'Meses'}
         </text>
-        <text transform="rotate(-90)" x="${-(pad.top + innerH / 2)}" y="14" fill="#cbd5e1" font-size="11" text-anchor="middle">
+        <text transform="rotate(-90)" x="${-(pad.top + innerH / 2)}" y="14" fill="${labelColor}" font-size="11" text-anchor="middle" font-weight="600">
           ${isEn ? 'Radiation' : 'Radiación'}
         </text>
 
@@ -285,15 +298,15 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
     gTicks.forEach((gVal) => {
       const y = yBottom(gVal);
       if (gridBottomEnabled) {
-        gridLinesBottom += `<line x1="${bPad.left}" y1="${y}" x2="${bPad.left + bInnerW}" y2="${y}" stroke="rgba(255,255,255,0.12)" stroke-dasharray="2,3" />`;
+        gridLinesBottom += `<line x1="${bPad.left}" y1="${y}" x2="${bPad.left + bInnerW}" y2="${y}" stroke="${gridStroke}" stroke-dasharray="2,3" />`;
       }
-      gridLinesBottom += `<text x="${bPad.left - 6}" y="${y + 4}" fill="#94a3b8" font-size="10" text-anchor="end" font-family="monospace">${gVal}</text>`;
+      gridLinesBottom += `<text x="${bPad.left - 6}" y="${y + 4}" fill="${tickColor}" font-size="10" text-anchor="end" font-family="monospace">${gVal}</text>`;
     });
 
     if (gridBottomEnabled) {
       for (let i = 0; i < 12; i++) {
         const x = bPad.left + ((i + 0.5) / 12) * bInnerW;
-        gridLinesBottom += `<line x1="${x}" y1="${bPad.top}" x2="${x}" y2="${bPad.top + bInnerH}" stroke="rgba(255,255,255,0.12)" stroke-dasharray="2,3" />`;
+        gridLinesBottom += `<line x1="${x}" y1="${bPad.top}" x2="${x}" y2="${bPad.top + bInnerH}" stroke="${gridStroke}" stroke-dasharray="2,3" />`;
       }
     }
 
@@ -313,15 +326,15 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
         const barFill = pct >= 0 ? '#0f766e' : '#b91c1c';
 
         return `
-          <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${bh.toFixed(1)}" fill="${barFill}" stroke="#14b8a6" stroke-width="0.8" />
+          <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${bh.toFixed(1)}" fill="${barFill}" stroke="${pct >= 0 ? '#14b8a6' : '#ef4444'}" stroke-width="0.8" />
         `;
       }).join('');
 
       bottomLegendHtml = `
         <g transform="translate(${bPad.left + bInnerW + 10}, ${bPad.top + 8})">
-          <rect x="0" y="0" width="60" height="26" fill="rgba(15, 23, 42, 0.85)" stroke="rgba(255,255,255,0.2)" rx="3" />
+          <rect x="0" y="0" width="60" height="26" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
           <rect x="8" y="7" width="14" height="12" fill="#0f766e" stroke="#14b8a6" stroke-width="0.8" />
-          <text x="28" y="16" fill="#f8fafc" font-size="10.5" font-weight="600">0°</text>
+          <text x="28" y="16" fill="${legendText}" font-size="10.5" font-weight="600">0°</text>
         </g>
       `;
     } else {
@@ -345,15 +358,15 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
 
       bottomLegendHtml = `
         <g transform="translate(${bPad.left + bInnerW + 8}, ${bPad.top + 6})">
-          <rect x="0" y="0" width="76" height="84" fill="rgba(15, 23, 42, 0.9)" stroke="rgba(255,255,255,0.2)" rx="3" />
+          <rect x="0" y="0" width="76" height="84" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
           <rect x="6" y="8" width="14" height="10" fill="#0f766e" />
-          <text x="24" y="17" fill="#f8fafc" font-size="9" font-weight="600">0°- G</text>
+          <text x="24" y="17" fill="${legendText}" font-size="9" font-weight="600">0°- G</text>
           <rect x="6" y="26" width="14" height="10" fill="#15803d" />
-          <text x="24" y="35" fill="#f8fafc" font-size="9" font-weight="600">0°- B</text>
+          <text x="24" y="35" fill="${legendText}" font-size="9" font-weight="600">0°- B</text>
           <rect x="6" y="44" width="14" height="10" fill="#a3e635" />
-          <text x="24" y="53" fill="#f8fafc" font-size="9" font-weight="600">0°- D</text>
+          <text x="24" y="53" fill="${legendText}" font-size="9" font-weight="600">0°- D</text>
           <rect x="6" y="62" width="14" height="10" fill="#fef08a" />
-          <text x="24" y="71" fill="#f8fafc" font-size="9" font-weight="600">0°- R</text>
+          <text x="24" y="71" fill="${legendText}" font-size="9" font-weight="600">0°- R</text>
         </g>
       `;
     }
@@ -361,29 +374,29 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
     const bottomSvgHtml = `
       <svg viewBox="0 0 ${bPlotW} ${bPlotH}" class="matlab-plot-svg" id="svg-matlab-gain-bottom">
         <!-- Title -->
-        <text x="${bPad.left + bInnerW / 2}" y="16" fill="#f8fafc" font-size="11.5" font-weight="700" text-anchor="middle">
+        <text x="${bPad.left + bInnerW / 2}" y="16" fill="${titleColor}" font-size="11.5" font-weight="700" text-anchor="middle">
           ${bottomPlotTitle}
         </text>
 
         <!-- Plot Area Box -->
-        <rect x="${bPad.left}" y="${bPad.top}" width="${bInnerW}" height="${bInnerH}" fill="#0b171f" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
+        <rect x="${bPad.left}" y="${bPad.top}" width="${bInnerW}" height="${bInnerH}" fill="${plotBg}" stroke="${plotBorder}" stroke-width="1" />
 
         <!-- Zero line -->
-        <line x1="${bPad.left}" y1="${zeroY}" x2="${bPad.left + bInnerW}" y2="${zeroY}" stroke="#ffffff" stroke-width="1" />
+        <line x1="${bPad.left}" y1="${zeroY}" x2="${bPad.left + bInnerW}" y2="${zeroY}" stroke="${zeroLineStroke}" stroke-width="1" />
 
         <!-- Grid Lines & Ticks -->
         ${gridLinesBottom}
 
         <!-- X Axis Month Ticks -->
         ${MONTH_NAMES_SHORT.map((mName, mIdx) => `
-          <text x="${bPad.left + (mIdx + 0.5) * colWidth}" y="${bPad.top + bInnerH + 15}" fill="#94a3b8" font-size="10" text-anchor="middle">${mName}</text>
+          <text x="${bPad.left + (mIdx + 0.5) * colWidth}" y="${bPad.top + bInnerH + 15}" fill="${tickColor}" font-size="10" text-anchor="middle">${mName}</text>
         `).join('')}
 
         <!-- Axis Labels -->
-        <text x="${bPad.left + bInnerW / 2}" y="${bPlotH - 4}" fill="#cbd5e1" font-size="11" text-anchor="middle">
+        <text x="${bPad.left + bInnerW / 2}" y="${bPlotH - 4}" fill="${labelColor}" font-size="11" text-anchor="middle" font-weight="600">
           ${isEn ? 'Months' : 'Meses'}
         </text>
-        <text transform="rotate(-90)" x="${-(bPad.top + bInnerH / 2)}" y="14" fill="#cbd5e1" font-size="11" text-anchor="middle">
+        <text transform="rotate(-90)" x="${-(bPad.top + bInnerH / 2)}" y="14" fill="${labelColor}" font-size="11" text-anchor="middle" font-weight="600">
           ${isEn ? 'Gains (%)' : 'Ganancias (%)'}
         </text>
 
@@ -400,7 +413,7 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
     // -------------------------------------------------------------
     const statBoxOptHtml = `
       <div class="matlab-stat-frame">
-        <div class="stat-frame-title">${isEn ? 'Annual optimal tilt' : 'Inclinación ópt. anual'}</div>
+        <div class="stat-frame-title title-opt">${isEn ? 'Annual optimal tilt' : 'Inclinación ópt. anual'}</div>
         <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${minVal(radOpt).toFixed(2)}</strong></div>
         <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${meanVal(radOpt).toFixed(2)}</strong></div>
         <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${maxVal(radOpt).toFixed(2)}</strong></div>
@@ -409,7 +422,7 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
 
     const statBoxHorizHtml = `
       <div class="matlab-stat-frame">
-        <div class="stat-frame-title">${isEn ? 'On horizontal plane' : 'Sobre plano horizontal'}</div>
+        <div class="stat-frame-title title-horiz">${isEn ? 'On horizontal plane' : 'Sobre plano horizontal'}</div>
         <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${minVal(rad0).toFixed(2)}</strong></div>
         <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${meanVal(rad0).toFixed(2)}</strong></div>
         <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${maxVal(rad0).toFixed(2)}</strong></div>
@@ -418,7 +431,7 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
 
     const statBoxGainHtml = `
       <div class="matlab-stat-frame" style="margin-top: 1.5rem;">
-        <div class="stat-frame-title">${isEn ? 'Rel. horizontal plane' : 'Res. plano horizontal'}</div>
+        <div class="stat-frame-title title-gain">${isEn ? 'Rel. horizontal plane' : 'Res. plano horizontal'}</div>
         <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${isAlbedo ? '-' : minVal(gainsPct).toFixed(2)}</strong></div>
         <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${isAlbedo ? '-' : meanVal(gainsPct).toFixed(2)}</strong></div>
         <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${isAlbedo ? '-' : maxVal(gainsPct).toFixed(2)}</strong></div>
@@ -555,6 +568,12 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
       else window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
+
+  themeManager.subscribe(() => {
+    if (document.body.contains(container)) {
+      renderInternal();
+    }
+  });
 
   renderInternal();
   return container;

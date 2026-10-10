@@ -200,8 +200,14 @@ function createApp() {
 // Initial mount
 createApp();
 
-// Reactively re-render whenever the user switches language
+import { themeManager } from '@/services/theme/themeManager';
+
+// Reactively re-render whenever the user switches language or theme
 i18n.subscribe(() => {
+  createApp();
+});
+
+themeManager.subscribe(() => {
   createApp();
 });
 
