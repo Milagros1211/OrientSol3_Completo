@@ -1,6 +1,7 @@
 import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { renderEnergyCalculationPanel } from '@/components/energy/EnergyCalculationPanel';
+import { renderTrackingDualAxisGraphsWindow } from '@/components/charts/TrackingDualAxisGraphsWindow';
 import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
@@ -279,10 +280,33 @@ export function renderTrackingDualAxisStudyPanel(props: TrackingDualStudyProps):
           </div>
         </div>
 
-        <!-- Mount point for Dedicated Osterwald Energy Window -->
+        <!-- Mount points for Dedicated Graphs Window and Energy Window -->
+        <div id="opt-dual-graphs-mount-point"></div>
         <div id="opt-dual-energy-mount-point"></div>
       </div>
     `;
+
+    // Mount Graphs Window if active
+    const graphsMountPoint = container.querySelector<HTMLDivElement>('#opt-dual-graphs-mount-point');
+    if (graphsMountPoint && stateDualShowGraphs) {
+      graphsMountPoint.innerHTML = '';
+      const graphsWindow = renderTrackingDualAxisGraphsWindow({
+        simulationResult: res,
+        locationName,
+        latitude,
+        initialComponent: stateDualComponent as any,
+        onBack: () => {
+          stateDualShowGraphs = false;
+          renderInternal();
+        },
+        onExit: () => {
+          stateDualShowGraphs = false;
+          renderInternal();
+          if (onExit) onExit();
+        },
+      });
+      graphsMountPoint.appendChild(graphsWindow);
+    }
 
     const energyMountPoint = container.querySelector<HTMLDivElement>('#opt-dual-energy-mount-point');
     if (energyMountPoint && stateDualShowEnergy) {
@@ -318,8 +342,12 @@ export function renderTrackingDualAxisStudyPanel(props: TrackingDualStudyProps):
 
     container.querySelector<HTMLButtonElement>('#btn-dual-view-charts')?.addEventListener('click', () => {
       stateDualShowGraphs = !stateDualShowGraphs;
-      const chartsSection = document.querySelector('#opt-charts-panel') || document.querySelector('.charts-grid-2col');
-      chartsSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      renderInternal();
+      if (stateDualShowGraphs) {
+        setTimeout(() => {
+          container.querySelector('#opt-dual-graphs-mount-point')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
     });
 
     container.querySelector<HTMLButtonElement>('#btn-dual-volver')?.addEventListener('click', () => {

@@ -1,6 +1,7 @@
 import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { renderEnergyCalculationPanel } from '@/components/energy/EnergyCalculationPanel';
+import { renderTrackingPolarGraphsWindow } from '@/components/charts/TrackingPolarGraphsWindow';
 import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
@@ -275,10 +276,33 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
           </div>
         </div>
 
-        <!-- Mount point for Dedicated Osterwald Energy Window -->
+        <!-- Mount points for Dedicated Graphs Window and Energy Window -->
+        <div id="opt-polar-graphs-mount-point"></div>
         <div id="opt-polar-energy-mount-point"></div>
       </div>
     `;
+
+    // Mount Graphs Window if active
+    const graphsMountPoint = container.querySelector<HTMLDivElement>('#opt-polar-graphs-mount-point');
+    if (graphsMountPoint && statePolarShowGraphs) {
+      graphsMountPoint.innerHTML = '';
+      const graphsWindow = renderTrackingPolarGraphsWindow({
+        simulationResult: res,
+        locationName,
+        latitude,
+        initialComponent: statePolarComponent as any,
+        onBack: () => {
+          statePolarShowGraphs = false;
+          renderInternal();
+        },
+        onExit: () => {
+          statePolarShowGraphs = false;
+          renderInternal();
+          if (onExit) onExit();
+        },
+      });
+      graphsMountPoint.appendChild(graphsWindow);
+    }
 
     // Mount Energy Panel if active
     const energyMountPoint = container.querySelector<HTMLDivElement>('#opt-polar-energy-mount-point');
@@ -315,10 +339,13 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
     });
 
     container.querySelector<HTMLButtonElement>('#btn-polar-view-charts')?.addEventListener('click', () => {
-      // Toggle charts or scroll
       statePolarShowGraphs = !statePolarShowGraphs;
-      const chartsSection = document.querySelector('#opt-charts-panel') || document.querySelector('.charts-grid-2col');
-      chartsSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      renderInternal();
+      if (statePolarShowGraphs) {
+        setTimeout(() => {
+          container.querySelector('#opt-polar-graphs-mount-point')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
     });
 
     container.querySelector<HTMLButtonElement>('#btn-polar-volver')?.addEventListener('click', () => {
