@@ -17,6 +17,13 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    proxy: {
+      '/api-pvgis': {
+        target: 'https://re.jrc.ec.europa.eu',
+        changeOrigin: true,
+        rewrite: (p: string) => p.replace(/^\/api-pvgis/, ''),
+      },
+    },
     watch: {
       ignored: ['**/release/**', '**/android/**', '**/.venv/**', '**/scratch/**'],
     },

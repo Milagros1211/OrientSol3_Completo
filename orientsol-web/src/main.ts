@@ -168,10 +168,30 @@ function createApp() {
 
   appTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
+      const targetTab = (tab.getAttribute('data-app-tab') || 'simulator') as typeof currentAppTab;
+
+      if (targetTab === 'satellite-apis') {
+        // Unify with primary simulator: switch to simulator view and activate Satellite APIs sub-tab
+        currentAppTab = 'simulator';
+        appTabs.forEach((t) => t.classList.remove('active'));
+        const simTabBtn = navBar.querySelector<HTMLButtonElement>('.dual-tab-btn[data-app-tab="simulator"]');
+        if (simTabBtn) simTabBtn.classList.add('active');
+
+        Object.entries(appViews).forEach(([key, viewEl]) => {
+          if (key === 'simulator') {
+            viewEl.classList.remove('hidden');
+          } else {
+            viewEl.classList.add('hidden');
+          }
+        });
+
+        window.dispatchEvent(new CustomEvent('orientsol:switch-climate-tab', { detail: 'api' }));
+        return;
+      }
+
       appTabs.forEach((t) => t.classList.remove('active'));
       tab.classList.add('active');
 
-      const targetTab = (tab.getAttribute('data-app-tab') || 'simulator') as typeof currentAppTab;
       currentAppTab = targetTab;
       Object.entries(appViews).forEach(([key, viewEl]) => {
         if (key === targetTab) {

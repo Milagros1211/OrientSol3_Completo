@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Network & Connectivity
   checkNetworkStatus: () => ipcRenderer.invoke('network:check-status'),
+  fetchExternalUrl: (url) => ipcRenderer.invoke('network:fetch-url', url),
   onNetworkStatusChanged: (callback) => {
     const subscription = (_event, isOnline) => callback(isOnline);
     ipcRenderer.on('network:status-changed', subscription);

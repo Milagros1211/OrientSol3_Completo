@@ -5872,3 +5872,61 @@ body.theme-dark .stat-frame-row strong {
   color: #ffffff;
 }
 
+/* =========================================================================
+   TAB 4: SATELLITE CLIMATE APIS STYLING (LIGHT & DARK MODES)
+   ========================================================================= */
+.climate-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.climate-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+[data-theme="light"] #tab-content-api .form-label,
+body.theme-light #tab-content-api .form-label {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+[data-theme="light"] #tab-content-api .form-select,
+[data-theme="light"] #tab-content-api .form-input,
+body.theme-light #tab-content-api .form-select,
+body.theme-light #tab-content-api .form-input {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1.5px solid #cbd5e1;
+}
+
+[data-theme="light"] #tab-content-api .form-select:focus,
+[data-theme="light"] #tab-content-api .form-input:focus,
+body.theme-light #tab-content-api .form-select:focus,
+body.theme-light #tab-content-api .form-input:focus {
+  border-color: #0284c7;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+[data-theme="dark"] #tab-content-api .form-label,
+body.theme-dark #tab-content-api .form-label {
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+[data-theme="dark"] #tab-content-api .form-select,
+[data-theme="dark"] #tab-content-api .form-input,
+body.theme-dark #tab-content-api .form-select,
+body.theme-dark #tab-content-api .form-input {
+  background: rgba(15, 23, 42, 0.85);
+  color: #f8fafc;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+}
+
+

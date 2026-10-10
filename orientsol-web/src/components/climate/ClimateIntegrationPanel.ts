@@ -1,5 +1,5 @@
 import { fetchUnifiedClimateData } from '@/services/external';
-import { climateDatabaseService } from '@/services/supabase';
+import { climateDatabaseService, formatEmplacementNameWithSuffix } from '@/services/supabase';
 import {
   executeSolarSimulationFromClimateData,
   type SolarBridgeSimulationResult,
@@ -208,7 +208,13 @@ export function renderClimateIntegrationPanel(): HTMLElement {
     saveBtn.disabled = true;
 
     try {
-      const reg = await climateDatabaseService.registerEmplacement(activeClimateData);
+      const formattedName = formatEmplacementNameWithSuffix(activeClimateData.locationName, activeClimateData.source);
+      const recordToSave: ClimateDataRecord = {
+        ...activeClimateData,
+        locationName: formattedName,
+      };
+
+      const reg = await climateDatabaseService.registerEmplacement(recordToSave);
       if (reg.isDuplicate) {
         setStatus(
           isEn
@@ -217,7 +223,13 @@ export function renderClimateIntegrationPanel(): HTMLElement {
           'warning'
         );
       } else {
-        setStatus(reg.message, 'success');
+        renderClimateDataPreview(recordToSave);
+        setStatus(
+          isEn
+            ? `✓ Emplacement "${formattedName}" registered successfully in Supabase (12 monthly records).`
+            : `✓ Emplazamiento "${formattedName}" guardado con éxito en Supabase (12 registros mensuales).`,
+          'success'
+        );
       }
     } catch (err: any) {
       setStatus(`Error al guardar en Supabase: ${err.message}`, 'error');
