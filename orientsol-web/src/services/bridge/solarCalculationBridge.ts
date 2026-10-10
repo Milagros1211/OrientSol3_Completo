@@ -102,6 +102,12 @@ export interface SolarBridgeSimulationResult {
       gainOverHorizontalPct: number;
       gainOverOptimalAnnualPct: number;
       monthlyDailyKwh: number[];
+      components?: {
+        global: number[];
+        beam: number[];
+        diffuse: number[];
+        albedo: number[];
+      };
     };
     azimuthalAxis: {
       annualMeanDailyKwh: number;
@@ -109,6 +115,12 @@ export interface SolarBridgeSimulationResult {
       gainOverHorizontalPct: number;
       gainOverOptimalAnnualPct: number;
       monthlyDailyKwh: number[];
+      components?: {
+        global: number[];
+        beam: number[];
+        diffuse: number[];
+        albedo: number[];
+      };
     };
     polarAxis: {
       annualMeanDailyKwh: number;
@@ -116,6 +128,12 @@ export interface SolarBridgeSimulationResult {
       gainOverHorizontalPct: number;
       gainOverOptimalAnnualPct: number;
       monthlyDailyKwh: number[];
+      components?: {
+        global: number[];
+        beam: number[];
+        diffuse: number[];
+        albedo: number[];
+      };
     };
     dualAxis: {
       annualMeanDailyKwh: number;
@@ -123,6 +141,12 @@ export interface SolarBridgeSimulationResult {
       gainOverHorizontalPct: number;
       gainOverOptimalAnnualPct: number;
       monthlyDailyKwh: number[];
+      components?: {
+        global: number[];
+        beam: number[];
+        diffuse: number[];
+        albedo: number[];
+      };
     };
   };
 
@@ -461,6 +485,12 @@ output_data = {
             "gainOverHorizontalPct": round(((res_horiz_track["media_gd"] - mean_g0) / mean_g0) * 100.0, 2),
             "gainOverOptimalAnnualPct": round(((res_horiz_track["media_gd"] - mean_opt) / mean_opt) * 100.0, 2),
             "monthlyDailyKwh": [round(float(v), 3) for v in res_horiz_track["gd_daily"]],
+            "components": {
+                "global": [round(float(v), 3) for v in res_horiz_track["gd_daily"]],
+                "beam": [round(float(v), 3) for v in res_horiz_track["bd_daily"]],
+                "diffuse": [round(float(v), 3) for v in res_horiz_track["dd_daily"]],
+                "albedo": [round(float(v), 3) for v in res_horiz_track["rd_daily"]],
+            },
         },
         "azimuthalAxis": {
             "annualMeanDailyKwh": round(float(res_azim_track["media_gd"]), 3),
@@ -468,6 +498,12 @@ output_data = {
             "gainOverHorizontalPct": round(((res_azim_track["media_gd"] - mean_g0) / mean_g0) * 100.0, 2),
             "gainOverOptimalAnnualPct": round(((res_azim_track["media_gd"] - mean_opt) / mean_opt) * 100.0, 2),
             "monthlyDailyKwh": [round(float(v), 3) for v in res_azim_track["gd_daily"]],
+            "components": {
+                "global": [round(float(v), 3) for v in res_azim_track["gd_daily"]],
+                "beam": [round(float(v), 3) for v in res_azim_track["bd_daily"]],
+                "diffuse": [round(float(v), 3) for v in res_azim_track["dd_daily"]],
+                "albedo": [round(float(v), 3) for v in res_azim_track["rd_daily"]],
+            },
         },
         "polarAxis": {
             "annualMeanDailyKwh": round(float(res_polar_track["media_gd"]), 3),
@@ -475,6 +511,12 @@ output_data = {
             "gainOverHorizontalPct": round(((res_polar_track["media_gd"] - mean_g0) / mean_g0) * 100.0, 2),
             "gainOverOptimalAnnualPct": round(((res_polar_track["media_gd"] - mean_opt) / mean_opt) * 100.0, 2),
             "monthlyDailyKwh": [round(float(v), 3) for v in res_polar_track["gd_daily"]],
+            "components": {
+                "global": [round(float(v), 3) for v in res_polar_track["gd_daily"]],
+                "beam": [round(float(v), 3) for v in res_polar_track["bd_daily"]],
+                "diffuse": [round(float(v), 3) for v in res_polar_track["dd_daily"]],
+                "albedo": [round(float(v), 3) for v in res_polar_track["rd_daily"]],
+            },
         },
         "dualAxis": {
             "annualMeanDailyKwh": round(float(res_2axis["media_gd"]), 3),
@@ -482,6 +524,12 @@ output_data = {
             "gainOverHorizontalPct": round(((res_2axis["media_gd"] - mean_g0) / mean_g0) * 100.0, 2),
             "gainOverOptimalAnnualPct": round(((res_2axis["media_gd"] - mean_opt) / mean_opt) * 100.0, 2),
             "monthlyDailyKwh": [round(float(v), 3) for v in res_2axis["gd_daily"]],
+            "components": {
+                "global": [round(float(v), 3) for v in res_2axis["gd_daily"]],
+                "beam": [round(float(v), 3) for v in res_2axis["bd_daily"]],
+                "diffuse": [round(float(v), 3) for v in res_2axis["dd_daily"]],
+                "albedo": [round(float(v), 3) for v in res_2axis["rd_daily"]],
+            },
         },
     },
     "energyYield": {
