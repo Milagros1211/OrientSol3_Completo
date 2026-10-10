@@ -1,4 +1,5 @@
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
+import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslations';
 
 const MONTH_NAMES_ES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const MONTH_NAMES_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -103,8 +104,8 @@ export function exportToCSV(
   for (const surf of res.surfaceComparison) {
     lines.push(
       [
-        surf.name,
-        surf.category,
+        getSurfaceDisplayName(surf, isEn),
+        getCategoryBadge(surf.category, isEn),
         surf.meanDailyKwhM2.toFixed(3),
         Math.round(surf.annualRadiationKwhM2),
         surf.gainOverHorizontalPct.toFixed(2),
@@ -181,7 +182,7 @@ ${isEn ? 'PV Peak Power' : 'Potencia Pico'}: ${peakKw.toFixed(2)} kWp | PR: ${(p
    • ${isEn ? 'Operating Cell Temp' : 'Temp. Célula Operativa'}: ${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)} °C (Máx: ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)} °C)
 
 3. ${isEn ? 'SURFACES BENCHMARK RANKING' : 'RANKING DE RENDIMIENTO DE SUPERFICIES'}:
-${res.surfaceComparison.map((s, idx) => `   ${idx + 1}. ${s.name}: ${s.meanDailyKwhM2.toFixed(3)} kWh/m²/d (${Math.round(s.annualRadiationKwhM2)} kWh/m²) | +${s.gainOverHorizontalPct.toFixed(1)}% | Prod: ${Math.round(s.energyProducedOsterwaldKwhYear).toLocaleString()} kWh/año`).join('\n')}
+${res.surfaceComparison.map((s, idx) => `   ${idx + 1}. ${getSurfaceDisplayName(s, isEn)}: ${s.meanDailyKwhM2.toFixed(3)} kWh/m²/d (${Math.round(s.annualRadiationKwhM2)} kWh/m²) | +${s.gainOverHorizontalPct.toFixed(1)}% | Prod: ${Math.round(s.energyProducedOsterwaldKwhYear).toLocaleString()} kWh/${isEn ? 'yr' : 'año'}`).join('\n')}
 
 ======================================================================
 OrientSol 3.0 Web • ${new Date().toLocaleDateString()}

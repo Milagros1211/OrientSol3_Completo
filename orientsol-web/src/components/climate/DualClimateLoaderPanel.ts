@@ -18,6 +18,7 @@ import {
   copyReportToClipboard,
 } from '@/components/export/reportExporter';
 import { pyodideService } from '@/services/pyodide';
+import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslations';
 
 // Module-level caches to preserve state across language toggles (ES <-> EN)
 let cachedLastSimulationResult: SolarBridgeSimulationResult | null = null;
@@ -106,27 +107,39 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       </button>
     </div>
 
-    <!-- TAB 1: HISTORICAL DATABASE -->
+    <!-- TAB 1: HISTORICAL DATABASE & SUPABASE SEARCH -->
     <div id="tab-content-historical" class="dual-tab-content ${cachedActiveTab === 'historical' ? '' : 'hidden'}">
       <div class="historical-search-row">
-        <div class="form-group flex-1">
-          <label for="hist-select-station" class="form-label">${t.hybridLoader.historicalLabel}</label>
-          <select id="hist-select-station" class="form-select">
-            ${hybridClimateManager
-              .getHistoricalLocations()
-              .map(
-                (loc) =>
-                  `<option value="${loc.id}" ${currentActiveRecordInit.id === loc.id ? 'selected' : ''}>
-                    ${loc.locationName} (${loc.country}) — Lat: ${loc.latitude.toFixed(2)}°, Alt: ${loc.elevationM ?? 'N/D'} m
-                  </option>`
-              )
-              .join('')}
-          </select>
+        <div class="form-group flex-1" style="position: relative;">
+          <label for="hist-search-input" class="form-label">
+            ${t.hybridLoader.historicalLabel}
+            <span class="search-hint-sub">${isEn ? '(Search case-insensitive: Supabase & Cache)' : '(Búsqueda case-insensitive: Supabase & Caché)'}</span>
+          </label>
+          <div class="search-input-box">
+            <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              type="text"
+              id="hist-search-input"
+              class="form-input search-text-input"
+              value="${currentActiveRecordInit.locationName}"
+              placeholder="${isEn ? 'Search location (Spanish/English letters only)...' : 'Buscar emplazamiento (solo letras castellano/inglés)...'}"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+          <!-- Live Suggestions / Similarities Dropdown -->
+          <div id="hist-suggestions-dropdown" class="suggestions-dropdown hidden" role="listbox"></div>
         </div>
         <button id="btn-use-historical" class="btn btn-primary" style="align-self: flex-end;">
           <span>${t.hybridLoader.selectStation}</span>
         </button>
       </div>
+
+      <!-- NOT FOUND ALERT BANNER -->
+      <div id="hist-not-found-banner" class="search-not-found-banner hidden"></div>
     </div>
 
     <!-- TAB 2: MANUAL FORM -->
@@ -225,7 +238,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             <input type="file" id="climate-file-input" accept=".csv,.json,.txt" style="display: none;" />
           </label>
           <button id="btn-download-csv-template" class="btn btn-secondary">${t.hybridLoader.sampleCsvBtn}</button>
+          <button id="btn-download-csv-multi-template" class="btn btn-secondary">${isEn ? 'Sample Batch CSV (Multi)' : 'Plantilla CSV (Lote Multi)'}</button>
           <button id="btn-download-json-template" class="btn btn-secondary">${t.hybridLoader.sampleJsonBtn}</button>
+          <button id="btn-download-json-multi-template" class="btn btn-secondary">${isEn ? 'Sample Batch JSON (Multi)' : 'Plantilla JSON (Lote Multi)'}</button>
         </div>
       </div>
     </div>
@@ -270,7 +285,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     upload: container.querySelector('#tab-content-upload') as HTMLElement,
   };
 
-  const histSelect = container.querySelector('#hist-select-station') as HTMLSelectElement;
+  const histSearchInput = container.querySelector('#hist-search-input') as HTMLInputElement;
+  const histSuggestionsDropdown = container.querySelector('#hist-suggestions-dropdown') as HTMLDivElement;
+  const histNotFoundBanner = container.querySelector('#hist-not-found-banner') as HTMLDivElement;
   const useHistBtn = container.querySelector('#btn-use-historical') as HTMLButtonElement;
 
   const manualName = container.querySelector('#manual-name') as HTMLInputElement;
@@ -285,7 +302,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   const dropzone = container.querySelector('#file-dropzone') as HTMLElement;
   const fileInput = container.querySelector('#climate-file-input') as HTMLInputElement;
   const downloadCsvBtn = container.querySelector('#btn-download-csv-template') as HTMLButtonElement;
+  const downloadCsvMultiBtn = container.querySelector('#btn-download-csv-multi-template') as HTMLButtonElement;
   const downloadJsonBtn = container.querySelector('#btn-download-json-template') as HTMLButtonElement;
+  const downloadJsonMultiBtn = container.querySelector('#btn-download-json-multi-template') as HTMLButtonElement;
 
   const activeCard = container.querySelector('#active-dataset-card') as HTMLElement;
   const simBtn = container.querySelector('#btn-run-hybrid-simulation') as HTMLButtonElement;
@@ -363,13 +382,219 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     `;
   }
 
-  // 1. Historical DB Actions
-  useHistBtn.addEventListener('click', () => {
-    const locId = histSelect.value;
-    const rec = hybridClimateManager.getHistoricalLocationById(locId);
-    if (rec) {
-      renderActiveRecord(rec);
-      setStatus(isEn ? `Loaded historical station: ${rec.locationName} (${rec.country}).` : `Cargada estación histórica: ${rec.locationName} (${rec.country}).`, 'success');
+  // 1. Historical & Supabase Station Live Similarity Search Actions
+  let allSearchableStations: ClimateDataRecord[] = [];
+
+  const updateSearchableStations = async () => {
+    const historicalList = hybridClimateManager.getHistoricalLocations();
+    let supabaseList: ClimateDataRecord[] = [];
+    try {
+      supabaseList = await climateDatabaseService.getClimateDatasets();
+    } catch (e) {
+      console.warn('[OrientSol] Could not fetch Supabase datasets for search:', e);
+    }
+
+    const seenNames = new Set<string>();
+    const merged: ClimateDataRecord[] = [];
+
+    // Prioritize Supabase records
+    for (const rec of supabaseList) {
+      const key = rec.locationName.trim().toLowerCase();
+      if (!seenNames.has(key)) {
+        seenNames.add(key);
+        merged.push(rec);
+      }
+    }
+
+    // Add historical database records
+    for (const rec of historicalList) {
+      const key = rec.locationName.trim().toLowerCase();
+      if (!seenNames.has(key)) {
+        seenNames.add(key);
+        merged.push(rec);
+      }
+    }
+
+    allSearchableStations = merged;
+  };
+
+  // Pre-load searchable stations
+  updateSearchableStations();
+
+  function showNotFoundBanner(queryText: string) {
+    histSuggestionsDropdown.classList.add('hidden');
+    histNotFoundBanner.innerHTML = `
+      <div class="search-alert-box alert-warning-box">
+        <div class="alert-icon-wrap">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f59e0b" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <div class="alert-content-wrap">
+          <p class="alert-text-msg">
+            ${isEn
+              ? `The location "<strong>${queryText}</strong>" is not saved in cache or in the database. If you wish, please fill in the manual entry.`
+              : `El emplazamiento "<strong>${queryText}</strong>" no está guardado ni en caché ni en la base de datos. Si deseas, llena la introducción manual.`}
+          </p>
+          <button type="button" id="btn-goto-manual-tab" class="btn btn-secondary btn-sm" style="margin-top: 0.5rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <span>✍️ ${isEn ? 'Go to Manual Entry (Tab 2)' : 'Llenar Introducción Manual (Pestaña 2)'}</span>
+          </button>
+        </div>
+      </div>
+    `;
+    histNotFoundBanner.classList.remove('hidden');
+
+    const gotoBtn = histNotFoundBanner.querySelector<HTMLButtonElement>('#btn-goto-manual-tab');
+    gotoBtn?.addEventListener('click', () => {
+      const manualTabBtn = container.querySelector<HTMLButtonElement>('.dual-tab-btn[data-tab="manual"]');
+      manualTabBtn?.click();
+      if (manualName && queryText) {
+        manualName.value = queryText;
+      }
+    });
+  }
+
+  function hideNotFoundBanner() {
+    histNotFoundBanner.classList.add('hidden');
+    histNotFoundBanner.innerHTML = '';
+  }
+
+  function selectLocation(loc: ClimateDataRecord) {
+    histSearchInput.value = loc.locationName;
+    histSuggestionsDropdown.classList.add('hidden');
+    hideNotFoundBanner();
+    renderActiveRecord(loc);
+    const sourceTag = loc.source === 'supabase' || (Boolean(loc.id) && loc.id!.startsWith('supabase-')) ? 'SUPABASE' : 'ORIENTSOL 3.0';
+    setStatus(
+      isEn
+        ? `Loaded station: ${loc.locationName} (${loc.country}) [${sourceTag}].`
+        : `Cargada estación: ${loc.locationName} (${loc.country}) [${sourceTag}].`,
+      'success'
+    );
+  }
+
+  function performSearch(queryText: string) {
+    const q = queryText.trim().toLowerCase();
+    if (!q) {
+      histSuggestionsDropdown.classList.add('hidden');
+      hideNotFoundBanner();
+      return;
+    }
+
+    // Filter case-insensitive similarity
+    const matches = allSearchableStations.filter((s) => {
+      const name = s.locationName.toLowerCase();
+      const country = (s.country || '').toLowerCase();
+      return name.includes(q) || country.includes(q);
+    });
+
+    if (matches.length > 0) {
+      hideNotFoundBanner();
+      histSuggestionsDropdown.innerHTML = `
+        <div class="suggestions-header">
+          <span>${isEn ? 'Similarities Found' : 'Similitudes Halladas'}: <strong>${matches.length}</strong></span>
+          <span class="suggestions-hint">${isEn ? 'Click to select' : 'Haz clic para seleccionar'}</span>
+        </div>
+        <div class="suggestions-list">
+          ${matches
+            .map((m) => {
+              const isSupabase = m.source === 'supabase' || (Boolean(m.id) && m.id!.startsWith('supabase-'));
+              const badgeClass = isSupabase ? 'badge-supabase' : 'badge-historical';
+              const badgeText = isSupabase ? 'SUPABASE' : 'ORIENTSOL 3.0';
+              const annualG = m.monthlyGdm0.reduce((a, b) => a + b, 0) / 12;
+              return `
+                <div class="suggestion-item" data-id="${m.id || m.locationName}" role="option">
+                  <div class="suggestion-main">
+                    <span class="suggestion-name"><strong>${m.locationName}</strong></span>
+                    <span class="suggestion-country">(${m.country})</span>
+                    <span class="suggestion-pill ${badgeClass}">${badgeText}</span>
+                  </div>
+                  <div class="suggestion-meta">
+                    <span>Lat: ${m.latitude.toFixed(2)}°</span>
+                    <span>Lon: ${m.longitude.toFixed(2)}°</span>
+                    <span>Alt: ${m.elevationM != null ? `${m.elevationM} m` : 'N/D'}</span>
+                    <span>G<sub>dm</sub>(0): ${annualG.toFixed(2)} kWh/m²/d</span>
+                  </div>
+                </div>
+              `;
+            })
+            .join('')}
+        </div>
+      `;
+      histSuggestionsDropdown.classList.remove('hidden');
+
+      histSuggestionsDropdown.querySelectorAll<HTMLElement>('.suggestion-item').forEach((item) => {
+        item.addEventListener('click', () => {
+          const id = item.dataset.id;
+          const found = allSearchableStations.find((s) => s.id === id || s.locationName === id);
+          if (found) {
+            selectLocation(found);
+          }
+        });
+      });
+    } else {
+      // No similarities found!
+      showNotFoundBanner(queryText.trim());
+    }
+  }
+
+  // Input event: case-insensitive only letters in Spanish/English
+  histSearchInput.addEventListener('input', (e) => {
+    const inp = e.target as HTMLInputElement;
+    const raw = inp.value;
+    // Allow only Spanish/English letters (a-z, A-Z, áéíóúüñ ÁÉÍÓÚÜÑ) and whitespace
+    const sanitized = raw.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '');
+    if (sanitized !== raw) {
+      inp.value = sanitized;
+    }
+    performSearch(sanitized);
+  });
+
+  const handleSaveOrSelectAction = () => {
+    const raw = histSearchInput.value.trim();
+    const q = raw.toLowerCase();
+    if (!q) {
+      return;
+    }
+
+    // Strict matching check
+    const exact = allSearchableStations.find((s) => s.locationName.trim().toLowerCase() === q);
+    const partial = !exact && allSearchableStations.find((s) => s.locationName.trim().toLowerCase().startsWith(q));
+    const toSelect = exact || partial;
+
+    if (!toSelect) {
+      // EN CASO DE NO HALLARLO:
+      // ASI PONGAS ENTER PARA GUARDAR NO DEBE DEJARTE HACER ABSOLUTAMENTE NADA.
+      // SOLO MOSTRARTE EL MENSAJE DE QUE EL EMPLAZAMIENTO NO ESTA GUARDADO NI EN CACHE NI EN LA BASE DE DATOS Y QUE SI DESEAS LLENA LA INTRODUCCION MANUAL.
+      showNotFoundBanner(raw);
+      histSearchInput.classList.add('input-error-shake');
+      setTimeout(() => histSearchInput.classList.remove('input-error-shake'), 600);
+      return;
+    }
+
+    // Found: load and select
+    selectLocation(toSelect);
+  };
+
+  histSearchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+      handleSaveOrSelectAction();
+    }
+  });
+
+  useHistBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    handleSaveOrSelectAction();
+  });
+
+  // Close suggestions if user clicks outside
+  document.addEventListener('click', (e) => {
+    if (!container.contains(e.target as Node)) {
+      histSuggestionsDropdown.classList.add('hidden');
     }
   });
 
@@ -449,23 +674,44 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     hybridClimateManager
       .parseUploadedClimateFile(file)
-      .then(async (record: ClimateDataRecord) => {
+      .then(async ({ record, records }) => {
         renderActiveRecord(record);
 
-        // Register in Supabase (Online auto-insert or Offline queue with >=90% duplicate detection)
-        const reg = await climateDatabaseService.registerEmplacement(record);
-        if (reg.isDuplicate) {
+        const listToRegister = records && records.length > 0 ? records : [record];
+        let dupsCount = 0;
+        let newCount = 0;
+
+        for (const item of listToRegister) {
+          const reg = await climateDatabaseService.registerEmplacement(item);
+          if (reg.isDuplicate) dupsCount++;
+          else newCount++;
+        }
+
+        // Refresh searchable stations so imported locations are immediately searchable
+        updateSearchableStations();
+
+        if (listToRegister.length > 1) {
           setStatus(
             isEn
-              ? `⚠️ File loaded, but emplacement was already registered (${reg.similarityPct}% data match with "${reg.matchedRecord?.locationName}").`
-              : `⚠️ Archivo cargado, pero el emplazamiento ya estaba registrado (${reg.similarityPct}% de coincidencia con "${reg.matchedRecord?.locationName}").`,
-            'warning'
+              ? `Batch file loaded: ${listToRegister.length} locations imported (${newCount} new, ${dupsCount} already registered).`
+              : `Archivo de lote cargado: ${listToRegister.length} emplazamientos importados (${newCount} nuevos, ${dupsCount} ya registrados).`,
+            newCount > 0 ? 'success' : 'warning'
           );
         } else {
-          const uploadPermissionStatus = reg.isOffline
-            ? (isEn ? '🔴 Online upload NOT permitted (Offline Mode) → Saved in local cache.' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Guardado en caché local.')
-            : (isEn ? '🟢 Online upload PERMITTED → Emplacement inserted into datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado en datos_mensuales.');
-          setStatus(`${uploadPermissionStatus} ${reg.message}`, 'success');
+          const reg = await climateDatabaseService.registerEmplacement(record);
+          if (reg.isDuplicate) {
+            setStatus(
+              isEn
+                ? `⚠️ File loaded, but emplacement was already registered (${reg.similarityPct}% data match with "${reg.matchedRecord?.locationName}").`
+                : `⚠️ Archivo cargado, pero el emplazamiento ya estaba registrado (${reg.similarityPct}% de coincidencia con "${reg.matchedRecord?.locationName}").`,
+              'warning'
+            );
+          } else {
+            const uploadPermissionStatus = reg.isOffline
+              ? (isEn ? '🔴 Online upload NOT permitted (Offline Mode) → Saved in local cache.' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Guardado en caché local.')
+              : (isEn ? '🟢 Online upload PERMITTED → Emplacement inserted into datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado en datos_mensuales.');
+            setStatus(`${uploadPermissionStatus} ${reg.message}`, 'success');
+          }
         }
       })
       .catch((err: any) => {
@@ -499,23 +745,45 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   });
 
   downloadCsvBtn.addEventListener('click', () => {
-    const csv = generateSampleCSV();
+    const csv = generateSampleCSV(false);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'plantilla_climatica_orientsol.csv';
+    a.download = 'plantilla_climatica_individual_orientsol.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  downloadCsvMultiBtn?.addEventListener('click', () => {
+    const csv = generateSampleCSV(true);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'plantilla_lote_multi_emplazamientos.csv';
     a.click();
     URL.revokeObjectURL(url);
   });
 
   downloadJsonBtn.addEventListener('click', () => {
-    const json = generateSampleJSON();
+    const json = generateSampleJSON(false);
     const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'plantilla_climatica_orientsol.json';
+    a.download = 'plantilla_climatica_individual_orientsol.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  downloadJsonMultiBtn?.addEventListener('click', () => {
+    const json = generateSampleJSON(true);
+    const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'plantilla_lote_multi_emplazamientos.json';
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -882,8 +1150,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
                 .map(
                   (surf) => `
                 <tr class="${surf.key === 'tracking_2axis_dual' ? 'highlight-row' : ''}">
-                  <td><strong>${surf.name}</strong></td>
-                  <td><span class="category-badge ${getBadgeClass(surf.category)}">${surf.category}</span></td>
+                  <td><strong>${getSurfaceDisplayName(surf, isEn)}</strong></td>
+                  <td><span class="category-badge ${getBadgeClass(surf.category)}">${getCategoryBadge(surf.category, isEn)}</span></td>
                   <td>${(surf.meanDailyKwhM2 ?? 0).toFixed(3)} kWh/m²/d</td>
                   <td>${Math.round(surf.annualRadiationKwhM2 ?? 0).toLocaleString()} kWh/m²</td>
                   <td class="${(surf.gainOverHorizontalPct ?? 0) > 0 ? 'text-gain' : ''}">

@@ -2744,4 +2744,208 @@ body {
   }
 }
 
+/* ==========================================================================
+   Historical Station & Supabase Live Similarity Search Styles
+   ========================================================================== */
+
+.search-hint-sub {
+  font-size: 0.78rem;
+  color: var(--text-dim, #94a3b8);
+  font-weight: 400;
+  margin-left: 0.4rem;
+}
+
+.search-input-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-input-box .search-icon {
+  position: absolute;
+  left: 0.9rem;
+  color: var(--solar-amber, #f59e0b);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.search-text-input {
+  padding-left: 2.5rem !important;
+  font-size: 0.95rem;
+  background: rgba(15, 23, 42, 0.75) !important;
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12)) !important;
+  transition: all var(--transition-normal, 0.25s ease);
+}
+
+.search-text-input:focus {
+  border-color: var(--solar-amber, #f59e0b) !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.25) !important;
+  background: rgba(15, 23, 42, 0.95) !important;
+}
+
+.input-error-shake {
+  animation: shakeInput 0.45s ease-in-out;
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.4) !important;
+}
+
+@keyframes shakeInput {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.suggestions-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  background: #111827;
+  border: 1px solid var(--border-medium, rgba(245, 158, 11, 0.3));
+  border-radius: var(--radius-md, 10px);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.65), 0 0 15px rgba(245, 158, 11, 0.15);
+  max-height: 310px;
+  overflow-y: auto;
+  backdrop-filter: blur(12px);
+}
+
+.suggestions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.78rem;
+  color: var(--text-dim, #94a3b8);
+}
+
+.suggestions-hint {
+  font-size: 0.72rem;
+  color: var(--solar-amber, #f59e0b);
+}
+
+.suggestions-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.suggestion-item {
+  padding: 0.7rem 0.9rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.18s ease;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.suggestion-main {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.suggestion-name {
+  color: #f3f4f6;
+  font-size: 0.92rem;
+}
+
+.suggestion-country {
+  color: #9ca3af;
+  font-size: 0.82rem;
+}
+
+.suggestion-pill {
+  margin-left: auto;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 9999px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.suggestion-pill.badge-supabase {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.45);
+}
+
+.suggestion-pill.badge-historical {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.45);
+}
+
+.suggestion-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.76rem;
+  color: #9ca3af;
+  font-family: monospace;
+}
+
+/* Alert box when station is not found */
+.search-not-found-banner {
+  margin-top: 0.85rem;
+}
+
+.search-alert-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius-md, 10px);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  animation: fadeInDown 0.3s ease;
+}
+
+.alert-warning-box {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.alert-icon-wrap {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.alert-content-wrap {
+  flex: 1;
+}
+
+.alert-text-msg {
+  color: #fef3c7;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.alert-text-msg strong {
+  color: #fbbf24;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
 
