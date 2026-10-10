@@ -19,7 +19,8 @@
     "pack:win": "npm run build && electron-builder --dir",
     "cap:sync": "npm run build && cap sync android",
     "cap:open:android": "cap open android",
-    "build:apk": "npm run build && cap sync android && node scripts/build-android-apk.mjs"
+    "build:apk": "npm run build && cap sync android && node scripts/build-android-apk.mjs",
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "devDependencies": {
     "@capacitor/android": "^8.5.2",
@@ -28,6 +29,7 @@
     "@types/node": "^26.6.4",
     "electron": "^44.5.1",
     "electron-builder": "^26.15.3",
+    "gh-pages": "^6.3.0",
     "typescript": "~6.0.2",
     "vite": "^8.3.0"
   },

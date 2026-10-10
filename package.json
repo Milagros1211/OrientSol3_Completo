@@ -10,6 +10,7 @@
     "app:desktop": "npm run --prefix orientsol-web app:desktop",
     "app:dev": "npm run --prefix orientsol-web app:dev",
     "electron:start": "npm run --prefix orientsol-web electron:start",
-    "electron:test": "npm run --prefix orientsol-web electron:test"
+    "electron:test": "npm run --prefix orientsol-web electron:test",
+    "deploy": "npm run --prefix orientsol-web deploy"
   }
 }
