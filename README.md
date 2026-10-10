@@ -8,7 +8,7 @@
 
 ---
 
-## 📌 Contexto Académico
+## Contexto Académico
 
 - **Institución:** Universidad de Jaén (UJA) — Escuela Politécnica Superior.
 - **Programa:** Máster Universitario en Energías Renovables.
@@ -18,7 +18,7 @@
 
 ---
 
-## ☀️ ¿Qué es OrientSol 3.0?
+## ¿Qué es OrientSol 3.0?
 
 **OrientSol 3.0** es la evolución y renovación integral del aplicativo original desarrollado en **MATLAB/Octave (`.m` y `.fig`)**. Ha sido transformado en una plataforma de software moderna, abierta y multiplataforma basada en tecnologías web de última generación:
 
@@ -122,7 +122,6 @@ npm run cap:open:android
 │   ├── android/                 # Proyecto nativo para Android (Capacitor)
 │   ├── public/                  # Assets estáticos, WebAssembly Pyodide y NumPy wheel
 │   └── package.json             # Scripts y dependencias del frontend
-├── [Master EERR] FormatoPropuestaTFMKarinaBaldeon.pdf  # Propuesta oficial de TFM
 ├── *.m / *.fig / *.rpt          # Código fuente histórico original de OrientSol en MATLAB
 └── package.json                 # Scripts de orquestación raíz
 ```
