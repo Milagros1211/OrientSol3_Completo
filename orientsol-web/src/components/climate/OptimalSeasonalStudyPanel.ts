@@ -8,6 +8,7 @@ import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
 } from '@/components/export/pdfReportGenerator';
+import { renderEnergyCalculationPanel } from '@/components/energy/EnergyCalculationPanel';
 import * as XLSX from 'xlsx';
 
 export type SeasonalRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
@@ -20,6 +21,7 @@ interface OptimalSeasonalStudyProps {
 
 // Module-level component state
 let stateSeasonalComponent: SeasonalRadiationComponent = 'global';
+let stateSeasonalShowEnergy: boolean = false;
 
 const MONTH_NAMES_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -829,11 +831,11 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
           </div>
 
           <div class="footer-btn-right-group">
-            <button id="btn-seasonal-goto-energy" class="btn-study-foot" type="button">
+            <button id="btn-seasonal-goto-energy" class="btn-study-foot ${stateSeasonalShowEnergy ? 'active' : ''}" type="button">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
               </svg>
-              <span>${t.results.energyCalcBtn}</span>
+              <span>${stateSeasonalShowEnergy ? (isEn ? 'Hide Energy Calculation' : 'Ocultar cálculo de energía') : t.results.energyCalcBtn}</span>
             </button>
 
             <button id="btn-seasonal-export-excel" class="btn-study-foot btn-excel" type="button">
@@ -856,8 +858,29 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
             </button>
           </div>
         </div>
+
+        <!-- Mount point for Dedicated MATLAB Energy Calculation Window (Imagen 1 / Energia_Osterwald.m) -->
+        <div id="opt-seasonal-energy-mount-point"></div>
       </div>
     `;
+
+    // Mount Energy Panel if active
+    const energyMountPoint = container.querySelector<HTMLDivElement>('#opt-seasonal-energy-mount-point');
+    if (energyMountPoint && stateSeasonalShowEnergy) {
+      energyMountPoint.innerHTML = '';
+      const energyWindow = renderEnergyCalculationPanel({
+        simulationResult: res,
+        locationName,
+        latitude,
+        studyType: 'seasonal',
+        onClose: () => {
+          stateSeasonalShowEnergy = false;
+          renderInternal();
+          container.querySelector('.opt-seasonal-footer-buttons')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        },
+      });
+      energyMountPoint.appendChild(energyWindow);
+    }
 
     // Event Listeners
     // 1. Component Selector Dropdown
@@ -895,12 +918,15 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
       }
     });
 
-    // 5. Scroll to Energy
+    // 5. Toggle Energy Calculation Panel (Imagen 1 / Energia_Osterwald.m)
     const btnEnergy = container.querySelector<HTMLButtonElement>('#btn-seasonal-goto-energy');
     btnEnergy?.addEventListener('click', () => {
-      const target = document.querySelector('.energy-models-grid');
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      stateSeasonalShowEnergy = !stateSeasonalShowEnergy;
+      renderInternal();
+      if (stateSeasonalShowEnergy) {
+        setTimeout(() => {
+          container.querySelector('#opt-seasonal-energy-mount-point')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
       }
     });
 

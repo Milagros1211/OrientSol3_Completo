@@ -4435,3 +4435,612 @@ body {
   border-color: #6ee7b7;
   color: #ffffff;
 }
+
+/* ==========================================================================
+   ENERGY CALCULATION WINDOW (OSTERWALD - IMAGEN 1)
+   ========================================================================== */
+.opt-energy-study-card {
+  margin-top: 1.5rem;
+  background: linear-gradient(180deg, #021a14 0%, #010f0c 100%);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 8px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.opt-energy-window-frame {
+  display: flex;
+  flex-direction: column;
+}
+
+.opt-energy-titlebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(90deg, #032b21 0%, #064e3b 100%);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.opt-energy-title-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ecfdf5;
+  letter-spacing: 0.02em;
+}
+
+.opt-energy-window-controls {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.opt-energy-win-btn {
+  background: transparent;
+  border: none;
+  color: #a7f3d0;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  line-height: 1;
+}
+
+.opt-energy-win-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.opt-energy-win-close:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.opt-energy-main-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .opt-energy-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Left: Inputs Panel */
+.energy-inputs-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.energy-inputs-card {
+  background: rgba(4, 38, 30, 0.6);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 6px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  height: 100%;
+}
+
+.energy-card-header-blue {
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  padding: 0.6rem 0.85rem;
+  border-radius: 4px;
+}
+
+.energy-card-header-blue h4 {
+  font-size: 0.95rem;
+  color: #38bdf8;
+  margin: 0;
+  font-weight: 700;
+  text-align: center;
+}
+
+.energy-field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.energy-field-label {
+  font-size: 0.88rem;
+  color: #d1fae5;
+  font-weight: 500;
+}
+
+.energy-field-input {
+  display: flex;
+  align-items: center;
+}
+
+.energy-input-box {
+  width: 110px;
+  padding: 0.45rem 0.65rem;
+  background: #01140f;
+  border: 1.5px solid rgba(16, 185, 129, 0.4);
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.energy-input-box:focus {
+  outline: none;
+  border-color: #34d399;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.25);
+}
+
+.energy-tech-group {
+  padding: 0.85rem;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px dashed rgba(245, 158, 11, 0.35);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.energy-tech-label {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.energy-inputs-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding-top: 0.5rem;
+}
+
+.energy-method-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #93c5fd;
+}
+
+.btn-energy-info-matlab {
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  padding: 0.3rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-energy-info-matlab:hover {
+  background: #0369a1;
+}
+
+.btn-energy-calculate-primary {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border: 1.5px solid #3b82f6;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-energy-calculate-primary:hover {
+  background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.55);
+}
+
+/* Right: Results Panel */
+.energy-results-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.energy-results-header-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  background: rgba(4, 38, 30, 0.7);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 6px;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.energy-header-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.energy-header-meta-row {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.energy-meta-item {
+  font-size: 0.88rem;
+}
+
+.energy-meta-item .meta-k {
+  color: #6ee7b7;
+  font-weight: 600;
+}
+
+.energy-meta-item .meta-v {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.energy-header-brand-col {
+  display: flex;
+  align-items: center;
+}
+
+.energy-matlab-brand {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ecfdf5;
+  letter-spacing: 0.05em;
+}
+
+.energy-matlab-brand strong {
+  color: #fbbf24;
+  margin-left: 0.25rem;
+}
+
+.energy-results-table-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.energy-table-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #a7f3d0;
+  margin: 0;
+}
+
+.opt-energy-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 6px;
+  background: #021a14;
+}
+
+.opt-energy-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: right;
+}
+
+.opt-energy-table th,
+.opt-energy-table td {
+  padding: 0.5rem 0.85rem;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.opt-energy-table th {
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.th-ener-month {
+  text-align: left;
+  background: #032b21;
+  color: #d1fae5;
+  width: 130px;
+}
+
+.th-ener-horiz {
+  background: #1e3a8a;
+  color: #bfdbfe;
+  text-align: right;
+}
+
+.th-ener-study {
+  background: #2563eb;
+  color: #ffffff;
+  text-align: right;
+}
+
+.th-ener-gain {
+  background: #7f1d1d;
+  color: #fecaca;
+  text-align: right;
+}
+
+.td-ener-month {
+  text-align: left;
+  color: #a7f3d0;
+  background: rgba(3, 43, 33, 0.4);
+}
+
+.td-ener-study-val {
+  color: #93c5fd;
+  font-weight: 600;
+}
+
+.td-ener-gain-val {
+  font-weight: 700;
+}
+
+.opt-energy-table tr:hover {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.energy-annual-row td {
+  background: #032b21;
+  font-weight: 800;
+  border-top: 2px solid #10b981;
+  color: #ecfdf5;
+  font-size: 0.95rem;
+}
+
+.td-ener-annual {
+  background: #01140f !important;
+  color: #34d399 !important;
+}
+
+.opt-energy-footer-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem 1.5rem 1.5rem;
+  border-top: 1px solid rgba(16, 185, 129, 0.2);
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   MATLAB GRAPHS WINDOW (IMÁGENES 2 A 4)
+   ========================================================================== */
+.opt-matlab-graphs-window {
+  margin-top: 1.5rem;
+  background: linear-gradient(180deg, #021a14 0%, #010f0c 100%);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 8px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.opt-matlab-graphs-frame {
+  display: flex;
+  flex-direction: column;
+}
+
+.opt-graphs-titlebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(90deg, #032b21 0%, #064e3b 100%);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.opt-graphs-header-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.5rem;
+  background: rgba(4, 38, 30, 0.5);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.opt-graphs-main-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+@media (max-width: 960px) {
+  .opt-graphs-main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.opt-graphs-plots-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.matlab-plot-card {
+  background: #01140f;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 6px;
+  padding: 1rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.matlab-plot-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+}
+
+.matlab-grid-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  color: #a7f3d0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.matlab-grid-toggle input[type="checkbox"] {
+  accent-color: #10b981;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+/* Right Side Column */
+.opt-graphs-side-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.matlab-comp-picker-box {
+  background: rgba(4, 38, 30, 0.6);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 6px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.matlab-picker-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #d1fae5;
+}
+
+.matlab-picker-select {
+  width: 100%;
+  padding: 0.55rem 0.85rem;
+  background: #01140f;
+  color: #ffffff;
+  border: 1.5px solid rgba(16, 185, 129, 0.4);
+  border-radius: 4px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.matlab-picker-select:focus {
+  outline: none;
+  border-color: #34d399;
+}
+
+.matlab-opt-angle-tag {
+  font-size: 0.95rem;
+  color: #6ee7b7;
+  padding-top: 0.25rem;
+}
+
+.matlab-opt-angle-tag strong {
+  color: #fbbf24;
+  font-size: 1.1rem;
+}
+
+.matlab-stat-boxes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.matlab-stat-frame {
+  background: rgba(4, 38, 30, 0.5);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.stat-frame-title {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.title-opt {
+  background: #064e3b;
+  color: #a7f3d0;
+  border-bottom: 1px solid #10b981;
+}
+
+.title-horiz {
+  background: #1e3a8a;
+  color: #bfdbfe;
+  border-bottom: 1px solid #3b82f6;
+}
+
+.title-gain {
+  background: #0f766e;
+  color: #ccfbf1;
+  border-bottom: 1px solid #14b8a6;
+}
+
+.stat-frame-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.stat-frame-table td {
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.12);
+}
+
+.stat-label-col {
+  color: #94a3b8;
+  font-weight: 500;
+  width: 50%;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.stat-val-col {
+  text-align: right;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.matlab-graphs-actions-row {
+  margin-top: auto;
+  display: flex;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
+.matlab-btn-default {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.55rem 1rem;
+  background: #064e3b;
+  color: #ecfdf5;
+  border: 1px solid #059669;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.matlab-btn-default:hover {
+  background: #047857;
+  border-color: #10b981;
+  color: #ffffff;
+}
+

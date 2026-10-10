@@ -2,9 +2,10 @@ import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import {
   renderInclinationEvolutionSvg,
-  renderMonthlyOptimumAndGainsSvg,
   saveSvgChartLocally,
 } from '@/components/charts/OptimalAnnualCharts';
+import { renderOptimalAnnualGraphsWindow } from '@/components/charts/OptimalAnnualGraphsWindow';
+import { renderEnergyCalculationPanel } from '@/components/energy/EnergyCalculationPanel';
 import * as XLSX from 'xlsx';
 import {
   showPdfGenerationNoticeModal,
@@ -26,9 +27,10 @@ let stateChartComponent: RadiationComponentType = 'all';
 let stateAngleX: number = 45;
 let stateComparisonMode: boolean = true; // Shows Angle X alongside optimal
 let stateShowAnglePicker: boolean = false;
-let stateShowCharts: boolean = true;
-let stateActiveChartTab: 'evolution' | 'monthly' = 'evolution';
+let stateShowCharts: boolean = false;
+let stateActiveChartTab: 'evolution' | 'monthly' = 'monthly';
 let stateGridEnabled: boolean = true;
+let stateShowEnergy: boolean = false;
 
 /**
  * Computes the 91-point annual daily mean radiation curve across tilt angles 0° to 90°.
@@ -510,34 +512,6 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
       albedo: getRadiationCurve91(res, 'albedo'),
     };
 
-    // All monthly components data for the monthly tab
-    const allMonthlyData = {
-      global: {
-        rad0: getMonthlyRadiationForAngle(res, 'global', 0),
-        radOpt: getMonthlyRadiationForAngle(res, 'global', optAngle),
-        radX: getMonthlyRadiationForAngle(res, 'global', stateAngleX),
-        gainsPct: calculateGains(getMonthlyRadiationForAngle(res, 'global', optAngle), getMonthlyRadiationForAngle(res, 'global', 0)).pcts,
-      },
-      beam: {
-        rad0: getMonthlyRadiationForAngle(res, 'beam', 0),
-        radOpt: getMonthlyRadiationForAngle(res, 'beam', optAngle),
-        radX: getMonthlyRadiationForAngle(res, 'beam', stateAngleX),
-        gainsPct: calculateGains(getMonthlyRadiationForAngle(res, 'beam', optAngle), getMonthlyRadiationForAngle(res, 'beam', 0)).pcts,
-      },
-      diffuse: {
-        rad0: getMonthlyRadiationForAngle(res, 'diffuse', 0),
-        radOpt: getMonthlyRadiationForAngle(res, 'diffuse', optAngle),
-        radX: getMonthlyRadiationForAngle(res, 'diffuse', stateAngleX),
-        gainsPct: calculateGains(getMonthlyRadiationForAngle(res, 'diffuse', optAngle), getMonthlyRadiationForAngle(res, 'diffuse', 0)).pcts,
-      },
-      albedo: {
-        rad0: getMonthlyRadiationForAngle(res, 'albedo', 0),
-        radOpt: getMonthlyRadiationForAngle(res, 'albedo', optAngle),
-        radX: getMonthlyRadiationForAngle(res, 'albedo', stateAngleX),
-        gainsPct: new Array(12).fill(0),
-      },
-    };
-
     const compSymbol =
       stateTableComponent === 'global'
         ? 'Gdm'
@@ -1008,79 +982,19 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
                 </div>
               </div>
             ` : `
-              <!-- Sub-view 2: Grafica_OptAnual (5th Image) -->
-              <div class="opt-chart-view opt-view-monthly">
-                <div class="opt-chart-view-intro" style="margin-bottom: 0.75rem;">
-                  <div class="opt-chart-comp-picker">
-                    <label for="chart-comp-dropdown-monthly" class="chart-comp-label">
-                      ${isEn ? 'Select a component:' : 'Seleccione una componente:'}
-                    </label>
-                    <select id="chart-comp-dropdown-monthly" class="form-select select-chart-comp">
-                      <option value="global" ${stateChartComponent === 'global' ? 'selected' : ''}>${t.results.compGlobal}</option>
-                      <option value="beam" ${stateChartComponent === 'beam' ? 'selected' : ''}>${t.results.compBeam}</option>
-                      <option value="diffuse" ${stateChartComponent === 'diffuse' ? 'selected' : ''}>${t.results.compDiffuse}</option>
-                      <option value="albedo" ${stateChartComponent === 'albedo' ? 'selected' : ''}>${t.results.compAlbedo}</option>
-                      <option value="all" ${stateChartComponent === 'all' ? 'selected' : ''}>${t.results.compAll}</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="opt-svg-wrapper">
-                  ${renderMonthlyOptimumAndGainsSvg({
-                    rad0,
-                    radOpt,
-                    radX,
-                    gainsPct: gainsHoriz.pcts,
-                    allMonthlyData,
-                    component: stateChartComponent,
-                    optimalAngle: optAngle,
-                    selectedAngleX: stateAngleX,
-                    gridEnabled: stateGridEnabled,
-                    isEn,
-                  })}
-                </div>
-
-                <!-- Values Panel matching MATLAB Valores_Rad & Valores_Gan -->
-                <div class="opt-matlab-stats-grid">
-                  <div class="matlab-stat-box box-horiz">
-                    <span class="stat-box-title">${isEn ? 'Horizontal Plane (0°)' : 'Plano Horizontal (0°)'}</span>
-                    <div class="stat-box-values">
-                      <div class="stat-chip"><span class="chip-k">${t.results.chartMinLabel}:</span> <span class="chip-v">${Math.min(...rad0).toFixed(2)}</span></div>
-                      <div class="stat-chip"><span class="chip-k">${t.results.chartMedLabel}:</span> <span class="chip-v highlight-c0">${mean0.toFixed(2)}</span></div>
-                      <div class="stat-chip"><span class="chip-k">${t.results.chartMaxLabel}:</span> <span class="chip-v">${Math.max(...rad0).toFixed(2)}</span></div>
-                    </div>
-                  </div>
-
-                  <div class="matlab-stat-box box-opt">
-                    <span class="stat-box-title">${isEn ? `Annual Optimal Tilt (${optAngle}°)` : `Inclinación Óptima Anual (${optAngle}°)`}</span>
-                    <div class="stat-box-values">
-                      <div class="stat-chip"><span class="chip-k">${t.results.chartMinLabel}:</span> <span class="chip-v">${Math.min(...radOpt).toFixed(2)}</span></div>
-                      <div class="stat-chip"><span class="chip-k">${t.results.chartMedLabel}:</span> <span class="chip-v highlight-opt">${meanOpt.toFixed(2)}</span></div>
-                      <div class="stat-chip"><span class="chip-k">${t.results.chartMaxLabel}:</span> <span class="chip-v">${Math.max(...radOpt).toFixed(2)}</span></div>
-                    </div>
-                  </div>
-
-                  <div class="matlab-stat-box box-gain">
-                    <span class="stat-box-title">${isEn ? 'Annual Gains vs 0° (%)' : 'Ganancias Óptima Anual s/ 0° (%)'}</span>
-                    <div class="stat-box-values">
-                      <div class="stat-chip"><span class="chip-k">${t.results.chartMinLabel}:</span> <span class="chip-v">${isAlbedo ? '-' : `${Math.min(...gainsHoriz.pcts).toFixed(2)}%`}</span></div>
-                      <div class="stat-chip"><span class="chip-k">${t.results.chartMedLabel}:</span> <span class="chip-v highlight-gain">${isAlbedo ? '-' : `+${meanPctHoriz.toFixed(2)}%`}</span></div>
-                      <div class="stat-chip"><span class="chip-k">${t.results.chartMaxLabel}:</span> <span class="chip-v">${isAlbedo ? '-' : `+${Math.max(...gainsHoriz.pcts).toFixed(2)}%`}</span></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <!-- Sub-view 2: Dedicated MATLAB OrientSol 3.0 Gráficas Inclinación Óptima Anual (Figuras 5.2.99, 5.2.107, 5.2.108, 5.2.109, 5.2.110) -->
+              <div id="matlab-opt-graphs-mount-point"></div>
             `}
           </div>
         ` : ''}
 
         <!-- 7. Action Button Footer matching OrientSol MATLAB window -->
         <div class="opt-study-footer-actions">
-          <button id="btn-goto-energy" class="btn-study-foot" type="button">
+          <button id="btn-goto-energy" class="btn-study-foot ${stateShowEnergy ? 'active' : ''}" type="button">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
             </svg>
-            <span>${t.results.energyCalcBtn}</span>
+            <span>${stateShowEnergy ? (isEn ? 'Hide Energy Calculation' : 'Ocultar cálculo de energía') : t.results.energyCalcBtn}</span>
           </button>
 
           <button id="btn-export-opt-excel" class="btn-study-foot btn-excel" type="button">
@@ -1102,8 +1016,52 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
             <span>${t.results.generateReportBtn}</span>
           </button>
         </div>
+
+        <!-- 8. Mount point for Dedicated MATLAB Energy Calculation Window (Imagen 1 / Energia_Osterwald.m) -->
+        <div id="opt-energy-mount-point"></div>
       </div>
     `;
+
+    // Mount Active Sub-Windows
+    // 0.1 Dedicated MATLAB Graphs Window (Figuras 5.2.99 / 5.2.107 / 5.2.108 / 5.2.109 / 5.2.110)
+    const graphsMountPoint = container.querySelector<HTMLDivElement>('#matlab-opt-graphs-mount-point');
+    if (graphsMountPoint && stateShowCharts && stateActiveChartTab === 'monthly') {
+      graphsMountPoint.innerHTML = '';
+      const graphsWindow = renderOptimalAnnualGraphsWindow({
+        simulationResult: res,
+        locationName,
+        latitude,
+        onBack: () => {
+          stateShowCharts = false;
+          renderInternal();
+          container.querySelector('.control-group-actions')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        },
+        onExit: () => {
+          stateShowCharts = false;
+          renderInternal();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+      });
+      graphsMountPoint.appendChild(graphsWindow);
+    }
+
+    // 0.2 Dedicated MATLAB Energy Calculation Window (Imagen 1 / Energia_Osterwald.m)
+    const energyMountPoint = container.querySelector<HTMLDivElement>('#opt-energy-mount-point');
+    if (energyMountPoint && stateShowEnergy) {
+      energyMountPoint.innerHTML = '';
+      const energyWindow = renderEnergyCalculationPanel({
+        simulationResult: res,
+        locationName,
+        latitude,
+        studyType: 'annual',
+        onClose: () => {
+          stateShowEnergy = false;
+          renderInternal();
+          container.querySelector('.opt-study-footer-actions')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        },
+      });
+      energyMountPoint.appendChild(energyWindow);
+    }
 
     // Attach Event Listeners
     // 1. Top Component Dropdown Change (Only global, beam, diffuse, albedo)
@@ -1159,14 +1117,15 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
       });
     });
 
-    // 5. Toggle and Scroll to Charts View
+    // 5. Toggle and Scroll to Charts View (Figuras 5.2.99 / 5.2.107 / 5.2.108 / 5.2.109 / 5.2.110)
     const btnToggleCharts = container.querySelector<HTMLButtonElement>('#btn-toggle-charts-view');
     btnToggleCharts?.addEventListener('click', () => {
       stateShowCharts = !stateShowCharts;
+      stateActiveChartTab = 'monthly';
       renderInternal();
       if (stateShowCharts) {
         setTimeout(() => {
-          container.querySelector('#opt-charts-panel')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          container.querySelector('#opt-charts-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 50);
       }
     });
@@ -1274,12 +1233,15 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
       }
     });
 
-    // 6. Scroll to Energy Yield Section
+    // 6. Toggle Dedicated Osterwald Energy Calculation Panel (Imagen 1 / Energia_Osterwald.m)
     const btnGotoEnergy = container.querySelector<HTMLButtonElement>('#btn-goto-energy');
     btnGotoEnergy?.addEventListener('click', () => {
-      const target = document.querySelector('.energy-models-grid');
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      stateShowEnergy = !stateShowEnergy;
+      renderInternal();
+      if (stateShowEnergy) {
+        setTimeout(() => {
+          container.querySelector('#opt-energy-mount-point')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
       }
     });
 
