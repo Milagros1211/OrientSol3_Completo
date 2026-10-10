@@ -36,10 +36,10 @@ export function renderHeader(): HTMLElement {
     </div>
     <div class="header-actions">
       <!-- Supabase Connection & Offline Sync Pill -->
-      <button id="supabase-sync-pill" class="runtime-pill status-supabase" type="button" title="${isEn ? 'Supabase Connection & Offline Sync' : 'Conexión y Sincronización Supabase'}">
+      <button id="supabase-sync-pill" class="runtime-pill status-supabase ${isConfigured && isOnline ? 'status-online' : 'status-offline'}" type="button" title="${isEn ? 'Supabase Database: datos_mensuales' : 'Base de Datos Supabase: datos_mensuales'}">
         <span class="status-dot ${isConfigured && isOnline ? 'status-dot-active' : ''}"></span>
         <span id="supabase-status-text">
-          ☁️ Supabase ${queueCount > 0 ? `<span class="pill-badge-counter">${queueCount}</span>` : ''}
+          ${isConfigured && isOnline ? (isEn ? 'Supabase: Conectado' : 'Supabase: Conectado') : (isEn ? 'Supabase: Desconectado' : 'Supabase: Desconectado')}${queueCount > 0 ? ` <span class="pill-badge-counter">${queueCount}</span>` : ''}
         </span>
       </button>
 
@@ -70,17 +70,26 @@ export function renderHeader(): HTMLElement {
     openSupabaseSyncModal();
   });
 
-  // Subscribe to Supabase database state updates (queue count, etc.)
+  // Subscribe to Supabase database state updates (connection & offline queue count)
   climateDatabaseService.subscribe(() => {
     const textEl = header.querySelector('#supabase-status-text');
     const dotEl = header.querySelector('#supabase-sync-pill .status-dot');
+    const pillEl = header.querySelector('#supabase-sync-pill');
     if (!textEl) return;
     const count = climateDatabaseService.getOfflineQueueCount();
     const configured = climateDatabaseService.isConfigured();
     const online = climateDatabaseService.isOnline();
-    textEl.innerHTML = `☁️ Supabase ${count > 0 ? `<span class="pill-badge-counter">${count}</span>` : ''}`;
+    const isConn = configured && online;
+
+    if (pillEl) {
+      pillEl.className = `runtime-pill status-supabase ${isConn ? 'status-online' : 'status-offline'}`;
+    }
+    const label = isConn
+      ? (isEn ? 'Supabase: Conectado' : 'Supabase: Conectado')
+      : (isEn ? 'Supabase: Desconectado' : 'Supabase: Desconectado');
+    textEl.innerHTML = `${label}${count > 0 ? ` <span class="pill-badge-counter">${count}</span>` : ''}`;
     if (dotEl) {
-      dotEl.className = `status-dot ${configured && online ? 'status-dot-active' : ''}`;
+      dotEl.className = `status-dot ${isConn ? 'status-dot-active' : ''}`;
     }
   });
 

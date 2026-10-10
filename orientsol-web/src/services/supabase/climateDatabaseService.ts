@@ -3,7 +3,7 @@ import {
   isSupabaseConfigured,
   testSupabaseConnection,
 } from './supabaseClient';
-import type { ClimateDataRecord, SupabaseClimateRow } from '@/types/climate';
+import type { ClimateDataRecord } from '@/types/climate';
 import { LOCATIONS_DATABASE } from '@/database/locations';
 
 const LOCAL_STORAGE_CACHE_KEY = 'orientsol_climate_datasets_cache';
@@ -165,23 +165,23 @@ export class ClimateDatabaseService {
     if (supabase && this.isOnline()) {
       try {
         const { data, error } = await supabase
-          .from('climate_locations')
+          .from('datos_mensuales')
           .select('*')
           .order('name', { ascending: true });
 
         if (!error && Array.isArray(data) && data.length > 0) {
-          const records: ClimateDataRecord[] = data.map((row: SupabaseClimateRow) => ({
-            id: row.id || `supabase-${row.name.toLowerCase().replace(/\s+/g, '-')}`,
+          const records: ClimateDataRecord[] = data.map((row: any) => ({
+            id: row.id || `supabase-${(row.name || row.nombre || 'loc').toLowerCase().replace(/\s+/g, '-')}`,
             source: 'supabase',
-            locationName: row.name,
-            country: row.country || 'España',
-            latitude: Number(row.latitude),
-            longitude: Number(row.longitude),
-            elevationM: row.elevation_m ? Number(row.elevation_m) : undefined,
-            monthlyGdm0: row.monthly_gdm0.map(Number),
-            monthlyTemperature: row.monthly_temperature.map(Number),
+            locationName: row.name || row.nombre || 'Ubicación Supabase',
+            country: row.country || row.pais || 'España',
+            latitude: Number(row.latitude ?? row.latitud ?? 0),
+            longitude: Number(row.longitude ?? row.longitud ?? 0),
+            elevationM: row.elevation_m != null ? Number(row.elevation_m) : (row.altitud != null ? Number(row.altitud) : undefined),
+            monthlyGdm0: (row.monthly_gdm0 || row.gdm0 || []).map(Number),
+            monthlyTemperature: (row.monthly_temperature || row.temperatura || []).map(Number),
             fetchedAt: row.created_at || new Date().toISOString(),
-            metadata: { is_verified: row.is_verified, notes: row.notes },
+            metadata: { notes: row.notes, tonc: row.tonc },
           }));
 
           this.saveToCache(records);
@@ -263,7 +263,7 @@ export class ClimateDatabaseService {
     const supabase = getSupabaseClient();
     if (supabase && this.isOnline()) {
       try {
-        const payload: SupabaseClimateRow = {
+        const payload: Record<string, any> = {
           name: record.locationName,
           country: record.country || 'España',
           latitude: record.latitude,
@@ -271,10 +271,11 @@ export class ClimateDatabaseService {
           elevation_m: record.elevationM,
           monthly_gdm0: record.monthlyGdm0,
           monthly_temperature: record.monthlyTemperature,
+          tonc: record.metadata?.tonc ?? 47.0,
           notes: 'Registrado desde OrientSol 3.0',
         };
 
-        const { data, error } = await supabase.from('climate_locations').insert([payload]).select();
+        const { data, error } = await supabase.from('datos_mensuales').insert([payload]).select();
         if (!error && data && data.length > 0) {
           const insertedId = data[0].id;
           const savedRecord: ClimateDataRecord = {
@@ -430,7 +431,7 @@ export class ClimateDatabaseService {
       } else {
         // Insert new record
         try {
-          const payload: SupabaseClimateRow = {
+          const payload: Record<string, any> = {
             name: item.locationName,
             country: item.country || 'España',
             latitude: item.latitude,
@@ -438,10 +439,11 @@ export class ClimateDatabaseService {
             elevation_m: item.elevationM,
             monthly_gdm0: item.monthlyGdm0,
             monthly_temperature: item.monthlyTemperature,
+            tonc: item.metadata?.tonc ?? 47.0,
             notes: 'Sincronizado desde cola offline OrientSol',
           };
 
-          const { data, error } = await supabase.from('climate_locations').insert([payload]).select();
+          const { data, error } = await supabase.from('datos_mensuales').insert([payload]).select();
           if (!error && data && data.length > 0) {
             summary.inserted++;
             summary.details.push({

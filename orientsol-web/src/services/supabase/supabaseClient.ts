@@ -126,13 +126,13 @@ export async function testSupabaseConnection(): Promise<{ ok: boolean; message: 
 
   try {
     const { count, error } = await supabase
-      .from('climate_locations')
+      .from('datos_mensuales')
       .select('*', { count: 'exact', head: true });
 
     if (error) {
       return {
         ok: false,
-        message: `Error al consultar la tabla climate_locations: ${error.message}`,
+        message: `Error al consultar la tabla datos_mensuales: ${error.message}`,
       };
     }
 
