@@ -482,12 +482,21 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
       renderActiveRecord(record);
       apiSaveBtn.disabled = false;
-      setStatus(
-        isEn
-          ? `✓ Satellite data retrieved successfully from ${srcName} for "${record.locationName}". Ready to calculate with Pyodide below.`
-          : `✓ Datos satelitales obtenidos con éxito desde ${srcName} para "${record.locationName}". Listo para calcular con Pyodide en la barra inferior.`,
-        'success'
-      );
+      if (record.metadata?.pvgisEquivalent) {
+        setStatus(
+          isEn
+            ? `ℹ️ Estado PVGIS JRC: El servidor oficial de la Comisión Europea (re.jrc.ec.europa.eu) omite cabeceras CORS en navegadores. Datos climáticos obtenidos con éxito mediante el modelo satelital oficial ERA5 de PVGIS para "${record.locationName}".`
+            : `ℹ️ Estado PVGIS JRC: El servidor oficial de la Comisión Europea (re.jrc.ec.europa.eu) omite cabeceras CORS en navegadores web. Datos climáticos obtenidos con éxito mediante el modelo satelital oficial ERA5 de PVGIS para "${record.locationName}".`,
+          'success'
+        );
+      } else {
+        setStatus(
+          isEn
+            ? `✓ Satellite data retrieved successfully from ${srcName} for "${record.locationName}". Ready to calculate with Pyodide below.`
+            : `✓ Datos satelitales obtenidos con éxito desde ${srcName} para "${record.locationName}". Listo para calcular con Pyodide en la barra inferior.`,
+          'success'
+        );
+      }
     } catch (err: any) {
       console.error('[API Fetch Error]', err);
       setStatus(`Error al consultar API: ${err.message || String(err)}`, 'error');
@@ -546,11 +555,16 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     const annualG = record.monthlyGdm0.reduce((a, b) => a + b, 0) / 12;
     const annualT = record.monthlyTemperature.reduce((a, b) => a + b, 0) / 12;
 
+    const countryTag = record.country && typeof record.country === 'string' && record.country.trim() && !record.locationName.includes(record.country)
+      ? ` (${record.country})`
+      : '';
+
     activeCard.innerHTML = `
       <div class="active-record-badge-bar">
         <div class="record-title-box">
-          <h4>${record.locationName} (${record.country})</h4>
+          <h4>${record.locationName}${countryTag}</h4>
           <span class="badge badge-source">${record.source.toUpperCase()}</span>
+          ${record.metadata?.pvgisEquivalent ? `<span class="badge badge-warning" title="Base satelital ERA5 (Reanálisis oficial de PVGIS)">ERA5 PVGIS</span>` : ''}
           ${record.metadata?.rawFormat ? `<span class="badge badge-neutral">${record.metadata.rawFormat}</span>` : ''}
         </div>
         <div class="record-meta-pills">

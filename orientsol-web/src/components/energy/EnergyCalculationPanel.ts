@@ -214,6 +214,21 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
         ? (isEn ? 'Seasonal optimal tilt' : 'Inclinación óptima estacional')
         : (isEn ? 'Annual optimal tilt' : 'Inclinación óptima anual');
 
+    const isSeasonal = studyType === 'seasonal';
+    const optTiltAnnual = res.optimalAnnual?.optimalTiltDeg ?? 30;
+    const seasonalData = res.seasonal;
+
+    let studyColTitle = '';
+    if (isSeasonal && seasonalData) {
+      studyColTitle = isEn
+        ? `Performed study (Inv: ${seasonalData.winterTiltDeg}° / P-O: ${seasonalData.springTiltDeg}° / Ver: ${seasonalData.summerTiltDeg}°)`
+        : `Estudio realizado (Inv: ${seasonalData.winterTiltDeg}° / P-O: ${seasonalData.springTiltDeg}° / Ver: ${seasonalData.summerTiltDeg}°)`;
+    } else {
+      studyColTitle = isEn
+        ? `Performed study (β = ${optTiltAnnual}°)`
+        : `Estudio realizado (β = ${optTiltAnnual}°)`;
+    }
+
     // Run Osterwald calculation
     const energyData = calculateOsterwaldEnergy(
       radHoriz,
@@ -240,6 +255,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
               <span class="meta-label">
                 <strong>${isEn ? 'Study:' : 'Estudio:'}</strong>
                 <span style="color: #60a5fa; font-weight: 600;">${studyTitle}</span>
+                <span class="badge badge-source" style="margin-left: 0.75rem; font-size: 0.78rem;">${isSeasonal ? (isEn ? 'Seasonal Tilts' : 'Inclinación Estacional') : `β = ${optTiltAnnual}°`}</span>
               </span>
             </div>
           </div>
@@ -333,8 +349,8 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                 <thead>
                   <tr>
                     <th class="th-ener-month">${isEn ? 'Month' : 'Mes'}</th>
-                    <th class="th-ener-horiz">${isEn ? 'Horizontal surface' : 'Superficie horizontal'}</th>
-                    <th class="th-ener-study">${isEn ? 'Performed study' : 'Estudio realizado'}</th>
+                    <th class="th-ener-horiz">${isEn ? 'Horizontal surface (0°)' : 'Superficie horizontal (0°)'}</th>
+                    <th class="th-ener-study">${studyColTitle}</th>
                     <th class="th-ener-gain">${isEn ? 'Gain (kWh)' : 'Ganancia (kWh)'}</th>
                   </tr>
                 </thead>
@@ -344,11 +360,20 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                     const e = energyData.e_mes[idx];
                     const g = energyData.ganancia_mes[idx];
 
+                    const monthAngle = isSeasonal && seasonalData
+                      ? (idx === 0 || idx === 1 || idx === 11 ? seasonalData.winterTiltDeg
+                         : idx === 5 || idx === 6 || idx === 7 ? seasonalData.summerTiltDeg
+                         : seasonalData.springTiltDeg)
+                      : optTiltAnnual;
+
                     return `
                       <tr>
                         <td class="td-ener-month"><strong>${monthName}</strong></td>
                         <td class="td-num">${e0.toFixed(2)}</td>
-                        <td class="td-num td-ener-study-val"><strong>${e.toFixed(2)}</strong></td>
+                        <td class="td-num td-ener-study-val">
+                          <strong>${e.toFixed(2)}</strong>
+                          <span class="energy-angle-tag" style="font-size: 0.78rem; opacity: 0.85; margin-left: 5px;">(${monthAngle}°)</span>
+                        </td>
                         <td class="td-num td-ener-gain-val ${g >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
                           ${g.toFixed(2)}
                         </td>

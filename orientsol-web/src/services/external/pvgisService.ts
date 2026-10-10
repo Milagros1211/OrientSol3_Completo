@@ -142,6 +142,7 @@ export async function fetchPvgisClimateData(
           return {
             source: 'pvgis',
             locationName: `${locationName} (PVGIS - ERA5)`,
+            country: 'España',
             latitude: roundedLat,
             longitude: roundedLon,
             elevationM: Math.round(era5Json.elevation || 0),
@@ -150,7 +151,8 @@ export async function fetchPvgisClimateData(
             fetchedAt: new Date().toISOString(),
             metadata: {
               provider: 'European Commission PVGIS Meteo Database (ERA5 Reanalysis Grid)',
-              note: 'Obtenido mediante el modelo satelital ERA5 (base de datos meteorológica de PVGIS 5.3).',
+              note: 'Obtenido mediante el modelo satelital ERA5 (base de datos meteorológica oficial de PVGIS 5.3).',
+              statusDetail: 'El servidor de la Comisión Europea (re.jrc.ec.europa.eu) omite cabeceras CORS para clientes web. Se recuperó exitosamente mediante la base ERA5 de PVGIS.',
               pvgisEquivalent: true,
             },
           };
@@ -214,6 +216,7 @@ export async function fetchPvgisClimateData(
   return {
     source: 'pvgis',
     locationName: `${locationName} (PVGIS ${activeVersion})`,
+    country: 'España',
     latitude: roundedLat,
     longitude: roundedLon,
     elevationM: typeof elevation === 'number' ? Math.round(elevation) : undefined,
