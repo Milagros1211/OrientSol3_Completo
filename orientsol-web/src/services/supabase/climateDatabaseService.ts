@@ -9,6 +9,9 @@ import { LOCATIONS_DATABASE } from '@/database/locations';
 const LOCAL_STORAGE_CACHE_KEY = 'orientsol_climate_datasets_cache';
 const OFFLINE_SYNC_QUEUE_KEY = 'orientsol_supabase_offline_queue';
 
+/** Days in each month for calculating monthly accumulated radiation <-> daily Gdm(0) */
+const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
 export interface SimilarityResult {
   isDuplicate: boolean;
   similarityPct: number;
@@ -166,26 +169,85 @@ export class ClimateDatabaseService {
       try {
         const { data, error } = await supabase
           .from('datos_mensuales')
-          .select('*')
-          .order('name', { ascending: true });
+          .select('*');
 
         if (!error && Array.isArray(data) && data.length > 0) {
-          const records: ClimateDataRecord[] = data.map((row: any) => ({
-            id: row.id || `supabase-${(row.name || row.nombre || 'loc').toLowerCase().replace(/\s+/g, '-')}`,
-            source: 'supabase',
-            locationName: row.name || row.nombre || 'Ubicación Supabase',
-            country: row.country || row.pais || 'España',
-            latitude: Number(row.latitude ?? row.latitud ?? 0),
-            longitude: Number(row.longitude ?? row.longitud ?? 0),
-            elevationM: row.elevation_m != null ? Number(row.elevation_m) : (row.altitud != null ? Number(row.altitud) : undefined),
-            monthlyGdm0: (row.monthly_gdm0 || row.gdm0 || []).map(Number),
-            monthlyTemperature: (row.monthly_temperature || row.temperatura || []).map(Number),
-            fetchedAt: row.created_at || new Date().toISOString(),
-            metadata: { notes: row.notes, tonc: row.tonc },
-          }));
+          // Check if table contains monthly normalized rows (nombre_emplazamiento, mes, radiacion_media, temp_media)
+          const isMonthlyRows = data.some((r: any) => r.nombre_emplazamiento !== undefined || r.mes !== undefined);
 
-          this.saveToCache(records);
-          return records;
+          let records: ClimateDataRecord[] = [];
+
+          if (isMonthlyRows) {
+            // Group rows by location name and coordinates
+            const grouped = new Map<string, any[]>();
+            for (const row of data) {
+              const name = (row.nombre_emplazamiento || row.name || row.nombre || 'Emplazamiento').trim();
+              const key = `${name.toLowerCase()}_${row.latitud ?? row.latitude ?? 0}_${row.longitud ?? row.longitude ?? 0}`;
+              if (!grouped.has(key)) {
+                grouped.set(key, []);
+              }
+              grouped.get(key)!.push(row);
+            }
+
+            for (const [, rows] of grouped.entries()) {
+              const first = rows[0];
+              const locName = (first.nombre_emplazamiento || first.name || first.nombre || 'Emplazamiento').trim();
+              const lat = Number(first.latitud ?? first.latitude ?? 0);
+              const lon = Number(first.longitud ?? first.longitude ?? 0);
+
+              const monthlyGdm0 = new Array(12).fill(0);
+              const monthlyTemp = new Array(12).fill(0);
+
+              for (const r of rows) {
+                const m = Number(r.mes);
+                if (m >= 1 && m <= 12) {
+                  const idx = m - 1;
+                  const rawRad = Number(r.radiacion_media ?? r.gdm0 ?? 0);
+                  const days = DAYS_IN_MONTH[idx];
+                  // If rawRad > 15, it is monthly accumulated radiation (kWh/m²/mes); convert to daily average Gdm(0) (kWh/m²/día)
+                  const dailyGdm0 = rawRad > 15 ? Number((rawRad / days).toFixed(2)) : rawRad;
+                  monthlyGdm0[idx] = dailyGdm0;
+                  monthlyTemp[idx] = Number(r.temp_media ?? r.temperatura ?? 0);
+                }
+              }
+
+              records.push({
+                id: `supabase-${locName.toLowerCase().replace(/\s+/g, '-')}`,
+                source: 'supabase',
+                locationName: locName,
+                country: first.country || first.pais || 'España',
+                latitude: lat,
+                longitude: lon,
+                monthlyGdm0,
+                monthlyTemperature: monthlyTemp,
+                fetchedAt: first.created_at || new Date().toISOString(),
+                metadata: {
+                  sourceTable: 'datos_mensuales',
+                  totalMonthsRecorded: rows.length,
+                },
+              });
+            }
+          } else {
+            // Fallback for wide format
+            records = data.map((row: any) => ({
+              id: row.id ? String(row.id) : `supabase-${(row.name || row.nombre || 'loc').toLowerCase().replace(/\s+/g, '-')}`,
+              source: 'supabase',
+              locationName: row.name || row.nombre || 'Ubicación Supabase',
+              country: row.country || row.pais || 'España',
+              latitude: Number(row.latitude ?? row.latitud ?? 0),
+              longitude: Number(row.longitude ?? row.longitud ?? 0),
+              elevationM: row.elevation_m != null ? Number(row.elevation_m) : undefined,
+              monthlyGdm0: (row.monthly_gdm0 || row.gdm0 || []).map(Number),
+              monthlyTemperature: (row.monthly_temperature || row.temperatura || []).map(Number),
+              fetchedAt: row.created_at || new Date().toISOString(),
+              metadata: { notes: row.notes, tonc: row.tonc },
+            }));
+          }
+
+          if (records.length > 0) {
+            this.saveToCache(records);
+            return records;
+          }
         }
       } catch (err) {
         console.warn('[Supabase Climate] Error fetching records from cloud:', err);
@@ -263,40 +325,46 @@ export class ClimateDatabaseService {
     const supabase = getSupabaseClient();
     if (supabase && this.isOnline()) {
       try {
-        const payload: Record<string, any> = {
-          name: record.locationName,
-          country: record.country || 'España',
-          latitude: record.latitude,
-          longitude: record.longitude,
-          elevation_m: record.elevationM,
-          monthly_gdm0: record.monthlyGdm0,
-          monthly_temperature: record.monthlyTemperature,
-          tonc: record.metadata?.tonc ?? 47.0,
-          notes: 'Registrado desde OrientSol 3.0',
-        };
+        // Build 12 monthly rows matching the table: nombre_emplazamiento, latitud, longitud, mes, radiacion_media, temp_media
+        const monthlyRows = [];
+        for (let m = 1; m <= 12; m++) {
+          const idx = m - 1;
+          const days = DAYS_IN_MONTH[idx];
+          const gdm0Daily = record.monthlyGdm0[idx] ?? 0;
+          const radMensual = Number((gdm0Daily * days).toFixed(2));
+          const tempMedia = Number((record.monthlyTemperature[idx] ?? 0).toFixed(2));
 
-        const { data, error } = await supabase.from('datos_mensuales').insert([payload]).select();
-        if (!error && data && data.length > 0) {
-          const insertedId = data[0].id;
+          monthlyRows.push({
+            nombre_emplazamiento: record.locationName,
+            latitud: record.latitude,
+            longitud: record.longitude,
+            mes: m,
+            radiacion_media: radMensual,
+            temp_media: tempMedia,
+          });
+        }
+
+        const { error } = await supabase.from('datos_mensuales').insert(monthlyRows);
+        if (!error) {
           const savedRecord: ClimateDataRecord = {
             ...record,
-            id: insertedId,
+            id: `supabase-${record.locationName.toLowerCase().replace(/\s+/g, '-')}`,
             source: 'supabase',
           };
 
           // Cache locally
           const existing = this.getFromCache() || this.getDefaultLocationsAsRecords();
-          this.saveToCache([savedRecord, ...existing.filter((r) => r.id !== savedRecord.id)]);
+          this.saveToCache([savedRecord, ...existing.filter((r) => r.locationName !== savedRecord.locationName)]);
           this.notify();
 
           return {
             success: true,
             isDuplicate: false,
             isOffline: false,
-            message: `✓ Emplazamiento "${record.locationName}" registrado automáticamente en Supabase.`,
+            message: `✓ Emplazamiento "${record.locationName}" registrado con éxito en Supabase (12 meses en datos_mensuales).`,
             record: savedRecord,
           };
-        } else if (error) {
+        } else {
           console.warn('[Supabase Insert Error]', error.message);
         }
       } catch (err: any) {
@@ -429,29 +497,35 @@ export class ClimateDatabaseService {
         });
         // Removed from queue
       } else {
-        // Insert new record
+        // Insert new record (12 monthly rows)
         try {
-          const payload: Record<string, any> = {
-            name: item.locationName,
-            country: item.country || 'España',
-            latitude: item.latitude,
-            longitude: item.longitude,
-            elevation_m: item.elevationM,
-            monthly_gdm0: item.monthlyGdm0,
-            monthly_temperature: item.monthlyTemperature,
-            tonc: item.metadata?.tonc ?? 47.0,
-            notes: 'Sincronizado desde cola offline OrientSol',
-          };
+          const monthlyRows = [];
+          for (let m = 1; m <= 12; m++) {
+            const idx = m - 1;
+            const days = DAYS_IN_MONTH[idx];
+            const gdm0Daily = item.monthlyGdm0[idx] ?? 0;
+            const radMensual = Number((gdm0Daily * days).toFixed(2));
+            const tempMedia = Number((item.monthlyTemperature[idx] ?? 0).toFixed(2));
 
-          const { data, error } = await supabase.from('datos_mensuales').insert([payload]).select();
-          if (!error && data && data.length > 0) {
+            monthlyRows.push({
+              nombre_emplazamiento: item.locationName,
+              latitud: item.latitude,
+              longitud: item.longitude,
+              mes: m,
+              radiacion_media: radMensual,
+              temp_media: tempMedia,
+            });
+          }
+
+          const { error } = await supabase.from('datos_mensuales').insert(monthlyRows);
+          if (!error) {
             summary.inserted++;
             summary.details.push({
               name: item.locationName,
               status: 'inserted',
-              message: `✓ Emplazamiento "${item.locationName}" ingresado con éxito en Supabase.`,
+              message: `✓ Emplazamiento "${item.locationName}" ingresado con éxito en Supabase (12 meses).`,
             });
-            existingCloudRecords.push({ ...item, id: data[0].id });
+            existingCloudRecords.push({ ...item, id: `supabase-${item.locationName.toLowerCase().replace(/\s+/g, '-')}` });
           } else {
             summary.errors++;
             summary.details.push({
