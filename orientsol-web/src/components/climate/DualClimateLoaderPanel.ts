@@ -12,14 +12,18 @@ import {
   renderEnergyAndTemperatureChart,
   renderSurfacesRankingChart,
 } from '@/components/charts/SolarCharts';
-import {
-  exportToCSV,
-  exportToPDF,
-  copyReportToClipboard,
-} from '@/components/export/reportExporter';
-import { pyodideService } from '@/services/pyodide';
+import { copyReportToClipboard } from '@/components/export/reportExporter';
 import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslations';
-import { renderOptimalAnnualStudyPanel } from '@/components/climate/OptimalAnnualStudyPanel';
+import { pyodideService } from '@/services/pyodide';
+import {
+  renderOptimalAnnualStudyPanel,
+  showExcelExportModal,
+} from '@/components/climate/OptimalAnnualStudyPanel';
+import { renderOptimalSeasonalStudyPanel } from '@/components/climate/OptimalSeasonalStudyPanel';
+import {
+  showPdfGenerationNoticeModal,
+  generateOrientSolPDFReport,
+} from '@/components/export/pdfReportGenerator';
 
 // Module-level caches to preserve state across language toggles (ES <-> EN)
 let cachedLastSimulationResult: SolarBridgeSimulationResult | null = null;
@@ -932,13 +936,13 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             </svg>
             <span>${t.results.exportPdfBtn}</span>
           </button>
-          <button id="btn-export-csv" class="btn-export btn-export-csv" type="button" title="${t.results.exportCsvBtn}">
+          <button id="btn-export-excel-top" class="btn-export btn-export-excel" type="button" title="${t.results.exportExcelBtn}">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="7 10 12 15 17 10"></polyline>
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            <span>${t.results.exportCsvBtn}</span>
+            <span>${t.results.exportExcelBtn}</span>
           </button>
           <button id="btn-copy-summary" class="btn-export btn-export-copy" type="button" title="${t.results.exportCopyBtn}">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
@@ -1002,38 +1006,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       <!-- 2. INCLINACIÓN ÓPTIMA ANUAL: ESTUDIO COMPLETO & TABLA MATRIZ ORIENTSOL 3.0 -->
       <div id="opt-annual-study-mount-point"></div>
 
-      <!-- OPTIMIZACIONES ADICIONALES: ESTACIONAL (4) Y MENSUAL (12) -->
-      <div class="results-section-grid">
-        <!-- 2.2 4 Posiciones Estacionales -->
-        <div class="result-card">
-          <div class="result-card-header">
-            <h4>${t.results.seasonalTitle}</h4>
-            <span class="text-gain">+${res.seasonal.gainOverOptimalAnnualPct.toFixed(2)}% ${t.results.vsFixed}</span>
-          </div>
-          <div class="seasonal-angles-list">
-            <div class="seasonal-item">
-              <span class="season-badge winter">${t.results.winter}</span>
-              <strong class="season-deg">${res.seasonal.winterTiltDeg}°</strong>
-              <span class="season-rad">${res.seasonal.winterMeanDailyKwh.toFixed(2)} kWh/m²/d</span>
-            </div>
-            <div class="seasonal-item">
-              <span class="season-badge spring">${t.results.spring}</span>
-              <strong class="season-deg">${res.seasonal.springTiltDeg}°</strong>
-              <span class="season-rad">${res.seasonal.springMeanDailyKwh.toFixed(2)} kWh/m²/d</span>
-            </div>
-            <div class="seasonal-item">
-              <span class="season-badge summer">${t.results.summer}</span>
-              <strong class="season-deg">${res.seasonal.summerTiltDeg}°</strong>
-              <span class="season-rad">${res.seasonal.summerMeanDailyKwh.toFixed(2)} kWh/m²/d</span>
-            </div>
-            <div class="seasonal-item">
-              <span class="season-badge autumn">${t.results.autumn}</span>
-              <strong class="season-deg">${res.seasonal.autumnTiltDeg}°</strong>
-              <span class="season-rad">${res.seasonal.autumnMeanDailyKwh.toFixed(2)} kWh/m²/d</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- 2.2 INCLINACIÓN ÓPTIMA ESTACIONAL: ESTUDIO COMPLETO & TABLA MATRIZ ORIENTSOL 3.0 (Figura 5.2.89) -->
+      <div id="opt-seasonal-study-mount-point"></div>
 
       <!-- 2.3 12 Posiciones Mensuales -->
       <div class="result-card wide-card" style="margin-bottom: 1.25rem;">
@@ -1225,22 +1199,32 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       optStudyMountPoint.appendChild(studyPanel);
     }
 
+    // Mount OrientSol 3.0 Inclinación Óptima Estacional Study Panel (Figura 5.2.89)
+    const optSeasonalMountPoint = resultsContainer.querySelector<HTMLDivElement>('#opt-seasonal-study-mount-point');
+    if (optSeasonalMountPoint) {
+      optSeasonalMountPoint.innerHTML = '';
+      const seasonalPanel = renderOptimalSeasonalStudyPanel({
+        simulationResult: res,
+        locationName: res.locationName,
+        latitude: res.latitude,
+      });
+      optSeasonalMountPoint.appendChild(seasonalPanel);
+    }
+
     // Event Listeners for Export & Report Actions
     const pdfBtn = resultsContainer.querySelector<HTMLButtonElement>('#btn-export-pdf');
-    const csvBtn = resultsContainer.querySelector<HTMLButtonElement>('#btn-export-csv');
+    const excelBtnTop = resultsContainer.querySelector<HTMLButtonElement>('#btn-export-excel-top');
     const copyBtn = resultsContainer.querySelector<HTMLButtonElement>('#btn-copy-summary');
     const copyLabel = resultsContainer.querySelector<HTMLSpanElement>('#copy-btn-label');
 
     pdfBtn?.addEventListener('click', () => {
-      exportToPDF();
+      showPdfGenerationNoticeModal(isEn, () => {
+        generateOrientSolPDFReport(res, isEn);
+      });
     });
 
-    csvBtn?.addEventListener('click', () => {
-      exportToCSV(res, {
-        peakPowerKw: parseFloat(simPeakKw.value) || 5.0,
-        performanceRatio: parseFloat(simPr.value) || 0.80,
-        isEn,
-      });
+    excelBtnTop?.addEventListener('click', () => {
+      showExcelExportModal(res, 45, isEn);
     });
 
     copyBtn?.addEventListener('click', async () => {
