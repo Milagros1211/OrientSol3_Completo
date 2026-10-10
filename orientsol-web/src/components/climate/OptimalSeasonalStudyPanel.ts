@@ -17,6 +17,7 @@ interface OptimalSeasonalStudyProps {
   simulationResult: SolarBridgeSimulationResult;
   locationName: string;
   latitude: number;
+  peakPowerKw?: number;
 }
 
 // Module-level component state
@@ -873,6 +874,7 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
         locationName,
         latitude,
         studyType: 'seasonal',
+        initialPeakKw: props.peakPowerKw ?? 5.0,
         onClose: () => {
           stateSeasonalShowEnergy = false;
           renderInternal();

@@ -516,3 +516,458 @@ export async function generateOrientSolPDFReport(
 
   showPdfGeneratedSuccessModal('C:\\OrientSol3\\InformesPDF', isEn);
 }
+
+export interface EnergyDataReport {
+  e0_mes: number[];
+  e_mes: number[];
+  ganancia_mes: number[];
+  e0_anual: number;
+  e_anual: number;
+  ganancia_anual: number;
+}
+
+/**
+ * Generates the Official OrientSol 3.0 Energy Report PDF strictly conforming to:
+ * - Figura 5.2.83: Contenidos del informe generado para la energía producida
+ * - Tabla de contenidos (1. Introducción, 2. Energía generada)
+ * - Lista de figuras (2.1. Energía media horizontal, 2.2. Energía estudio seleccionado, 2.3. Ganancias respecto al plano horizontal)
+ */
+export async function generateOrientSolEnergyPDFReport(
+  res: SolarBridgeSimulationResult,
+  energyData: EnergyDataReport,
+  peakKw: number,
+  coefTemp: number,
+  tonc: number,
+  studyTitle: string,
+  isEn: boolean
+): Promise<void> {
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4',
+  });
+
+  const months = isEn
+    ? ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+  const drawAcademicHeader = (pageNumber: number) => {
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(8.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text('Miriam Jiménez Torres', 20, 12);
+    doc.text(
+      isEn
+        ? 'Energy study and planning according to optimal module tilt.'
+        : 'Estudio y planificación energética en función de la posición óptima de los módulos.',
+      95,
+      12
+    );
+    doc.text(
+      isEn
+        ? 'Industrial Organization Engineering'
+        : 'Ingeniería de Organización Industrial',
+      20,
+      17
+    );
+    doc.text('OrientSol 3.0', 160, 17);
+
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.4);
+    doc.line(20, 20, 190, 20);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text(String(pageNumber), 185, 287);
+  };
+
+  // =========================================================================
+  // PÁGINA 1: PORTADA & CONTENIDOS DEL INFORME (Figura 5.2.83)
+  // =========================================================================
+  drawAcademicHeader(1);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(15, 23, 42);
+  doc.text(
+    isEn
+      ? 'Chapter 5. New software: OrientSol 3.0'
+      : 'Capítulo 5. Nuevo software: OrientSol 3.0',
+    20,
+    30
+  );
+
+  // Box 1: Tabla de contenidos
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(20, 38, 170, 32, 2, 2, 'FD');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? 'Table of contents' : 'Tabla de contenidos', 25, 48);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9.5);
+  doc.setTextColor(51, 65, 85);
+  doc.text(
+    isEn
+      ? '1. Introduction ................................................................................................................... 1'
+      : '1. Introducción ................................................................................................................... 1',
+    25,
+    57
+  );
+  doc.text(
+    isEn
+      ? '2. Generated energy ............................................................................................................ 2'
+      : '2. Energía generada ............................................................................................................ 2',
+    25,
+    64
+  );
+
+  // Box 2: Lista de figuras
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(20, 76, 170, 40, 2, 2, 'FD');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? 'List of figures' : 'Lista de figuras', 25, 86);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9.5);
+  doc.setTextColor(51, 65, 85);
+  doc.text(
+    isEn
+      ? '2.1. Mean monthly energy on horizontal surface ............................................................. 2'
+      : '2.1. Energía media mensual sobre superficie horizontal ..................................................... 2',
+    25,
+    95
+  );
+  doc.text(
+    isEn
+      ? '2.2. Mean monthly energy for selected study .................................................................... 3'
+      : '2.2. Energía media mensual para el estudio seleccionado ................................................... 3',
+    25,
+    102
+  );
+  doc.text(
+    isEn
+      ? '2.3. Global radiation gains with respect to horizontal plane .............................................. 3'
+      : '2.3. Ganancias de la rad. global respecto al plano horizontal ............................................... 3',
+    25,
+    109
+  );
+
+  // Caption: Figura 5.2.83
+  doc.setFont('helvetica', 'italic');
+  doc.setFontSize(8.5);
+  doc.setTextColor(37, 99, 235);
+  doc.text(
+    isEn
+      ? 'Figure 5.2.83. Report contents generated for produced energy'
+      : 'Figura 5.2.83. Contenidos del informe generado para la energía producida',
+    25,
+    122
+  );
+
+  // Sección 1: Introducción
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? '1. Introduction' : '1. Introducción', 20, 134);
+
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(203, 213, 225);
+  doc.roundedRect(20, 138, 170, 68, 2, 2, 'FD');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text(`${isEn ? 'Location' : 'Ciudad'}:`, 25, 146);
+  doc.setFont('helvetica', 'normal');
+  doc.text(res.locationName, 55, 146);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Latitude' : 'Latitud'}:`, 110, 146);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${res.latitude.toFixed(4)}°`, 135, 146);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Study' : 'Estudio'}:`, 25, 155);
+  doc.setFont('helvetica', 'normal');
+  doc.text(studyTitle, 55, 155);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Method' : 'Método'}:`, 110, 155);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Osterwald Thermal & Yield Model', 135, 155);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Installed peak power' : 'Potencia pico instalada'}:`, 25, 164);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${peakKw} kWp`, 80, 164);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Temperature coefficient' : 'Coeficiente de temperatura'} (γ):`, 25, 173);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${coefTemp} 1/°C`, 85, 173);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'NOCT / TONC' : 'TONC'}:`, 25, 182);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${tonc} °C`, 85, 182);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(71, 85, 105);
+  doc.text(
+    isEn
+      ? 'Calculation implemented according to Osterwald formula: PM = PM,STC · (G/1000) · [1 + γ · (Tc - 25)]'
+      : 'Cálculo implementado según la fórmula de Osterwald: PM = PM,STC · (G/1000) · [1 + γ · (Tc - 25)]',
+    25,
+    195
+  );
+  doc.text(
+    isEn
+      ? 'where cell temperature is given by: Tc = Tamb + [(TONC - 20) / 800] · G'
+      : 'donde la temperatura de célula viene dada por: Tc = Tamb + [(TONC - 20) / 800] · G',
+    25,
+    200
+  );
+
+  // =========================================================================
+  // PÁGINA 2: ENERGÍA GENERADA & FIGURA 2.1
+  // =========================================================================
+  doc.addPage();
+  drawAcademicHeader(2);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? '2. Generated energy' : '2. Energía generada', 20, 30);
+
+  // Monthly Energy Table
+  const tableY = 36;
+  doc.setFillColor(37, 99, 235);
+  doc.rect(20, tableY, 170, 7, 'F');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(255, 255, 255);
+  doc.text(isEn ? 'Month' : 'Mes', 23, tableY + 5);
+  doc.text(isEn ? 'Horizontal plane (kWh)' : 'Superficie horizontal (kWh)', 55, tableY + 5);
+  doc.text(isEn ? 'Performed study (kWh)' : 'Estudio realizado (kWh)', 110, tableY + 5);
+  doc.text(isEn ? 'Gain (kWh)' : 'Ganancia (kWh)', 160, tableY + 5);
+
+  let curY = tableY + 7;
+  for (let i = 0; i < 12; i++) {
+    const isAlt = i % 2 === 1;
+    if (isAlt) {
+      doc.setFillColor(248, 250, 252);
+      doc.rect(20, curY, 170, 5.5, 'F');
+    }
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(30, 41, 59);
+    doc.text(months[i], 23, curY + 4);
+    doc.text(energyData.e0_mes[i].toFixed(2), 65, curY + 4);
+    doc.text(energyData.e_mes[i].toFixed(2), 120, curY + 4);
+
+    const g = energyData.ganancia_mes[i];
+    if (g >= 0) doc.setTextColor(16, 185, 129);
+    else doc.setTextColor(239, 68, 68);
+    doc.text(`${g >= 0 ? '+' : ''}${g.toFixed(2)}`, 165, curY + 4);
+
+    curY += 5.5;
+  }
+
+  // Annual total row
+  doc.setFillColor(15, 23, 42);
+  doc.rect(20, curY, 170, 6.5, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(255, 255, 255);
+  doc.text(isEn ? 'ANNUAL' : 'ANUAL', 23, curY + 4.5);
+  doc.text(energyData.e0_anual.toFixed(1), 65, curY + 4.5);
+  doc.text(energyData.e_anual.toFixed(1), 120, curY + 4.5);
+  doc.text(`${energyData.ganancia_anual >= 0 ? '+' : ''}${energyData.ganancia_anual.toFixed(2)}`, 165, curY + 4.5);
+
+  // Figura 2.1: Gráfica de energía horizontal
+  const chart1Y = curY + 16;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(15, 23, 42);
+  doc.text(
+    isEn
+      ? 'Figure 2.1. Mean monthly energy on horizontal surface'
+      : 'Figura 2.1. Energía media mensual sobre superficie horizontal',
+    20,
+    chart1Y
+  );
+
+  // Vector chart box
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(203, 213, 225);
+  doc.roundedRect(20, chart1Y + 4, 170, 68, 2, 2, 'FD');
+
+  const maxE0 = Math.max(...energyData.e0_mes) * 1.15 || 2500;
+  const barPlotBaseY = chart1Y + 62;
+  const barPlotH = 46;
+  const barW = 9;
+  const barStep = 13;
+
+  for (let i = 0; i < 12; i++) {
+    const val = energyData.e0_mes[i];
+    const h = (val / maxE0) * barPlotH;
+    const x = 27 + i * barStep;
+    const y = barPlotBaseY - h;
+
+    doc.setFillColor(37, 99, 235);
+    doc.rect(x, y, barW, h, 'F');
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(71, 85, 105);
+    doc.text(String(i + 1), x + 3, barPlotBaseY + 5);
+
+    doc.setFontSize(5.5);
+    doc.text(String(Math.round(val)), x - 1, y - 2);
+  }
+
+  // =========================================================================
+  // PÁGINA 3: FIGURAS 2.2 Y 2.3
+  // =========================================================================
+  doc.addPage();
+  drawAcademicHeader(3);
+
+  // Figura 2.2: Energía estudio seleccionado
+  const chart2Y = 32;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(15, 23, 42);
+  doc.text(
+    isEn
+      ? 'Figure 2.2. Mean monthly energy for selected study'
+      : 'Figura 2.2. Energía media mensual para el estudio seleccionado',
+    20,
+    chart2Y
+  );
+
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(203, 213, 225);
+  doc.roundedRect(20, chart2Y + 4, 170, 72, 2, 2, 'FD');
+
+  const maxE = Math.max(...energyData.e_mes) * 1.15 || 2500;
+  const barPlot2BaseY = chart2Y + 66;
+
+  for (let i = 0; i < 12; i++) {
+    const val = energyData.e_mes[i];
+    const h = (val / maxE) * 50;
+    const x = 27 + i * barStep;
+    const y = barPlot2BaseY - h;
+
+    doc.setFillColor(16, 185, 129);
+    doc.rect(x, y, barW, h, 'F');
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(71, 85, 105);
+    doc.text(String(i + 1), x + 3, barPlot2BaseY + 5);
+
+    doc.setFontSize(5.5);
+    doc.text(String(Math.round(val)), x - 1, y - 2);
+  }
+
+  // Figura 2.3: Ganancias respecto al plano horizontal
+  const chart3Y = 120;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(15, 23, 42);
+  doc.text(
+    isEn
+      ? 'Figure 2.3. Global radiation gains with respect to horizontal plane'
+      : 'Figura 2.3. Ganancias de la rad. global respecto al plano horizontal',
+    20,
+    chart3Y
+  );
+
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(203, 213, 225);
+  doc.roundedRect(20, chart3Y + 4, 170, 78, 2, 2, 'FD');
+
+  const maxGainAbs = Math.max(...energyData.ganancia_mes.map((g) => Math.abs(g))) * 1.25 || 500;
+  const zeroLineY = chart3Y + 50;
+
+  // Zero axis line
+  doc.setDrawColor(148, 163, 184);
+  doc.setLineWidth(0.4);
+  doc.line(24, zeroLineY, 186, zeroLineY);
+
+  for (let i = 0; i < 12; i++) {
+    const g = energyData.ganancia_mes[i];
+    const h = (Math.abs(g) / maxGainAbs) * 32;
+    const x = 27 + i * barStep;
+
+    if (g >= 0) {
+      doc.setFillColor(16, 185, 129);
+      doc.rect(x, zeroLineY - h, barW, h, 'F');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(5.5);
+      doc.setTextColor(16, 185, 129);
+      doc.text(`+${Math.round(g)}`, x - 1, zeroLineY - h - 2);
+    } else {
+      doc.setFillColor(239, 68, 68);
+      doc.rect(x, zeroLineY, barW, h, 'F');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(5.5);
+      doc.setTextColor(239, 68, 68);
+      doc.text(`${Math.round(g)}`, x - 1, zeroLineY + h + 5);
+    }
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(71, 85, 105);
+    doc.text(String(i + 1), x + 3, zeroLineY + (g >= 0 ? 5 : -3));
+  }
+
+  // Save the PDF
+  const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const filename = `OrientSol3_Informe_Energia_${cleanLoc}.pdf`;
+  const pdfBlob = doc.output('blob');
+
+  let savedDirectoryLabel = 'C:\\OrientSol3\\InformesPDF';
+
+  if ('showSaveFilePicker' in window) {
+    try {
+      const handle = await (window as any).showSaveFilePicker({
+        suggestedName: filename,
+        types: [
+          {
+            description: 'Documento PDF (*.pdf)',
+            accept: { 'application/pdf': ['.pdf'] },
+          },
+        ],
+      });
+      const writable = await handle.createWritable();
+      await writable.write(pdfBlob);
+      await writable.close();
+      savedDirectoryLabel = handle.name || filename;
+      showPdfGeneratedSuccessModal(savedDirectoryLabel, isEn);
+      return;
+    } catch (err: any) {
+      if (err.name === 'AbortError') return;
+    }
+  }
+
+  const url = URL.createObjectURL(pdfBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  showPdfGeneratedSuccessModal('C:\\OrientSol3\\InformesPDF', isEn);
+}
+

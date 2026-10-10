@@ -8,36 +8,36 @@
   --font-heading: 'Outfit', var(--font-sans);
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-  /* Color Palette - Deep Dark Solar Theme */
-  --bg-primary: #0a0e17;
-  --bg-secondary: #111827;
-  --bg-card: rgba(17, 24, 39, 0.75);
-  --bg-card-hover: rgba(24, 33, 53, 0.85);
-  --bg-input: #1a2234;
-  --bg-terminal: #070a10;
+  /* Color Palette - Light Solar Eco Theme (Amarillos y Verdes Claros) */
+  --bg-primary: #f8faf5;
+  --bg-secondary: #f0fdf4;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f7fee7;
+  --bg-input: #ffffff;
+  --bg-terminal: #0f172a;
 
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-highlight: rgba(255, 255, 255, 0.16);
-  --border-active: #f59e0b;
+  --border-subtle: #dcfce7;
+  --border-highlight: #86efac;
+  --border-active: #16a34a;
 
-  --text-main: #f3f4f6;
-  --text-muted: #9ca3af;
-  --text-dim: #6b7280;
+  --text-main: #0f172a;
+  --text-muted: #334155;
+  --text-dim: #64748b;
 
-  /* Accents */
-  --solar-amber: #f59e0b;
-  --solar-gold: #fbbf24;
-  --solar-glow: rgba(245, 158, 11, 0.25);
-  --accent-cyan: #06b6d4;
-  --accent-indigo: #6366f1;
-  --accent-emerald: #10b981;
-  --accent-rose: #f43f5e;
+  /* Accents - Yellows & Greens */
+  --solar-amber: #d97706;
+  --solar-gold: #ca8a04;
+  --solar-glow: rgba(202, 138, 4, 0.15);
+  --accent-cyan: #0284c7;
+  --accent-indigo: #4f46e5;
+  --accent-emerald: #16a34a;
+  --accent-rose: #e11d48;
 
   /* Shadows & Glass */
   --glass-blur: blur(16px);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 25px var(--solar-glow);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 20px rgba(234, 179, 8, 0.18);
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -61,8 +61,8 @@ body {
   display: flex;
   flex-direction: column;
   background-image: 
-    radial-gradient(ellipse at 20% 0%, rgba(245, 158, 11, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 100%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
+    radial-gradient(ellipse at 15% 0%, rgba(254, 240, 138, 0.4) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 100%, rgba(187, 247, 208, 0.35) 0%, transparent 60%);
   background-attachment: fixed;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -4128,11 +4128,11 @@ body {
 .opt-seasonal-study-card {
   margin-top: 2rem;
   margin-bottom: 2.5rem;
-  background: linear-gradient(180deg, #041f19 0%, #021410 100%);
-  color: #ecfdf5;
+  background: #ffffff;
+  color: #0f172a;
   border-radius: var(--radius-md, 8px);
-  box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.6), 0 0 25px rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 10px 30px rgba(22, 163, 74, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04);
+  border: 1.5px solid #86efac;
   overflow: hidden;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
@@ -4146,27 +4146,29 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid rgba(16, 185, 129, 0.25);
+  border-bottom: 2px solid #dcfce7;
   padding-bottom: 1rem;
   margin-bottom: 1.25rem;
 }
 
 .opt-seasonal-meta-row {
   font-size: 1.05rem;
-  color: #f0fdf4;
+  color: #0f172a;
+  font-weight: 700;
   margin-bottom: 0.35rem;
 }
 
 .opt-seasonal-study-title-row {
   font-size: 1rem;
-  color: #34d399;
+  color: #15803d;
+  font-weight: 600;
 }
 
 .opt-matlab-brand-title {
   font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.5px;
-  color: #10b981;
+  color: #16a34a;
 }
 
 .opt-seasonal-toolbar {
@@ -4185,40 +4187,42 @@ body {
 .seasonal-comp-label {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #34d399;
+  color: #15803d;
 }
 
 .seasonal-comp-dropdown {
   padding: 0.45rem 0.95rem;
   font-size: 0.9rem;
-  border: 1px solid #059669;
-  border-radius: 4px;
-  background: #064e3b;
-  color: #ecfdf5;
+  border: 1.5px solid #16a34a;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #0f172a;
   font-weight: 600;
   cursor: pointer;
   outline: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .seasonal-comp-dropdown:focus {
-  border-color: #34d399;
-  box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.3);
+  border-color: #15803d;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
 }
 
 .opt-seasonal-table-caption {
   font-size: 1.02rem;
   font-weight: 700;
-  color: #a7f3d0;
+  color: #15803d;
   margin-bottom: 0.75rem;
   letter-spacing: 0.02em;
 }
 
 .opt-seasonal-table-wrap {
   overflow-x: auto;
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  border-radius: 6px;
+  border: 1.5px solid #86efac;
+  border-radius: 8px;
   margin-bottom: 1.5rem;
-  background: #021b15;
+  background: #ffffff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
 }
 
 .opt-seasonal-table {
@@ -4227,42 +4231,42 @@ body {
   text-align: center;
   font-size: 0.9rem;
   font-variant-numeric: tabular-nums;
-  background: #021b15;
-  color: #f0fdf4;
+  background: #ffffff;
+  color: #0f172a;
 }
 
 .opt-seasonal-table th,
 .opt-seasonal-table td {
-  border: 1px solid rgba(52, 211, 153, 0.16);
-  padding: 0.48rem 0.55rem;
+  border: 1px solid #cbd5e1;
+  padding: 0.5rem 0.6rem;
 }
 
 .seasonal-top-th-row th {
-  background: linear-gradient(180deg, #065f46 0%, #044e39 100%);
+  background: linear-gradient(180deg, #15803d 0%, #166534 100%);
   color: #ffffff;
   font-weight: 700;
   font-size: 0.85rem;
 }
 
 .seasonal-sub-th-row th {
-  background: #033a2a;
-  color: #a7f3d0;
+  background: #14532d;
+  color: #f0fdf4;
   font-weight: 600;
   font-size: 0.8rem;
 }
 
 .th-opt-angle-col,
 .th-opt-rad-col {
-  background: linear-gradient(180deg, #059669 0%, #047857 100%) !important;
+  background: linear-gradient(180deg, #ca8a04 0%, #a16207 100%) !important;
   color: #ffffff !important;
 }
 
 .th-gains-super-col {
-  background: #022c22 !important;
-  color: #34d399 !important;
+  background: #1e3a8a !important;
+  color: #ffffff !important;
 }
 
-/* Seasonal Month Badges - Tonalidades Verdes */
+/* Seasonal Month Badges - High Contrast Between Seasons */
 .td-month-badge {
   text-align: left !important;
   padding-left: 0.85rem !important;
@@ -4270,97 +4274,133 @@ body {
   font-size: 0.88rem;
   min-width: 110px;
   font-weight: 700;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Invierno: Verde Teal Frío */
+/* Invierno (Winter): Azul Hielo / Cian Frío */
 .badge-winter {
-  background: #0f766e !important;
+  background: #0284c7 !important;
+  border-right: 2px solid #0369a1 !important;
 }
 
-/* Primavera: Verde Esmeralda Vivo */
-.badge-spring {
-  background: #059669 !important;
+.row-season-winter {
+  background: #f0f9ff !important;
 }
 
-/* Verano: Verde Jade / Lima Intenso */
-.badge-summer {
-  background: #4d7c0f !important;
+.row-season-winter:hover {
+  background: #e0f2fe !important;
 }
 
-/* Otoño: Verde Bosque / Oliva Oscuro */
-.badge-autumn {
-  background: #166534 !important;
-}
-
-/* Media: Verde Noche Profundo */
-.badge-media {
-  background: #022c22 !important;
-  color: #a7f3d0 !important;
+.row-season-winter td {
+  color: #0c4a6e;
 }
 
 .text-season-winter {
-  color: #2dd4bf;
-}
-
-.text-season-spring {
-  color: #34d399;
-}
-
-.text-season-summer {
-  color: #a3e635;
-}
-
-.text-season-autumn {
-  color: #4ade80;
+  color: #0284c7 !important;
 }
 
 .val-opt-winter {
-  color: #5eead4;
-  font-weight: 700;
-}
-
-.val-opt-spring {
-  color: #6ee7b7;
-  font-weight: 700;
-}
-
-.val-opt-summer {
-  color: #bef264;
-  font-weight: 700;
-}
-
-.val-opt-autumn {
-  color: #86efac;
-  font-weight: 700;
-}
-
-.highlight-media {
-  color: #f0fdf4;
+  color: #0369a1 !important;
   font-weight: 800;
 }
 
-/* Filas con sutil tinte verde */
-.row-season-winter {
-  background: rgba(15, 118, 110, 0.12);
+/* Primavera (Spring): Verde Fresco / Esmeralda Brillante */
+.badge-spring {
+  background: #16a34a !important;
+  border-right: 2px solid #15803d !important;
 }
 
 .row-season-spring {
-  background: rgba(5, 150, 105, 0.12);
+  background: #f0fdf4 !important;
+}
+
+.row-season-spring:hover {
+  background: #dcfce7 !important;
+}
+
+.row-season-spring td {
+  color: #14532d;
+}
+
+.text-season-spring {
+  color: #15803d !important;
+}
+
+.val-opt-spring {
+  color: #166534 !important;
+  font-weight: 800;
+}
+
+/* Verano (Summer): Amarillo Oro Solar Radiante */
+.badge-summer {
+  background: #ca8a04 !important;
+  border-right: 2px solid #a16207 !important;
 }
 
 .row-season-summer {
-  background: rgba(77, 124, 15, 0.12);
+  background: #fefce8 !important;
+}
+
+.row-season-summer:hover {
+  background: #fef9c3 !important;
+}
+
+.row-season-summer td {
+  color: #713f12;
+}
+
+.text-season-summer {
+  color: #a16207 !important;
+}
+
+.val-opt-summer {
+  color: #854d0e !important;
+  font-weight: 800;
+}
+
+/* Otoño (Autumn): Terracota / Naranja Quemado Cálido */
+.badge-autumn {
+  background: #ea580c !important;
+  border-right: 2px solid #c2410c !important;
 }
 
 .row-season-autumn {
-  background: rgba(22, 101, 52, 0.12);
+  background: #fff7ed !important;
+}
+
+.row-season-autumn:hover {
+  background: #ffedd5 !important;
+}
+
+.row-season-autumn td {
+  color: #7c2d12;
+}
+
+.text-season-autumn {
+  color: #c2410c !important;
+}
+
+.val-opt-autumn {
+  color: #9a3412 !important;
+  font-weight: 800;
+}
+
+/* Media: Neutro Grafito Elegante */
+.badge-media {
+  background: #1e293b !important;
+  color: #ffffff !important;
 }
 
 .seasonal-media-row td {
-  background: #064e3b;
-  font-weight: 700;
-  border-top: 2px solid #10b981;
-  color: #ecfdf5;
+  background: #f8fafc !important;
+  font-weight: 800;
+  border-top: 2.5px solid #0f172a !important;
+  color: #0f172a !important;
+}
+
+.highlight-media {
+  color: #15803d !important;
+  font-weight: 800;
 }
 
 .opt-seasonal-footer-buttons {
@@ -4384,27 +4424,29 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.5rem 1.15rem;
-  background: #064e3b;
-  color: #ecfdf5;
-  border: 1px solid #059669;
-  border-radius: 4px;
+  padding: 0.55rem 1.25rem;
+  background: #16a34a;
+  color: #ffffff;
+  border: 1px solid #15803d;
+  border-radius: 6px;
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2);
   transition: all 0.15s ease;
 }
 
 .btn-study-foot:hover {
-  background: #047857;
-  border-color: #10b981;
-  color: #ffffff;
+  background: #15803d;
+  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.3);
+  transform: translateY(-1px);
 }
 
 .btn-salir {
-  background: rgba(239, 68, 68, 0.15);
+  background: #ffffff;
   border-color: #ef4444;
-  color: #fca5a5;
+  color: #ef4444;
+  box-shadow: none;
 }
 
 .btn-salir:hover {
@@ -4412,28 +4454,36 @@ body {
   color: #ffffff;
 }
 
+.btn-volver {
+  background: #ffffff;
+  border-color: #64748b;
+  color: #334155;
+  box-shadow: none;
+}
+
+.btn-volver:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
 .btn-excel {
-  background: rgba(16, 185, 129, 0.2);
-  color: #6ee7b7;
-  border-color: #10b981;
+  background: #059669;
+  color: #ffffff;
+  border-color: #047857;
 }
 
 .btn-excel:hover {
-  background: #059669;
-  border-color: #34d399;
-  color: #ffffff;
+  background: #047857;
 }
 
 .btn-report {
-  background: rgba(5, 150, 105, 0.28);
-  color: #a7f3d0;
-  border-color: #34d399;
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0369a1;
 }
 
 .btn-report:hover {
-  background: #047857;
-  border-color: #6ee7b7;
-  color: #ffffff;
+  background: #0369a1;
 }
 
 /* ==========================================================================
@@ -4441,10 +4491,10 @@ body {
    ========================================================================== */
 .opt-energy-study-card {
   margin-top: 1.5rem;
-  background: linear-gradient(180deg, #021a14 0%, #010f0c 100%);
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: #ffffff;
+  border: 1.5px solid #86efac;
   border-radius: 8px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.08);
+  box-shadow: 0 10px 30px rgba(22, 163, 74, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04);
   overflow: hidden;
   transition: all 0.3s ease;
 }
@@ -4459,14 +4509,14 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 1rem;
-  background: linear-gradient(90deg, #032b21 0%, #064e3b 100%);
-  border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+  background: linear-gradient(90deg, #15803d 0%, #16a34a 100%);
+  border-bottom: 1px solid #15803d;
 }
 
 .opt-energy-title-text {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #ecfdf5;
+  color: #ffffff;
   letter-spacing: 0.02em;
 }
 
@@ -4478,7 +4528,7 @@ body {
 .opt-energy-win-btn {
   background: transparent;
   border: none;
-  color: #a7f3d0;
+  color: #dcfce7;
   cursor: pointer;
   padding: 0.2rem 0.4rem;
   border-radius: 3px;
@@ -4486,7 +4536,7 @@ body {
 }
 
 .opt-energy-win-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .opt-energy-win-close:hover {
@@ -4514,8 +4564,8 @@ body {
 }
 
 .energy-inputs-card {
-  background: rgba(4, 38, 30, 0.6);
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  background: #f8faf5;
+  border: 1.5px solid #bbf7d0;
   border-radius: 6px;
   padding: 1.25rem;
   display: flex;
@@ -4525,15 +4575,15 @@ body {
 }
 
 .energy-card-header-blue {
-  background: rgba(14, 165, 233, 0.12);
-  border: 1px solid rgba(14, 165, 233, 0.3);
+  background: #e0f2fe;
+  border: 1px solid #7dd3fc;
   padding: 0.6rem 0.85rem;
   border-radius: 4px;
 }
 
 .energy-card-header-blue h4 {
   font-size: 0.95rem;
-  color: #38bdf8;
+  color: #0369a1;
   margin: 0;
   font-weight: 700;
   text-align: center;
@@ -4548,8 +4598,8 @@ body {
 
 .energy-field-label {
   font-size: 0.88rem;
-  color: #d1fae5;
-  font-weight: 500;
+  color: #1e293b;
+  font-weight: 600;
 }
 
 .energy-field-input {
@@ -4560,27 +4610,27 @@ body {
 .energy-input-box {
   width: 110px;
   padding: 0.45rem 0.65rem;
-  background: #01140f;
-  border: 1.5px solid rgba(16, 185, 129, 0.4);
+  background: #ffffff;
+  border: 1.5px solid #16a34a;
   border-radius: 4px;
-  color: #ffffff;
+  color: #0f172a;
   font-size: 0.95rem;
   font-family: var(--font-mono, monospace);
-  font-weight: 600;
+  font-weight: 700;
   text-align: center;
   transition: all 0.2s ease;
 }
 
 .energy-input-box:focus {
   outline: none;
-  border-color: #34d399;
-  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.25);
+  border-color: #15803d;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
 }
 
 .energy-tech-group {
   padding: 0.85rem;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px dashed rgba(245, 158, 11, 0.35);
+  background: #fefce8;
+  border: 1px dashed #ca8a04;
   border-radius: 5px;
   display: flex;
   flex-direction: column;
@@ -4590,7 +4640,7 @@ body {
 .energy-tech-label {
   font-size: 0.86rem;
   font-weight: 700;
-  color: #fbbf24;
+  color: #854d0e;
 }
 
 .energy-inputs-footer {
@@ -4607,18 +4657,19 @@ body {
   justify-content: space-between;
   gap: 0.5rem;
   font-size: 0.82rem;
-  color: #93c5fd;
+  color: #0369a1;
 }
 
 .btn-energy-info-matlab {
   background: #0284c7;
   color: #ffffff;
   border: none;
-  padding: 0.3rem 0.75rem;
+  padding: 0.35rem 0.85rem;
   border-radius: 4px;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2);
   transition: background 0.15s ease;
 }
 
@@ -4631,19 +4682,19 @@ body {
   padding: 0.75rem 1rem;
   background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
   color: #ffffff;
-  border: 1.5px solid #3b82f6;
+  border: 1.5px solid #1d4ed8;
   border-radius: 5px;
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
   transition: all 0.2s ease;
 }
 
 .btn-energy-calculate-primary:hover {
   background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%);
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.55);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
 }
 
 /* Right: Results Panel */
@@ -4658,8 +4709,8 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0.85rem 1.25rem;
-  background: rgba(4, 38, 30, 0.7);
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: #f0fdf4;
+  border: 1.5px solid #bbf7d0;
   border-radius: 6px;
   flex-wrap: wrap;
   gap: 1rem;
@@ -4682,12 +4733,12 @@ body {
 }
 
 .energy-meta-item .meta-k {
-  color: #6ee7b7;
+  color: #166534;
   font-weight: 600;
 }
 
 .energy-meta-item .meta-v {
-  color: #ffffff;
+  color: #0f172a;
   font-weight: 700;
 }
 
@@ -4699,12 +4750,12 @@ body {
 .energy-matlab-brand {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #ecfdf5;
+  color: #15803d;
   letter-spacing: 0.05em;
 }
 
 .energy-matlab-brand strong {
-  color: #fbbf24;
+  color: #ca8a04;
   margin-left: 0.25rem;
 }
 
@@ -4717,15 +4768,15 @@ body {
 .energy-table-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #a7f3d0;
+  color: #15803d;
   margin: 0;
 }
 
 .opt-energy-table-wrapper {
   overflow-x: auto;
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  border: 1.5px solid #bbf7d0;
   border-radius: 6px;
-  background: #021a14;
+  background: #ffffff;
 }
 
 .opt-energy-table {
@@ -4733,12 +4784,13 @@ body {
   border-collapse: collapse;
   font-size: 0.88rem;
   text-align: right;
+  color: #0f172a;
 }
 
 .opt-energy-table th,
 .opt-energy-table td {
-  padding: 0.5rem 0.85rem;
-  border-bottom: 1px solid rgba(16, 185, 129, 0.15);
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .opt-energy-table th {
@@ -4749,14 +4801,14 @@ body {
 
 .th-ener-month {
   text-align: left;
-  background: #032b21;
-  color: #d1fae5;
+  background: #15803d;
+  color: #ffffff;
   width: 130px;
 }
 
 .th-ener-horiz {
-  background: #1e3a8a;
-  color: #bfdbfe;
+  background: #1d4ed8;
+  color: #ffffff;
   text-align: right;
 }
 
@@ -4767,20 +4819,21 @@ body {
 }
 
 .th-ener-gain {
-  background: #7f1d1d;
-  color: #fecaca;
+  background: #b91c1c;
+  color: #ffffff;
   text-align: right;
 }
 
 .td-ener-month {
   text-align: left;
-  color: #a7f3d0;
-  background: rgba(3, 43, 33, 0.4);
+  color: #166534;
+  background: #f0fdf4;
+  font-weight: 700;
 }
 
 .td-ener-study-val {
-  color: #93c5fd;
-  font-weight: 600;
+  color: #1d4ed8;
+  font-weight: 700;
 }
 
 .td-ener-gain-val {
@@ -4788,20 +4841,20 @@ body {
 }
 
 .opt-energy-table tr:hover {
-  background: rgba(16, 185, 129, 0.08);
+  background: #f0fdf4;
 }
 
 .energy-annual-row td {
-  background: #032b21;
+  background: #f0fdf4;
   font-weight: 800;
-  border-top: 2px solid #10b981;
-  color: #ecfdf5;
+  border-top: 2px solid #16a34a;
+  color: #15803d;
   font-size: 0.95rem;
 }
 
 .td-ener-annual {
-  background: #01140f !important;
-  color: #34d399 !important;
+  background: #dcfce7 !important;
+  color: #15803d !important;
 }
 
 .opt-energy-footer-buttons {

@@ -19,6 +19,7 @@ interface OptimalAnnualStudyProps {
   simulationResult: SolarBridgeSimulationResult;
   locationName: string;
   latitude: number;
+  peakPowerKw?: number;
 }
 
 // Module-level state: decoupled table component and chart component
@@ -1054,6 +1055,7 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
         locationName,
         latitude,
         studyType: 'annual',
+        initialPeakKw: props.peakPowerKw ?? 5.0,
         onClose: () => {
           stateShowEnergy = false;
           renderInternal();
