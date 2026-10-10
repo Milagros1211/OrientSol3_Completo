@@ -40,31 +40,9 @@
 
 ---
 
-## 🚀 Despliegue en GitHub Pages
-
-Este repositorio cuenta con un pipeline automatizado de integración y despliegue continuo (**CI/CD**) mediante **GitHub Actions** (`.github/workflows/deploy.yml`).
-
-### Pasos para activar GitHub Pages en tu repositorio:
-
-1. Crea el repositorio en GitHub y sube el código:
-   ```bash
-   git init
-   git add .
-   git commit -m "feat: Initial commit of OrientSol 3.0 suite"
-   git branch -M main
-   git remote add origin https://github.com/<tu-usuario>/<tu-repositorio>.git
-   git push -u origin main
-   ```
-2. En GitHub, dirígete a: **Settings** > **Pages**.
-3. En la sección **Build and deployment > Source**, selecciona **GitHub Actions**.
-4. ¡Listo! Cada vez que realices un `push` a la rama `main`, la aplicación se compilará y se publicará automáticamente en:
-   ```
-   https://<tu-usuario>.github.io/<tu-repositorio>/
-   ```
-
 ---
 
-## 💻 Ejecución y Desarrollo Local
+## Ejecución y Desarrollo Local
 
 ### Requisitos previos:
 - [Node.js](https://nodejs.org/) v18 o superior.
@@ -105,7 +83,7 @@ npm run cap:open:android
 
 ---
 
-## 📂 Estructura del Repositorio
+## Estructura del Repositorio
 
 ```text
 ├── .github/workflows/
@@ -128,7 +106,7 @@ npm run cap:open:android
 
 ---
 
-## 📜 Licencia y Derechos de Autor
+## Licencia y Derechos de Autor
 
 Desarrollado en el marco del Máster Universitario en Energías Renovables de la **Universidad de Jaén**.  
 Código abierto bajo licencia MIT.
