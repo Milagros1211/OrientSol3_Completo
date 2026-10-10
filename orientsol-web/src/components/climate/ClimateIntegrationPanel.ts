@@ -204,15 +204,20 @@ export function renderClimateIntegrationPanel(): HTMLElement {
   saveBtn.addEventListener('click', async () => {
     if (!activeClimateData) return;
 
-    setStatus(isEn ? 'Saving dataset to Supabase...' : 'Guardando dataset en Supabase...', 'info');
+    setStatus(isEn ? 'Registering dataset in Supabase...' : 'Registrando dataset en Supabase...', 'info');
     saveBtn.disabled = true;
 
     try {
-      const saved = await climateDatabaseService.saveClimateData(activeClimateData);
-      if (saved) {
-        setStatus(isEn ? '✓ Climate dataset saved successfully to Supabase.' : '✓ Dataset climático guardado con éxito en Supabase.', 'success');
+      const reg = await climateDatabaseService.registerEmplacement(activeClimateData);
+      if (reg.isDuplicate) {
+        setStatus(
+          isEn
+            ? `⚠️ Emplacement already registered (${reg.similarityPct}% data match with "${reg.matchedRecord?.locationName}").`
+            : `⚠️ El emplazamiento ya ha sido registrado previamente (${reg.similarityPct}% de coincidencia en datos ingresados con "${reg.matchedRecord?.locationName}").`,
+          'warning'
+        );
       } else {
-        setStatus(isEn ? 'Note: Working in offline mode (mock storage simulated).' : 'Aviso: Funcionando en modo offline (simulación mock completada).', 'info');
+        setStatus(reg.message, 'success');
       }
     } catch (err: any) {
       setStatus(`Error al guardar en Supabase: ${err.message}`, 'error');
@@ -249,7 +254,7 @@ export function renderClimateIntegrationPanel(): HTMLElement {
     }
   });
 
-  function setStatus(msg: string, type: 'info' | 'success' | 'error' = 'info') {
+  function setStatus(msg: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') {
     statusBar.textContent = msg;
     statusBar.className = `climate-status-bar status-${type}`;
   }

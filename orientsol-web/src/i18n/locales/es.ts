@@ -76,6 +76,7 @@ export const es: Translations = {
     peakPowerLabel: 'Potencia Pico (kWp)',
     prLabel: 'PR (Performance Ratio)',
     albedoLabel: 'Albedo (ρ)',
+    toncLabel: 'TONC / NOCT [°C]',
     runSimulationBtn: '🚀 Ejecutar en Motor Python (Pyodide)',
     runningSimulationBtn: 'Calculando en Pyodide...',
   },

@@ -6,3 +6,4 @@ export * from './dashboard/ArchitectureOverview';
 export * from './common/Badge';
 export * from './climate/ClimateIntegrationPanel';
 export * from './climate/DualClimateLoaderPanel';
+export * from './supabase/SupabaseSyncModal';
