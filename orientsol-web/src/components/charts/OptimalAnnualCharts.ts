@@ -20,6 +20,12 @@ export interface MonthlyOptimumChartProps {
   radOpt: number[];
   radX: number[];
   gainsPct: number[]; // vs 0°
+  allMonthlyData?: {
+    global: { rad0: number[]; radOpt: number[]; radX: number[]; gainsPct: number[] };
+    beam: { rad0: number[]; radOpt: number[]; radX: number[]; gainsPct: number[] };
+    diffuse: { rad0: number[]; radOpt: number[]; radX: number[]; gainsPct: number[] };
+    albedo: { rad0: number[]; radOpt: number[]; radX: number[]; gainsPct: number[] };
+  };
   component: RadiationComponentType;
   optimalAngle: number;
   selectedAngleX: number;
@@ -253,10 +259,24 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
   const optX = xScale(optimalAngle);
   const optY = yScale(optRad);
 
+  const optBeamRad = isAll ? (beamPts[optimalAngle]?.rad || 0) : 0;
+  const optBeamY = yScale(optBeamRad);
+  const optDiffRad = isAll ? (diffusePts[optimalAngle]?.rad || 0) : 0;
+  const optDiffY = yScale(optDiffRad);
+  const optAlbRad = isAll ? (albedoPts[optimalAngle]?.rad || 0) : 0;
+  const optAlbY = yScale(optAlbRad);
+
   // Selected Angle X point
   const angleXRad = optPts[selectedAngleX]?.rad || 0;
   const angleXX = xScale(selectedAngleX);
   const angleXY = yScale(angleXRad);
+
+  const angleXBeamRad = isAll ? (beamPts[selectedAngleX]?.rad || 0) : 0;
+  const angleXBeamY = yScale(angleXBeamRad);
+  const angleXDiffRad = isAll ? (diffusePts[selectedAngleX]?.rad || 0) : 0;
+  const angleXDiffY = yScale(angleXDiffRad);
+  const angleXAlbRad = isAll ? (albedoPts[selectedAngleX]?.rad || 0) : 0;
+  const angleXAlbY = yScale(angleXAlbRad);
 
   const chartTitle = isEn
     ? 'Evolution of radiation as a function of inclination'
@@ -354,28 +374,102 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
       `
       }
 
-      <!-- Optimal Angle Indicator (Golden Marker) -->
-      <line x1="${optX}" y1="${optY}" x2="${optX}" y2="${height - padding.bottom}" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3" />
-      <circle cx="${optX}" cy="${optY}" r="6.5" fill="#fbbf24" stroke="#ffffff" stroke-width="2" filter="url(#glow-opt)" />
-      <g transform="translate(${optX}, ${Math.max(padding.top + 10, optY - 14)})">
-        <rect x="-42" y="-18" width="84" height="20" rx="4" fill="rgba(15, 23, 42, 0.9)" stroke="#f59e0b" stroke-width="1" />
+      <!-- Optimal Angle Indicator (Markers on all curves when Todas is selected) -->
+      <line
+        x1="${optX}"
+        y1="${isAll ? Math.min(optY, optBeamY, optDiffY, optAlbY) : optY}"
+        x2="${optX}"
+        y2="${height - padding.bottom}"
+        stroke="#f59e0b"
+        stroke-width="1.5"
+        stroke-dasharray="4,3"
+      />
+
+      <!-- Global Curve Intersection (Gdm) -->
+      <circle cx="${optX}" cy="${optY}" r="6.5" fill="#00b4d8" stroke="#ffffff" stroke-width="2" filter="url(#glow-opt)" />
+      <g transform="translate(${optX}, ${Math.max(padding.top + 8, optY - 14)})">
+        <rect x="-44" y="-18" width="88" height="20" rx="4" fill="rgba(15, 23, 42, 0.9)" stroke="#f59e0b" stroke-width="1" />
         <text x="0" y="-4" fill="#fef08a" font-size="11" font-weight="700" text-anchor="middle" font-family="monospace">
           ${isEn ? 'Opt' : 'Ópt'}: ${optimalAngle}° (${optRad.toFixed(2)})
         </text>
       </g>
 
-      <!-- Selected Angle X Indicator (Purple Marker) -->
+      ${
+        isAll
+          ? `
+        <!-- Beam Curve Intersection (Bdm: Red) -->
+        <circle cx="${optX}" cy="${optBeamY}" r="5.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.8" />
+        <g transform="translate(${optX + 8}, ${optBeamY + 3})">
+          <rect x="0" y="-9" width="48" height="15" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#ef4444" stroke-width="0.8" />
+          <text x="24" y="2" fill="#fca5a5" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">B: ${optBeamRad.toFixed(2)}</text>
+        </g>
+
+        <!-- Diffuse Curve Intersection (Ddm: Lime Green) -->
+        <circle cx="${optX}" cy="${optDiffY}" r="5.5" fill="#84cc16" stroke="#ffffff" stroke-width="1.8" />
+        <g transform="translate(${optX + 8}, ${optDiffY + 3})">
+          <rect x="0" y="-9" width="48" height="15" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#84cc16" stroke-width="0.8" />
+          <text x="24" y="2" fill="#bef264" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">D: ${optDiffRad.toFixed(2)}</text>
+        </g>
+
+        <!-- Albedo Curve Intersection (Rdm: Orange) -->
+        <circle cx="${optX}" cy="${optAlbY}" r="5.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.8" />
+        <g transform="translate(${optX + 8}, ${optAlbY + 3})">
+          <rect x="0" y="-9" width="48" height="15" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#f59e0b" stroke-width="0.8" />
+          <text x="24" y="2" fill="#fed7aa" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">R: ${optAlbRad.toFixed(2)}</text>
+        </g>
+      `
+          : ''
+      }
+
+      <!-- Selected Angle X Indicator (Markers on all curves) -->
       ${
         selectedAngleX !== optimalAngle
           ? `
-        <line x1="${angleXX}" y1="${angleXY}" x2="${angleXX}" y2="${height - padding.bottom}" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="4,3" />
+        <line
+          x1="${angleXX}"
+          y1="${isAll ? Math.min(angleXY, angleXBeamY, angleXDiffY, angleXAlbY) : angleXY}"
+          x2="${angleXX}"
+          y2="${height - padding.bottom}"
+          stroke="#a855f7"
+          stroke-width="1.5"
+          stroke-dasharray="4,3"
+        />
+
+        <!-- Global Intersection at Angle X -->
         <circle cx="${angleXX}" cy="${angleXY}" r="6" fill="#c084fc" stroke="#ffffff" stroke-width="2" filter="url(#glow-anglex)" />
-        <g transform="translate(${angleXX}, ${Math.max(padding.top + 10, angleXY - 14)})">
-          <rect x="-40" y="-18" width="80" height="20" rx="4" fill="rgba(15, 23, 42, 0.9)" stroke="#a855f7" stroke-width="1" />
+        <g transform="translate(${angleXX}, ${Math.max(padding.top + 8, angleXY - 14)})">
+          <rect x="-42" y="-18" width="84" height="20" rx="4" fill="rgba(15, 23, 42, 0.9)" stroke="#a855f7" stroke-width="1" />
           <text x="0" y="-4" fill="#e9d5ff" font-size="11" font-weight="700" text-anchor="middle" font-family="monospace">
             X: ${selectedAngleX}° (${angleXRad.toFixed(2)})
           </text>
         </g>
+
+        ${
+          isAll
+            ? `
+          <!-- Beam Intersection at Angle X -->
+          <circle cx="${angleXX}" cy="${angleXBeamY}" r="5" fill="#ef4444" stroke="#c084fc" stroke-width="1.8" />
+          <g transform="translate(${angleXX + 8}, ${angleXBeamY + 3})">
+            <rect x="0" y="-9" width="48" height="15" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#a855f7" stroke-width="0.8" />
+            <text x="24" y="2" fill="#fca5a5" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">B: ${angleXBeamRad.toFixed(2)}</text>
+          </g>
+
+          <!-- Diffuse Intersection at Angle X -->
+          <circle cx="${angleXX}" cy="${angleXDiffY}" r="5" fill="#84cc16" stroke="#c084fc" stroke-width="1.8" />
+          <g transform="translate(${angleXX + 8}, ${angleXDiffY + 3})">
+            <rect x="0" y="-9" width="48" height="15" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#a855f7" stroke-width="0.8" />
+            <text x="24" y="2" fill="#bef264" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">D: ${angleXDiffRad.toFixed(2)}</text>
+          </g>
+
+          <!-- Albedo Intersection at Angle X -->
+          <circle cx="${angleXX}" cy="${angleXAlbY}" r="5" fill="#f59e0b" stroke="#c084fc" stroke-width="1.8" />
+          <g transform="translate(${angleXX + 8}, ${angleXAlbY + 3})">
+            <rect x="0" y="-9" width="48" height="15" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#a855f7" stroke-width="0.8" />
+            <text x="24" y="2" fill="#fed7aa" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">R: ${angleXAlbRad.toFixed(2)}</text>
+          </g>
+        `
+            : ''
+        }
       `
           : ''
       }
@@ -392,7 +486,18 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
  * Bottom Chart: Monthly Gains Bar Chart (%).
  */
 export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps): string {
-  const { rad0, radOpt, radX, gainsPct, component, optimalAngle, selectedAngleX, gridEnabled, isEn } = props;
+  const {
+    rad0,
+    radOpt,
+    radX,
+    gainsPct,
+    allMonthlyData,
+    component,
+    optimalAngle,
+    selectedAngleX,
+    gridEnabled,
+    isEn,
+  } = props;
   const months = isEn ? MONTHS_SHORT_EN : MONTHS_SHORT_ES;
 
   const width = 820;
@@ -410,10 +515,20 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
   const bottomY0 = topY1 + gap;
   const bottomY1 = bottomY0 + bottomH;
 
-  // 1. Scales for Top Plot (Radiation)
-  const maxRad = Math.ceil(Math.max(...rad0, ...radOpt, ...radX, 1.0) * 1.15 * 10) / 10;
-  const yTopScale = (v: number) => topY1 - (v / maxRad) * topH;
+  const isAll = component === 'all' && Boolean(allMonthlyData);
 
+  // 1. Scales for Top Plot (Radiation)
+  const allRadVals = isAll
+    ? [
+        ...allMonthlyData!.global.radOpt,
+        ...allMonthlyData!.beam.radOpt,
+        ...allMonthlyData!.diffuse.radOpt,
+        ...allMonthlyData!.albedo.radOpt,
+      ]
+    : [...rad0, ...radOpt, ...radX];
+
+  const maxRad = Math.ceil(Math.max(...allRadVals, 1.0) * 1.15 * 10) / 10;
+  const yTopScale = (v: number) => topY1 - (v / maxRad) * topH;
   const xMonthScale = (idx: number) => padding.left + (idx + 0.5) * (plotW / 12);
 
   // Top Plot Grid
@@ -437,13 +552,22 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
   }
 
   // Top Curves
-  const optLine = radOpt.map((v, i) => `${i === 0 ? 'M' : 'L'} ${xMonthScale(i).toFixed(1)} ${yTopScale(v).toFixed(1)}`).join(' ');
-  const horizLine = rad0.map((v, i) => `${i === 0 ? 'M' : 'L'} ${xMonthScale(i).toFixed(1)} ${yTopScale(v).toFixed(1)}`).join(' ');
-  const xLine = radX.map((v, i) => `${i === 0 ? 'M' : 'L'} ${xMonthScale(i).toFixed(1)} ${yTopScale(v).toFixed(1)}`).join(' ');
+  const toMonthLine = (arr: number[]) =>
+    arr.map((v, i) => `${i === 0 ? 'M' : 'L'} ${xMonthScale(i).toFixed(1)} ${yTopScale(v).toFixed(1)}`).join(' ');
+
+  const optLine = toMonthLine(radOpt);
+  const horizLine = toMonthLine(rad0);
+  const xLine = toMonthLine(radX);
+
+  const globalOptLine = isAll ? toMonthLine(allMonthlyData!.global.radOpt) : '';
+  const beamOptLine = isAll ? toMonthLine(allMonthlyData!.beam.radOpt) : '';
+  const diffOptLine = isAll ? toMonthLine(allMonthlyData!.diffuse.radOpt) : '';
+  const albOptLine = isAll ? toMonthLine(allMonthlyData!.albedo.radOpt) : '';
 
   // 2. Scales for Bottom Plot (Gains %)
-  const minGain = Math.floor(Math.min(...gainsPct, 0) / 10) * 10;
-  const maxGain = Math.ceil(Math.max(...gainsPct, 10) / 10) * 10;
+  const activeGains = isAll ? allMonthlyData!.global.gainsPct : gainsPct;
+  const minGain = Math.floor(Math.min(...activeGains, 0) / 10) * 10;
+  const maxGain = Math.ceil(Math.max(...activeGains, 10) / 10) * 10;
   const gainSpan = Math.max(10, maxGain - minGain);
   const yGainScale = (pct: number) => bottomY1 - ((pct - minGain) / gainSpan) * bottomH;
   const zeroY = yGainScale(0);
@@ -452,8 +576,8 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
   const colW = plotW / 12;
   const barW = colW * 0.45;
 
-  const gainBars = gainsPct
-    .map((pct, idx) => {
+  const gainBars = activeGains
+    .map((pct: number, idx: number) => {
       const cx = xMonthScale(idx);
       const bx = cx - barW / 2;
       const by = Math.min(yGainScale(pct), zeroY);
@@ -483,16 +607,23 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
     `;
   });
 
-  const compLabel =
-    component === 'global' ? 'Global' : component === 'beam' ? 'Directa' : component === 'diffuse' ? 'Difusa' : 'Albedo';
+  const compLabel = isAll
+    ? (isEn ? 'All Components' : 'Todas las componentes')
+    : component === 'global'
+    ? 'Global'
+    : component === 'beam'
+    ? 'Directa'
+    : component === 'diffuse'
+    ? 'Difusa'
+    : 'Albedo';
 
   const title1 = isEn
-    ? `Monthly ${compLabel} Radiation (kWh/m²/day)`
-    : `Radiación ${compLabel.toLowerCase()} (kWh/m²/día)`;
+    ? `Monthly ${compLabel} Radiation (kWh/m²/day) at Optimal Tilt (${optimalAngle}°)`
+    : `Radiación mensual ${compLabel.toLowerCase()} (kWh/m²/día) en inclinación óptima (${optimalAngle}°)`;
 
   const title2 = isEn
-    ? `Annual Optimal Tilt Radiation Gains (%) vs Horizontal (0°)`
-    : `Ganancias de radiación para la inclinación óptima anual (%) s/ Horizontal (0°)`;
+    ? `Radiation Gains (%) vs Horizontal (0°)`
+    : `Ganancias de radiación (%) s/ Horizontal (0°)`;
 
   return `
     <svg viewBox="0 0 ${width} ${height}" class="opt-svg-chart" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
@@ -505,46 +636,75 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
       <line x1="${padding.left}" y1="${topY1}" x2="${width - padding.right}" y2="${topY1}" stroke="#475569" stroke-width="1.2" />
       <line x1="${padding.left}" y1="${topY0}" x2="${padding.left}" y2="${topY1}" stroke="#475569" stroke-width="1.2" />
 
-      <!-- Horizontal 0° Line (Dark Cyan / Teal) -->
-      <path d="${horizLine}" fill="none" stroke="#0ea5e9" stroke-width="2.5" stroke-dasharray="4,3" />
-      ${rad0
-        .map((v, i) => `<circle cx="${xMonthScale(i)}" cy="${yTopScale(v)}" r="3.5" fill="#0ea5e9" />`)
-        .join('')}
-
-      <!-- Angle X Line (Purple) -->
       ${
-        selectedAngleX !== optimalAngle
+        isAll
           ? `
-        <path d="${xLine}" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" />
-        ${radX.map((v, i) => `<circle cx="${xMonthScale(i)}" cy="${yTopScale(v)}" r="3" fill="#a855f7" />`).join('')}
+        <!-- Four Monthly Curves at Optimal Tilt -->
+        <path d="${globalOptLine}" fill="none" stroke="#00b4d8" stroke-width="2.8" stroke-linecap="round" />
+        ${allMonthlyData!.global.radOpt.map((v: number, i: number) => `<circle cx="${xMonthScale(i)}" cy="${yTopScale(v)}" r="4.5" fill="#00b4d8" stroke="#ffffff" stroke-width="1.5" />`).join('')}
+
+        <path d="${beamOptLine}" fill="none" stroke="#ef4444" stroke-width="2.4" stroke-linecap="round" />
+        ${allMonthlyData!.beam.radOpt.map((v: number, i: number) => `<circle cx="${xMonthScale(i)}" cy="${yTopScale(v)}" r="4" fill="#ef4444" stroke="#ffffff" stroke-width="1.2" />`).join('')}
+
+        <path d="${diffOptLine}" fill="none" stroke="#84cc16" stroke-width="2.4" stroke-linecap="round" />
+        ${allMonthlyData!.diffuse.radOpt.map((v: number, i: number) => `<circle cx="${xMonthScale(i)}" cy="${yTopScale(v)}" r="4" fill="#84cc16" stroke="#ffffff" stroke-width="1.2" />`).join('')}
+
+        <path d="${albOptLine}" fill="none" stroke="#f59e0b" stroke-width="2.4" stroke-linecap="round" />
+        ${allMonthlyData!.albedo.radOpt.map((v: number, i: number) => `<circle cx="${xMonthScale(i)}" cy="${yTopScale(v)}" r="4" fill="#f59e0b" stroke="#ffffff" stroke-width="1.2" />`).join('')}
+
+        <!-- Top Legend: Todas (4 components) -->
+        <g transform="translate(${width - padding.right - 280}, ${topY0 + 6})">
+          <rect x="0" y="0" width="275" height="26" rx="4" fill="rgba(15, 23, 42, 0.9)" stroke="rgba(255,255,255,0.15)" />
+          <circle cx="12" cy="13" r="4" fill="#00b4d8" />
+          <text x="20" y="17" fill="#7dd3fc" font-size="11" font-weight="700">Gdm</text>
+          
+          <circle cx="75" cy="13" r="4" fill="#ef4444" />
+          <text x="83" y="17" fill="#fca5a5" font-size="11" font-weight="700">Bdm</text>
+
+          <circle cx="138" cy="13" r="4" fill="#84cc16" />
+          <text x="146" y="17" fill="#bef264" font-size="11" font-weight="700">Ddm</text>
+
+          <circle cx="202" cy="13" r="4" fill="#f59e0b" />
+          <text x="210" y="17" fill="#fed7aa" font-size="11" font-weight="700">Rdm</text>
+        </g>
       `
-          : ''
-      }
-
-      <!-- Optimal Angle Line (Glowing Cyan / Amber) -->
-      <path d="${optLine}" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" />
-      ${radOpt
-        .map((v, i) => `<circle cx="${xMonthScale(i)}" cy="${yTopScale(v)}" r="4.5" fill="#fbbf24" stroke="#ffffff" stroke-width="1.5" />`)
-        .join('')}
-
-      <!-- Top Legend -->
-      <g transform="translate(${width - padding.right - 260}, ${topY0 + 6})">
-        <rect x="0" y="0" width="250" height="26" rx="4" fill="rgba(15, 23, 42, 0.85)" stroke="rgba(255,255,255,0.12)" />
-        <circle cx="12" cy="13" r="4" fill="#fbbf24" />
-        <text x="20" y="17" fill="#fef08a" font-size="11" font-weight="700">${isEn ? 'Opt' : 'Ópt'}. (${optimalAngle}°)</text>
-        
-        <circle cx="95" cy="13" r="4" fill="#0ea5e9" />
-        <text x="103" y="17" fill="#7dd3fc" font-size="11" font-weight="600">0° (Horiz)</text>
+          : `
+        <!-- Single Component: Opt vs 0° vs X -->
+        <path d="${horizLine}" fill="none" stroke="#0ea5e9" stroke-width="2.5" stroke-dasharray="4,3" />
+        ${rad0.map((v, i) => `<circle cx="${xMonthScale(i)}" cy="${yTopScale(v)}" r="3.5" fill="#0ea5e9" />`).join('')}
 
         ${
           selectedAngleX !== optimalAngle
             ? `
-          <circle cx="178" cy="13" r="4" fill="#a855f7" />
-          <text x="186" y="17" fill="#e9d5ff" font-size="11" font-weight="600">X (${selectedAngleX}°)</text>
+          <path d="${xLine}" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" />
+          ${radX.map((v, i) => `<circle cx="${xMonthScale(i)}" cy="${yTopScale(v)}" r="3" fill="#a855f7" />`).join('')}
         `
             : ''
         }
-      </g>
+
+        <path d="${optLine}" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" />
+        ${radOpt.map((v, i) => `<circle cx="${xMonthScale(i)}" cy="${yTopScale(v)}" r="4.5" fill="#fbbf24" stroke="#ffffff" stroke-width="1.5" />`).join('')}
+
+        <!-- Top Legend -->
+        <g transform="translate(${width - padding.right - 260}, ${topY0 + 6})">
+          <rect x="0" y="0" width="250" height="26" rx="4" fill="rgba(15, 23, 42, 0.85)" stroke="rgba(255,255,255,0.12)" />
+          <circle cx="12" cy="13" r="4" fill="#fbbf24" />
+          <text x="20" y="17" fill="#fef08a" font-size="11" font-weight="700">${isEn ? 'Opt' : 'Ópt'}. (${optimalAngle}°)</text>
+          
+          <circle cx="95" cy="13" r="4" fill="#0ea5e9" />
+          <text x="103" y="17" fill="#7dd3fc" font-size="11" font-weight="600">0° (Horiz)</text>
+
+          ${
+            selectedAngleX !== optimalAngle
+              ? `
+            <circle cx="178" cy="13" r="4" fill="#a855f7" />
+            <text x="186" y="17" fill="#e9d5ff" font-size="11" font-weight="600">X (${selectedAngleX}°)</text>
+          `
+              : ''
+          }
+        </g>
+      `
+      }
 
       <!-- SUBPLOT 2: Gains Bar Chart (%) -->
       <text x="${width / 2}" y="${bottomY0 - 14}" fill="#f8fafc" font-size="14" font-weight="700" text-anchor="middle">
