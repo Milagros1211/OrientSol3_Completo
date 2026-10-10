@@ -51,9 +51,11 @@ export function renderHeader(): HTMLElement {
 
   // Attach language switcher events
   header.querySelectorAll<HTMLButtonElement>('.lang-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const targetLang = btn.dataset.lang as 'es' | 'en';
-      if (targetLang) {
+      if (targetLang && targetLang !== i18n.getLocale()) {
         i18n.setLocale(targetLang);
       }
     });

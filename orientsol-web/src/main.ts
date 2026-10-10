@@ -66,7 +66,10 @@ function renderAboutView(isEn: boolean): HTMLElement {
   return container;
 }
 
+let currentAppTab: 'simulator' | 'satellite-apis' | 'console' | 'about' = 'simulator';
+
 function createApp() {
+  const prevScroll = typeof window !== 'undefined' ? window.scrollY : 0;
   const app = document.querySelector<HTMLDivElement>('#app')!;
   app.innerHTML = '';
   const isEn = i18n.getLocale() === 'en';
@@ -84,7 +87,7 @@ function createApp() {
   navBar.className = 'dual-tabs-bar app-main-nav';
   navBar.style.marginBottom = '1.25rem';
   navBar.innerHTML = `
-    <button class="dual-tab-btn active" data-app-tab="simulator">
+    <button class="dual-tab-btn ${currentAppTab === 'simulator' ? 'active' : ''}" data-app-tab="simulator">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="5"></circle>
         <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -97,14 +100,14 @@ function createApp() {
       <span>${isEn ? 'Solar Simulator & Optimization' : 'Simulador & Optimización Solar'}</span>
     </button>
 
-    <button class="dual-tab-btn" data-app-tab="satellite-apis">
+    <button class="dual-tab-btn ${currentAppTab === 'satellite-apis' ? 'active' : ''}" data-app-tab="satellite-apis">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"></path>
       </svg>
       <span>${isEn ? 'Satellite Climate APIs' : 'APIs Climáticas Satelitales'}</span>
     </button>
 
-    <button class="dual-tab-btn" data-app-tab="console">
+    <button class="dual-tab-btn ${currentAppTab === 'console' ? 'active' : ''}" data-app-tab="console">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="4 17 10 11 4 5"></polyline>
         <line x1="12" y1="19" x2="20" y2="19"></line>
@@ -112,7 +115,7 @@ function createApp() {
       <span>${isEn ? 'Python WASM Console' : 'Consola Python (WASM)'}</span>
     </button>
 
-    <button class="dual-tab-btn" data-app-tab="about">
+    <button class="dual-tab-btn ${currentAppTab === 'about' ? 'active' : ''}" data-app-tab="about">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10"></circle>
         <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -126,7 +129,7 @@ function createApp() {
   // Tab 1: Core Solar Simulation & Optimization Panel (Primary Application View)
   const simView = document.createElement('div');
   simView.id = 'app-view-simulator';
-  simView.className = 'app-tab-view';
+  simView.className = `app-tab-view ${currentAppTab === 'simulator' ? '' : 'hidden'}`;
   const dualLoaderPanel = renderDualClimateLoaderPanel();
   simView.appendChild(dualLoaderPanel);
   main.appendChild(simView);
@@ -134,7 +137,7 @@ function createApp() {
   // Tab 2: Satellite Climate APIs Panel
   const climateView = document.createElement('div');
   climateView.id = 'app-view-satellite-apis';
-  climateView.className = 'app-tab-view hidden';
+  climateView.className = `app-tab-view ${currentAppTab === 'satellite-apis' ? '' : 'hidden'}`;
   const climatePanel = renderClimateIntegrationPanel();
   climateView.appendChild(climatePanel);
   main.appendChild(climateView);
@@ -142,7 +145,7 @@ function createApp() {
   // Tab 3: Interactive Python Console Panel
   const consoleView = document.createElement('div');
   consoleView.id = 'app-view-console';
-  consoleView.className = 'app-tab-view hidden';
+  consoleView.className = `app-tab-view ${currentAppTab === 'console' ? '' : 'hidden'}`;
   const consolePanel = renderPythonConsole();
   consoleView.appendChild(consolePanel);
   main.appendChild(consoleView);
@@ -150,7 +153,7 @@ function createApp() {
   // Tab 4: About OrientSol & TFM View
   const aboutView = document.createElement('div');
   aboutView.id = 'app-view-about';
-  aboutView.className = 'app-tab-view hidden';
+  aboutView.className = `app-tab-view ${currentAppTab === 'about' ? '' : 'hidden'}`;
   const aboutPanel = renderAboutView(isEn);
   aboutView.appendChild(aboutPanel);
   main.appendChild(aboutView);
@@ -169,7 +172,8 @@ function createApp() {
       appTabs.forEach((t) => t.classList.remove('active'));
       tab.classList.add('active');
 
-      const targetTab = tab.getAttribute('data-app-tab') || 'simulator';
+      const targetTab = (tab.getAttribute('data-app-tab') || 'simulator') as typeof currentAppTab;
+      currentAppTab = targetTab;
       Object.entries(appViews).forEach(([key, viewEl]) => {
         if (key === targetTab) {
           viewEl.classList.remove('hidden');
@@ -185,6 +189,13 @@ function createApp() {
   // 4. Status Bar Footer
   const footer = renderStatusBar();
   app.appendChild(footer);
+
+  // 5. Restore scroll smoothly
+  if (prevScroll > 0) {
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: prevScroll, behavior: 'instant' });
+    });
+  }
 }
 
 // Initial mount
