@@ -24,6 +24,37 @@ let cachedLastSimulationResult: SolarBridgeSimulationResult | null = null;
 let cachedActiveRecord: ClimateDataRecord | null = null;
 let cachedActiveTab: 'historical' | 'manual' | 'upload' = 'historical';
 
+/**
+ * Renders the banner indicating whether online upload to Supabase is permitted or in offline cache mode.
+ */
+function renderSupabaseUploadBannerHtml(isEn: boolean): string {
+  const isOnline = climateDatabaseService.isOnline();
+  const isConfigured = climateDatabaseService.isConfigured();
+  const isAllowed = isOnline && isConfigured;
+
+  if (isAllowed) {
+    return `
+      <div class="supabase-upload-indicator online">
+        <span class="status-indicator-dot online"></span>
+        <div class="indicator-text-block">
+          <strong>${isEn ? '🟢 Online Supabase Upload: PERMITTED' : '🟢 Carga Online a Supabase: PERMITIDA'}</strong>
+          <span class="indicator-sub">${isEn ? 'Connected to table: ' : 'Conectado a la tabla: '}<code>datos_mensuales</code>. ${isEn ? 'New emplacements are automatically stored in the cloud.' : 'Los nuevos emplazamientos se guardan automáticamente en la nube.'}</span>
+        </div>
+      </div>
+    `;
+  } else {
+    return `
+      <div class="supabase-upload-indicator offline">
+        <span class="status-indicator-dot offline"></span>
+        <div class="indicator-text-block">
+          <strong>${isEn ? '🔴 Online Supabase Upload: NOT PERMITTED (Offline Mode)' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline)'}</strong>
+          <span class="indicator-sub">${isEn ? 'No Supabase connection detected. New emplacements will be safely saved in local cache.' : 'Sin conexión activa a Supabase. El emplazamiento se guardará en la caché local para sincronizarlo después.'}</span>
+        </div>
+      </div>
+    `;
+  }
+}
+
 export function renderDualClimateLoaderPanel(): HTMLElement {
   const container = document.createElement('section');
   container.className = 'panel-card dual-climate-panel';
@@ -100,6 +131,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     <!-- TAB 2: MANUAL FORM -->
     <div id="tab-content-manual" class="dual-tab-content ${cachedActiveTab === 'manual' ? '' : 'hidden'}">
+      <div id="manual-upload-permission-box">${renderSupabaseUploadBannerHtml(isEn)}</div>
       <div class="manual-preset-row">
         <span class="manual-preset-label">${t.hybridLoader.manualPresetLabel}</span>
         <select id="manual-template-select" class="form-select select-compact">
@@ -175,6 +207,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     <!-- TAB 3: DIGITAL FILE UPLOAD -->
     <div id="tab-content-upload" class="dual-tab-content hidden">
+      <div id="file-upload-permission-box">${renderSupabaseUploadBannerHtml(isEn)}</div>
       <div id="file-dropzone" class="file-dropzone">
         <div class="dropzone-icon">
           <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -398,7 +431,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           'warning'
         );
       } else {
-        setStatus(reg.message, 'success');
+        const uploadPermissionStatus = reg.isOffline
+          ? (isEn ? '🔴 Online upload NOT permitted (Offline Mode) → Emplacement safely stored in local cache.' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Emplazamiento guardado en caché local para sincronizarlo después.')
+          : (isEn ? '🟢 Online upload PERMITTED → Emplacement successfully inserted into datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en la tabla datos_mensuales.');
+        setStatus(`${uploadPermissionStatus} ${reg.message}`, 'success');
       }
     } catch (err: any) {
       setStatus(`Error: ${err.message}`, 'error');
@@ -426,12 +462,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             'warning'
           );
         } else {
-          setStatus(
-            isEn
-              ? `✓ File "${file.name}" loaded: ${reg.message}`
-              : `✓ Archivo "${file.name}" cargado: ${reg.message}`,
-            'success'
-          );
+          const uploadPermissionStatus = reg.isOffline
+            ? (isEn ? '🔴 Online upload NOT permitted (Offline Mode) → Saved in local cache.' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Guardado en caché local.')
+            : (isEn ? '🟢 Online upload PERMITTED → Emplacement inserted into datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado en datos_mensuales.');
+          setStatus(`${uploadPermissionStatus} ${reg.message}`, 'success');
         }
       })
       .catch((err: any) => {
@@ -439,6 +473,15 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         setStatus(`Error de lectura: ${err.message}`, 'error');
       });
   }
+
+  // Subscribe to Supabase connection state changes to keep online upload banners updated
+  climateDatabaseService.subscribe(() => {
+    const box1 = container.querySelector('#manual-upload-permission-box');
+    const box2 = container.querySelector('#file-upload-permission-box');
+    const bannerHtml = renderSupabaseUploadBannerHtml(isEn);
+    if (box1) box1.innerHTML = bannerHtml;
+    if (box2) box2.innerHTML = bannerHtml;
+  });
 
   fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 

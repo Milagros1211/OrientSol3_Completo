@@ -243,9 +243,84 @@ body {
   border-color: var(--solar-amber);
 }
 
+.runtime-pill.status-supabase.status-online {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #34d399;
+}
+
+.runtime-pill.status-supabase.status-offline {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
 .status-dot-active {
   background: #10b981 !important;
   box-shadow: 0 0 8px #10b981;
+}
+
+/* Supabase Online Upload Permission Indicators */
+.supabase-upload-indicator {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  transition: all var(--transition-normal);
+}
+
+.supabase-upload-indicator.online {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+
+.supabase-upload-indicator.offline {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+.supabase-upload-indicator .indicator-text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.supabase-upload-indicator .indicator-sub {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.supabase-upload-indicator code {
+  background: rgba(0, 0, 0, 0.35);
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  font-family: monospace;
+  color: #fef08a;
+  font-weight: 600;
+}
+
+.status-indicator-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.status-indicator-dot.online {
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+}
+
+.status-indicator-dot.offline {
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
 }
 
 .pill-badge-counter {
