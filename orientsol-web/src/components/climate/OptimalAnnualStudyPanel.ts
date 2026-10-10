@@ -3,9 +3,10 @@ import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalcula
 import {
   renderInclinationEvolutionSvg,
   renderMonthlyOptimumAndGainsSvg,
+  saveSvgChartLocally,
 } from '@/components/charts/OptimalAnnualCharts';
 
-export type RadiationComponentType = 'global' | 'beam' | 'diffuse' | 'albedo';
+export type RadiationComponentType = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
 interface OptimalAnnualStudyProps {
   simulationResult: SolarBridgeSimulationResult;
@@ -40,27 +41,28 @@ export function getRadiationCurve91(
 
 /**
  * Extracts the 12 monthly daily radiation values for a specific tilt angle (0 to 90 degrees)
- * for the selected radiation component (global, beam, diffuse, albedo).
+ * for the selected radiation component (global, beam, diffuse, albedo, all).
  */
 export function getMonthlyRadiationForAngle(
   res: SolarBridgeSimulationResult,
   component: RadiationComponentType,
   angleDeg: number
 ): number[] {
+  const actualComp = component === 'all' ? 'global' : component;
   const comp91 = res.optimalAnnual.components91;
   const horizComp = res.optimalAnnual.horizontalComponents;
 
   // Horizontal plane (0 degrees)
   if (angleDeg === 0) {
     if (horizComp) {
-      if (component === 'global') return horizComp.global;
-      if (component === 'beam') return horizComp.beam;
-      if (component === 'diffuse') return horizComp.diffuse;
-      if (component === 'albedo') return horizComp.albedo;
+      if (actualComp === 'global') return horizComp.global;
+      if (actualComp === 'beam') return horizComp.beam;
+      if (actualComp === 'diffuse') return horizComp.diffuse;
+      if (actualComp === 'albedo') return horizComp.albedo;
     }
-    if (component === 'global') return res.horizontal.gdm0;
-    if (component === 'beam') return res.horizontal.bdm0;
-    if (component === 'diffuse') return res.horizontal.ddm0;
+    if (actualComp === 'global') return res.horizontal.gdm0;
+    if (actualComp === 'beam') return res.horizontal.bdm0;
+    if (actualComp === 'diffuse') return res.horizontal.ddm0;
     return new Array(12).fill(0.0);
   }
 
@@ -269,12 +271,28 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
     const meanPctX = meanOf(gainsX.pcts);
 
     const radiationCurve91 = getRadiationCurve91(res, stateComponent);
+    const allCurves = {
+      global: getRadiationCurve91(res, 'global'),
+      beam: getRadiationCurve91(res, 'beam'),
+      diffuse: getRadiationCurve91(res, 'diffuse'),
+      albedo: getRadiationCurve91(res, 'albedo'),
+    };
 
     const compSymbol =
-      stateComponent === 'global' ? 'Gdm' : stateComponent === 'beam' ? 'Bdm' : stateComponent === 'diffuse' ? 'Ddm' : 'Rdm';
+      stateComponent === 'all'
+        ? (isEn ? 'All' : 'Todas')
+        : stateComponent === 'global'
+        ? 'Gdm'
+        : stateComponent === 'beam'
+        ? 'Bdm'
+        : stateComponent === 'diffuse'
+        ? 'Ddm'
+        : 'Rdm';
 
     const compLabelName =
-      stateComponent === 'global'
+      stateComponent === 'all'
+        ? t.results.compAll
+        : stateComponent === 'global'
         ? t.results.radGlobal
         : stateComponent === 'beam'
         ? t.results.radBeam
@@ -375,6 +393,7 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
               <option value="beam" ${stateComponent === 'beam' ? 'selected' : ''}>${t.results.compBeam}</option>
               <option value="diffuse" ${stateComponent === 'diffuse' ? 'selected' : ''}>${t.results.compDiffuse}</option>
               <option value="albedo" ${stateComponent === 'albedo' ? 'selected' : ''}>${t.results.compAlbedo}</option>
+              <option value="all" ${stateComponent === 'all' ? 'selected' : ''}>${t.results.compAll}</option>
             </select>
           </div>
 
@@ -642,26 +661,79 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
               </div>
             </div>
 
-            <!-- Sub-view 1: Grafica_Inclinaciones (4th Image) -->
+            <!-- Sub-view 1: Grafica_Inclinaciones (Figuras 5.2.57, 5.2.58, 5.2.59) -->
             ${stateActiveChartTab === 'evolution' ? `
               <div class="opt-chart-view opt-view-evolution">
+                <!-- Top MATLAB Window Header -->
                 <div class="opt-chart-view-intro">
-                  <h4 class="opt-chart-question">${t.results.chartHowVariesQuestion}</h4>
-                  <div class="opt-chart-badge-comp">
-                    <span>${isEn ? 'Component' : 'Componente'}:</span>
-                    <strong>${compSymbol} (${stateComponent.toUpperCase()})</strong>
+                  <div class="opt-chart-title-block">
+                    <h4 class="opt-chart-question">${t.results.chartHowVariesQuestion}</h4>
+                    <span class="opt-chart-matlab-brand">ORIENT<strong>SOL 3.0</strong></span>
+                  </div>
+
+                  <!-- Component Selector matching Figure 5.2.57 & 5.2.58 -->
+                  <div class="opt-chart-inline-toolbar">
+                    <div class="opt-chart-comp-picker">
+                      <label for="chart-comp-dropdown" class="chart-comp-label">
+                        ${isEn ? 'Select a component:' : 'Seleccione una componente:'}
+                      </label>
+                      <select id="chart-comp-dropdown" class="form-select select-chart-comp">
+                        <option value="global" ${stateComponent === 'global' ? 'selected' : ''}>${t.results.compGlobal}</option>
+                        <option value="beam" ${stateComponent === 'beam' ? 'selected' : ''}>${t.results.compBeam}</option>
+                        <option value="diffuse" ${stateComponent === 'diffuse' ? 'selected' : ''}>${t.results.compDiffuse}</option>
+                        <option value="albedo" ${stateComponent === 'albedo' ? 'selected' : ''}>${t.results.compAlbedo}</option>
+                        <option value="all" ${stateComponent === 'all' ? 'selected' : ''}>${t.results.compAll}</option>
+                      </select>
+                    </div>
+
+                    <!-- Standalone Local Save Button (File System Access / Local Computer) -->
+                    <div class="opt-chart-export-tools">
+                      <button
+                        type="button"
+                        id="btn-save-chart-local"
+                        class="btn btn-primary btn-sm btn-chart-save"
+                        title="${t.results.saveChartLocalBtn}"
+                      >
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                          <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        <span>${t.results.saveChartLocalBtn}</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
+
+                <!-- Live feedback banner for local saving -->
+                <div id="chart-save-feedback" class="chart-save-feedback hidden"></div>
 
                 <div class="opt-svg-wrapper">
                   ${renderInclinationEvolutionSvg({
                     radiationCurve: radiationCurve91,
+                    allCurves,
                     component: stateComponent,
                     optimalAngle: optAngle,
                     selectedAngleX: stateAngleX,
                     gridEnabled: stateGridEnabled,
                     isEn,
                   })}
+                </div>
+
+                <!-- Bottom MATLAB controls matching Figure 5.2.57 & Figure 5.2.59 -->
+                <div class="opt-chart-bottom-toolbar">
+                  <button type="button" id="btn-chart-back" class="btn btn-secondary btn-sm btn-matlab-volver">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="19" y1="12" x2="5" y2="12"></line>
+                      <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    <span>${t.results.chartBackBtn}</span>
+                  </button>
+
+                  <label class="opt-grid-toggle">
+                    <input type="checkbox" id="chk-chart-grid-bottom" ${stateGridEnabled ? 'checked' : ''} />
+                    <span>${t.results.chartEnableGrid}</span>
+                  </label>
                 </div>
 
                 <div class="opt-chart-note">
@@ -832,11 +904,69 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
       renderInternal();
     });
 
-    // 5.2 Grid Checkbox
+    // 5.2 Grid Checkboxes (top and bottom)
     const chkGrid = container.querySelector<HTMLInputElement>('#chk-chart-grid');
     chkGrid?.addEventListener('change', () => {
       stateGridEnabled = chkGrid.checked;
       renderInternal();
+    });
+
+    const chkGridBottom = container.querySelector<HTMLInputElement>('#chk-chart-grid-bottom');
+    chkGridBottom?.addEventListener('change', () => {
+      stateGridEnabled = chkGridBottom.checked;
+      renderInternal();
+    });
+
+    // 5.3 Inline Chart Component Dropdown (Figures 5.2.57 & 5.2.58)
+    const chartCompDropdown = container.querySelector<HTMLSelectElement>('#chart-comp-dropdown');
+    chartCompDropdown?.addEventListener('change', () => {
+      stateComponent = (chartCompDropdown.value || 'global') as RadiationComponentType;
+      renderInternal();
+    });
+
+    // 5.4 Standalone Local Save Action (Local Computer directory via showSaveFilePicker / download)
+    const btnSaveChart = container.querySelector<HTMLButtonElement>('#btn-save-chart-local');
+    const saveFeedback = container.querySelector<HTMLElement>('#chart-save-feedback');
+    btnSaveChart?.addEventListener('click', async () => {
+      const svgEl = container.querySelector<SVGSVGElement>('#svg-inclination-evolution');
+      if (!svgEl) return;
+
+      const compName = stateComponent === 'all' ? (isEn ? 'All_Components' : 'Todas_Componentes') : stateComponent;
+      const cleanLoc = locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const fileName = `OrientSol3_Variacion_Radiacion_${cleanLoc}_${compName}`;
+
+      btnSaveChart.disabled = true;
+      btnSaveChart.classList.add('loading');
+
+      const resSave = await saveSvgChartLocally(svgEl, fileName, isEn);
+
+      btnSaveChart.disabled = false;
+      btnSaveChart.classList.remove('loading');
+
+      if (saveFeedback) {
+        if (resSave.success) {
+          saveFeedback.textContent = resSave.message || t.results.saveChartSuccess;
+          saveFeedback.className = 'chart-save-feedback feedback-success';
+          saveFeedback.classList.remove('hidden');
+          setTimeout(() => saveFeedback?.classList.add('hidden'), 4500);
+        } else if (resSave.message) {
+          saveFeedback.textContent = resSave.message;
+          saveFeedback.className = 'chart-save-feedback feedback-error';
+          saveFeedback.classList.remove('hidden');
+          setTimeout(() => saveFeedback?.classList.add('hidden'), 4500);
+        }
+      }
+    });
+
+    // 5.5 Chart "Volver" button (Figure 5.2.57)
+    const btnChartBack = container.querySelector<HTMLButtonElement>('#btn-chart-back');
+    btnChartBack?.addEventListener('click', () => {
+      const topTable = container.querySelector('.opt-table-responsive');
+      if (topTable) {
+        topTable.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     });
 
     // 6. Scroll to Energy Yield Section

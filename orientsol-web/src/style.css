@@ -3710,7 +3710,14 @@ body {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.opt-chart-title-block {
+  display: flex;
+  align-items: center;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .opt-chart-question {
@@ -3719,6 +3726,124 @@ body {
   font-weight: 700;
   color: #f8fafc;
   letter-spacing: -0.01em;
+}
+
+.opt-chart-matlab-brand {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: #38bdf8;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+}
+
+.opt-chart-inline-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.opt-chart-comp-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chart-comp-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.select-chart-comp {
+  background: rgba(15, 23, 42, 0.9);
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.select-chart-comp:hover,
+.select-chart-comp:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+.opt-chart-export-tools .btn-chart-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #ffffff;
+  border: 1px solid #38bdf8;
+  padding: 0.4rem 0.85rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.opt-chart-export-tools .btn-chart-save:hover {
+  background: linear-gradient(135deg, #0369a1, #075985);
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.4);
+}
+
+.opt-chart-bottom-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.15rem;
+}
+
+.btn-matlab-volver {
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f1f5f9;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-matlab-volver:hover {
+  background: rgba(51, 65, 85, 0.95);
+  border-color: #94a3b8;
+}
+
+.chart-save-feedback {
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.chart-save-feedback.feedback-success {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #6ee7b7;
+}
+
+.chart-save-feedback.feedback-error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
 }
 
 .opt-chart-badge-comp {

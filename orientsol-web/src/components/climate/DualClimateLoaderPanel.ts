@@ -386,8 +386,29 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   // 1. Historical & Supabase Station Live Similarity Search Actions
   let allSearchableStations: ClimateDataRecord[] = [];
 
+  const getBaseKey = (name: string) =>
+    name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/_?versionoriginal/gi, '')
+      .replace(/[^a-z0-9]/g, '')
+      .trim();
+
   const updateSearchableStations = async () => {
+    const isOnline = Boolean(typeof navigator !== 'undefined' ? navigator.onLine : true) && climateDatabaseService.isOnline();
     const historicalList = hybridClimateManager.getHistoricalLocations();
+
+    if (!isOnline) {
+      // OFFLINE: Solo mostrar estaciones de la memoria caché local (OrientSol 3.0)
+      allSearchableStations = historicalList.map((h) => ({
+        ...h,
+        source: 'local_database' as const,
+      }));
+      return;
+    }
+
+    // ONLINE: Solo debe aparecer una por ciudad (prioridad máxima a Supabase)
     let supabaseList: ClimateDataRecord[] = [];
     try {
       supabaseList = await climateDatabaseService.getClimateDatasets();
@@ -395,23 +416,23 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       console.warn('[OrientSol] Could not fetch Supabase datasets for search:', e);
     }
 
-    const seenNames = new Set<string>();
+    const seenBaseKeys = new Set<string>();
     const merged: ClimateDataRecord[] = [];
 
-    // Prioritize Supabase records
+    // 1. Agregar registros de Supabase (máxima prioridad online)
     for (const rec of supabaseList) {
-      const key = rec.locationName.trim().toLowerCase();
-      if (!seenNames.has(key)) {
-        seenNames.add(key);
+      const baseKey = getBaseKey(rec.locationName);
+      if (!seenBaseKeys.has(baseKey)) {
+        seenBaseKeys.add(baseKey);
         merged.push(rec);
       }
     }
 
-    // Add historical database records
+    // 2. Solo agregar de la caché histórica aquellas ciudades que NO existan en Supabase
     for (const rec of historicalList) {
-      const key = rec.locationName.trim().toLowerCase();
-      if (!seenNames.has(key)) {
-        seenNames.add(key);
+      const baseKey = getBaseKey(rec.locationName);
+      if (!seenBaseKeys.has(baseKey)) {
+        seenBaseKeys.add(baseKey);
         merged.push(rec);
       }
     }
@@ -419,8 +440,29 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     allSearchableStations = merged;
   };
 
-  // Pre-load searchable stations
+  // Pre-load and re-sync on network state changes & database updates
   updateSearchableStations();
+  climateDatabaseService.subscribe(() => {
+    updateSearchableStations().then(() => {
+      if (histSearchInput && histSearchInput.value.trim()) {
+        performSearch(histSearchInput.value.trim());
+      }
+    });
+  });
+  window.addEventListener('online', () => {
+    updateSearchableStations().then(() => {
+      if (histSearchInput && histSearchInput.value.trim()) {
+        performSearch(histSearchInput.value.trim());
+      }
+    });
+  });
+  window.addEventListener('offline', () => {
+    updateSearchableStations().then(() => {
+      if (histSearchInput && histSearchInput.value.trim()) {
+        performSearch(histSearchInput.value.trim());
+      }
+    });
+  });
 
   function showNotFoundBanner(queryText: string) {
     histSuggestionsDropdown.classList.add('hidden');
@@ -485,11 +527,22 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     }
 
     // Filter case-insensitive similarity
-    const matches = allSearchableStations.filter((s) => {
+    const rawMatches = allSearchableStations.filter((s) => {
       const name = s.locationName.toLowerCase();
       const country = (s.country || '').toLowerCase();
       return name.includes(q) || country.includes(q);
     });
+
+    // Deduplicate matches so that only 1 station per city is displayed
+    const seenMatchKeys = new Set<string>();
+    const matches: ClimateDataRecord[] = [];
+    for (const m of rawMatches) {
+      const key = getBaseKey(m.locationName);
+      if (!seenMatchKeys.has(key)) {
+        seenMatchKeys.add(key);
+        matches.push(m);
+      }
+    }
 
     if (matches.length > 0) {
       hideNotFoundBanner();

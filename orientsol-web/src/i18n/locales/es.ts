@@ -206,6 +206,10 @@ export const es: Translations = {
     chartMedLabel: 'Medio',
     chartMaxLabel: 'Máximo',
     chartToggleChartsBtn: 'Ver gráficas',
+    compAll: 'Todas',
+    saveChartLocalBtn: 'Guardar gráfico en local',
+    saveChartSuccess: 'Gráfico guardado en local con éxito',
+    chartBackBtn: 'Volver',
     // Export Actions
     exportActionsTitle: 'Exportación de Datos e Informes',
     exportPdfBtn: 'Exportar Informe PDF / Imprimir',
