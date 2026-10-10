@@ -2,15 +2,16 @@ import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import {
   showPdfGenerationNoticeModal,
-  generateOrientSolPDFReport,
+  generateOrientSolEnergyPDFReport,
 } from '@/components/export/pdfReportGenerator';
 import * as XLSX from 'xlsx';
 
-interface EnergyCalculationProps {
+export interface EnergyCalculationProps {
   simulationResult: SolarBridgeSimulationResult;
   locationName: string;
   latitude: number;
   studyType?: 'annual' | 'seasonal';
+  initialPeakKw?: number;
   onClose?: () => void;
 }
 
@@ -28,7 +29,7 @@ const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 /**
  * Shows Osterwald Formula and Nomenclature help dialog
- * matching Ayuda_Energia.m in OrientSol 3.0
+ * matching EXACTLY Figura 5.2.80 (Ayuda_Energia.m) in OrientSol 3.0
  */
 export function showOsterwaldInfoModal(isEn: boolean): void {
   const existing = document.getElementById('matlab-ayuda-energia-modal');
@@ -39,37 +40,84 @@ export function showOsterwaldInfoModal(isEn: boolean): void {
   backdrop.className = 'matlab-modal-backdrop';
 
   backdrop.innerHTML = `
-    <div class="matlab-dialog-box" role="dialog" aria-modal="true" style="max-width: 620px; border-color: #059669;">
-      <div class="matlab-dialog-titlebar" style="background: linear-gradient(90deg, #064e3b, #047857);">
-        <span class="matlab-title-text">${isEn ? 'Osterwald Method Help' : 'Ayuda - Método Osterwald'}</span>
-        <button type="button" class="matlab-close-btn" aria-label="Cerrar">&times;</button>
+    <div class="matlab-dialog-box" role="dialog" aria-modal="true" style="max-width: 680px; background: #ffffff; border: 1.5px solid #64748b; box-shadow: 0 12px 36px rgba(0,0,0,0.3); border-radius: 4px; overflow: hidden;">
+      <div class="matlab-dialog-titlebar" style="background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%); border-bottom: 1px solid #cbd5e1; padding: 7px 12px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#ea580c"/>
+            <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#ea580c" stroke-width="2"/>
+          </svg>
+          <span style="font-size: 13.5px; font-weight: 600; color: #1e293b; font-family: 'Segoe UI', Tahoma, sans-serif;">
+            ${isEn ? 'Information and nomenclature of the Osterwald method' : 'Información y nomenclatura del método de Osterwald'}
+          </span>
+        </div>
+        <div style="display: flex; gap: 4px;">
+          <button type="button" class="matlab-close-btn" aria-label="Cerrar" style="border: none; background: transparent; font-size: 18px; color: #64748b; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
+        </div>
       </div>
-      <div class="matlab-dialog-body" style="padding: 1.5rem; color: #ecfdf5; font-size: 0.9rem; line-height: 1.6;">
-        <h4 style="color: #34d399; margin: 0 0 0.75rem; font-size: 1.05rem;">
-          ${isEn ? 'Formulas & Thermal Behavior' : 'Fórmulas y Comportamiento Térmico'}
-        </h4>
-
-        <div style="background: #022c22; padding: 1rem; border-radius: 6px; border: 1px solid rgba(52, 211, 153, 0.25); margin-bottom: 1rem; font-family: monospace; font-size: 0.88rem;">
-          <p style="margin: 0 0 0.5rem; color: #a7f3d0;"><strong>1. Irradiancia media equivalente (W/m²):</strong><br/>G = Gdm · (1000 Wh / 1 kWh) · (1 día / 24 h) = Gdm · 1000 / 24</p>
-          <p style="margin: 0 0 0.5rem; color: #a7f3d0;"><strong>2. Temperatura de célula (°C):</strong><br/>T<sub>c</sub> = T<sub>amb</sub> + [(TONC - 20) / 800] · G</p>
-          <p style="margin: 0 0 0.5rem; color: #a7f3d0;"><strong>3. Potencia generada (W):</strong><br/>P = (P<sub>pico</sub> · 1000) · (G / 1000) · [1 + γ · (T<sub>c</sub> - 25)]</p>
-          <p style="margin: 0; color: #a7f3d0;"><strong>4. Energía producida mensual (kWh):</strong><br/>E = (P · 24 / 1000) · días_mes</p>
+      <div class="matlab-dialog-body" style="padding: 16px; background: #ffffff;">
+        <!-- Top Section: Método de Osterwald -->
+        <div style="border: 1.5px solid #3b82f6; border-radius: 3px; padding: 14px 18px; background: #ffffff; margin-bottom: 14px;">
+          <div style="color: #ea580c; font-weight: bold; font-size: 15px; margin-bottom: 12px; font-family: 'Segoe UI', Tahoma, sans-serif;">
+            ${isEn ? 'Osterwald method:' : 'Método de Osterwald:'}
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+            <!-- Formula box with orange border -->
+            <div style="border: 1.5px solid #f97316; padding: 9px 16px; background: #ffffff; font-family: 'Times New Roman', Times, serif; font-size: 17px; color: #0f172a; display: inline-flex; align-items: center;">
+              <span>P<sub>M</sub> = P<sub>M,STC</sub> &middot; </span>
+              <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 5px; vertical-align: middle;">
+                <span style="border-bottom: 1px solid #000; padding: 0 4px; line-height: 1.1;">G</span>
+                <span style="line-height: 1.1;">G<sub>STC</sub></span>
+              </span>
+              <span>[1 - &gamma; &middot; (T<sub>c</sub> - 25)]</span>
+            </div>
+            <!-- Right side: donde Tc = Tamb + ... -->
+            <div style="font-family: 'Times New Roman', Times, serif; font-size: 16px; color: #0f172a; display: inline-flex; align-items: center;">
+              <span>${isEn ? 'where' : 'donde'}&nbsp;&nbsp;T<sub>c</sub> = T<sub>amb</sub> &middot; </span>
+              <span style="display: inline-flex; flex-direction: column; align-items: center; margin: 0 5px; vertical-align: middle;">
+                <span style="border-bottom: 1px solid #000; padding: 0 4px; line-height: 1.1;">TONC - 20 &deg;C</span>
+                <span style="line-height: 1.1;">800 Wm<sup>-2</sup></span>
+              </span>
+              <span>&middot; G</span>
+            </div>
+          </div>
+          <!-- Integrated Energy equation -->
+          <div style="margin-top: 14px; font-family: 'Times New Roman', Times, serif; font-size: 18px; color: #0f172a;">
+            E = &int;<sub>t<sub>1</sub></sub><sup>t<sub>2</sub></sup> p(t) dt
+          </div>
         </div>
 
-        <h4 style="color: #34d399; margin: 0 0 0.5rem; font-size: 1rem;">
-          ${isEn ? 'Nomenclature & Parameters' : 'Nomenclatura y Parámetros'}
-        </h4>
-        <ul style="margin: 0; padding-left: 1.25rem; color: #cbd5e1; font-size: 0.86rem;">
-          <li><strong>P<sub>pico</sub>:</strong> ${isEn ? 'Installed peak power under STC (kWp).' : 'Potencia pico instalada en condiciones estándar STC (kWp).'}</li>
-          <li><strong>γ (1/°C):</strong> ${isEn ? 'Power temperature coefficient (-0.005 to -0.003 for monocrystalline silicon).' : 'Coeficiente de variación de potencia con la temperatura (-0.005 a -0.003 para silicio monocristalino).'}</li>
-          <li><strong>TONC (°C):</strong> ${isEn ? 'Nominal Operating Cell Temperature (40 °C to 55 °C).' : 'Temperatura de Operación Nominal de la Célula (40 a 55 °C).'}</li>
-          <li><strong>T<sub>amb</sub>:</strong> ${isEn ? 'Monthly mean ambient temperature (°C).' : 'Temperatura media ambiental mensual (°C).'}</li>
-        </ul>
-      </div>
-      <div class="matlab-dialog-actions" style="justify-content: flex-end; padding: 0.75rem 1.25rem; background: #021a15;">
-        <button type="button" class="matlab-btn-default btn-ayuda-ok" style="background: #059669; border-color: #10b981; color: #ffffff;">
-          OK
-        </button>
+        <!-- Bottom Section: Nomenclatura utilizada -->
+        <div style="border: 1.5px solid #3b82f6; border-radius: 3px; padding: 14px 18px; background: #ffffff;">
+          <div style="color: #2563eb; font-weight: bold; font-size: 15px; margin-bottom: 10px; font-family: 'Segoe UI', Tahoma, sans-serif;">
+            ${isEn ? 'Nomenclature used:' : 'Nomenclatura utilizada:'}
+          </div>
+          <div style="font-family: 'Times New Roman', Times, serif; font-size: 14.5px; line-height: 1.8; color: #1e293b;">
+            <div>P<sub>M</sub> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${isEn ? 'Maximum module power at maximum power point (W)' : 'Potencia máxima del módulo en el punto de máxima potencia (W)'}</div>
+            <div>P<sub>M,STC</sub> &nbsp;= ${isEn ? 'Maximum cell power under standard test conditions (W)' : 'Potencia máxima de la célula en condiciones estándar (W)'}</div>
+            <div>G &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${isEn ? 'Incident global irradiance (W/m²)' : 'Irradiancia global incidente (<sup>W</sup>/<sub>m<sup>2</sup></sub>)'}</div>
+            <div>T<sub>c</sub> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${isEn ? 'Cell temperature (°C)' : 'Temperatura de la célula (°C)'}</div>
+            <div>&gamma; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= ${isEn ? 'Temperature coefficient of maximum cell power (°C⁻¹).' : 'Coeficiente de temperatura de la potencia máxima de la célula (°C⁻¹).'}</div>
+            <div style="padding-left: 60px; color: #334155;">
+              ${isEn
+                ? 'For monocrystalline silicon it can range between -0.005 to -0.003 °C⁻¹. Good results are obtained with 0.0035°C⁻¹'
+                : 'En silicio monocristalino puede oscilar entre -0,005 a -0,003 °C⁻¹. Se obtienen buenos resultdos con 0.0035°C⁻¹'}
+            </div>
+            <div>TONC &nbsp;&nbsp;&nbsp;&nbsp;= ${isEn ? 'Nominal operating cell temperature measured at 800 W/m² of' : 'Temperatura de operación nominal de la célula medida a 800 <sup>W</sup>/<sub>m<sup>2</sup></sub> de'}</div>
+            <div style="padding-left: 60px; color: #334155;">
+              ${isEn
+                ? 'global irradiance and 20 °C ambient temperature. For monocrystalline silicon 47 °C can be used.'
+                : 'irradiancia global y a 20 °C de temperatura ambiente. En silicio monocristalino puede usar 47 °C.'}
+            </div>
+          </div>
+        </div>
+
+        <!-- Action footer with Cerrar button on left matching Figura 5.2.80 -->
+        <div style="margin-top: 14px; display: flex; justify-content: flex-start;">
+          <button type="button" class="matlab-btn-default btn-ayuda-ok" style="min-width: 95px; padding: 6px 16px; font-size: 13.5px; background: #e2e8f0; color: #0f172a; border: 1px solid #94a3b8; border-radius: 3px; cursor: pointer; font-weight: 500;">
+            ${isEn ? 'Close' : 'Cerrar'}
+          </button>
+        </div>
       </div>
     </div>
   `;
@@ -144,8 +192,8 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
   container.className = 'opt-energy-study-card';
   container.id = 'energy-calculation-window';
 
-  // Default parameters matching MATLAB Energia_Osterwald.fig
-  let statePeakKw: number = 10;
+  // Default parameters matching MATLAB Energia_Osterwald.fig, initialized with peakPowerKw from above
+  let statePeakKw: number = props.initialPeakKw ?? 5.0;
   let stateCoefTemp: number = -0.0035;
   let stateTonc: number = 47;
 
@@ -424,11 +472,11 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
       exportEnergyToExcel(res, energyData, statePeakKw, stateCoefTemp, stateTonc, studyTitle, isEn);
     });
 
-    // 6. Generate PDF Report
+    // 6. Generate PDF Report (Figura 5.2.83)
     const btnReport = container.querySelector<HTMLButtonElement>('#btn-energy-export-report');
     btnReport?.addEventListener('click', () => {
       showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn);
+        generateOrientSolEnergyPDFReport(res, energyData, statePeakKw, stateCoefTemp, stateTonc, studyTitle, isEn);
       });
     });
   }
@@ -438,50 +486,52 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
 }
 
 /**
- * Exports Energy Yield Table to Excel (.xlsx)
+ * Exports Energy Yield Table to Excel (.xlsx) strictly matching:
+ * - Figura 5.2.82: Datos exportados de energía generada para la inclinación óptima anual
  */
 async function exportEnergyToExcel(
   res: SolarBridgeSimulationResult,
   energyData: ReturnType<typeof calculateOsterwaldEnergy>,
-  peakKw: number,
-  coefTemp: number,
-  tonc: number,
+  _peakKw: number,
+  _coefTemp: number,
+  _tonc: number,
   studyTitle: string,
   isEn: boolean
 ) {
   const months = isEn ? MONTH_NAMES_EN : MONTH_NAMES_ES;
   const data: any[][] = [];
 
-  // Header metadata
-  data.push([res.locationName, isEn ? 'Latitude' : 'Latitud', res.latitude, '', studyTitle]);
-  data.push([]);
-  data.push([isEn ? 'PV Peak Power (kWp)' : 'Potencia pico (kWp)', peakKw]);
-  data.push(['γ (1/°C)', coefTemp]);
-  data.push(['TONC (°C)', tonc]);
-  data.push([isEn ? 'Method' : 'Método', 'Osterwald']);
-  data.push([]);
-  data.push([
-    isEn ? 'Month' : 'Mes',
-    isEn ? 'Horizontal surface (kWh)' : 'Superficie horizontal (kWh)',
-    isEn ? 'Performed study (kWh)' : 'Estudio realizado (kWh)',
-    isEn ? 'Gain (kWh)' : 'Ganancia (kWh)',
-  ]);
+  // Row 1 (Index 0): Jaén | Latitud | 37,7655556 | | Inclinación óptima anual (Figura 5.2.82)
+  data[0] = [res.locationName, isEn ? 'Latitude' : 'Latitud', res.latitude, '', studyTitle];
+  // Row 2 (Index 1): empty
+  data[1] = [];
+  // Row 3 (Index 2): Col B: ENERGÍA MEDIA MENSUAL (kWh/mes)
+  data[2] = ['', isEn ? 'MEAN MONTHLY ENERGY (kWh/month)' : 'ENERGÍA MEDIA MENSUAL (kWh/mes)'];
+  // Row 4 (Index 3): Col B: Plano horizo | Col C: Tipo de estu | Col D: Ganancias (kWh)
+  data[3] = [
+    '',
+    isEn ? 'Horizontal plane' : 'Plano horizo',
+    isEn ? 'Study type' : 'Tipo de estu',
+    isEn ? 'Gains (kWh)' : 'Ganancias (kWh)',
+  ];
 
+  // Rows 5..16 (Index 4..15): Enero..Diciembre
   for (let i = 0; i < 12; i++) {
-    data.push([
+    data[4 + i] = [
       months[i],
       energyData.e0_mes[i],
       energyData.e_mes[i],
       energyData.ganancia_mes[i],
-    ]);
+    ];
   }
 
-  data.push([
+  // Row 17 (Index 16): ANUAL
+  data[16] = [
     isEn ? 'ANNUAL' : 'ANUAL',
     energyData.e0_anual,
     energyData.e_anual,
     energyData.ganancia_anual,
-  ]);
+  ];
 
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(data);

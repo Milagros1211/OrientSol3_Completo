@@ -358,7 +358,6 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         <div class="record-meta-pills">
           <span><strong>${t.location.latitude}:</strong> ${record.latitude.toFixed(3)}°</span>
           <span><strong>${t.location.longitude}:</strong> ${record.longitude.toFixed(3)}°</span>
-          <span><strong>${t.location.elevation}:</strong> ${record.elevationM ?? 'N/D'} m</span>
           <span><strong>G<sub>dm</sub>(0):</strong> ${annualG.toFixed(2)} kWh/m²/d</span>
           <span><strong>T<sub>amb</sub>:</strong> ${annualT.toFixed(1)} °C</span>
         </div>
@@ -1187,6 +1186,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       </div>
     `;
 
+    const currentPeakKw = parseFloat(simPeakKw.value) || 5.0;
+
     // Mount OrientSol 3.0 Inclinación Óptima Anual Study Panel
     const optStudyMountPoint = resultsContainer.querySelector<HTMLDivElement>('#opt-annual-study-mount-point');
     if (optStudyMountPoint) {
@@ -1195,6 +1196,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         simulationResult: res,
         locationName: res.locationName,
         latitude: res.latitude,
+        peakPowerKw: currentPeakKw,
       });
       optStudyMountPoint.appendChild(studyPanel);
     }
@@ -1207,6 +1209,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         simulationResult: res,
         locationName: res.locationName,
         latitude: res.latitude,
+        peakPowerKw: currentPeakKw,
       });
       optSeasonalMountPoint.appendChild(seasonalPanel);
     }
