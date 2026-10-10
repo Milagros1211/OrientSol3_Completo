@@ -2,12 +2,6 @@ import {
   climateDatabaseService,
   type SyncSummary,
 } from '@/services/supabase/climateDatabaseService';
-import {
-  getEffectiveSupabaseConfig,
-  setSupabaseCredentials,
-  clearSupabaseCredentials,
-  testSupabaseConnection,
-} from '@/services/supabase/supabaseClient';
 import { i18n } from '@/i18n';
 
 let activeModalEl: HTMLElement | null = null;
@@ -22,9 +16,9 @@ export function openSupabaseSyncModal(): void {
   modal.className = 'modal-backdrop';
   modal.id = 'supabase-sync-modal';
 
-  const config = getEffectiveSupabaseConfig();
   const isOnline = climateDatabaseService.isOnline();
   const isConfigured = climateDatabaseService.isConfigured();
+  const isConnected = isOnline && isConfigured;
   const queue = climateDatabaseService.getOfflineQueue();
 
   modal.innerHTML = `
@@ -40,7 +34,7 @@ export function openSupabaseSyncModal(): void {
           </div>
           <div>
             <h3 class="modal-title">${isEn ? 'Supabase Database & Offline Sync' : 'Base de Datos Supabase & Sincronización Offline'}</h3>
-            <p class="modal-subtitle">${isEn ? 'Automatic cloud persistence & offline cache with >=90% duplicate detection' : 'Persistencia automática en la nube y caché offline con detección de duplicados (≥90%)'}</p>
+            <p class="modal-subtitle">${isEn ? 'Automatic cloud persistence (datos_mensuales) & offline cache' : 'Persistencia automática en la tabla datos_mensuales y caché local'}</p>
           </div>
         </div>
         <button type="button" class="btn-close" id="btn-close-modal" aria-label="Close">&times;</button>
@@ -56,9 +50,9 @@ export function openSupabaseSyncModal(): void {
             </span>
           </div>
           <div class="status-indicator-col">
-            <span class="status-label">${isEn ? 'Supabase Cloud:' : 'Nube Supabase:'}</span>
-            <span id="supabase-cloud-badge" class="badge ${isConfigured ? 'badge-success' : 'badge-neutral'}">
-              ${isConfigured ? (isEn ? '✓ Configured' : '✓ Configurado') : (isEn ? '⚠ Unconfigured' : '⚠ Sin configurar')}
+            <span class="status-label">${isEn ? 'Supabase (datos_mensuales):' : 'Supabase (datos_mensuales):'}</span>
+            <span id="supabase-cloud-badge" class="badge ${isConnected ? 'badge-success' : 'badge-neutral'}">
+              ${isConnected ? (isEn ? '🟢 Connected' : '🟢 Conectado') : (isEn ? '🔴 Disconnected' : '🔴 Desconectado')}
             </span>
           </div>
           <div class="status-indicator-col">
@@ -69,38 +63,14 @@ export function openSupabaseSyncModal(): void {
           </div>
         </div>
 
-        <!-- 2. Supabase Configuration Section -->
+        <!-- 2. System Status Card (External Integration Notice) -->
         <div class="modal-section-card">
-          <h4 class="section-card-title">${isEn ? 'Supabase Project Credentials' : 'Credenciales del Proyecto Supabase'}</h4>
-          <p class="section-card-desc">
+          <h4 class="section-card-title">${isEn ? 'External Supabase Integration' : 'Integración Externa de Supabase'}</h4>
+          <p class="section-card-desc" style="margin-bottom: 0;">
             ${isEn
-              ? 'Enter your Supabase project URL and public Anon Key (stored securely in local browser cache).'
-              : 'Introduce la URL de tu proyecto Supabase y la clave pública Anon (se guardan de forma segura en tu navegador).'}
+              ? 'Supabase credentials are automatically managed outside the page (via GitHub Secrets and environment variables). No credentials need to be typed or configured inside this page.'
+              : 'Las credenciales de Supabase se gestionan de forma automática fuera de la página (mediante GitHub Secrets y variables de entorno). No es necesario ingresar ninguna clave dentro de la página.'}
           </p>
-
-          <div class="form-grid supabase-form-grid">
-            <div class="form-group">
-              <label for="input-supabase-url" class="form-label">${isEn ? 'Project URL (VITE_SUPABASE_URL)' : 'URL del Proyecto (VITE_SUPABASE_URL)'}</label>
-              <input type="text" id="input-supabase-url" class="form-input" placeholder="https://xyzproject.supabase.co" value="${config.url}" />
-            </div>
-            <div class="form-group">
-              <label for="input-supabase-key" class="form-label">${isEn ? 'Public Anon Key (VITE_SUPABASE_ANON_KEY)' : 'Clave Pública Anon (VITE_SUPABASE_ANON_KEY)'}</label>
-              <input type="password" id="input-supabase-key" class="form-input" placeholder="PLACEHOLDER_TOKEN..." value="${config.key}" />
-            </div>
-          </div>
-
-          <div class="supabase-actions-row">
-            <button id="btn-save-credentials" type="button" class="btn btn-secondary btn-sm">
-              ${isEn ? 'Save Credentials' : 'Guardar Credenciales'}
-            </button>
-            <button id="btn-test-connection" type="button" class="btn btn-primary btn-sm">
-              ${isEn ? 'Test Connection' : 'Probar Conexión'}
-            </button>
-            <button id="btn-clear-credentials" type="button" class="btn btn-ghost btn-sm">
-              ${isEn ? 'Clear' : 'Limpiar'}
-            </button>
-          </div>
-          <div id="connection-test-feedback" class="connection-feedback-box hidden"></div>
         </div>
 
         <!-- 3. Offline Sync Queue Section -->
@@ -110,8 +80,8 @@ export function openSupabaseSyncModal(): void {
               <h4 class="section-card-title">${isEn ? 'Offline Datasets Queue' : 'Cola de Emplazamientos Offline'}</h4>
               <p class="section-card-desc">
                 ${isEn
-                  ? 'Locations entered while offline or unconfigured. Synced locations with >=90% similarity in numerical data are detected as duplicates.'
-                  : 'Emplazamientos ingresados en modo offline. Los datos con ≥90% de coincidencia numérica se detectan como ya registrados.'}
+                  ? 'Locations saved while working offline. Emplacements with >=90% similarity in numerical data are automatically detected as already registered.'
+                  : 'Emplazamientos guardados en modo sin conexión. Los emplazamientos con ≥90% de coincidencia numérica se detectan automáticamente como ya registrados.'}
               </p>
             </div>
             ${queue.length > 0 ? `
@@ -136,7 +106,7 @@ export function openSupabaseSyncModal(): void {
 
       <div class="modal-footer">
         <span class="modal-footer-hint">
-          ℹ️ ${isEn ? 'Duplicate Rule: At least 90% match in monthly solar & temperature curves.' : 'Regla de Integridad: Al menos 90% de coincidencia en curvas de radiación y temperatura.'}
+          ℹ️ ${isEn ? 'Duplicate Rule: At least 90% match in monthly curves flags duplicates.' : 'Regla de Integridad: Al menos 90% de coincidencia numérica detecta duplicados.'}
         </span>
         <button type="button" class="btn btn-secondary" id="btn-modal-close-footer">${isEn ? 'Close' : 'Cerrar'}</button>
       </div>
@@ -161,62 +131,6 @@ export function openSupabaseSyncModal(): void {
   modal.addEventListener('click', (e) => {
     if (e.target === modal) closeModal();
   });
-
-  // Credential action handlers
-  const urlInput = modal.querySelector<HTMLInputElement>('#input-supabase-url')!;
-  const keyInput = modal.querySelector<HTMLInputElement>('#input-supabase-key')!;
-  const feedbackBox = modal.querySelector<HTMLElement>('#connection-test-feedback')!;
-
-  modal.querySelector('#btn-save-credentials')?.addEventListener('click', () => {
-    const url = urlInput.value.trim();
-    const key = keyInput.value.trim();
-    setSupabaseCredentials(url, key);
-    feedbackBox.className = 'connection-feedback-box feedback-success';
-    feedbackBox.textContent = isEn ? '✓ Credentials saved successfully.' : '✓ Credenciales guardadas correctamente.';
-    feedbackBox.classList.remove('hidden');
-    updateCloudBadge();
-  });
-
-  modal.querySelector('#btn-test-connection')?.addEventListener('click', async () => {
-    const url = urlInput.value.trim();
-    const key = keyInput.value.trim();
-    setSupabaseCredentials(url, key);
-
-    feedbackBox.className = 'connection-feedback-box feedback-info';
-    feedbackBox.textContent = isEn ? 'Testing connection to Supabase table climate_locations...' : 'Comprobando conexión con la tabla climate_locations...';
-    feedbackBox.classList.remove('hidden');
-
-    const result = await testSupabaseConnection();
-    if (result.ok) {
-      feedbackBox.className = 'connection-feedback-box feedback-success';
-      feedbackBox.textContent = `✓ ${result.message}`;
-    } else {
-      feedbackBox.className = 'connection-feedback-box feedback-error';
-      feedbackBox.textContent = `✗ ${result.message}`;
-    }
-    updateCloudBadge();
-  });
-
-  modal.querySelector('#btn-clear-credentials')?.addEventListener('click', () => {
-    clearSupabaseCredentials();
-    urlInput.value = '';
-    keyInput.value = '';
-    feedbackBox.className = 'connection-feedback-box feedback-info';
-    feedbackBox.textContent = isEn ? 'Credentials cleared.' : 'Credenciales eliminadas.';
-    feedbackBox.classList.remove('hidden');
-    updateCloudBadge();
-  });
-
-  function updateCloudBadge() {
-    const cloudBadge = modal.querySelector('#supabase-cloud-badge');
-    if (cloudBadge) {
-      const configured = climateDatabaseService.isConfigured();
-      cloudBadge.className = `badge ${configured ? 'badge-success' : 'badge-neutral'}`;
-      cloudBadge.textContent = configured
-        ? (isEn ? '✓ Configured' : '✓ Configurado')
-        : (isEn ? '⚠ Unconfigured' : '⚠ Sin configurar');
-    }
-  }
 
   // Queue actions
   const queueContainer = modal.querySelector<HTMLElement>('#offline-queue-container')!;
@@ -291,7 +205,7 @@ function renderQueueItemsMarkup(queue: any[], isEn: boolean): string {
           <circle cx="12" cy="12" r="10"></circle>
           <path d="m9 12 2 2 4-4"></path>
         </svg>
-        <p>${isEn ? 'No offline datasets pending. Local cache is synchronized.' : 'No hay emplazamientos pendientes en cola offline. Todos los datos están sincronizados.'}</p>
+        <p>${isEn ? 'No offline datasets pending. Local cache is synchronized.' : 'No hay emplazamientos pendientes en la cola local. Todo sincronizado.'}</p>
       </div>
     `;
   }
