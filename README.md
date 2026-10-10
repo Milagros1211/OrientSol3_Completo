@@ -7,12 +7,12 @@
 [![Engine](https://img.shields.io/badge/WebAssembly-Pyodide%20%2B%20NumPy-F7931E?logo=webassembly)](https://pyodide.org/)
 [![Multiplatform](https://img.shields.io/badge/Multiplatform-Web%20%7C%20Windows%20%7C%20Android-4CAF50)](https://capacitorjs.com/)
 
-> 🌐 **Enlace Permanente del Software en Vivo:**  
-> 👉 [https://Milagros1211.github.io/OrientSol3_Completo/](https://Milagros1211.github.io/OrientSol3_Completo/)
+> **Enlace Permanente del Software en Vivo:**  
+>  [https://Milagros1211.github.io/OrientSol3_Completo/](https://Milagros1211.github.io/OrientSol3_Completo/)
 
 ---
 
-## 📌 Contexto Académico
+## Contexto Académico
 
 - **Institución:** Universidad de Jaén (UJA) — Escuela Politécnica Superior.
 - **Programa:** Máster Universitario en Energías Renovables.
@@ -22,7 +22,7 @@
 
 ---
 
-## ☀️ ¿Qué es OrientSol 3.0?
+## ¿Qué es OrientSol 3.0?
 
 **OrientSol 3.0** es la modernización y evolución web del software original desarrollado en **MATLAB/Octave (`.m` y `.fig`)**. Ha sido transformado en una suite de simulación solar abierta, interactiva y multiplataforma basada en tecnologías de vanguardia:
 
@@ -45,7 +45,7 @@
 
 ---
 
-## 📋 Guía de Plantillas y Formatos para la Carga de Emplazamientos (CSV / JSON)
+## Guía de Plantillas y Formatos para la Carga de Emplazamientos (CSV / JSON)
 
 OrientSol 3.0 incluye un motor universal de ingesta digital capaz de procesar archivos de climatología tanto para **un único emplazamiento** como para un **lote de múltiples emplazamientos simultáneos (Batch)**. Los archivos subidos se validan matemáticamente, se cargan en el motor de cálculo y se registran automáticamente en la base de datos de **Supabase** (tabla `datos_mensuales`) o en la caché offline si no hay conexión a Internet.
 
@@ -188,7 +188,7 @@ Para facilitar la creación de tus archivos, la plataforma cuenta con botones de
 
 ---
 
-## 📊 Estado de Cumplimiento de los Objetivos del TFM
+## Estado de Cumplimiento de los Objetivos del TFM
 
 En base al documento oficial aprobado: **`[Master EERR] FormatoPropuestaTFMKarinaBaldeon.pdf`**
 
@@ -240,7 +240,7 @@ graph LR
 
 ---
 
-## 💻 Ejecución y Desarrollo Local
+## Ejecución y Desarrollo Local
 
 ### Requisitos previos:
 - [Node.js](https://nodejs.org/) v18 o superior.
@@ -286,7 +286,7 @@ npm run --prefix orientsol-web cap:open:android
 
 ---
 
-## 📂 Estructura del Repositorio
+## Estructura del Repositorio
 
 ```text
 ├── .github/workflows/
@@ -314,7 +314,7 @@ npm run --prefix orientsol-web cap:open:android
 
 ---
 
-## 📜 Licencia y Derechos de Autor
+## Licencia y Derechos de Autor
 
 Desarrollado en el marco del **Máster Universitario en Energías Renovables** de la **Universidad de Jaén (UJA)**.  
 Código abierto bajo licencia MIT.
