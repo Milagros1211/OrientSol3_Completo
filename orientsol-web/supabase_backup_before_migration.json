@@ -1,0 +1,9002 @@
+[
+  {
+    "id": 1,
+    "nombre_emplazamiento": "Albacete",
+    "latitud": 38.9975,
+    "longitud": -1.86,
+    "mes": 1,
+    "radiacion_media": 76.17,
+    "temp_media": 5.36
+  },
+  {
+    "id": 2,
+    "nombre_emplazamiento": "Albacete",
+    "latitud": 38.9975,
+    "longitud": -1.86,
+    "mes": 2,
+    "radiacion_media": 94.42,
+    "temp_media": 6.59
+  },
+  {
+    "id": 3,
+    "nombre_emplazamiento": "Albacete",
+    "latitud": 38.9975,
+    "longitud": -1.86,
+    "mes": 3,
+    "radiacion_media": 139.94,
+    "temp_media": 9.54
+  },
+  {
+    "id": 4,
+    "nombre_emplazamiento": "Albacete",
+    "latitud": 38.9975,
+    "longitud": -1.86,
+    "mes": 4,
+    "radiacion_media": 170.12,
+    "temp_media": 12.8
+  },
+  {
+    "id": 5,
+    "nombre_emplazamiento": "Albacete",
+    "latitud": 38.9975,
+    "longitud": -1.86,
+    "mes": 5,
+    "radiacion_media": 208.17,
+    "temp_media": 17.36
+  },
+  {
+    "id": 6,
+    "nombre_emplazamiento": "Albacete",
+    "latitud": 38.9975,
+    "longitud": -1.86,
+    "mes": 6,
+    "radiacion_media": 226.98,
+    "temp_media": 22.44
+  },
+  {
+    "id": 7,
+    "nombre_emplazamiento": "Albacete",
+    "latitud": 38.9975,
+    "longitud": -1.86,
+    "mes": 7,
+    "radiacion_media": 243.77,
+    "temp_media": 26.32
+  },
+  {
+    "id": 8,
+    "nombre_emplazamiento": "Albacete",
+    "latitud": 38.9975,
+    "longitud": -1.86,
+    "mes": 8,
+    "radiacion_media": 213.13,
+    "temp_media": 25.28
+  },
+  {
+    "id": 9,
+    "nombre_emplazamiento": "Albacete",
+    "latitud": 38.9975,
+    "longitud": -1.86,
+    "mes": 9,
+    "radiacion_media": 160.54,
+    "temp_media": 20.2
+  },
+  {
+    "id": 10,
+    "nombre_emplazamiento": "Albacete",
+    "latitud": 38.9975,
+    "longitud": -1.86,
+    "mes": 10,
+    "radiacion_media": 120.92,
+    "temp_media": 15.49
+  },
+  {
+    "id": 11,
+    "nombre_emplazamiento": "Albacete",
+    "latitud": 38.9975,
+    "longitud": -1.86,
+    "mes": 11,
+    "radiacion_media": 80.15,
+    "temp_media": 9.2
+  },
+  {
+    "id": 12,
+    "nombre_emplazamiento": "Albacete",
+    "latitud": 38.9975,
+    "longitud": -1.86,
+    "mes": 12,
+    "radiacion_media": 69.1,
+    "temp_media": 6.09
+  },
+  {
+    "id": 13,
+    "nombre_emplazamiento": "Alicante",
+    "latitud": 38.345,
+    "longitud": -0.48083,
+    "mes": 1,
+    "radiacion_media": 79.24,
+    "temp_media": 9.44
+  },
+  {
+    "id": 14,
+    "nombre_emplazamiento": "Alicante",
+    "latitud": 38.345,
+    "longitud": -0.48083,
+    "mes": 2,
+    "radiacion_media": 95.62,
+    "temp_media": 10.2
+  },
+  {
+    "id": 15,
+    "nombre_emplazamiento": "Alicante",
+    "latitud": 38.345,
+    "longitud": -0.48083,
+    "mes": 3,
+    "radiacion_media": 140.65,
+    "temp_media": 12.6
+  },
+  {
+    "id": 16,
+    "nombre_emplazamiento": "Alicante",
+    "latitud": 38.345,
+    "longitud": -0.48083,
+    "mes": 4,
+    "radiacion_media": 172.06,
+    "temp_media": 15.05
+  },
+  {
+    "id": 17,
+    "nombre_emplazamiento": "Alicante",
+    "latitud": 38.345,
+    "longitud": -0.48083,
+    "mes": 5,
+    "radiacion_media": 211.9,
+    "temp_media": 18.62
+  },
+  {
+    "id": 18,
+    "nombre_emplazamiento": "Alicante",
+    "latitud": 38.345,
+    "longitud": -0.48083,
+    "mes": 6,
+    "radiacion_media": 228.98,
+    "temp_media": 22.77
+  },
+  {
+    "id": 19,
+    "nombre_emplazamiento": "Alicante",
+    "latitud": 38.345,
+    "longitud": -0.48083,
+    "mes": 7,
+    "radiacion_media": 234.96,
+    "temp_media": 25.68
+  },
+  {
+    "id": 20,
+    "nombre_emplazamiento": "Alicante",
+    "latitud": 38.345,
+    "longitud": -0.48083,
+    "mes": 8,
+    "radiacion_media": 207.91,
+    "temp_media": 25.26
+  },
+  {
+    "id": 21,
+    "nombre_emplazamiento": "Alicante",
+    "latitud": 38.345,
+    "longitud": -0.48083,
+    "mes": 9,
+    "radiacion_media": 156.29,
+    "temp_media": 21.85
+  },
+  {
+    "id": 22,
+    "nombre_emplazamiento": "Alicante",
+    "latitud": 38.345,
+    "longitud": -0.48083,
+    "mes": 10,
+    "radiacion_media": 120.32,
+    "temp_media": 18.07
+  },
+  {
+    "id": 23,
+    "nombre_emplazamiento": "Alicante",
+    "latitud": 38.345,
+    "longitud": -0.48083,
+    "mes": 11,
+    "radiacion_media": 80.78,
+    "temp_media": 12.84
+  },
+  {
+    "id": 24,
+    "nombre_emplazamiento": "Alicante",
+    "latitud": 38.345,
+    "longitud": -0.48083,
+    "mes": 12,
+    "radiacion_media": 70.74,
+    "temp_media": 9.97
+  },
+  {
+    "id": 25,
+    "nombre_emplazamiento": "Almería",
+    "latitud": 36.84,
+    "longitud": -2.46778,
+    "mes": 1,
+    "radiacion_media": 86.02,
+    "temp_media": 8.63
+  },
+  {
+    "id": 26,
+    "nombre_emplazamiento": "Almería",
+    "latitud": 36.84,
+    "longitud": -2.46778,
+    "mes": 2,
+    "radiacion_media": 104.71,
+    "temp_media": 9.6
+  },
+  {
+    "id": 27,
+    "nombre_emplazamiento": "Almería",
+    "latitud": 36.84,
+    "longitud": -2.46778,
+    "mes": 3,
+    "radiacion_media": 151.03,
+    "temp_media": 12.11
+  },
+  {
+    "id": 28,
+    "nombre_emplazamiento": "Almería",
+    "latitud": 36.84,
+    "longitud": -2.46778,
+    "mes": 4,
+    "radiacion_media": 182.3,
+    "temp_media": 14.91
+  },
+  {
+    "id": 29,
+    "nombre_emplazamiento": "Almería",
+    "latitud": 36.84,
+    "longitud": -2.46778,
+    "mes": 5,
+    "radiacion_media": 220.79,
+    "temp_media": 18.96
+  },
+  {
+    "id": 30,
+    "nombre_emplazamiento": "Almería",
+    "latitud": 36.84,
+    "longitud": -2.46778,
+    "mes": 6,
+    "radiacion_media": 237,
+    "temp_media": 23.21
+  },
+  {
+    "id": 31,
+    "nombre_emplazamiento": "Almería",
+    "latitud": 36.84,
+    "longitud": -2.46778,
+    "mes": 7,
+    "radiacion_media": 241.06,
+    "temp_media": 26.26
+  },
+  {
+    "id": 32,
+    "nombre_emplazamiento": "Almería",
+    "latitud": 36.84,
+    "longitud": -2.46778,
+    "mes": 8,
+    "radiacion_media": 215.75,
+    "temp_media": 25.63
+  },
+  {
+    "id": 33,
+    "nombre_emplazamiento": "Almería",
+    "latitud": 36.84,
+    "longitud": -2.46778,
+    "mes": 9,
+    "radiacion_media": 165.19,
+    "temp_media": 21.57
+  },
+  {
+    "id": 34,
+    "nombre_emplazamiento": "Almería",
+    "latitud": 36.84,
+    "longitud": -2.46778,
+    "mes": 10,
+    "radiacion_media": 127.8,
+    "temp_media": 17.47
+  },
+  {
+    "id": 35,
+    "nombre_emplazamiento": "Almería",
+    "latitud": 36.84,
+    "longitud": -2.46778,
+    "mes": 11,
+    "radiacion_media": 88.69,
+    "temp_media": 12.11
+  },
+  {
+    "id": 36,
+    "nombre_emplazamiento": "Almería",
+    "latitud": 36.84,
+    "longitud": -2.46778,
+    "mes": 12,
+    "radiacion_media": 80.24,
+    "temp_media": 9.44
+  },
+  {
+    "id": 37,
+    "nombre_emplazamiento": "Ávila",
+    "latitud": 40.65639,
+    "longitud": -4.70028,
+    "mes": 1,
+    "radiacion_media": 64.83,
+    "temp_media": 2.19
+  },
+  {
+    "id": 38,
+    "nombre_emplazamiento": "Ávila",
+    "latitud": 40.65639,
+    "longitud": -4.70028,
+    "mes": 2,
+    "radiacion_media": 82.96,
+    "temp_media": 2.75
+  },
+  {
+    "id": 39,
+    "nombre_emplazamiento": "Ávila",
+    "latitud": 40.65639,
+    "longitud": -4.70028,
+    "mes": 3,
+    "radiacion_media": 128.5,
+    "temp_media": 5.42
+  },
+  {
+    "id": 40,
+    "nombre_emplazamiento": "Ávila",
+    "latitud": 40.65639,
+    "longitud": -4.70028,
+    "mes": 4,
+    "radiacion_media": 157.86,
+    "temp_media": 8.5
+  },
+  {
+    "id": 41,
+    "nombre_emplazamiento": "Ávila",
+    "latitud": 40.65639,
+    "longitud": -4.70028,
+    "mes": 5,
+    "radiacion_media": 196.35,
+    "temp_media": 12.77
+  },
+  {
+    "id": 42,
+    "nombre_emplazamiento": "Ávila",
+    "latitud": 40.65639,
+    "longitud": -4.70028,
+    "mes": 6,
+    "radiacion_media": 218.21,
+    "temp_media": 17.57
+  },
+  {
+    "id": 43,
+    "nombre_emplazamiento": "Ávila",
+    "latitud": 40.65639,
+    "longitud": -4.70028,
+    "mes": 7,
+    "radiacion_media": 240.17,
+    "temp_media": 21.27
+  },
+  {
+    "id": 44,
+    "nombre_emplazamiento": "Ávila",
+    "latitud": 40.65639,
+    "longitud": -4.70028,
+    "mes": 8,
+    "radiacion_media": 211.17,
+    "temp_media": 20.69
+  },
+  {
+    "id": 45,
+    "nombre_emplazamiento": "Ávila",
+    "latitud": 40.65639,
+    "longitud": -4.70028,
+    "mes": 9,
+    "radiacion_media": 157.89,
+    "temp_media": 16.61
+  },
+  {
+    "id": 46,
+    "nombre_emplazamiento": "Ávila",
+    "latitud": 40.65639,
+    "longitud": -4.70028,
+    "mes": 10,
+    "radiacion_media": 111.08,
+    "temp_media": 11.5
+  },
+  {
+    "id": 47,
+    "nombre_emplazamiento": "Ávila",
+    "latitud": 40.65639,
+    "longitud": -4.70028,
+    "mes": 11,
+    "radiacion_media": 68.05,
+    "temp_media": 5.46
+  },
+  {
+    "id": 48,
+    "nombre_emplazamiento": "Ávila",
+    "latitud": 40.65639,
+    "longitud": -4.70028,
+    "mes": 12,
+    "radiacion_media": 62.12,
+    "temp_media": 3.08
+  },
+  {
+    "id": 49,
+    "nombre_emplazamiento": "Badajoz",
+    "latitud": 38.87833,
+    "longitud": -6.97,
+    "mes": 1,
+    "radiacion_media": 73.16,
+    "temp_media": 8.49
+  },
+  {
+    "id": 50,
+    "nombre_emplazamiento": "Badajoz",
+    "latitud": 38.87833,
+    "longitud": -6.97,
+    "mes": 2,
+    "radiacion_media": 95.87,
+    "temp_media": 9.75
+  },
+  {
+    "id": 51,
+    "nombre_emplazamiento": "Badajoz",
+    "latitud": 38.87833,
+    "longitud": -6.97,
+    "mes": 3,
+    "radiacion_media": 139.62,
+    "temp_media": 12.43
+  },
+  {
+    "id": 52,
+    "nombre_emplazamiento": "Badajoz",
+    "latitud": 38.87833,
+    "longitud": -6.97,
+    "mes": 4,
+    "radiacion_media": 169.83,
+    "temp_media": 15.19
+  },
+  {
+    "id": 53,
+    "nombre_emplazamiento": "Badajoz",
+    "latitud": 38.87833,
+    "longitud": -6.97,
+    "mes": 5,
+    "radiacion_media": 212.69,
+    "temp_media": 19.6
+  },
+  {
+    "id": 54,
+    "nombre_emplazamiento": "Badajoz",
+    "latitud": 38.87833,
+    "longitud": -6.97,
+    "mes": 6,
+    "radiacion_media": 230.1,
+    "temp_media": 23.7
+  },
+  {
+    "id": 55,
+    "nombre_emplazamiento": "Badajoz",
+    "latitud": 38.87833,
+    "longitud": -6.97,
+    "mes": 7,
+    "radiacion_media": 249.4,
+    "temp_media": 26.79
+  },
+  {
+    "id": 56,
+    "nombre_emplazamiento": "Badajoz",
+    "latitud": 38.87833,
+    "longitud": -6.97,
+    "mes": 8,
+    "radiacion_media": 220.76,
+    "temp_media": 26.98
+  },
+  {
+    "id": 57,
+    "nombre_emplazamiento": "Badajoz",
+    "latitud": 38.87833,
+    "longitud": -6.97,
+    "mes": 9,
+    "radiacion_media": 166.79,
+    "temp_media": 23.37
+  },
+  {
+    "id": 58,
+    "nombre_emplazamiento": "Badajoz",
+    "latitud": 38.87833,
+    "longitud": -6.97,
+    "mes": 10,
+    "radiacion_media": 118.94,
+    "temp_media": 18.29
+  },
+  {
+    "id": 59,
+    "nombre_emplazamiento": "Badajoz",
+    "latitud": 38.87833,
+    "longitud": -6.97,
+    "mes": 11,
+    "radiacion_media": 78.82,
+    "temp_media": 12.29
+  },
+  {
+    "id": 60,
+    "nombre_emplazamiento": "Badajoz",
+    "latitud": 38.87833,
+    "longitud": -6.97,
+    "mes": 12,
+    "radiacion_media": 65.92,
+    "temp_media": 9.3
+  },
+  {
+    "id": 61,
+    "nombre_emplazamiento": "Barcelona",
+    "latitud": 41.38778,
+    "longitud": 2.16972,
+    "mes": 1,
+    "radiacion_media": 66.78,
+    "temp_media": 8.62
+  },
+  {
+    "id": 62,
+    "nombre_emplazamiento": "Barcelona",
+    "latitud": 41.38778,
+    "longitud": 2.16972,
+    "mes": 2,
+    "radiacion_media": 85.37,
+    "temp_media": 9.21
+  },
+  {
+    "id": 63,
+    "nombre_emplazamiento": "Barcelona",
+    "latitud": 41.38778,
+    "longitud": 2.16972,
+    "mes": 3,
+    "radiacion_media": 134.02,
+    "temp_media": 11.22
+  },
+  {
+    "id": 64,
+    "nombre_emplazamiento": "Barcelona",
+    "latitud": 41.38778,
+    "longitud": 2.16972,
+    "mes": 4,
+    "radiacion_media": 161.43,
+    "temp_media": 13.82
+  },
+  {
+    "id": 65,
+    "nombre_emplazamiento": "Barcelona",
+    "latitud": 41.38778,
+    "longitud": 2.16972,
+    "mes": 5,
+    "radiacion_media": 202.53,
+    "temp_media": 17.15
+  },
+  {
+    "id": 66,
+    "nombre_emplazamiento": "Barcelona",
+    "latitud": 41.38778,
+    "longitud": 2.16972,
+    "mes": 6,
+    "radiacion_media": 219.2,
+    "temp_media": 21.24
+  },
+  {
+    "id": 67,
+    "nombre_emplazamiento": "Barcelona",
+    "latitud": 41.38778,
+    "longitud": 2.16972,
+    "mes": 7,
+    "radiacion_media": 223.25,
+    "temp_media": 23.99
+  },
+  {
+    "id": 68,
+    "nombre_emplazamiento": "Barcelona",
+    "latitud": 41.38778,
+    "longitud": 2.16972,
+    "mes": 8,
+    "radiacion_media": 193.18,
+    "temp_media": 23.74
+  },
+  {
+    "id": 69,
+    "nombre_emplazamiento": "Barcelona",
+    "latitud": 41.38778,
+    "longitud": 2.16972,
+    "mes": 9,
+    "radiacion_media": 142.38,
+    "temp_media": 20.94
+  },
+  {
+    "id": 70,
+    "nombre_emplazamiento": "Barcelona",
+    "latitud": 41.38778,
+    "longitud": 2.16972,
+    "mes": 10,
+    "radiacion_media": 102.27,
+    "temp_media": 17.47
+  },
+  {
+    "id": 71,
+    "nombre_emplazamiento": "Barcelona",
+    "latitud": 41.38778,
+    "longitud": 2.16972,
+    "mes": 11,
+    "radiacion_media": 69.59,
+    "temp_media": 12.51
+  },
+  {
+    "id": 72,
+    "nombre_emplazamiento": "Barcelona",
+    "latitud": 41.38778,
+    "longitud": 2.16972,
+    "mes": 12,
+    "radiacion_media": 59.63,
+    "temp_media": 9.24
+  },
+  {
+    "id": 73,
+    "nombre_emplazamiento": "Bilbao",
+    "latitud": 43.25056,
+    "longitud": -2.92333,
+    "mes": 1,
+    "radiacion_media": 43.28,
+    "temp_media": 7.19
+  },
+  {
+    "id": 74,
+    "nombre_emplazamiento": "Bilbao",
+    "latitud": 43.25056,
+    "longitud": -2.92333,
+    "mes": 2,
+    "radiacion_media": 59.94,
+    "temp_media": 7.35
+  },
+  {
+    "id": 75,
+    "nombre_emplazamiento": "Bilbao",
+    "latitud": 43.25056,
+    "longitud": -2.92333,
+    "mes": 3,
+    "radiacion_media": 99.86,
+    "temp_media": 9.32
+  },
+  {
+    "id": 76,
+    "nombre_emplazamiento": "Bilbao",
+    "latitud": 43.25056,
+    "longitud": -2.92333,
+    "mes": 4,
+    "radiacion_media": 125.92,
+    "temp_media": 11.46
+  },
+  {
+    "id": 77,
+    "nombre_emplazamiento": "Bilbao",
+    "latitud": 43.25056,
+    "longitud": -2.92333,
+    "mes": 5,
+    "radiacion_media": 152.56,
+    "temp_media": 13.93
+  },
+  {
+    "id": 78,
+    "nombre_emplazamiento": "Bilbao",
+    "latitud": 43.25056,
+    "longitud": -2.92333,
+    "mes": 6,
+    "radiacion_media": 156.86,
+    "temp_media": 16.74
+  },
+  {
+    "id": 79,
+    "nombre_emplazamiento": "Bilbao",
+    "latitud": 43.25056,
+    "longitud": -2.92333,
+    "mes": 7,
+    "radiacion_media": 164.65,
+    "temp_media": 18.69
+  },
+  {
+    "id": 80,
+    "nombre_emplazamiento": "Bilbao",
+    "latitud": 43.25056,
+    "longitud": -2.92333,
+    "mes": 8,
+    "radiacion_media": 150.2,
+    "temp_media": 18.88
+  },
+  {
+    "id": 81,
+    "nombre_emplazamiento": "Bilbao",
+    "latitud": 43.25056,
+    "longitud": -2.92333,
+    "mes": 9,
+    "radiacion_media": 119.53,
+    "temp_media": 17.32
+  },
+  {
+    "id": 82,
+    "nombre_emplazamiento": "Bilbao",
+    "latitud": 43.25056,
+    "longitud": -2.92333,
+    "mes": 10,
+    "radiacion_media": 82.29,
+    "temp_media": 14.81
+  },
+  {
+    "id": 83,
+    "nombre_emplazamiento": "Bilbao",
+    "latitud": 43.25056,
+    "longitud": -2.92333,
+    "mes": 11,
+    "radiacion_media": 47.88,
+    "temp_media": 10.47
+  },
+  {
+    "id": 84,
+    "nombre_emplazamiento": "Bilbao",
+    "latitud": 43.25056,
+    "longitud": -2.92333,
+    "mes": 12,
+    "radiacion_media": 41.24,
+    "temp_media": 7.91
+  },
+  {
+    "id": 85,
+    "nombre_emplazamiento": "Burgos",
+    "latitud": 42.34083,
+    "longitud": -3.69972,
+    "mes": 1,
+    "radiacion_media": 51.88,
+    "temp_media": 3.07
+  },
+  {
+    "id": 86,
+    "nombre_emplazamiento": "Burgos",
+    "latitud": 42.34083,
+    "longitud": -3.69972,
+    "mes": 2,
+    "radiacion_media": 71.79,
+    "temp_media": 3.64
+  },
+  {
+    "id": 87,
+    "nombre_emplazamiento": "Burgos",
+    "latitud": 42.34083,
+    "longitud": -3.69972,
+    "mes": 3,
+    "radiacion_media": 117.11,
+    "temp_media": 6.26
+  },
+  {
+    "id": 88,
+    "nombre_emplazamiento": "Burgos",
+    "latitud": 42.34083,
+    "longitud": -3.69972,
+    "mes": 4,
+    "radiacion_media": 148.53,
+    "temp_media": 9.11
+  },
+  {
+    "id": 89,
+    "nombre_emplazamiento": "Burgos",
+    "latitud": 42.34083,
+    "longitud": -3.69972,
+    "mes": 5,
+    "radiacion_media": 192.65,
+    "temp_media": 12.56
+  },
+  {
+    "id": 90,
+    "nombre_emplazamiento": "Burgos",
+    "latitud": 42.34083,
+    "longitud": -3.69972,
+    "mes": 6,
+    "radiacion_media": 209.68,
+    "temp_media": 16.71
+  },
+  {
+    "id": 91,
+    "nombre_emplazamiento": "Burgos",
+    "latitud": 42.34083,
+    "longitud": -3.69972,
+    "mes": 7,
+    "radiacion_media": 233.27,
+    "temp_media": 19.44
+  },
+  {
+    "id": 92,
+    "nombre_emplazamiento": "Burgos",
+    "latitud": 42.34083,
+    "longitud": -3.69972,
+    "mes": 8,
+    "radiacion_media": 206.54,
+    "temp_media": 19.42
+  },
+  {
+    "id": 93,
+    "nombre_emplazamiento": "Burgos",
+    "latitud": 42.34083,
+    "longitud": -3.69972,
+    "mes": 9,
+    "radiacion_media": 150.7,
+    "temp_media": 16.44
+  },
+  {
+    "id": 94,
+    "nombre_emplazamiento": "Burgos",
+    "latitud": 42.34083,
+    "longitud": -3.69972,
+    "mes": 10,
+    "radiacion_media": 102.17,
+    "temp_media": 12.16
+  },
+  {
+    "id": 95,
+    "nombre_emplazamiento": "Burgos",
+    "latitud": 42.34083,
+    "longitud": -3.69972,
+    "mes": 11,
+    "radiacion_media": 58.66,
+    "temp_media": 6.54
+  },
+  {
+    "id": 96,
+    "nombre_emplazamiento": "Burgos",
+    "latitud": 42.34083,
+    "longitud": -3.69972,
+    "mes": 12,
+    "radiacion_media": 48.61,
+    "temp_media": 3.77
+  },
+  {
+    "id": 97,
+    "nombre_emplazamiento": "Cáceres",
+    "latitud": 39.47611,
+    "longitud": -6.37056,
+    "mes": 1,
+    "radiacion_media": 71.43,
+    "temp_media": 7.58
+  },
+  {
+    "id": 98,
+    "nombre_emplazamiento": "Cáceres",
+    "latitud": 39.47611,
+    "longitud": -6.37056,
+    "mes": 2,
+    "radiacion_media": 93.44,
+    "temp_media": 8.9
+  },
+  {
+    "id": 99,
+    "nombre_emplazamiento": "Cáceres",
+    "latitud": 39.47611,
+    "longitud": -6.37056,
+    "mes": 3,
+    "radiacion_media": 137.41,
+    "temp_media": 11.56
+  },
+  {
+    "id": 100,
+    "nombre_emplazamiento": "Cáceres",
+    "latitud": 39.47611,
+    "longitud": -6.37056,
+    "mes": 4,
+    "radiacion_media": 169.45,
+    "temp_media": 14.41
+  },
+  {
+    "id": 101,
+    "nombre_emplazamiento": "Cáceres",
+    "latitud": 39.47611,
+    "longitud": -6.37056,
+    "mes": 5,
+    "radiacion_media": 211.42,
+    "temp_media": 18.92
+  },
+  {
+    "id": 102,
+    "nombre_emplazamiento": "Cáceres",
+    "latitud": 39.47611,
+    "longitud": -6.37056,
+    "mes": 6,
+    "radiacion_media": 230.86,
+    "temp_media": 23.45
+  },
+  {
+    "id": 103,
+    "nombre_emplazamiento": "Cáceres",
+    "latitud": 39.47611,
+    "longitud": -6.37056,
+    "mes": 7,
+    "radiacion_media": 248.67,
+    "temp_media": 27.13
+  },
+  {
+    "id": 104,
+    "nombre_emplazamiento": "Cáceres",
+    "latitud": 39.47611,
+    "longitud": -6.37056,
+    "mes": 8,
+    "radiacion_media": 219.23,
+    "temp_media": 27.01
+  },
+  {
+    "id": 105,
+    "nombre_emplazamiento": "Cáceres",
+    "latitud": 39.47611,
+    "longitud": -6.37056,
+    "mes": 9,
+    "radiacion_media": 164.41,
+    "temp_media": 22.75
+  },
+  {
+    "id": 106,
+    "nombre_emplazamiento": "Cáceres",
+    "latitud": 39.47611,
+    "longitud": -6.37056,
+    "mes": 10,
+    "radiacion_media": 116.18,
+    "temp_media": 17.48
+  },
+  {
+    "id": 107,
+    "nombre_emplazamiento": "Cáceres",
+    "latitud": 39.47611,
+    "longitud": -6.37056,
+    "mes": 11,
+    "radiacion_media": 76.4,
+    "temp_media": 11.41
+  },
+  {
+    "id": 108,
+    "nombre_emplazamiento": "Cáceres",
+    "latitud": 39.47611,
+    "longitud": -6.37056,
+    "mes": 12,
+    "radiacion_media": 64.8,
+    "temp_media": 8.43
+  },
+  {
+    "id": 109,
+    "nombre_emplazamiento": "Cádiz",
+    "latitud": 36.52944,
+    "longitud": -6.2925,
+    "mes": 1,
+    "radiacion_media": 86.5,
+    "temp_media": 12.53
+  },
+  {
+    "id": 110,
+    "nombre_emplazamiento": "Cádiz",
+    "latitud": 36.52944,
+    "longitud": -6.2925,
+    "mes": 2,
+    "radiacion_media": 104,
+    "temp_media": 13.14
+  },
+  {
+    "id": 111,
+    "nombre_emplazamiento": "Cádiz",
+    "latitud": 36.52944,
+    "longitud": -6.2925,
+    "mes": 3,
+    "radiacion_media": 149.78,
+    "temp_media": 14.74
+  },
+  {
+    "id": 112,
+    "nombre_emplazamiento": "Cádiz",
+    "latitud": 36.52944,
+    "longitud": -6.2925,
+    "mes": 4,
+    "radiacion_media": 184.51,
+    "temp_media": 16.6
+  },
+  {
+    "id": 113,
+    "nombre_emplazamiento": "Cádiz",
+    "latitud": 36.52944,
+    "longitud": -6.2925,
+    "mes": 5,
+    "radiacion_media": 225.73,
+    "temp_media": 19.59
+  },
+  {
+    "id": 114,
+    "nombre_emplazamiento": "Cádiz",
+    "latitud": 36.52944,
+    "longitud": -6.2925,
+    "mes": 6,
+    "radiacion_media": 237.11,
+    "temp_media": 22.31
+  },
+  {
+    "id": 115,
+    "nombre_emplazamiento": "Cádiz",
+    "latitud": 36.52944,
+    "longitud": -6.2925,
+    "mes": 7,
+    "radiacion_media": 247.48,
+    "temp_media": 24.54
+  },
+  {
+    "id": 116,
+    "nombre_emplazamiento": "Cádiz",
+    "latitud": 36.52944,
+    "longitud": -6.2925,
+    "mes": 8,
+    "radiacion_media": 220.73,
+    "temp_media": 25.07
+  },
+  {
+    "id": 117,
+    "nombre_emplazamiento": "Cádiz",
+    "latitud": 36.52944,
+    "longitud": -6.2925,
+    "mes": 9,
+    "radiacion_media": 170.2,
+    "temp_media": 22.99
+  },
+  {
+    "id": 118,
+    "nombre_emplazamiento": "Cádiz",
+    "latitud": 36.52944,
+    "longitud": -6.2925,
+    "mes": 10,
+    "radiacion_media": 130.13,
+    "temp_media": 20.16
+  },
+  {
+    "id": 119,
+    "nombre_emplazamiento": "Cádiz",
+    "latitud": 36.52944,
+    "longitud": -6.2925,
+    "mes": 11,
+    "radiacion_media": 89.33,
+    "temp_media": 15.89
+  },
+  {
+    "id": 120,
+    "nombre_emplazamiento": "Cádiz",
+    "latitud": 36.52944,
+    "longitud": -6.2925,
+    "mes": 12,
+    "radiacion_media": 78.53,
+    "temp_media": 13.6
+  },
+  {
+    "id": 121,
+    "nombre_emplazamiento": "Castellón de la Plana",
+    "latitud": 39.98306,
+    "longitud": -0.04083,
+    "mes": 1,
+    "radiacion_media": 72.38,
+    "temp_media": 9.26
+  },
+  {
+    "id": 122,
+    "nombre_emplazamiento": "Castellón de la Plana",
+    "latitud": 39.98306,
+    "longitud": -0.04083,
+    "mes": 2,
+    "radiacion_media": 91.66,
+    "temp_media": 9.69
+  },
+  {
+    "id": 123,
+    "nombre_emplazamiento": "Castellón de la Plana",
+    "latitud": 39.98306,
+    "longitud": -0.04083,
+    "mes": 3,
+    "radiacion_media": 136.43,
+    "temp_media": 12.05
+  },
+  {
+    "id": 124,
+    "nombre_emplazamiento": "Castellón de la Plana",
+    "latitud": 39.98306,
+    "longitud": -0.04083,
+    "mes": 4,
+    "radiacion_media": 168.76,
+    "temp_media": 14.5
+  },
+  {
+    "id": 125,
+    "nombre_emplazamiento": "Castellón de la Plana",
+    "latitud": 39.98306,
+    "longitud": -0.04083,
+    "mes": 5,
+    "radiacion_media": 206.84,
+    "temp_media": 18.09
+  },
+  {
+    "id": 126,
+    "nombre_emplazamiento": "Castellón de la Plana",
+    "latitud": 39.98306,
+    "longitud": -0.04083,
+    "mes": 6,
+    "radiacion_media": 221.43,
+    "temp_media": 22.04
+  },
+  {
+    "id": 127,
+    "nombre_emplazamiento": "Castellón de la Plana",
+    "latitud": 39.98306,
+    "longitud": -0.04083,
+    "mes": 7,
+    "radiacion_media": 225.21,
+    "temp_media": 24.79
+  },
+  {
+    "id": 128,
+    "nombre_emplazamiento": "Castellón de la Plana",
+    "latitud": 39.98306,
+    "longitud": -0.04083,
+    "mes": 8,
+    "radiacion_media": 195.36,
+    "temp_media": 24.48
+  },
+  {
+    "id": 129,
+    "nombre_emplazamiento": "Castellón de la Plana",
+    "latitud": 39.98306,
+    "longitud": -0.04083,
+    "mes": 9,
+    "radiacion_media": 148.66,
+    "temp_media": 21.49
+  },
+  {
+    "id": 130,
+    "nombre_emplazamiento": "Castellón de la Plana",
+    "latitud": 39.98306,
+    "longitud": -0.04083,
+    "mes": 10,
+    "radiacion_media": 113.02,
+    "temp_media": 17.76
+  },
+  {
+    "id": 131,
+    "nombre_emplazamiento": "Castellón de la Plana",
+    "latitud": 39.98306,
+    "longitud": -0.04083,
+    "mes": 11,
+    "radiacion_media": 76.84,
+    "temp_media": 12.85
+  },
+  {
+    "id": 132,
+    "nombre_emplazamiento": "Castellón de la Plana",
+    "latitud": 39.98306,
+    "longitud": -0.04083,
+    "mes": 12,
+    "radiacion_media": 65.4,
+    "temp_media": 9.81
+  },
+  {
+    "id": 133,
+    "nombre_emplazamiento": "Ceuta",
+    "latitud": 35.88889,
+    "longitud": -5.31639,
+    "mes": 1,
+    "radiacion_media": 81.72,
+    "temp_media": 13.86
+  },
+  {
+    "id": 134,
+    "nombre_emplazamiento": "Ceuta",
+    "latitud": 35.88889,
+    "longitud": -5.31639,
+    "mes": 2,
+    "radiacion_media": 94.92,
+    "temp_media": 13.74
+  },
+  {
+    "id": 135,
+    "nombre_emplazamiento": "Ceuta",
+    "latitud": 35.88889,
+    "longitud": -5.31639,
+    "mes": 3,
+    "radiacion_media": 136.55,
+    "temp_media": 14.57
+  },
+  {
+    "id": 136,
+    "nombre_emplazamiento": "Ceuta",
+    "latitud": 35.88889,
+    "longitud": -5.31639,
+    "mes": 4,
+    "radiacion_media": 165.08,
+    "temp_media": 15.77
+  },
+  {
+    "id": 137,
+    "nombre_emplazamiento": "Ceuta",
+    "latitud": 35.88889,
+    "longitud": -5.31639,
+    "mes": 5,
+    "radiacion_media": 208.11,
+    "temp_media": 17.87
+  },
+  {
+    "id": 138,
+    "nombre_emplazamiento": "Ceuta",
+    "latitud": 35.88889,
+    "longitud": -5.31639,
+    "mes": 6,
+    "radiacion_media": 230.44,
+    "temp_media": 20.08
+  },
+  {
+    "id": 139,
+    "nombre_emplazamiento": "Ceuta",
+    "latitud": 35.88889,
+    "longitud": -5.31639,
+    "mes": 7,
+    "radiacion_media": 236.71,
+    "temp_media": 22.26
+  },
+  {
+    "id": 140,
+    "nombre_emplazamiento": "Ceuta",
+    "latitud": 35.88889,
+    "longitud": -5.31639,
+    "mes": 8,
+    "radiacion_media": 205.87,
+    "temp_media": 22.86
+  },
+  {
+    "id": 141,
+    "nombre_emplazamiento": "Ceuta",
+    "latitud": 35.88889,
+    "longitud": -5.31639,
+    "mes": 9,
+    "radiacion_media": 155.16,
+    "temp_media": 21.53
+  },
+  {
+    "id": 142,
+    "nombre_emplazamiento": "Ceuta",
+    "latitud": 35.88889,
+    "longitud": -5.31639,
+    "mes": 10,
+    "radiacion_media": 118.28,
+    "temp_media": 19.47
+  },
+  {
+    "id": 143,
+    "nombre_emplazamiento": "Ceuta",
+    "latitud": 35.88889,
+    "longitud": -5.31639,
+    "mes": 11,
+    "radiacion_media": 83.45,
+    "temp_media": 16.55
+  },
+  {
+    "id": 144,
+    "nombre_emplazamiento": "Ceuta",
+    "latitud": 35.88889,
+    "longitud": -5.31639,
+    "mes": 12,
+    "radiacion_media": 73.13,
+    "temp_media": 14.92
+  },
+  {
+    "id": 145,
+    "nombre_emplazamiento": "Ciudad Real",
+    "latitud": 38.98639,
+    "longitud": -3.92611,
+    "mes": 1,
+    "radiacion_media": 72.87,
+    "temp_media": 5.63
+  },
+  {
+    "id": 146,
+    "nombre_emplazamiento": "Ciudad Real",
+    "latitud": 38.98639,
+    "longitud": -3.92611,
+    "mes": 2,
+    "radiacion_media": 93.6,
+    "temp_media": 7.09
+  },
+  {
+    "id": 147,
+    "nombre_emplazamiento": "Ciudad Real",
+    "latitud": 38.98639,
+    "longitud": -3.92611,
+    "mes": 3,
+    "radiacion_media": 139.79,
+    "temp_media": 10.08
+  },
+  {
+    "id": 148,
+    "nombre_emplazamiento": "Ciudad Real",
+    "latitud": 38.98639,
+    "longitud": -3.92611,
+    "mes": 4,
+    "radiacion_media": 171.2,
+    "temp_media": 13.29
+  },
+  {
+    "id": 149,
+    "nombre_emplazamiento": "Ciudad Real",
+    "latitud": 38.98639,
+    "longitud": -3.92611,
+    "mes": 5,
+    "radiacion_media": 210.69,
+    "temp_media": 18.19
+  },
+  {
+    "id": 150,
+    "nombre_emplazamiento": "Ciudad Real",
+    "latitud": 38.98639,
+    "longitud": -3.92611,
+    "mes": 6,
+    "radiacion_media": 231.8,
+    "temp_media": 23.44
+  },
+  {
+    "id": 151,
+    "nombre_emplazamiento": "Ciudad Real",
+    "latitud": 38.98639,
+    "longitud": -3.92611,
+    "mes": 7,
+    "radiacion_media": 248.78,
+    "temp_media": 27.46
+  },
+  {
+    "id": 152,
+    "nombre_emplazamiento": "Ciudad Real",
+    "latitud": 38.98639,
+    "longitud": -3.92611,
+    "mes": 8,
+    "radiacion_media": 221.39,
+    "temp_media": 26.78
+  },
+  {
+    "id": 153,
+    "nombre_emplazamiento": "Ciudad Real",
+    "latitud": 38.98639,
+    "longitud": -3.92611,
+    "mes": 9,
+    "radiacion_media": 165.47,
+    "temp_media": 21.72
+  },
+  {
+    "id": 154,
+    "nombre_emplazamiento": "Ciudad Real",
+    "latitud": 38.98639,
+    "longitud": -3.92611,
+    "mes": 10,
+    "radiacion_media": 122.31,
+    "temp_media": 16.29
+  },
+  {
+    "id": 155,
+    "nombre_emplazamiento": "Ciudad Real",
+    "latitud": 38.98639,
+    "longitud": -3.92611,
+    "mes": 11,
+    "radiacion_media": 79.61,
+    "temp_media": 9.71
+  },
+  {
+    "id": 156,
+    "nombre_emplazamiento": "Ciudad Real",
+    "latitud": 38.98639,
+    "longitud": -3.92611,
+    "mes": 12,
+    "radiacion_media": 66.17,
+    "temp_media": 6.46
+  },
+  {
+    "id": 157,
+    "nombre_emplazamiento": "Córdoba",
+    "latitud": 37.89139,
+    "longitud": -4.7725,
+    "mes": 1,
+    "radiacion_media": 81.57,
+    "temp_media": 8.79
+  },
+  {
+    "id": 158,
+    "nombre_emplazamiento": "Córdoba",
+    "latitud": 37.89139,
+    "longitud": -4.7725,
+    "mes": 2,
+    "radiacion_media": 98.42,
+    "temp_media": 10.26
+  },
+  {
+    "id": 159,
+    "nombre_emplazamiento": "Córdoba",
+    "latitud": 37.89139,
+    "longitud": -4.7725,
+    "mes": 3,
+    "radiacion_media": 145.16,
+    "temp_media": 13.07
+  },
+  {
+    "id": 160,
+    "nombre_emplazamiento": "Córdoba",
+    "latitud": 37.89139,
+    "longitud": -4.7725,
+    "mes": 4,
+    "radiacion_media": 174.06,
+    "temp_media": 16.21
+  },
+  {
+    "id": 161,
+    "nombre_emplazamiento": "Córdoba",
+    "latitud": 37.89139,
+    "longitud": -4.7725,
+    "mes": 5,
+    "radiacion_media": 217.98,
+    "temp_media": 21.06
+  },
+  {
+    "id": 162,
+    "nombre_emplazamiento": "Córdoba",
+    "latitud": 37.89139,
+    "longitud": -4.7725,
+    "mes": 6,
+    "radiacion_media": 237.21,
+    "temp_media": 25.89
+  },
+  {
+    "id": 163,
+    "nombre_emplazamiento": "Córdoba",
+    "latitud": 37.89139,
+    "longitud": -4.7725,
+    "mes": 7,
+    "radiacion_media": 251.87,
+    "temp_media": 29.33
+  },
+  {
+    "id": 164,
+    "nombre_emplazamiento": "Córdoba",
+    "latitud": 37.89139,
+    "longitud": -4.7725,
+    "mes": 8,
+    "radiacion_media": 224.22,
+    "temp_media": 29.08
+  },
+  {
+    "id": 165,
+    "nombre_emplazamiento": "Córdoba",
+    "latitud": 37.89139,
+    "longitud": -4.7725,
+    "mes": 9,
+    "radiacion_media": 169.04,
+    "temp_media": 24.43
+  },
+  {
+    "id": 166,
+    "nombre_emplazamiento": "Córdoba",
+    "latitud": 37.89139,
+    "longitud": -4.7725,
+    "mes": 10,
+    "radiacion_media": 126.48,
+    "temp_media": 19.46
+  },
+  {
+    "id": 167,
+    "nombre_emplazamiento": "Córdoba",
+    "latitud": 37.89139,
+    "longitud": -4.7725,
+    "mes": 11,
+    "radiacion_media": 86.06,
+    "temp_media": 12.94
+  },
+  {
+    "id": 168,
+    "nombre_emplazamiento": "Córdoba",
+    "latitud": 37.89139,
+    "longitud": -4.7725,
+    "mes": 12,
+    "radiacion_media": 75.2,
+    "temp_media": 9.74
+  },
+  {
+    "id": 169,
+    "nombre_emplazamiento": "La Coruña",
+    "latitud": 43.36472,
+    "longitud": -8.41167,
+    "mes": 1,
+    "radiacion_media": 47.11,
+    "temp_media": 9.3
+  },
+  {
+    "id": 170,
+    "nombre_emplazamiento": "La Coruña",
+    "latitud": 43.36472,
+    "longitud": -8.41167,
+    "mes": 2,
+    "radiacion_media": 67.96,
+    "temp_media": 9.11
+  },
+  {
+    "id": 171,
+    "nombre_emplazamiento": "La Coruña",
+    "latitud": 43.36472,
+    "longitud": -8.41167,
+    "mes": 3,
+    "radiacion_media": 109.98,
+    "temp_media": 10.37
+  },
+  {
+    "id": 172,
+    "nombre_emplazamiento": "La Coruña",
+    "latitud": 43.36472,
+    "longitud": -8.41167,
+    "mes": 4,
+    "radiacion_media": 143.08,
+    "temp_media": 11.82
+  },
+  {
+    "id": 173,
+    "nombre_emplazamiento": "La Coruña",
+    "latitud": 43.36472,
+    "longitud": -8.41167,
+    "mes": 5,
+    "radiacion_media": 171.84,
+    "temp_media": 13.98
+  },
+  {
+    "id": 174,
+    "nombre_emplazamiento": "La Coruña",
+    "latitud": 43.36472,
+    "longitud": -8.41167,
+    "mes": 6,
+    "radiacion_media": 175.89,
+    "temp_media": 16.29
+  },
+  {
+    "id": 175,
+    "nombre_emplazamiento": "La Coruña",
+    "latitud": 43.36472,
+    "longitud": -8.41167,
+    "mes": 7,
+    "radiacion_media": 192.11,
+    "temp_media": 18.18
+  },
+  {
+    "id": 176,
+    "nombre_emplazamiento": "La Coruña",
+    "latitud": 43.36472,
+    "longitud": -8.41167,
+    "mes": 8,
+    "radiacion_media": 170.8,
+    "temp_media": 18.53
+  },
+  {
+    "id": 177,
+    "nombre_emplazamiento": "La Coruña",
+    "latitud": 43.36472,
+    "longitud": -8.41167,
+    "mes": 9,
+    "radiacion_media": 134.19,
+    "temp_media": 17.44
+  },
+  {
+    "id": 178,
+    "nombre_emplazamiento": "La Coruña",
+    "latitud": 43.36472,
+    "longitud": -8.41167,
+    "mes": 10,
+    "radiacion_media": 90.37,
+    "temp_media": 15.16
+  },
+  {
+    "id": 179,
+    "nombre_emplazamiento": "La Coruña",
+    "latitud": 43.36472,
+    "longitud": -8.41167,
+    "mes": 11,
+    "radiacion_media": 52.92,
+    "temp_media": 11.71
+  },
+  {
+    "id": 180,
+    "nombre_emplazamiento": "La Coruña",
+    "latitud": 43.36472,
+    "longitud": -8.41167,
+    "mes": 12,
+    "radiacion_media": 44.58,
+    "temp_media": 9.99
+  },
+  {
+    "id": 181,
+    "nombre_emplazamiento": "Cuenca",
+    "latitud": 40.07167,
+    "longitud": -2.13417,
+    "mes": 1,
+    "radiacion_media": 69.68,
+    "temp_media": 3.46
+  },
+  {
+    "id": 182,
+    "nombre_emplazamiento": "Cuenca",
+    "latitud": 40.07167,
+    "longitud": -2.13417,
+    "mes": 2,
+    "radiacion_media": 87.17,
+    "temp_media": 4.36
+  },
+  {
+    "id": 183,
+    "nombre_emplazamiento": "Cuenca",
+    "latitud": 40.07167,
+    "longitud": -2.13417,
+    "mes": 3,
+    "radiacion_media": 133.06,
+    "temp_media": 7.33
+  },
+  {
+    "id": 184,
+    "nombre_emplazamiento": "Cuenca",
+    "latitud": 40.07167,
+    "longitud": -2.13417,
+    "mes": 4,
+    "radiacion_media": 161.54,
+    "temp_media": 10.51
+  },
+  {
+    "id": 185,
+    "nombre_emplazamiento": "Cuenca",
+    "latitud": 40.07167,
+    "longitud": -2.13417,
+    "mes": 5,
+    "radiacion_media": 199.86,
+    "temp_media": 15.06
+  },
+  {
+    "id": 186,
+    "nombre_emplazamiento": "Cuenca",
+    "latitud": 40.07167,
+    "longitud": -2.13417,
+    "mes": 6,
+    "radiacion_media": 223.71,
+    "temp_media": 20.24
+  },
+  {
+    "id": 187,
+    "nombre_emplazamiento": "Cuenca",
+    "latitud": 40.07167,
+    "longitud": -2.13417,
+    "mes": 7,
+    "radiacion_media": 245.7,
+    "temp_media": 24.32
+  },
+  {
+    "id": 188,
+    "nombre_emplazamiento": "Cuenca",
+    "latitud": 40.07167,
+    "longitud": -2.13417,
+    "mes": 8,
+    "radiacion_media": 213.62,
+    "temp_media": 23.56
+  },
+  {
+    "id": 189,
+    "nombre_emplazamiento": "Cuenca",
+    "latitud": 40.07167,
+    "longitud": -2.13417,
+    "mes": 9,
+    "radiacion_media": 158.52,
+    "temp_media": 18.53
+  },
+  {
+    "id": 190,
+    "nombre_emplazamiento": "Cuenca",
+    "latitud": 40.07167,
+    "longitud": -2.13417,
+    "mes": 10,
+    "radiacion_media": 115.81,
+    "temp_media": 13.41
+  },
+  {
+    "id": 191,
+    "nombre_emplazamiento": "Cuenca",
+    "latitud": 40.07167,
+    "longitud": -2.13417,
+    "mes": 11,
+    "radiacion_media": 74.04,
+    "temp_media": 7.12
+  },
+  {
+    "id": 192,
+    "nombre_emplazamiento": "Cuenca",
+    "latitud": 40.07167,
+    "longitud": -2.13417,
+    "mes": 12,
+    "radiacion_media": 64.62,
+    "temp_media": 4.18
+  },
+  {
+    "id": 193,
+    "nombre_emplazamiento": "Gerona",
+    "latitud": 41.98333,
+    "longitud": 2.81667,
+    "mes": 1,
+    "radiacion_media": 66.91,
+    "temp_media": 7.21
+  },
+  {
+    "id": 194,
+    "nombre_emplazamiento": "Gerona",
+    "latitud": 41.98333,
+    "longitud": 2.81667,
+    "mes": 2,
+    "radiacion_media": 85.38,
+    "temp_media": 7.84
+  },
+  {
+    "id": 195,
+    "nombre_emplazamiento": "Gerona",
+    "latitud": 41.98333,
+    "longitud": 2.81667,
+    "mes": 3,
+    "radiacion_media": 128.32,
+    "temp_media": 10.39
+  },
+  {
+    "id": 196,
+    "nombre_emplazamiento": "Gerona",
+    "latitud": 41.98333,
+    "longitud": 2.81667,
+    "mes": 4,
+    "radiacion_media": 156.87,
+    "temp_media": 13.48
+  },
+  {
+    "id": 197,
+    "nombre_emplazamiento": "Gerona",
+    "latitud": 41.98333,
+    "longitud": 2.81667,
+    "mes": 5,
+    "radiacion_media": 190.38,
+    "temp_media": 17.13
+  },
+  {
+    "id": 198,
+    "nombre_emplazamiento": "Gerona",
+    "latitud": 41.98333,
+    "longitud": 2.81667,
+    "mes": 6,
+    "radiacion_media": 208.4,
+    "temp_media": 21.65
+  },
+  {
+    "id": 199,
+    "nombre_emplazamiento": "Gerona",
+    "latitud": 41.98333,
+    "longitud": 2.81667,
+    "mes": 7,
+    "radiacion_media": 213.74,
+    "temp_media": 24.46
+  },
+  {
+    "id": 200,
+    "nombre_emplazamiento": "Gerona",
+    "latitud": 41.98333,
+    "longitud": 2.81667,
+    "mes": 8,
+    "radiacion_media": 187.24,
+    "temp_media": 23.8
+  },
+  {
+    "id": 201,
+    "nombre_emplazamiento": "Gerona",
+    "latitud": 41.98333,
+    "longitud": 2.81667,
+    "mes": 9,
+    "radiacion_media": 139.09,
+    "temp_media": 20.15
+  },
+  {
+    "id": 202,
+    "nombre_emplazamiento": "Gerona",
+    "latitud": 41.98333,
+    "longitud": 2.81667,
+    "mes": 10,
+    "radiacion_media": 102.72,
+    "temp_media": 16.36
+  },
+  {
+    "id": 203,
+    "nombre_emplazamiento": "Gerona",
+    "latitud": 41.98333,
+    "longitud": 2.81667,
+    "mes": 11,
+    "radiacion_media": 69.27,
+    "temp_media": 11.19
+  },
+  {
+    "id": 204,
+    "nombre_emplazamiento": "Gerona",
+    "latitud": 41.98333,
+    "longitud": 2.81667,
+    "mes": 12,
+    "radiacion_media": 59.9,
+    "temp_media": 7.92
+  },
+  {
+    "id": 205,
+    "nombre_emplazamiento": "Granada",
+    "latitud": 37.17639,
+    "longitud": -3.59389,
+    "mes": 1,
+    "radiacion_media": 83.21,
+    "temp_media": 5.79
+  },
+  {
+    "id": 206,
+    "nombre_emplazamiento": "Granada",
+    "latitud": 37.17639,
+    "longitud": -3.59389,
+    "mes": 2,
+    "radiacion_media": 98.3,
+    "temp_media": 6.8
+  },
+  {
+    "id": 207,
+    "nombre_emplazamiento": "Granada",
+    "latitud": 37.17639,
+    "longitud": -3.59389,
+    "mes": 3,
+    "radiacion_media": 142.01,
+    "temp_media": 9.49
+  },
+  {
+    "id": 208,
+    "nombre_emplazamiento": "Granada",
+    "latitud": 37.17639,
+    "longitud": -3.59389,
+    "mes": 4,
+    "radiacion_media": 170,
+    "temp_media": 12.64
+  },
+  {
+    "id": 209,
+    "nombre_emplazamiento": "Granada",
+    "latitud": 37.17639,
+    "longitud": -3.59389,
+    "mes": 5,
+    "radiacion_media": 212.65,
+    "temp_media": 17.16
+  },
+  {
+    "id": 210,
+    "nombre_emplazamiento": "Granada",
+    "latitud": 37.17639,
+    "longitud": -3.59389,
+    "mes": 6,
+    "radiacion_media": 236.19,
+    "temp_media": 22.18
+  },
+  {
+    "id": 211,
+    "nombre_emplazamiento": "Granada",
+    "latitud": 37.17639,
+    "longitud": -3.59389,
+    "mes": 7,
+    "radiacion_media": 249.17,
+    "temp_media": 26.24
+  },
+  {
+    "id": 212,
+    "nombre_emplazamiento": "Granada",
+    "latitud": 37.17639,
+    "longitud": -3.59389,
+    "mes": 8,
+    "radiacion_media": 221.03,
+    "temp_media": 25.66
+  },
+  {
+    "id": 213,
+    "nombre_emplazamiento": "Granada",
+    "latitud": 37.17639,
+    "longitud": -3.59389,
+    "mes": 9,
+    "radiacion_media": 166.07,
+    "temp_media": 20.57
+  },
+  {
+    "id": 214,
+    "nombre_emplazamiento": "Granada",
+    "latitud": 37.17639,
+    "longitud": -3.59389,
+    "mes": 10,
+    "radiacion_media": 127.12,
+    "temp_media": 15.92
+  },
+  {
+    "id": 215,
+    "nombre_emplazamiento": "Granada",
+    "latitud": 37.17639,
+    "longitud": -3.59389,
+    "mes": 11,
+    "radiacion_media": 86.54,
+    "temp_media": 9.49
+  },
+  {
+    "id": 216,
+    "nombre_emplazamiento": "Granada",
+    "latitud": 37.17639,
+    "longitud": -3.59389,
+    "mes": 12,
+    "radiacion_media": 77.47,
+    "temp_media": 6.8
+  },
+  {
+    "id": 217,
+    "nombre_emplazamiento": "Guadalajara",
+    "latitud": 40.63278,
+    "longitud": -3.16111,
+    "mes": 1,
+    "radiacion_media": 67.62,
+    "temp_media": 4.31
+  },
+  {
+    "id": 218,
+    "nombre_emplazamiento": "Guadalajara",
+    "latitud": 40.63278,
+    "longitud": -3.16111,
+    "mes": 2,
+    "radiacion_media": 86.88,
+    "temp_media": 5.58
+  },
+  {
+    "id": 219,
+    "nombre_emplazamiento": "Guadalajara",
+    "latitud": 40.63278,
+    "longitud": -3.16111,
+    "mes": 3,
+    "radiacion_media": 133.49,
+    "temp_media": 8.66
+  },
+  {
+    "id": 220,
+    "nombre_emplazamiento": "Guadalajara",
+    "latitud": 40.63278,
+    "longitud": -3.16111,
+    "mes": 4,
+    "radiacion_media": 164,
+    "temp_media": 11.89
+  },
+  {
+    "id": 221,
+    "nombre_emplazamiento": "Guadalajara",
+    "latitud": 40.63278,
+    "longitud": -3.16111,
+    "mes": 5,
+    "radiacion_media": 203.49,
+    "temp_media": 16.48
+  },
+  {
+    "id": 222,
+    "nombre_emplazamiento": "Guadalajara",
+    "latitud": 40.63278,
+    "longitud": -3.16111,
+    "mes": 6,
+    "radiacion_media": 222.66,
+    "temp_media": 21.8
+  },
+  {
+    "id": 223,
+    "nombre_emplazamiento": "Guadalajara",
+    "latitud": 40.63278,
+    "longitud": -3.16111,
+    "mes": 7,
+    "radiacion_media": 244.68,
+    "temp_media": 25.68
+  },
+  {
+    "id": 224,
+    "nombre_emplazamiento": "Guadalajara",
+    "latitud": 40.63278,
+    "longitud": -3.16111,
+    "mes": 8,
+    "radiacion_media": 215.17,
+    "temp_media": 24.85
+  },
+  {
+    "id": 225,
+    "nombre_emplazamiento": "Guadalajara",
+    "latitud": 40.63278,
+    "longitud": -3.16111,
+    "mes": 9,
+    "radiacion_media": 160.66,
+    "temp_media": 20.07
+  },
+  {
+    "id": 226,
+    "nombre_emplazamiento": "Guadalajara",
+    "latitud": 40.63278,
+    "longitud": -3.16111,
+    "mes": 10,
+    "radiacion_media": 112.74,
+    "temp_media": 14.39
+  },
+  {
+    "id": 227,
+    "nombre_emplazamiento": "Guadalajara",
+    "latitud": 40.63278,
+    "longitud": -3.16111,
+    "mes": 11,
+    "radiacion_media": 71.5,
+    "temp_media": 8.25
+  },
+  {
+    "id": 228,
+    "nombre_emplazamiento": "Guadalajara",
+    "latitud": 40.63278,
+    "longitud": -3.16111,
+    "mes": 12,
+    "radiacion_media": 62.53,
+    "temp_media": 5.01
+  },
+  {
+    "id": 229,
+    "nombre_emplazamiento": "Huelva",
+    "latitud": 37.26611,
+    "longitud": -6.94028,
+    "mes": 1,
+    "radiacion_media": 83.8,
+    "temp_media": 11.28
+  },
+  {
+    "id": 230,
+    "nombre_emplazamiento": "Huelva",
+    "latitud": 37.26611,
+    "longitud": -6.94028,
+    "mes": 2,
+    "radiacion_media": 102.7,
+    "temp_media": 12.2
+  },
+  {
+    "id": 231,
+    "nombre_emplazamiento": "Huelva",
+    "latitud": 37.26611,
+    "longitud": -6.94028,
+    "mes": 3,
+    "radiacion_media": 149.21,
+    "temp_media": 14.48
+  },
+  {
+    "id": 232,
+    "nombre_emplazamiento": "Huelva",
+    "latitud": 37.26611,
+    "longitud": -6.94028,
+    "mes": 4,
+    "radiacion_media": 181.42,
+    "temp_media": 16.88
+  },
+  {
+    "id": 233,
+    "nombre_emplazamiento": "Huelva",
+    "latitud": 37.26611,
+    "longitud": -6.94028,
+    "mes": 5,
+    "radiacion_media": 224.06,
+    "temp_media": 20.64
+  },
+  {
+    "id": 234,
+    "nombre_emplazamiento": "Huelva",
+    "latitud": 37.26611,
+    "longitud": -6.94028,
+    "mes": 6,
+    "radiacion_media": 238.13,
+    "temp_media": 24.07
+  },
+  {
+    "id": 235,
+    "nombre_emplazamiento": "Huelva",
+    "latitud": 37.26611,
+    "longitud": -6.94028,
+    "mes": 7,
+    "radiacion_media": 250.58,
+    "temp_media": 26.85
+  },
+  {
+    "id": 236,
+    "nombre_emplazamiento": "Huelva",
+    "latitud": 37.26611,
+    "longitud": -6.94028,
+    "mes": 8,
+    "radiacion_media": 221.74,
+    "temp_media": 27.07
+  },
+  {
+    "id": 237,
+    "nombre_emplazamiento": "Huelva",
+    "latitud": 37.26611,
+    "longitud": -6.94028,
+    "mes": 9,
+    "radiacion_media": 170.56,
+    "temp_media": 23.86
+  },
+  {
+    "id": 238,
+    "nombre_emplazamiento": "Huelva",
+    "latitud": 37.26611,
+    "longitud": -6.94028,
+    "mes": 10,
+    "radiacion_media": 126.9,
+    "temp_media": 20.04
+  },
+  {
+    "id": 239,
+    "nombre_emplazamiento": "Huelva",
+    "latitud": 37.26611,
+    "longitud": -6.94028,
+    "mes": 11,
+    "radiacion_media": 87.82,
+    "temp_media": 14.94
+  },
+  {
+    "id": 240,
+    "nombre_emplazamiento": "Huelva",
+    "latitud": 37.26611,
+    "longitud": -6.94028,
+    "mes": 12,
+    "radiacion_media": 76.36,
+    "temp_media": 12.33
+  },
+  {
+    "id": 241,
+    "nombre_emplazamiento": "Huesca",
+    "latitud": 42.13639,
+    "longitud": -0.40861,
+    "mes": 1,
+    "radiacion_media": 64.11,
+    "temp_media": 4.89
+  },
+  {
+    "id": 242,
+    "nombre_emplazamiento": "Huesca",
+    "latitud": 42.13639,
+    "longitud": -0.40861,
+    "mes": 2,
+    "radiacion_media": 92.35,
+    "temp_media": 5.83
+  },
+  {
+    "id": 243,
+    "nombre_emplazamiento": "Huesca",
+    "latitud": 42.13639,
+    "longitud": -0.40861,
+    "mes": 3,
+    "radiacion_media": 139.66,
+    "temp_media": 9.26
+  },
+  {
+    "id": 244,
+    "nombre_emplazamiento": "Huesca",
+    "latitud": 42.13639,
+    "longitud": -0.40861,
+    "mes": 4,
+    "radiacion_media": 169.62,
+    "temp_media": 12.76
+  },
+  {
+    "id": 245,
+    "nombre_emplazamiento": "Huesca",
+    "latitud": 42.13639,
+    "longitud": -0.40861,
+    "mes": 5,
+    "radiacion_media": 209.38,
+    "temp_media": 17.04
+  },
+  {
+    "id": 246,
+    "nombre_emplazamiento": "Huesca",
+    "latitud": 42.13639,
+    "longitud": -0.40861,
+    "mes": 6,
+    "radiacion_media": 224.16,
+    "temp_media": 21.81
+  },
+  {
+    "id": 247,
+    "nombre_emplazamiento": "Huesca",
+    "latitud": 42.13639,
+    "longitud": -0.40861,
+    "mes": 7,
+    "radiacion_media": 238.94,
+    "temp_media": 24.82
+  },
+  {
+    "id": 248,
+    "nombre_emplazamiento": "Huesca",
+    "latitud": 42.13639,
+    "longitud": -0.40861,
+    "mes": 8,
+    "radiacion_media": 210.61,
+    "temp_media": 23.88
+  },
+  {
+    "id": 249,
+    "nombre_emplazamiento": "Huesca",
+    "latitud": 42.13639,
+    "longitud": -0.40861,
+    "mes": 9,
+    "radiacion_media": 158.6,
+    "temp_media": 19.75
+  },
+  {
+    "id": 250,
+    "nombre_emplazamiento": "Huesca",
+    "latitud": 42.13639,
+    "longitud": -0.40861,
+    "mes": 10,
+    "radiacion_media": 111.08,
+    "temp_media": 14.72
+  },
+  {
+    "id": 251,
+    "nombre_emplazamiento": "Huesca",
+    "latitud": 42.13639,
+    "longitud": -0.40861,
+    "mes": 11,
+    "radiacion_media": 69.83,
+    "temp_media": 8.66
+  },
+  {
+    "id": 252,
+    "nombre_emplazamiento": "Huesca",
+    "latitud": 42.13639,
+    "longitud": -0.40861,
+    "mes": 12,
+    "radiacion_media": 57.23,
+    "temp_media": 5.26
+  },
+  {
+    "id": 253,
+    "nombre_emplazamiento": "Jaén",
+    "latitud": 37.765,
+    "longitud": -3.79028,
+    "mes": 1,
+    "radiacion_media": 78.45,
+    "temp_media": 5.66
+  },
+  {
+    "id": 254,
+    "nombre_emplazamiento": "Jaén",
+    "latitud": 37.765,
+    "longitud": -3.79028,
+    "mes": 2,
+    "radiacion_media": 95.62,
+    "temp_media": 6.81
+  },
+  {
+    "id": 255,
+    "nombre_emplazamiento": "Jaén",
+    "latitud": 37.765,
+    "longitud": -3.79028,
+    "mes": 3,
+    "radiacion_media": 141.48,
+    "temp_media": 9.43
+  },
+  {
+    "id": 256,
+    "nombre_emplazamiento": "Jaén",
+    "latitud": 37.765,
+    "longitud": -3.79028,
+    "mes": 4,
+    "radiacion_media": 167.69,
+    "temp_media": 12.51
+  },
+  {
+    "id": 257,
+    "nombre_emplazamiento": "Jaén",
+    "latitud": 37.765,
+    "longitud": -3.79028,
+    "mes": 5,
+    "radiacion_media": 211.2,
+    "temp_media": 17.01
+  },
+  {
+    "id": 258,
+    "nombre_emplazamiento": "Jaén",
+    "latitud": 37.765,
+    "longitud": -3.79028,
+    "mes": 6,
+    "radiacion_media": 233.74,
+    "temp_media": 21.86
+  },
+  {
+    "id": 259,
+    "nombre_emplazamiento": "Jaén",
+    "latitud": 37.765,
+    "longitud": -3.79028,
+    "mes": 7,
+    "radiacion_media": 247.09,
+    "temp_media": 25.78
+  },
+  {
+    "id": 260,
+    "nombre_emplazamiento": "Jaén",
+    "latitud": 37.765,
+    "longitud": -3.79028,
+    "mes": 8,
+    "radiacion_media": 219.55,
+    "temp_media": 25.5
+  },
+  {
+    "id": 261,
+    "nombre_emplazamiento": "Jaén",
+    "latitud": 37.765,
+    "longitud": -3.79028,
+    "mes": 9,
+    "radiacion_media": 163.49,
+    "temp_media": 20.54
+  },
+  {
+    "id": 262,
+    "nombre_emplazamiento": "Jaén",
+    "latitud": 37.765,
+    "longitud": -3.79028,
+    "mes": 10,
+    "radiacion_media": 125.22,
+    "temp_media": 15.79
+  },
+  {
+    "id": 263,
+    "nombre_emplazamiento": "Jaén",
+    "latitud": 37.765,
+    "longitud": -3.79028,
+    "mes": 11,
+    "radiacion_media": 82.87,
+    "temp_media": 9.45
+  },
+  {
+    "id": 264,
+    "nombre_emplazamiento": "Jaén",
+    "latitud": 37.765,
+    "longitud": -3.79028,
+    "mes": 12,
+    "radiacion_media": 74.16,
+    "temp_media": 6.71
+  },
+  {
+    "id": 265,
+    "nombre_emplazamiento": "León",
+    "latitud": 42.59861,
+    "longitud": -5.56722,
+    "mes": 1,
+    "radiacion_media": 56.58,
+    "temp_media": 3.61
+  },
+  {
+    "id": 266,
+    "nombre_emplazamiento": "León",
+    "latitud": 42.59861,
+    "longitud": -5.56722,
+    "mes": 2,
+    "radiacion_media": 84.61,
+    "temp_media": 4.33
+  },
+  {
+    "id": 267,
+    "nombre_emplazamiento": "León",
+    "latitud": 42.59861,
+    "longitud": -5.56722,
+    "mes": 3,
+    "radiacion_media": 130.92,
+    "temp_media": 7.01
+  },
+  {
+    "id": 268,
+    "nombre_emplazamiento": "León",
+    "latitud": 42.59861,
+    "longitud": -5.56722,
+    "mes": 4,
+    "radiacion_media": 161.38,
+    "temp_media": 9.88
+  },
+  {
+    "id": 269,
+    "nombre_emplazamiento": "León",
+    "latitud": 42.59861,
+    "longitud": -5.56722,
+    "mes": 5,
+    "radiacion_media": 202.78,
+    "temp_media": 13.83
+  },
+  {
+    "id": 270,
+    "nombre_emplazamiento": "León",
+    "latitud": 42.59861,
+    "longitud": -5.56722,
+    "mes": 6,
+    "radiacion_media": 218.33,
+    "temp_media": 18.07
+  },
+  {
+    "id": 271,
+    "nombre_emplazamiento": "León",
+    "latitud": 42.59861,
+    "longitud": -5.56722,
+    "mes": 7,
+    "radiacion_media": 238.25,
+    "temp_media": 21.19
+  },
+  {
+    "id": 272,
+    "nombre_emplazamiento": "León",
+    "latitud": 42.59861,
+    "longitud": -5.56722,
+    "mes": 8,
+    "radiacion_media": 209.2,
+    "temp_media": 20.92
+  },
+  {
+    "id": 273,
+    "nombre_emplazamiento": "León",
+    "latitud": 42.59861,
+    "longitud": -5.56722,
+    "mes": 9,
+    "radiacion_media": 156.59,
+    "temp_media": 17.57
+  },
+  {
+    "id": 274,
+    "nombre_emplazamiento": "León",
+    "latitud": 42.59861,
+    "longitud": -5.56722,
+    "mes": 10,
+    "radiacion_media": 103.19,
+    "temp_media": 12.39
+  },
+  {
+    "id": 275,
+    "nombre_emplazamiento": "León",
+    "latitud": 42.59861,
+    "longitud": -5.56722,
+    "mes": 11,
+    "radiacion_media": 63.83,
+    "temp_media": 6.8
+  },
+  {
+    "id": 276,
+    "nombre_emplazamiento": "León",
+    "latitud": 42.59861,
+    "longitud": -5.56722,
+    "mes": 12,
+    "radiacion_media": 51.41,
+    "temp_media": 4.08
+  },
+  {
+    "id": 277,
+    "nombre_emplazamiento": "Lérida",
+    "latitud": 41.61667,
+    "longitud": 0.62222,
+    "mes": 1,
+    "radiacion_media": 60.2,
+    "temp_media": 5.91
+  },
+  {
+    "id": 278,
+    "nombre_emplazamiento": "Lérida",
+    "latitud": 41.61667,
+    "longitud": 0.62222,
+    "mes": 2,
+    "radiacion_media": 90.87,
+    "temp_media": 7.41
+  },
+  {
+    "id": 279,
+    "nombre_emplazamiento": "Lérida",
+    "latitud": 41.61667,
+    "longitud": 0.62222,
+    "mes": 3,
+    "radiacion_media": 141.49,
+    "temp_media": 10.96
+  },
+  {
+    "id": 280,
+    "nombre_emplazamiento": "Lérida",
+    "latitud": 41.61667,
+    "longitud": 0.62222,
+    "mes": 4,
+    "radiacion_media": 167.44,
+    "temp_media": 14.36
+  },
+  {
+    "id": 281,
+    "nombre_emplazamiento": "Lérida",
+    "latitud": 41.61667,
+    "longitud": 0.62222,
+    "mes": 5,
+    "radiacion_media": 208.77,
+    "temp_media": 18.69
+  },
+  {
+    "id": 282,
+    "nombre_emplazamiento": "Lérida",
+    "latitud": 41.61667,
+    "longitud": 0.62222,
+    "mes": 6,
+    "radiacion_media": 222.03,
+    "temp_media": 23.29
+  },
+  {
+    "id": 283,
+    "nombre_emplazamiento": "Lérida",
+    "latitud": 41.61667,
+    "longitud": 0.62222,
+    "mes": 7,
+    "radiacion_media": 234.39,
+    "temp_media": 26.19
+  },
+  {
+    "id": 284,
+    "nombre_emplazamiento": "Lérida",
+    "latitud": 41.61667,
+    "longitud": 0.62222,
+    "mes": 8,
+    "radiacion_media": 203.98,
+    "temp_media": 25.18
+  },
+  {
+    "id": 285,
+    "nombre_emplazamiento": "Lérida",
+    "latitud": 41.61667,
+    "longitud": 0.62222,
+    "mes": 9,
+    "radiacion_media": 154.34,
+    "temp_media": 21.11
+  },
+  {
+    "id": 286,
+    "nombre_emplazamiento": "Lérida",
+    "latitud": 41.61667,
+    "longitud": 0.62222,
+    "mes": 10,
+    "radiacion_media": 111.15,
+    "temp_media": 16.45
+  },
+  {
+    "id": 287,
+    "nombre_emplazamiento": "Lérida",
+    "latitud": 41.61667,
+    "longitud": 0.62222,
+    "mes": 11,
+    "radiacion_media": 69.64,
+    "temp_media": 10.12
+  },
+  {
+    "id": 288,
+    "nombre_emplazamiento": "Lérida",
+    "latitud": 41.61667,
+    "longitud": 0.62222,
+    "mes": 12,
+    "radiacion_media": 51.48,
+    "temp_media": 6.2
+  },
+  {
+    "id": 289,
+    "nombre_emplazamiento": "Logroño",
+    "latitud": 42.46333,
+    "longitud": -2.44361,
+    "mes": 1,
+    "radiacion_media": 55.67,
+    "temp_media": 4.01
+  },
+  {
+    "id": 290,
+    "nombre_emplazamiento": "Logroño",
+    "latitud": 42.46333,
+    "longitud": -2.44361,
+    "mes": 2,
+    "radiacion_media": 75.24,
+    "temp_media": 4.41
+  },
+  {
+    "id": 291,
+    "nombre_emplazamiento": "Logroño",
+    "latitud": 42.46333,
+    "longitud": -2.44361,
+    "mes": 3,
+    "radiacion_media": 121.84,
+    "temp_media": 7.09
+  },
+  {
+    "id": 292,
+    "nombre_emplazamiento": "Logroño",
+    "latitud": 42.46333,
+    "longitud": -2.44361,
+    "mes": 4,
+    "radiacion_media": 149,
+    "temp_media": 10.07
+  },
+  {
+    "id": 293,
+    "nombre_emplazamiento": "Logroño",
+    "latitud": 42.46333,
+    "longitud": -2.44361,
+    "mes": 5,
+    "radiacion_media": 180.94,
+    "temp_media": 13.36
+  },
+  {
+    "id": 294,
+    "nombre_emplazamiento": "Logroño",
+    "latitud": 42.46333,
+    "longitud": -2.44361,
+    "mes": 6,
+    "radiacion_media": 198.25,
+    "temp_media": 17.18
+  },
+  {
+    "id": 295,
+    "nombre_emplazamiento": "Logroño",
+    "latitud": 42.46333,
+    "longitud": -2.44361,
+    "mes": 7,
+    "radiacion_media": 217.72,
+    "temp_media": 19.55
+  },
+  {
+    "id": 296,
+    "nombre_emplazamiento": "Logroño",
+    "latitud": 42.46333,
+    "longitud": -2.44361,
+    "mes": 8,
+    "radiacion_media": 191.31,
+    "temp_media": 19.54
+  },
+  {
+    "id": 297,
+    "nombre_emplazamiento": "Logroño",
+    "latitud": 42.46333,
+    "longitud": -2.44361,
+    "mes": 9,
+    "radiacion_media": 143.32,
+    "temp_media": 16.87
+  },
+  {
+    "id": 298,
+    "nombre_emplazamiento": "Logroño",
+    "latitud": 42.46333,
+    "longitud": -2.44361,
+    "mes": 10,
+    "radiacion_media": 98.98,
+    "temp_media": 12.85
+  },
+  {
+    "id": 299,
+    "nombre_emplazamiento": "Logroño",
+    "latitud": 42.46333,
+    "longitud": -2.44361,
+    "mes": 11,
+    "radiacion_media": 58.93,
+    "temp_media": 7.39
+  },
+  {
+    "id": 300,
+    "nombre_emplazamiento": "Logroño",
+    "latitud": 42.46333,
+    "longitud": -2.44361,
+    "mes": 12,
+    "radiacion_media": 49.88,
+    "temp_media": 4.6
+  },
+  {
+    "id": 301,
+    "nombre_emplazamiento": "Lugo",
+    "latitud": 43.0125,
+    "longitud": -7.55667,
+    "mes": 1,
+    "radiacion_media": 47.56,
+    "temp_media": 5.86
+  },
+  {
+    "id": 302,
+    "nombre_emplazamiento": "Lugo",
+    "latitud": 43.0125,
+    "longitud": -7.55667,
+    "mes": 2,
+    "radiacion_media": 68.45,
+    "temp_media": 5.94
+  },
+  {
+    "id": 303,
+    "nombre_emplazamiento": "Lugo",
+    "latitud": 43.0125,
+    "longitud": -7.55667,
+    "mes": 3,
+    "radiacion_media": 110.44,
+    "temp_media": 7.91
+  },
+  {
+    "id": 304,
+    "nombre_emplazamiento": "Lugo",
+    "latitud": 43.0125,
+    "longitud": -7.55667,
+    "mes": 4,
+    "radiacion_media": 139.45,
+    "temp_media": 9.97
+  },
+  {
+    "id": 305,
+    "nombre_emplazamiento": "Lugo",
+    "latitud": 43.0125,
+    "longitud": -7.55667,
+    "mes": 5,
+    "radiacion_media": 174.01,
+    "temp_media": 12.72
+  },
+  {
+    "id": 306,
+    "nombre_emplazamiento": "Lugo",
+    "latitud": 43.0125,
+    "longitud": -7.55667,
+    "mes": 6,
+    "radiacion_media": 182.43,
+    "temp_media": 15.64
+  },
+  {
+    "id": 307,
+    "nombre_emplazamiento": "Lugo",
+    "latitud": 43.0125,
+    "longitud": -7.55667,
+    "mes": 7,
+    "radiacion_media": 203.31,
+    "temp_media": 17.84
+  },
+  {
+    "id": 308,
+    "nombre_emplazamiento": "Lugo",
+    "latitud": 43.0125,
+    "longitud": -7.55667,
+    "mes": 8,
+    "radiacion_media": 181.1,
+    "temp_media": 17.94
+  },
+  {
+    "id": 309,
+    "nombre_emplazamiento": "Lugo",
+    "latitud": 43.0125,
+    "longitud": -7.55667,
+    "mes": 9,
+    "radiacion_media": 136.87,
+    "temp_media": 16.26
+  },
+  {
+    "id": 310,
+    "nombre_emplazamiento": "Lugo",
+    "latitud": 43.0125,
+    "longitud": -7.55667,
+    "mes": 10,
+    "radiacion_media": 90.96,
+    "temp_media": 13.06
+  },
+  {
+    "id": 311,
+    "nombre_emplazamiento": "Lugo",
+    "latitud": 43.0125,
+    "longitud": -7.55667,
+    "mes": 11,
+    "radiacion_media": 51.37,
+    "temp_media": 8.56
+  },
+  {
+    "id": 312,
+    "nombre_emplazamiento": "Lugo",
+    "latitud": 43.0125,
+    "longitud": -7.55667,
+    "mes": 12,
+    "radiacion_media": 42.78,
+    "temp_media": 6.47
+  },
+  {
+    "id": 313,
+    "nombre_emplazamiento": "Madrid",
+    "latitud": 40.4165,
+    "longitud": -3.70256,
+    "mes": 1,
+    "radiacion_media": 70.64,
+    "temp_media": 4.67
+  },
+  {
+    "id": 314,
+    "nombre_emplazamiento": "Madrid",
+    "latitud": 40.4165,
+    "longitud": -3.70256,
+    "mes": 2,
+    "radiacion_media": 90.74,
+    "temp_media": 5.94
+  },
+  {
+    "id": 315,
+    "nombre_emplazamiento": "Madrid",
+    "latitud": 40.4165,
+    "longitud": -3.70256,
+    "mes": 3,
+    "radiacion_media": 137.98,
+    "temp_media": 9.05
+  },
+  {
+    "id": 316,
+    "nombre_emplazamiento": "Madrid",
+    "latitud": 40.4165,
+    "longitud": -3.70256,
+    "mes": 4,
+    "radiacion_media": 169.31,
+    "temp_media": 12.28
+  },
+  {
+    "id": 317,
+    "nombre_emplazamiento": "Madrid",
+    "latitud": 40.4165,
+    "longitud": -3.70256,
+    "mes": 5,
+    "radiacion_media": 208.02,
+    "temp_media": 17.05
+  },
+  {
+    "id": 318,
+    "nombre_emplazamiento": "Madrid",
+    "latitud": 40.4165,
+    "longitud": -3.70256,
+    "mes": 6,
+    "radiacion_media": 228.64,
+    "temp_media": 22.29
+  },
+  {
+    "id": 319,
+    "nombre_emplazamiento": "Madrid",
+    "latitud": 40.4165,
+    "longitud": -3.70256,
+    "mes": 7,
+    "radiacion_media": 246.67,
+    "temp_media": 26.18
+  },
+  {
+    "id": 320,
+    "nombre_emplazamiento": "Madrid",
+    "latitud": 40.4165,
+    "longitud": -3.70256,
+    "mes": 8,
+    "radiacion_media": 216.67,
+    "temp_media": 25.39
+  },
+  {
+    "id": 321,
+    "nombre_emplazamiento": "Madrid",
+    "latitud": 40.4165,
+    "longitud": -3.70256,
+    "mes": 9,
+    "radiacion_media": 162.91,
+    "temp_media": 20.57
+  },
+  {
+    "id": 322,
+    "nombre_emplazamiento": "Madrid",
+    "latitud": 40.4165,
+    "longitud": -3.70256,
+    "mes": 10,
+    "radiacion_media": 115.06,
+    "temp_media": 14.85
+  },
+  {
+    "id": 323,
+    "nombre_emplazamiento": "Madrid",
+    "latitud": 40.4165,
+    "longitud": -3.70256,
+    "mes": 11,
+    "radiacion_media": 74.24,
+    "temp_media": 8.63
+  },
+  {
+    "id": 324,
+    "nombre_emplazamiento": "Madrid",
+    "latitud": 40.4165,
+    "longitud": -3.70256,
+    "mes": 12,
+    "radiacion_media": 64.69,
+    "temp_media": 5.42
+  },
+  {
+    "id": 325,
+    "nombre_emplazamiento": "Málaga",
+    "latitud": 36.71944,
+    "longitud": -4.42,
+    "mes": 1,
+    "radiacion_media": 85.44,
+    "temp_media": 10.96
+  },
+  {
+    "id": 326,
+    "nombre_emplazamiento": "Málaga",
+    "latitud": 36.71944,
+    "longitud": -4.42,
+    "mes": 2,
+    "radiacion_media": 100.89,
+    "temp_media": 11.43
+  },
+  {
+    "id": 327,
+    "nombre_emplazamiento": "Málaga",
+    "latitud": 36.71944,
+    "longitud": -4.42,
+    "mes": 3,
+    "radiacion_media": 143.44,
+    "temp_media": 13.27
+  },
+  {
+    "id": 328,
+    "nombre_emplazamiento": "Málaga",
+    "latitud": 36.71944,
+    "longitud": -4.42,
+    "mes": 4,
+    "radiacion_media": 173.04,
+    "temp_media": 15.36
+  },
+  {
+    "id": 329,
+    "nombre_emplazamiento": "Málaga",
+    "latitud": 36.71944,
+    "longitud": -4.42,
+    "mes": 5,
+    "radiacion_media": 215.59,
+    "temp_media": 18.69
+  },
+  {
+    "id": 330,
+    "nombre_emplazamiento": "Málaga",
+    "latitud": 36.71944,
+    "longitud": -4.42,
+    "mes": 6,
+    "radiacion_media": 233.42,
+    "temp_media": 22.49
+  },
+  {
+    "id": 331,
+    "nombre_emplazamiento": "Málaga",
+    "latitud": 36.71944,
+    "longitud": -4.42,
+    "mes": 7,
+    "radiacion_media": 240.23,
+    "temp_media": 25.34
+  },
+  {
+    "id": 332,
+    "nombre_emplazamiento": "Málaga",
+    "latitud": 36.71944,
+    "longitud": -4.42,
+    "mes": 8,
+    "radiacion_media": 212.86,
+    "temp_media": 25.18
+  },
+  {
+    "id": 333,
+    "nombre_emplazamiento": "Málaga",
+    "latitud": 36.71944,
+    "longitud": -4.42,
+    "mes": 9,
+    "radiacion_media": 162.96,
+    "temp_media": 22.1
+  },
+  {
+    "id": 334,
+    "nombre_emplazamiento": "Málaga",
+    "latitud": 36.71944,
+    "longitud": -4.42,
+    "mes": 10,
+    "radiacion_media": 124.57,
+    "temp_media": 18.67
+  },
+  {
+    "id": 335,
+    "nombre_emplazamiento": "Málaga",
+    "latitud": 36.71944,
+    "longitud": -4.42,
+    "mes": 11,
+    "radiacion_media": 86.39,
+    "temp_media": 14.25
+  },
+  {
+    "id": 336,
+    "nombre_emplazamiento": "Málaga",
+    "latitud": 36.71944,
+    "longitud": -4.42,
+    "mes": 12,
+    "radiacion_media": 76.75,
+    "temp_media": 12.04
+  },
+  {
+    "id": 337,
+    "nombre_emplazamiento": "Melilla",
+    "latitud": 35.29333,
+    "longitud": -2.93889,
+    "mes": 1,
+    "radiacion_media": 88.86,
+    "temp_media": 11.37
+  },
+  {
+    "id": 338,
+    "nombre_emplazamiento": "Melilla",
+    "latitud": 35.29333,
+    "longitud": -2.93889,
+    "mes": 2,
+    "radiacion_media": 103.88,
+    "temp_media": 12.05
+  },
+  {
+    "id": 339,
+    "nombre_emplazamiento": "Melilla",
+    "latitud": 35.29333,
+    "longitud": -2.93889,
+    "mes": 3,
+    "radiacion_media": 145.58,
+    "temp_media": 13.92
+  },
+  {
+    "id": 340,
+    "nombre_emplazamiento": "Melilla",
+    "latitud": 35.29333,
+    "longitud": -2.93889,
+    "mes": 4,
+    "radiacion_media": 168.09,
+    "temp_media": 16.07
+  },
+  {
+    "id": 341,
+    "nombre_emplazamiento": "Melilla",
+    "latitud": 35.29333,
+    "longitud": -2.93889,
+    "mes": 5,
+    "radiacion_media": 202.79,
+    "temp_media": 19.31
+  },
+  {
+    "id": 342,
+    "nombre_emplazamiento": "Melilla",
+    "latitud": 35.29333,
+    "longitud": -2.93889,
+    "mes": 6,
+    "radiacion_media": 222.82,
+    "temp_media": 22.69
+  },
+  {
+    "id": 343,
+    "nombre_emplazamiento": "Melilla",
+    "latitud": 35.29333,
+    "longitud": -2.93889,
+    "mes": 7,
+    "radiacion_media": 223.17,
+    "temp_media": 25.79
+  },
+  {
+    "id": 344,
+    "nombre_emplazamiento": "Melilla",
+    "latitud": 35.29333,
+    "longitud": -2.93889,
+    "mes": 8,
+    "radiacion_media": 203.75,
+    "temp_media": 26.13
+  },
+  {
+    "id": 345,
+    "nombre_emplazamiento": "Melilla",
+    "latitud": 35.29333,
+    "longitud": -2.93889,
+    "mes": 9,
+    "radiacion_media": 158.83,
+    "temp_media": 23
+  },
+  {
+    "id": 346,
+    "nombre_emplazamiento": "Melilla",
+    "latitud": 35.29333,
+    "longitud": -2.93889,
+    "mes": 10,
+    "radiacion_media": 130.08,
+    "temp_media": 19.64
+  },
+  {
+    "id": 347,
+    "nombre_emplazamiento": "Melilla",
+    "latitud": 35.29333,
+    "longitud": -2.93889,
+    "mes": 11,
+    "radiacion_media": 91.69,
+    "temp_media": 15.03
+  },
+  {
+    "id": 348,
+    "nombre_emplazamiento": "Melilla",
+    "latitud": 35.29333,
+    "longitud": -2.93889,
+    "mes": 12,
+    "radiacion_media": 82.65,
+    "temp_media": 12.29
+  },
+  {
+    "id": 349,
+    "nombre_emplazamiento": "Murcia",
+    "latitud": 37.98611,
+    "longitud": -1.13028,
+    "mes": 1,
+    "radiacion_media": 82.29,
+    "temp_media": 9.11
+  },
+  {
+    "id": 350,
+    "nombre_emplazamiento": "Murcia",
+    "latitud": 37.98611,
+    "longitud": -1.13028,
+    "mes": 2,
+    "radiacion_media": 97.49,
+    "temp_media": 10.18
+  },
+  {
+    "id": 351,
+    "nombre_emplazamiento": "Murcia",
+    "latitud": 37.98611,
+    "longitud": -1.13028,
+    "mes": 3,
+    "radiacion_media": 142.36,
+    "temp_media": 12.59
+  },
+  {
+    "id": 352,
+    "nombre_emplazamiento": "Murcia",
+    "latitud": 37.98611,
+    "longitud": -1.13028,
+    "mes": 4,
+    "radiacion_media": 170.54,
+    "temp_media": 15.39
+  },
+  {
+    "id": 353,
+    "nombre_emplazamiento": "Murcia",
+    "latitud": 37.98611,
+    "longitud": -1.13028,
+    "mes": 5,
+    "radiacion_media": 210.49,
+    "temp_media": 19.21
+  },
+  {
+    "id": 354,
+    "nombre_emplazamiento": "Murcia",
+    "latitud": 37.98611,
+    "longitud": -1.13028,
+    "mes": 6,
+    "radiacion_media": 228.46,
+    "temp_media": 23.43
+  },
+  {
+    "id": 355,
+    "nombre_emplazamiento": "Murcia",
+    "latitud": 37.98611,
+    "longitud": -1.13028,
+    "mes": 7,
+    "radiacion_media": 234.84,
+    "temp_media": 26.21
+  },
+  {
+    "id": 356,
+    "nombre_emplazamiento": "Murcia",
+    "latitud": 37.98611,
+    "longitud": -1.13028,
+    "mes": 8,
+    "radiacion_media": 203.9,
+    "temp_media": 25.89
+  },
+  {
+    "id": 357,
+    "nombre_emplazamiento": "Murcia",
+    "latitud": 37.98611,
+    "longitud": -1.13028,
+    "mes": 9,
+    "radiacion_media": 152.74,
+    "temp_media": 22.26
+  },
+  {
+    "id": 358,
+    "nombre_emplazamiento": "Murcia",
+    "latitud": 37.98611,
+    "longitud": -1.13028,
+    "mes": 10,
+    "radiacion_media": 118.97,
+    "temp_media": 18.27
+  },
+  {
+    "id": 359,
+    "nombre_emplazamiento": "Murcia",
+    "latitud": 37.98611,
+    "longitud": -1.13028,
+    "mes": 11,
+    "radiacion_media": 84.49,
+    "temp_media": 12.82
+  },
+  {
+    "id": 360,
+    "nombre_emplazamiento": "Murcia",
+    "latitud": 37.98611,
+    "longitud": -1.13028,
+    "mes": 12,
+    "radiacion_media": 73.74,
+    "temp_media": 9.69
+  },
+  {
+    "id": 361,
+    "nombre_emplazamiento": "Orense",
+    "latitud": 42.33667,
+    "longitud": -7.86389,
+    "mes": 1,
+    "radiacion_media": 50.77,
+    "temp_media": 6.31
+  },
+  {
+    "id": 362,
+    "nombre_emplazamiento": "Orense",
+    "latitud": 42.33667,
+    "longitud": -7.86389,
+    "mes": 2,
+    "radiacion_media": 73.91,
+    "temp_media": 6.84
+  },
+  {
+    "id": 363,
+    "nombre_emplazamiento": "Orense",
+    "latitud": 42.33667,
+    "longitud": -7.86389,
+    "mes": 3,
+    "radiacion_media": 114.37,
+    "temp_media": 9.14
+  },
+  {
+    "id": 364,
+    "nombre_emplazamiento": "Orense",
+    "latitud": 42.33667,
+    "longitud": -7.86389,
+    "mes": 4,
+    "radiacion_media": 145.17,
+    "temp_media": 11.51
+  },
+  {
+    "id": 365,
+    "nombre_emplazamiento": "Orense",
+    "latitud": 42.33667,
+    "longitud": -7.86389,
+    "mes": 5,
+    "radiacion_media": 181.92,
+    "temp_media": 14.43
+  },
+  {
+    "id": 366,
+    "nombre_emplazamiento": "Orense",
+    "latitud": 42.33667,
+    "longitud": -7.86389,
+    "mes": 6,
+    "radiacion_media": 193.15,
+    "temp_media": 17.44
+  },
+  {
+    "id": 367,
+    "nombre_emplazamiento": "Orense",
+    "latitud": 42.33667,
+    "longitud": -7.86389,
+    "mes": 7,
+    "radiacion_media": 215.41,
+    "temp_media": 19.85
+  },
+  {
+    "id": 368,
+    "nombre_emplazamiento": "Orense",
+    "latitud": 42.33667,
+    "longitud": -7.86389,
+    "mes": 8,
+    "radiacion_media": 192.07,
+    "temp_media": 19.93
+  },
+  {
+    "id": 369,
+    "nombre_emplazamiento": "Orense",
+    "latitud": 42.33667,
+    "longitud": -7.86389,
+    "mes": 9,
+    "radiacion_media": 144.37,
+    "temp_media": 18.06
+  },
+  {
+    "id": 370,
+    "nombre_emplazamiento": "Orense",
+    "latitud": 42.33667,
+    "longitud": -7.86389,
+    "mes": 10,
+    "radiacion_media": 94.19,
+    "temp_media": 14.22
+  },
+  {
+    "id": 371,
+    "nombre_emplazamiento": "Orense",
+    "latitud": 42.33667,
+    "longitud": -7.86389,
+    "mes": 11,
+    "radiacion_media": 54.38,
+    "temp_media": 9.2
+  },
+  {
+    "id": 372,
+    "nombre_emplazamiento": "Orense",
+    "latitud": 42.33667,
+    "longitud": -7.86389,
+    "mes": 12,
+    "radiacion_media": 46.08,
+    "temp_media": 6.83
+  },
+  {
+    "id": 373,
+    "nombre_emplazamiento": "Oviedo",
+    "latitud": 43.36167,
+    "longitud": -5.84583,
+    "mes": 1,
+    "radiacion_media": 49.36,
+    "temp_media": 5.49
+  },
+  {
+    "id": 374,
+    "nombre_emplazamiento": "Oviedo",
+    "latitud": 43.36167,
+    "longitud": -5.84583,
+    "mes": 2,
+    "radiacion_media": 67.73,
+    "temp_media": 5.68
+  },
+  {
+    "id": 375,
+    "nombre_emplazamiento": "Oviedo",
+    "latitud": 43.36167,
+    "longitud": -5.84583,
+    "mes": 3,
+    "radiacion_media": 106.17,
+    "temp_media": 7.71
+  },
+  {
+    "id": 376,
+    "nombre_emplazamiento": "Oviedo",
+    "latitud": 43.36167,
+    "longitud": -5.84583,
+    "mes": 4,
+    "radiacion_media": 128.57,
+    "temp_media": 9.86
+  },
+  {
+    "id": 377,
+    "nombre_emplazamiento": "Oviedo",
+    "latitud": 43.36167,
+    "longitud": -5.84583,
+    "mes": 5,
+    "radiacion_media": 148.44,
+    "temp_media": 12.52
+  },
+  {
+    "id": 378,
+    "nombre_emplazamiento": "Oviedo",
+    "latitud": 43.36167,
+    "longitud": -5.84583,
+    "mes": 6,
+    "radiacion_media": 148.05,
+    "temp_media": 15.35
+  },
+  {
+    "id": 379,
+    "nombre_emplazamiento": "Oviedo",
+    "latitud": 43.36167,
+    "longitud": -5.84583,
+    "mes": 7,
+    "radiacion_media": 157.21,
+    "temp_media": 17.23
+  },
+  {
+    "id": 380,
+    "nombre_emplazamiento": "Oviedo",
+    "latitud": 43.36167,
+    "longitud": -5.84583,
+    "mes": 8,
+    "radiacion_media": 150.12,
+    "temp_media": 17.28
+  },
+  {
+    "id": 381,
+    "nombre_emplazamiento": "Oviedo",
+    "latitud": 43.36167,
+    "longitud": -5.84583,
+    "mes": 9,
+    "radiacion_media": 124.14,
+    "temp_media": 15.6
+  },
+  {
+    "id": 382,
+    "nombre_emplazamiento": "Oviedo",
+    "latitud": 43.36167,
+    "longitud": -5.84583,
+    "mes": 10,
+    "radiacion_media": 88.07,
+    "temp_media": 12.76
+  },
+  {
+    "id": 383,
+    "nombre_emplazamiento": "Oviedo",
+    "latitud": 43.36167,
+    "longitud": -5.84583,
+    "mes": 11,
+    "radiacion_media": 52.91,
+    "temp_media": 8.32
+  },
+  {
+    "id": 384,
+    "nombre_emplazamiento": "Oviedo",
+    "latitud": 43.36167,
+    "longitud": -5.84583,
+    "mes": 12,
+    "radiacion_media": 46.05,
+    "temp_media": 6.17
+  },
+  {
+    "id": 385,
+    "nombre_emplazamiento": "Palencia",
+    "latitud": 42.00833,
+    "longitud": -4.52667,
+    "mes": 1,
+    "radiacion_media": 57.16,
+    "temp_media": 3.85
+  },
+  {
+    "id": 386,
+    "nombre_emplazamiento": "Palencia",
+    "latitud": 42.00833,
+    "longitud": -4.52667,
+    "mes": 2,
+    "radiacion_media": 82.97,
+    "temp_media": 4.7
+  },
+  {
+    "id": 387,
+    "nombre_emplazamiento": "Palencia",
+    "latitud": 42.00833,
+    "longitud": -4.52667,
+    "mes": 3,
+    "radiacion_media": 130.39,
+    "temp_media": 7.51
+  },
+  {
+    "id": 388,
+    "nombre_emplazamiento": "Palencia",
+    "latitud": 42.00833,
+    "longitud": -4.52667,
+    "mes": 4,
+    "radiacion_media": 158.79,
+    "temp_media": 10.46
+  },
+  {
+    "id": 389,
+    "nombre_emplazamiento": "Palencia",
+    "latitud": 42.00833,
+    "longitud": -4.52667,
+    "mes": 5,
+    "radiacion_media": 200.8,
+    "temp_media": 14.45
+  },
+  {
+    "id": 390,
+    "nombre_emplazamiento": "Palencia",
+    "latitud": 42.00833,
+    "longitud": -4.52667,
+    "mes": 6,
+    "radiacion_media": 216.16,
+    "temp_media": 18.77
+  },
+  {
+    "id": 391,
+    "nombre_emplazamiento": "Palencia",
+    "latitud": 42.00833,
+    "longitud": -4.52667,
+    "mes": 7,
+    "radiacion_media": 238.51,
+    "temp_media": 21.84
+  },
+  {
+    "id": 392,
+    "nombre_emplazamiento": "Palencia",
+    "latitud": 42.00833,
+    "longitud": -4.52667,
+    "mes": 8,
+    "radiacion_media": 210.15,
+    "temp_media": 21.41
+  },
+  {
+    "id": 393,
+    "nombre_emplazamiento": "Palencia",
+    "latitud": 42.00833,
+    "longitud": -4.52667,
+    "mes": 9,
+    "radiacion_media": 157.38,
+    "temp_media": 17.97
+  },
+  {
+    "id": 394,
+    "nombre_emplazamiento": "Palencia",
+    "latitud": 42.00833,
+    "longitud": -4.52667,
+    "mes": 10,
+    "radiacion_media": 107.32,
+    "temp_media": 13.08
+  },
+  {
+    "id": 395,
+    "nombre_emplazamiento": "Palencia",
+    "latitud": 42.00833,
+    "longitud": -4.52667,
+    "mes": 11,
+    "radiacion_media": 64.75,
+    "temp_media": 7.31
+  },
+  {
+    "id": 396,
+    "nombre_emplazamiento": "Palencia",
+    "latitud": 42.00833,
+    "longitud": -4.52667,
+    "mes": 12,
+    "radiacion_media": 52.64,
+    "temp_media": 4.34
+  },
+  {
+    "id": 397,
+    "nombre_emplazamiento": "Palma de Mallorca",
+    "latitud": 39.56833,
+    "longitud": 2.65139,
+    "mes": 1,
+    "radiacion_media": 71.08,
+    "temp_media": 11.63
+  },
+  {
+    "id": 398,
+    "nombre_emplazamiento": "Palma de Mallorca",
+    "latitud": 39.56833,
+    "longitud": 2.65139,
+    "mes": 2,
+    "radiacion_media": 87.55,
+    "temp_media": 11.51
+  },
+  {
+    "id": 399,
+    "nombre_emplazamiento": "Palma de Mallorca",
+    "latitud": 39.56833,
+    "longitud": 2.65139,
+    "mes": 3,
+    "radiacion_media": 138.13,
+    "temp_media": 13.24
+  },
+  {
+    "id": 400,
+    "nombre_emplazamiento": "Palma de Mallorca",
+    "latitud": 39.56833,
+    "longitud": 2.65139,
+    "mes": 4,
+    "radiacion_media": 171.09,
+    "temp_media": 16
+  },
+  {
+    "id": 401,
+    "nombre_emplazamiento": "Palma de Mallorca",
+    "latitud": 39.56833,
+    "longitud": 2.65139,
+    "mes": 5,
+    "radiacion_media": 210.07,
+    "temp_media": 19.52
+  },
+  {
+    "id": 402,
+    "nombre_emplazamiento": "Palma de Mallorca",
+    "latitud": 39.56833,
+    "longitud": 2.65139,
+    "mes": 6,
+    "radiacion_media": 227.14,
+    "temp_media": 23.64
+  },
+  {
+    "id": 403,
+    "nombre_emplazamiento": "Palma de Mallorca",
+    "latitud": 39.56833,
+    "longitud": 2.65139,
+    "mes": 7,
+    "radiacion_media": 235.11,
+    "temp_media": 26.49
+  },
+  {
+    "id": 404,
+    "nombre_emplazamiento": "Palma de Mallorca",
+    "latitud": 39.56833,
+    "longitud": 2.65139,
+    "mes": 8,
+    "radiacion_media": 203.69,
+    "temp_media": 26.38
+  },
+  {
+    "id": 405,
+    "nombre_emplazamiento": "Palma de Mallorca",
+    "latitud": 39.56833,
+    "longitud": 2.65139,
+    "mes": 9,
+    "radiacion_media": 150.3,
+    "temp_media": 23.45
+  },
+  {
+    "id": 406,
+    "nombre_emplazamiento": "Palma de Mallorca",
+    "latitud": 39.56833,
+    "longitud": 2.65139,
+    "mes": 10,
+    "radiacion_media": 111.92,
+    "temp_media": 20.04
+  },
+  {
+    "id": 407,
+    "nombre_emplazamiento": "Palma de Mallorca",
+    "latitud": 39.56833,
+    "longitud": 2.65139,
+    "mes": 11,
+    "radiacion_media": 74.36,
+    "temp_media": 15.69
+  },
+  {
+    "id": 408,
+    "nombre_emplazamiento": "Palma de Mallorca",
+    "latitud": 39.56833,
+    "longitud": 2.65139,
+    "mes": 12,
+    "radiacion_media": 64.14,
+    "temp_media": 12.76
+  },
+  {
+    "id": 409,
+    "nombre_emplazamiento": "Las Palmas de Gran Canaria",
+    "latitud": 28.11583,
+    "longitud": -15.435,
+    "mes": 1,
+    "radiacion_media": 108.53,
+    "temp_media": 15.29
+  },
+  {
+    "id": 410,
+    "nombre_emplazamiento": "Las Palmas de Gran Canaria",
+    "latitud": 28.11583,
+    "longitud": -15.435,
+    "mes": 2,
+    "radiacion_media": 118.07,
+    "temp_media": 15.06
+  },
+  {
+    "id": 411,
+    "nombre_emplazamiento": "Las Palmas de Gran Canaria",
+    "latitud": 28.11583,
+    "longitud": -15.435,
+    "mes": 3,
+    "radiacion_media": 162.31,
+    "temp_media": 15.84
+  },
+  {
+    "id": 412,
+    "nombre_emplazamiento": "Las Palmas de Gran Canaria",
+    "latitud": 28.11583,
+    "longitud": -15.435,
+    "mes": 4,
+    "radiacion_media": 182.11,
+    "temp_media": 16.76
+  },
+  {
+    "id": 413,
+    "nombre_emplazamiento": "Las Palmas de Gran Canaria",
+    "latitud": 28.11583,
+    "longitud": -15.435,
+    "mes": 5,
+    "radiacion_media": 199.92,
+    "temp_media": 18.1
+  },
+  {
+    "id": 414,
+    "nombre_emplazamiento": "Las Palmas de Gran Canaria",
+    "latitud": 28.11583,
+    "longitud": -15.435,
+    "mes": 6,
+    "radiacion_media": 196.61,
+    "temp_media": 19.62
+  },
+  {
+    "id": 415,
+    "nombre_emplazamiento": "Las Palmas de Gran Canaria",
+    "latitud": 28.11583,
+    "longitud": -15.435,
+    "mes": 7,
+    "radiacion_media": 191.46,
+    "temp_media": 20.91
+  },
+  {
+    "id": 416,
+    "nombre_emplazamiento": "Las Palmas de Gran Canaria",
+    "latitud": 28.11583,
+    "longitud": -15.435,
+    "mes": 8,
+    "radiacion_media": 192.07,
+    "temp_media": 21.79
+  },
+  {
+    "id": 417,
+    "nombre_emplazamiento": "Las Palmas de Gran Canaria",
+    "latitud": 28.11583,
+    "longitud": -15.435,
+    "mes": 9,
+    "radiacion_media": 170.59,
+    "temp_media": 21.57
+  },
+  {
+    "id": 418,
+    "nombre_emplazamiento": "Las Palmas de Gran Canaria",
+    "latitud": 28.11583,
+    "longitud": -15.435,
+    "mes": 10,
+    "radiacion_media": 144.11,
+    "temp_media": 20.56
+  },
+  {
+    "id": 419,
+    "nombre_emplazamiento": "Las Palmas de Gran Canaria",
+    "latitud": 28.11583,
+    "longitud": -15.435,
+    "mes": 11,
+    "radiacion_media": 110.24,
+    "temp_media": 18.24
+  },
+  {
+    "id": 420,
+    "nombre_emplazamiento": "Las Palmas de Gran Canaria",
+    "latitud": 28.11583,
+    "longitud": -15.435,
+    "mes": 12,
+    "radiacion_media": 102.79,
+    "temp_media": 16.47
+  },
+  {
+    "id": 421,
+    "nombre_emplazamiento": "Pamplona",
+    "latitud": 42.81306,
+    "longitud": -1.64472,
+    "mes": 1,
+    "radiacion_media": 51.09,
+    "temp_media": 4.07
+  },
+  {
+    "id": 422,
+    "nombre_emplazamiento": "Pamplona",
+    "latitud": 42.81306,
+    "longitud": -1.64472,
+    "mes": 2,
+    "radiacion_media": 72.73,
+    "temp_media": 4.6
+  },
+  {
+    "id": 423,
+    "nombre_emplazamiento": "Pamplona",
+    "latitud": 42.81306,
+    "longitud": -1.64472,
+    "mes": 3,
+    "radiacion_media": 115.25,
+    "temp_media": 7.41
+  },
+  {
+    "id": 424,
+    "nombre_emplazamiento": "Pamplona",
+    "latitud": 42.81306,
+    "longitud": -1.64472,
+    "mes": 4,
+    "radiacion_media": 145.31,
+    "temp_media": 10.38
+  },
+  {
+    "id": 425,
+    "nombre_emplazamiento": "Pamplona",
+    "latitud": 42.81306,
+    "longitud": -1.64472,
+    "mes": 5,
+    "radiacion_media": 176.47,
+    "temp_media": 13.55
+  },
+  {
+    "id": 426,
+    "nombre_emplazamiento": "Pamplona",
+    "latitud": 42.81306,
+    "longitud": -1.64472,
+    "mes": 6,
+    "radiacion_media": 197.97,
+    "temp_media": 17.27
+  },
+  {
+    "id": 427,
+    "nombre_emplazamiento": "Pamplona",
+    "latitud": 42.81306,
+    "longitud": -1.64472,
+    "mes": 7,
+    "radiacion_media": 217.45,
+    "temp_media": 19.39
+  },
+  {
+    "id": 428,
+    "nombre_emplazamiento": "Pamplona",
+    "latitud": 42.81306,
+    "longitud": -1.64472,
+    "mes": 8,
+    "radiacion_media": 191.38,
+    "temp_media": 19.39
+  },
+  {
+    "id": 429,
+    "nombre_emplazamiento": "Pamplona",
+    "latitud": 42.81306,
+    "longitud": -1.64472,
+    "mes": 9,
+    "radiacion_media": 142.91,
+    "temp_media": 16.98
+  },
+  {
+    "id": 430,
+    "nombre_emplazamiento": "Pamplona",
+    "latitud": 42.81306,
+    "longitud": -1.64472,
+    "mes": 10,
+    "radiacion_media": 97.58,
+    "temp_media": 13.11
+  },
+  {
+    "id": 431,
+    "nombre_emplazamiento": "Pamplona",
+    "latitud": 42.81306,
+    "longitud": -1.64472,
+    "mes": 11,
+    "radiacion_media": 56.91,
+    "temp_media": 7.66
+  },
+  {
+    "id": 432,
+    "nombre_emplazamiento": "Pamplona",
+    "latitud": 42.81306,
+    "longitud": -1.64472,
+    "mes": 12,
+    "radiacion_media": 47.39,
+    "temp_media": 4.69
+  },
+  {
+    "id": 433,
+    "nombre_emplazamiento": "Pontevedra",
+    "latitud": 42.43361,
+    "longitud": -8.64722,
+    "mes": 1,
+    "radiacion_media": 51.35,
+    "temp_media": 8.99
+  },
+  {
+    "id": 434,
+    "nombre_emplazamiento": "Pontevedra",
+    "latitud": 42.43361,
+    "longitud": -8.64722,
+    "mes": 2,
+    "radiacion_media": 72.58,
+    "temp_media": 9.16
+  },
+  {
+    "id": 435,
+    "nombre_emplazamiento": "Pontevedra",
+    "latitud": 42.43361,
+    "longitud": -8.64722,
+    "mes": 3,
+    "radiacion_media": 111.71,
+    "temp_media": 10.91
+  },
+  {
+    "id": 436,
+    "nombre_emplazamiento": "Pontevedra",
+    "latitud": 42.43361,
+    "longitud": -8.64722,
+    "mes": 4,
+    "radiacion_media": 146.12,
+    "temp_media": 12.76
+  },
+  {
+    "id": 437,
+    "nombre_emplazamiento": "Pontevedra",
+    "latitud": 42.43361,
+    "longitud": -8.64722,
+    "mes": 5,
+    "radiacion_media": 182.32,
+    "temp_media": 15.21
+  },
+  {
+    "id": 438,
+    "nombre_emplazamiento": "Pontevedra",
+    "latitud": 42.43361,
+    "longitud": -8.64722,
+    "mes": 6,
+    "radiacion_media": 192.56,
+    "temp_media": 17.68
+  },
+  {
+    "id": 439,
+    "nombre_emplazamiento": "Pontevedra",
+    "latitud": 42.43361,
+    "longitud": -8.64722,
+    "mes": 7,
+    "radiacion_media": 210.35,
+    "temp_media": 19.78
+  },
+  {
+    "id": 440,
+    "nombre_emplazamiento": "Pontevedra",
+    "latitud": 42.43361,
+    "longitud": -8.64722,
+    "mes": 8,
+    "radiacion_media": 188.6,
+    "temp_media": 19.92
+  },
+  {
+    "id": 441,
+    "nombre_emplazamiento": "Pontevedra",
+    "latitud": 42.43361,
+    "longitud": -8.64722,
+    "mes": 9,
+    "radiacion_media": 143.99,
+    "temp_media": 18.43
+  },
+  {
+    "id": 442,
+    "nombre_emplazamiento": "Pontevedra",
+    "latitud": 42.43361,
+    "longitud": -8.64722,
+    "mes": 10,
+    "radiacion_media": 93.11,
+    "temp_media": 15.61
+  },
+  {
+    "id": 443,
+    "nombre_emplazamiento": "Pontevedra",
+    "latitud": 42.43361,
+    "longitud": -8.64722,
+    "mes": 11,
+    "radiacion_media": 55.71,
+    "temp_media": 11.62
+  },
+  {
+    "id": 444,
+    "nombre_emplazamiento": "Pontevedra",
+    "latitud": 42.43361,
+    "longitud": -8.64722,
+    "mes": 12,
+    "radiacion_media": 47.48,
+    "temp_media": 9.64
+  },
+  {
+    "id": 445,
+    "nombre_emplazamiento": "Salamanca",
+    "latitud": 40.965,
+    "longitud": -5.66361,
+    "mes": 1,
+    "radiacion_media": 63.23,
+    "temp_media": 3.86
+  },
+  {
+    "id": 446,
+    "nombre_emplazamiento": "Salamanca",
+    "latitud": 40.965,
+    "longitud": -5.66361,
+    "mes": 2,
+    "radiacion_media": 87.56,
+    "temp_media": 4.76
+  },
+  {
+    "id": 447,
+    "nombre_emplazamiento": "Salamanca",
+    "latitud": 40.965,
+    "longitud": -5.66361,
+    "mes": 3,
+    "radiacion_media": 133.33,
+    "temp_media": 7.41
+  },
+  {
+    "id": 448,
+    "nombre_emplazamiento": "Salamanca",
+    "latitud": 40.965,
+    "longitud": -5.66361,
+    "mes": 4,
+    "radiacion_media": 162.27,
+    "temp_media": 10.36
+  },
+  {
+    "id": 449,
+    "nombre_emplazamiento": "Salamanca",
+    "latitud": 40.965,
+    "longitud": -5.66361,
+    "mes": 5,
+    "radiacion_media": 205.8,
+    "temp_media": 14.59
+  },
+  {
+    "id": 450,
+    "nombre_emplazamiento": "Salamanca",
+    "latitud": 40.965,
+    "longitud": -5.66361,
+    "mes": 6,
+    "radiacion_media": 221.65,
+    "temp_media": 19.01
+  },
+  {
+    "id": 451,
+    "nombre_emplazamiento": "Salamanca",
+    "latitud": 40.965,
+    "longitud": -5.66361,
+    "mes": 7,
+    "radiacion_media": 243.31,
+    "temp_media": 22.42
+  },
+  {
+    "id": 452,
+    "nombre_emplazamiento": "Salamanca",
+    "latitud": 40.965,
+    "longitud": -5.66361,
+    "mes": 8,
+    "radiacion_media": 214.74,
+    "temp_media": 21.93
+  },
+  {
+    "id": 453,
+    "nombre_emplazamiento": "Salamanca",
+    "latitud": 40.965,
+    "longitud": -5.66361,
+    "mes": 9,
+    "radiacion_media": 160.86,
+    "temp_media": 18.1
+  },
+  {
+    "id": 454,
+    "nombre_emplazamiento": "Salamanca",
+    "latitud": 40.965,
+    "longitud": -5.66361,
+    "mes": 10,
+    "radiacion_media": 112.23,
+    "temp_media": 13.16
+  },
+  {
+    "id": 455,
+    "nombre_emplazamiento": "Salamanca",
+    "latitud": 40.965,
+    "longitud": -5.66361,
+    "mes": 11,
+    "radiacion_media": 69.09,
+    "temp_media": 7.26
+  },
+  {
+    "id": 456,
+    "nombre_emplazamiento": "Salamanca",
+    "latitud": 40.965,
+    "longitud": -5.66361,
+    "mes": 12,
+    "radiacion_media": 58.72,
+    "temp_media": 4.56
+  },
+  {
+    "id": 457,
+    "nombre_emplazamiento": "San Sebastián",
+    "latitud": 43.32139,
+    "longitud": -1.98139,
+    "mes": 1,
+    "radiacion_media": 45.17,
+    "temp_media": 7.89
+  },
+  {
+    "id": 458,
+    "nombre_emplazamiento": "San Sebastián",
+    "latitud": 43.32139,
+    "longitud": -1.98139,
+    "mes": 2,
+    "radiacion_media": 63.53,
+    "temp_media": 7.93
+  },
+  {
+    "id": 459,
+    "nombre_emplazamiento": "San Sebastián",
+    "latitud": 43.32139,
+    "longitud": -1.98139,
+    "mes": 3,
+    "radiacion_media": 102.37,
+    "temp_media": 9.85
+  },
+  {
+    "id": 460,
+    "nombre_emplazamiento": "San Sebastián",
+    "latitud": 43.32139,
+    "longitud": -1.98139,
+    "mes": 4,
+    "radiacion_media": 127.03,
+    "temp_media": 11.94
+  },
+  {
+    "id": 461,
+    "nombre_emplazamiento": "San Sebastián",
+    "latitud": 43.32139,
+    "longitud": -1.98139,
+    "mes": 5,
+    "radiacion_media": 148.97,
+    "temp_media": 14.4
+  },
+  {
+    "id": 462,
+    "nombre_emplazamiento": "San Sebastián",
+    "latitud": 43.32139,
+    "longitud": -1.98139,
+    "mes": 6,
+    "radiacion_media": 155.63,
+    "temp_media": 17.27
+  },
+  {
+    "id": 463,
+    "nombre_emplazamiento": "San Sebastián",
+    "latitud": 43.32139,
+    "longitud": -1.98139,
+    "mes": 7,
+    "radiacion_media": 162.64,
+    "temp_media": 19.21
+  },
+  {
+    "id": 464,
+    "nombre_emplazamiento": "San Sebastián",
+    "latitud": 43.32139,
+    "longitud": -1.98139,
+    "mes": 8,
+    "radiacion_media": 151.01,
+    "temp_media": 19.4
+  },
+  {
+    "id": 465,
+    "nombre_emplazamiento": "San Sebastián",
+    "latitud": 43.32139,
+    "longitud": -1.98139,
+    "mes": 9,
+    "radiacion_media": 123.01,
+    "temp_media": 17.93
+  },
+  {
+    "id": 466,
+    "nombre_emplazamiento": "San Sebastián",
+    "latitud": 43.32139,
+    "longitud": -1.98139,
+    "mes": 10,
+    "radiacion_media": 84.43,
+    "temp_media": 15.49
+  },
+  {
+    "id": 467,
+    "nombre_emplazamiento": "San Sebastián",
+    "latitud": 43.32139,
+    "longitud": -1.98139,
+    "mes": 11,
+    "radiacion_media": 50.1,
+    "temp_media": 11.14
+  },
+  {
+    "id": 468,
+    "nombre_emplazamiento": "San Sebastián",
+    "latitud": 43.32139,
+    "longitud": -1.98139,
+    "mes": 12,
+    "radiacion_media": 42.77,
+    "temp_media": 8.73
+  },
+  {
+    "id": 469,
+    "nombre_emplazamiento": "Santa Cruz de Tenerife",
+    "latitud": 28.46361,
+    "longitud": -16.25194,
+    "mes": 1,
+    "radiacion_media": 110.88,
+    "temp_media": 16.95
+  },
+  {
+    "id": 470,
+    "nombre_emplazamiento": "Santa Cruz de Tenerife",
+    "latitud": 28.46361,
+    "longitud": -16.25194,
+    "mes": 2,
+    "radiacion_media": 122.56,
+    "temp_media": 16.38
+  },
+  {
+    "id": 471,
+    "nombre_emplazamiento": "Santa Cruz de Tenerife",
+    "latitud": 28.46361,
+    "longitud": -16.25194,
+    "mes": 3,
+    "radiacion_media": 171.68,
+    "temp_media": 16.56
+  },
+  {
+    "id": 472,
+    "nombre_emplazamiento": "Santa Cruz de Tenerife",
+    "latitud": 28.46361,
+    "longitud": -16.25194,
+    "mes": 4,
+    "radiacion_media": 196.72,
+    "temp_media": 17.19
+  },
+  {
+    "id": 473,
+    "nombre_emplazamiento": "Santa Cruz de Tenerife",
+    "latitud": 28.46361,
+    "longitud": -16.25194,
+    "mes": 5,
+    "radiacion_media": 222.59,
+    "temp_media": 18.23
+  },
+  {
+    "id": 474,
+    "nombre_emplazamiento": "Santa Cruz de Tenerife",
+    "latitud": 28.46361,
+    "longitud": -16.25194,
+    "mes": 6,
+    "radiacion_media": 231.87,
+    "temp_media": 19.53
+  },
+  {
+    "id": 475,
+    "nombre_emplazamiento": "Santa Cruz de Tenerife",
+    "latitud": 28.46361,
+    "longitud": -16.25194,
+    "mes": 7,
+    "radiacion_media": 246.6,
+    "temp_media": 20.71
+  },
+  {
+    "id": 476,
+    "nombre_emplazamiento": "Santa Cruz de Tenerife",
+    "latitud": 28.46361,
+    "longitud": -16.25194,
+    "mes": 8,
+    "radiacion_media": 227.3,
+    "temp_media": 21.62
+  },
+  {
+    "id": 477,
+    "nombre_emplazamiento": "Santa Cruz de Tenerife",
+    "latitud": 28.46361,
+    "longitud": -16.25194,
+    "mes": 9,
+    "radiacion_media": 184.98,
+    "temp_media": 21.9
+  },
+  {
+    "id": 478,
+    "nombre_emplazamiento": "Santa Cruz de Tenerife",
+    "latitud": 28.46361,
+    "longitud": -16.25194,
+    "mes": 10,
+    "radiacion_media": 148.94,
+    "temp_media": 21.41
+  },
+  {
+    "id": 479,
+    "nombre_emplazamiento": "Santa Cruz de Tenerife",
+    "latitud": 28.46361,
+    "longitud": -16.25194,
+    "mes": 11,
+    "radiacion_media": 111.79,
+    "temp_media": 19.73
+  },
+  {
+    "id": 480,
+    "nombre_emplazamiento": "Santa Cruz de Tenerife",
+    "latitud": 28.46361,
+    "longitud": -16.25194,
+    "mes": 12,
+    "radiacion_media": 102.14,
+    "temp_media": 18.25
+  },
+  {
+    "id": 481,
+    "nombre_emplazamiento": "Santander",
+    "latitud": 43.46083,
+    "longitud": -3.80778,
+    "mes": 1,
+    "radiacion_media": 45.5,
+    "temp_media": 8.39
+  },
+  {
+    "id": 482,
+    "nombre_emplazamiento": "Santander",
+    "latitud": 43.46083,
+    "longitud": -3.80778,
+    "mes": 2,
+    "radiacion_media": 63.59,
+    "temp_media": 8.44
+  },
+  {
+    "id": 483,
+    "nombre_emplazamiento": "Santander",
+    "latitud": 43.46083,
+    "longitud": -3.80778,
+    "mes": 3,
+    "radiacion_media": 105.84,
+    "temp_media": 10.33
+  },
+  {
+    "id": 484,
+    "nombre_emplazamiento": "Santander",
+    "latitud": 43.46083,
+    "longitud": -3.80778,
+    "mes": 4,
+    "radiacion_media": 133.76,
+    "temp_media": 12.34
+  },
+  {
+    "id": 485,
+    "nombre_emplazamiento": "Santander",
+    "latitud": 43.46083,
+    "longitud": -3.80778,
+    "mes": 5,
+    "radiacion_media": 159.24,
+    "temp_media": 14.84
+  },
+  {
+    "id": 486,
+    "nombre_emplazamiento": "Santander",
+    "latitud": 43.46083,
+    "longitud": -3.80778,
+    "mes": 6,
+    "radiacion_media": 160.74,
+    "temp_media": 17.62
+  },
+  {
+    "id": 487,
+    "nombre_emplazamiento": "Santander",
+    "latitud": 43.46083,
+    "longitud": -3.80778,
+    "mes": 7,
+    "radiacion_media": 166.78,
+    "temp_media": 19.72
+  },
+  {
+    "id": 488,
+    "nombre_emplazamiento": "Santander",
+    "latitud": 43.46083,
+    "longitud": -3.80778,
+    "mes": 8,
+    "radiacion_media": 152.16,
+    "temp_media": 19.83
+  },
+  {
+    "id": 489,
+    "nombre_emplazamiento": "Santander",
+    "latitud": 43.46083,
+    "longitud": -3.80778,
+    "mes": 9,
+    "radiacion_media": 125.27,
+    "temp_media": 18.32
+  },
+  {
+    "id": 490,
+    "nombre_emplazamiento": "Santander",
+    "latitud": 43.46083,
+    "longitud": -3.80778,
+    "mes": 10,
+    "radiacion_media": 86.94,
+    "temp_media": 15.74
+  },
+  {
+    "id": 491,
+    "nombre_emplazamiento": "Santander",
+    "latitud": 43.46083,
+    "longitud": -3.80778,
+    "mes": 11,
+    "radiacion_media": 51.11,
+    "temp_media": 11.57
+  },
+  {
+    "id": 492,
+    "nombre_emplazamiento": "Santander",
+    "latitud": 43.46083,
+    "longitud": -3.80778,
+    "mes": 12,
+    "radiacion_media": 43.59,
+    "temp_media": 9.19
+  },
+  {
+    "id": 493,
+    "nombre_emplazamiento": "Segovia",
+    "latitud": 40.94833,
+    "longitud": -4.11806,
+    "mes": 1,
+    "radiacion_media": 55.95,
+    "temp_media": 3.09
+  },
+  {
+    "id": 494,
+    "nombre_emplazamiento": "Segovia",
+    "latitud": 40.94833,
+    "longitud": -4.11806,
+    "mes": 2,
+    "radiacion_media": 72.13,
+    "temp_media": 3.82
+  },
+  {
+    "id": 495,
+    "nombre_emplazamiento": "Segovia",
+    "latitud": 40.94833,
+    "longitud": -4.11806,
+    "mes": 3,
+    "radiacion_media": 115.47,
+    "temp_media": 6.61
+  },
+  {
+    "id": 496,
+    "nombre_emplazamiento": "Segovia",
+    "latitud": 40.94833,
+    "longitud": -4.11806,
+    "mes": 4,
+    "radiacion_media": 144.08,
+    "temp_media": 9.79
+  },
+  {
+    "id": 497,
+    "nombre_emplazamiento": "Segovia",
+    "latitud": 40.94833,
+    "longitud": -4.11806,
+    "mes": 5,
+    "radiacion_media": 184.75,
+    "temp_media": 14.01
+  },
+  {
+    "id": 498,
+    "nombre_emplazamiento": "Segovia",
+    "latitud": 40.94833,
+    "longitud": -4.11806,
+    "mes": 6,
+    "radiacion_media": 207.12,
+    "temp_media": 18.76
+  },
+  {
+    "id": 499,
+    "nombre_emplazamiento": "Segovia",
+    "latitud": 40.94833,
+    "longitud": -4.11806,
+    "mes": 7,
+    "radiacion_media": 234.69,
+    "temp_media": 22.42
+  },
+  {
+    "id": 500,
+    "nombre_emplazamiento": "Segovia",
+    "latitud": 40.94833,
+    "longitud": -4.11806,
+    "mes": 8,
+    "radiacion_media": 206.55,
+    "temp_media": 21.99
+  },
+  {
+    "id": 501,
+    "nombre_emplazamiento": "Segovia",
+    "latitud": 40.94833,
+    "longitud": -4.11806,
+    "mes": 9,
+    "radiacion_media": 148.65,
+    "temp_media": 17.93
+  },
+  {
+    "id": 502,
+    "nombre_emplazamiento": "Segovia",
+    "latitud": 40.94833,
+    "longitud": -4.11806,
+    "mes": 10,
+    "radiacion_media": 104.79,
+    "temp_media": 12.74
+  },
+  {
+    "id": 503,
+    "nombre_emplazamiento": "Segovia",
+    "latitud": 40.94833,
+    "longitud": -4.11806,
+    "mes": 11,
+    "radiacion_media": 60.77,
+    "temp_media": 6.51
+  },
+  {
+    "id": 504,
+    "nombre_emplazamiento": "Segovia",
+    "latitud": 40.94833,
+    "longitud": -4.11806,
+    "mes": 12,
+    "radiacion_media": 55.03,
+    "temp_media": 3.99
+  },
+  {
+    "id": 505,
+    "nombre_emplazamiento": "Sevilla",
+    "latitud": 37.38222,
+    "longitud": -5.97306,
+    "mes": 1,
+    "radiacion_media": 84.07,
+    "temp_media": 10.22
+  },
+  {
+    "id": 506,
+    "nombre_emplazamiento": "Sevilla",
+    "latitud": 37.38222,
+    "longitud": -5.97306,
+    "mes": 2,
+    "radiacion_media": 100.71,
+    "temp_media": 11.59
+  },
+  {
+    "id": 507,
+    "nombre_emplazamiento": "Sevilla",
+    "latitud": 37.38222,
+    "longitud": -5.97306,
+    "mes": 3,
+    "radiacion_media": 145.24,
+    "temp_media": 14.1
+  },
+  {
+    "id": 508,
+    "nombre_emplazamiento": "Sevilla",
+    "latitud": 37.38222,
+    "longitud": -5.97306,
+    "mes": 4,
+    "radiacion_media": 175.6,
+    "temp_media": 16.76
+  },
+  {
+    "id": 509,
+    "nombre_emplazamiento": "Sevilla",
+    "latitud": 37.38222,
+    "longitud": -5.97306,
+    "mes": 5,
+    "radiacion_media": 218.94,
+    "temp_media": 21.05
+  },
+  {
+    "id": 510,
+    "nombre_emplazamiento": "Sevilla",
+    "latitud": 37.38222,
+    "longitud": -5.97306,
+    "mes": 6,
+    "radiacion_media": 234.72,
+    "temp_media": 25.14
+  },
+  {
+    "id": 511,
+    "nombre_emplazamiento": "Sevilla",
+    "latitud": 37.38222,
+    "longitud": -5.97306,
+    "mes": 7,
+    "radiacion_media": 248.46,
+    "temp_media": 28.02
+  },
+  {
+    "id": 512,
+    "nombre_emplazamiento": "Sevilla",
+    "latitud": 37.38222,
+    "longitud": -5.97306,
+    "mes": 8,
+    "radiacion_media": 221.22,
+    "temp_media": 28.23
+  },
+  {
+    "id": 513,
+    "nombre_emplazamiento": "Sevilla",
+    "latitud": 37.38222,
+    "longitud": -5.97306,
+    "mes": 9,
+    "radiacion_media": 168.04,
+    "temp_media": 24.44
+  },
+  {
+    "id": 514,
+    "nombre_emplazamiento": "Sevilla",
+    "latitud": 37.38222,
+    "longitud": -5.97306,
+    "mes": 10,
+    "radiacion_media": 126.18,
+    "temp_media": 19.95
+  },
+  {
+    "id": 515,
+    "nombre_emplazamiento": "Sevilla",
+    "latitud": 37.38222,
+    "longitud": -5.97306,
+    "mes": 11,
+    "radiacion_media": 87.48,
+    "temp_media": 14.1
+  },
+  {
+    "id": 516,
+    "nombre_emplazamiento": "Sevilla",
+    "latitud": 37.38222,
+    "longitud": -5.97306,
+    "mes": 12,
+    "radiacion_media": 76.71,
+    "temp_media": 11.23
+  },
+  {
+    "id": 517,
+    "nombre_emplazamiento": "Soria",
+    "latitud": 41.76361,
+    "longitud": -2.465,
+    "mes": 1,
+    "radiacion_media": 63.03,
+    "temp_media": 2.39
+  },
+  {
+    "id": 518,
+    "nombre_emplazamiento": "Soria",
+    "latitud": 41.76361,
+    "longitud": -2.465,
+    "mes": 2,
+    "radiacion_media": 81.41,
+    "temp_media": 2.94
+  },
+  {
+    "id": 519,
+    "nombre_emplazamiento": "Soria",
+    "latitud": 41.76361,
+    "longitud": -2.465,
+    "mes": 3,
+    "radiacion_media": 125.63,
+    "temp_media": 5.83
+  },
+  {
+    "id": 520,
+    "nombre_emplazamiento": "Soria",
+    "latitud": 41.76361,
+    "longitud": -2.465,
+    "mes": 4,
+    "radiacion_media": 154.51,
+    "temp_media": 8.97
+  },
+  {
+    "id": 521,
+    "nombre_emplazamiento": "Soria",
+    "latitud": 41.76361,
+    "longitud": -2.465,
+    "mes": 5,
+    "radiacion_media": 192.93,
+    "temp_media": 13.06
+  },
+  {
+    "id": 522,
+    "nombre_emplazamiento": "Soria",
+    "latitud": 41.76361,
+    "longitud": -2.465,
+    "mes": 6,
+    "radiacion_media": 210.28,
+    "temp_media": 17.9
+  },
+  {
+    "id": 523,
+    "nombre_emplazamiento": "Soria",
+    "latitud": 41.76361,
+    "longitud": -2.465,
+    "mes": 7,
+    "radiacion_media": 233.18,
+    "temp_media": 21.27
+  },
+  {
+    "id": 524,
+    "nombre_emplazamiento": "Soria",
+    "latitud": 41.76361,
+    "longitud": -2.465,
+    "mes": 8,
+    "radiacion_media": 204.2,
+    "temp_media": 20.54
+  },
+  {
+    "id": 525,
+    "nombre_emplazamiento": "Soria",
+    "latitud": 41.76361,
+    "longitud": -2.465,
+    "mes": 9,
+    "radiacion_media": 151.84,
+    "temp_media": 16.46
+  },
+  {
+    "id": 526,
+    "nombre_emplazamiento": "Soria",
+    "latitud": 41.76361,
+    "longitud": -2.465,
+    "mes": 10,
+    "radiacion_media": 108.3,
+    "temp_media": 11.74
+  },
+  {
+    "id": 527,
+    "nombre_emplazamiento": "Soria",
+    "latitud": 41.76361,
+    "longitud": -2.465,
+    "mes": 11,
+    "radiacion_media": 65.37,
+    "temp_media": 5.69
+  },
+  {
+    "id": 528,
+    "nombre_emplazamiento": "Soria",
+    "latitud": 41.76361,
+    "longitud": -2.465,
+    "mes": 12,
+    "radiacion_media": 56.86,
+    "temp_media": 3.14
+  },
+  {
+    "id": 529,
+    "nombre_emplazamiento": "Tarragona",
+    "latitud": 41.11667,
+    "longitud": 1.25,
+    "mes": 1,
+    "radiacion_media": 68.57,
+    "temp_media": 7.75
+  },
+  {
+    "id": 530,
+    "nombre_emplazamiento": "Tarragona",
+    "latitud": 41.11667,
+    "longitud": 1.25,
+    "mes": 2,
+    "radiacion_media": 87.49,
+    "temp_media": 8.97
+  },
+  {
+    "id": 531,
+    "nombre_emplazamiento": "Tarragona",
+    "latitud": 41.11667,
+    "longitud": 1.25,
+    "mes": 3,
+    "radiacion_media": 133.56,
+    "temp_media": 11.82
+  },
+  {
+    "id": 532,
+    "nombre_emplazamiento": "Tarragona",
+    "latitud": 41.11667,
+    "longitud": 1.25,
+    "mes": 4,
+    "radiacion_media": 162.44,
+    "temp_media": 14.62
+  },
+  {
+    "id": 533,
+    "nombre_emplazamiento": "Tarragona",
+    "latitud": 41.11667,
+    "longitud": 1.25,
+    "mes": 5,
+    "radiacion_media": 203.25,
+    "temp_media": 18.34
+  },
+  {
+    "id": 534,
+    "nombre_emplazamiento": "Tarragona",
+    "latitud": 41.11667,
+    "longitud": 1.25,
+    "mes": 6,
+    "radiacion_media": 219.39,
+    "temp_media": 22.57
+  },
+  {
+    "id": 535,
+    "nombre_emplazamiento": "Tarragona",
+    "latitud": 41.11667,
+    "longitud": 1.25,
+    "mes": 7,
+    "radiacion_media": 224.31,
+    "temp_media": 25.31
+  },
+  {
+    "id": 536,
+    "nombre_emplazamiento": "Tarragona",
+    "latitud": 41.11667,
+    "longitud": 1.25,
+    "mes": 8,
+    "radiacion_media": 194.2,
+    "temp_media": 24.62
+  },
+  {
+    "id": 537,
+    "nombre_emplazamiento": "Tarragona",
+    "latitud": 41.11667,
+    "longitud": 1.25,
+    "mes": 9,
+    "radiacion_media": 145.16,
+    "temp_media": 21.14
+  },
+  {
+    "id": 538,
+    "nombre_emplazamiento": "Tarragona",
+    "latitud": 41.11667,
+    "longitud": 1.25,
+    "mes": 10,
+    "radiacion_media": 106.19,
+    "temp_media": 17.18
+  },
+  {
+    "id": 539,
+    "nombre_emplazamiento": "Tarragona",
+    "latitud": 41.11667,
+    "longitud": 1.25,
+    "mes": 11,
+    "radiacion_media": 71.32,
+    "temp_media": 11.59
+  },
+  {
+    "id": 540,
+    "nombre_emplazamiento": "Tarragona",
+    "latitud": 41.11667,
+    "longitud": 1.25,
+    "mes": 12,
+    "radiacion_media": 60.77,
+    "temp_media": 8.06
+  },
+  {
+    "id": 541,
+    "nombre_emplazamiento": "Teruel",
+    "latitud": 40.34583,
+    "longitud": -1.10694,
+    "mes": 1,
+    "radiacion_media": 69.94,
+    "temp_media": 2.79
+  },
+  {
+    "id": 542,
+    "nombre_emplazamiento": "Teruel",
+    "latitud": 40.34583,
+    "longitud": -1.10694,
+    "mes": 2,
+    "radiacion_media": 87.01,
+    "temp_media": 3.58
+  },
+  {
+    "id": 543,
+    "nombre_emplazamiento": "Teruel",
+    "latitud": 40.34583,
+    "longitud": -1.10694,
+    "mes": 3,
+    "radiacion_media": 133.21,
+    "temp_media": 6.64
+  },
+  {
+    "id": 544,
+    "nombre_emplazamiento": "Teruel",
+    "latitud": 40.34583,
+    "longitud": -1.10694,
+    "mes": 4,
+    "radiacion_media": 160.74,
+    "temp_media": 9.84
+  },
+  {
+    "id": 545,
+    "nombre_emplazamiento": "Teruel",
+    "latitud": 40.34583,
+    "longitud": -1.10694,
+    "mes": 5,
+    "radiacion_media": 198.21,
+    "temp_media": 14.09
+  },
+  {
+    "id": 546,
+    "nombre_emplazamiento": "Teruel",
+    "latitud": 40.34583,
+    "longitud": -1.10694,
+    "mes": 6,
+    "radiacion_media": 216.46,
+    "temp_media": 19.02
+  },
+  {
+    "id": 547,
+    "nombre_emplazamiento": "Teruel",
+    "latitud": 40.34583,
+    "longitud": -1.10694,
+    "mes": 7,
+    "radiacion_media": 234.2,
+    "temp_media": 22.75
+  },
+  {
+    "id": 548,
+    "nombre_emplazamiento": "Teruel",
+    "latitud": 40.34583,
+    "longitud": -1.10694,
+    "mes": 8,
+    "radiacion_media": 204.07,
+    "temp_media": 21.79
+  },
+  {
+    "id": 549,
+    "nombre_emplazamiento": "Teruel",
+    "latitud": 40.34583,
+    "longitud": -1.10694,
+    "mes": 9,
+    "radiacion_media": 153.57,
+    "temp_media": 17.14
+  },
+  {
+    "id": 550,
+    "nombre_emplazamiento": "Teruel",
+    "latitud": 40.34583,
+    "longitud": -1.10694,
+    "mes": 10,
+    "radiacion_media": 114.86,
+    "temp_media": 12.48
+  },
+  {
+    "id": 551,
+    "nombre_emplazamiento": "Teruel",
+    "latitud": 40.34583,
+    "longitud": -1.10694,
+    "mes": 11,
+    "radiacion_media": 73.66,
+    "temp_media": 6.14
+  },
+  {
+    "id": 552,
+    "nombre_emplazamiento": "Teruel",
+    "latitud": 40.34583,
+    "longitud": -1.10694,
+    "mes": 12,
+    "radiacion_media": 65.11,
+    "temp_media": 3.56
+  },
+  {
+    "id": 553,
+    "nombre_emplazamiento": "Toledo",
+    "latitud": 39.85694,
+    "longitud": -4.02444,
+    "mes": 1,
+    "radiacion_media": 72.93,
+    "temp_media": 5.38
+  },
+  {
+    "id": 554,
+    "nombre_emplazamiento": "Toledo",
+    "latitud": 39.85694,
+    "longitud": -4.02444,
+    "mes": 2,
+    "radiacion_media": 92.31,
+    "temp_media": 6.8
+  },
+  {
+    "id": 555,
+    "nombre_emplazamiento": "Toledo",
+    "latitud": 39.85694,
+    "longitud": -4.02444,
+    "mes": 3,
+    "radiacion_media": 137.88,
+    "temp_media": 9.84
+  },
+  {
+    "id": 556,
+    "nombre_emplazamiento": "Toledo",
+    "latitud": 39.85694,
+    "longitud": -4.02444,
+    "mes": 4,
+    "radiacion_media": 170.04,
+    "temp_media": 12.88
+  },
+  {
+    "id": 557,
+    "nombre_emplazamiento": "Toledo",
+    "latitud": 39.85694,
+    "longitud": -4.02444,
+    "mes": 5,
+    "radiacion_media": 208.14,
+    "temp_media": 17.56
+  },
+  {
+    "id": 558,
+    "nombre_emplazamiento": "Toledo",
+    "latitud": 39.85694,
+    "longitud": -4.02444,
+    "mes": 6,
+    "radiacion_media": 226.86,
+    "temp_media": 22.59
+  },
+  {
+    "id": 559,
+    "nombre_emplazamiento": "Toledo",
+    "latitud": 39.85694,
+    "longitud": -4.02444,
+    "mes": 7,
+    "radiacion_media": 245.47,
+    "temp_media": 26.6
+  },
+  {
+    "id": 560,
+    "nombre_emplazamiento": "Toledo",
+    "latitud": 39.85694,
+    "longitud": -4.02444,
+    "mes": 8,
+    "radiacion_media": 216.06,
+    "temp_media": 26
+  },
+  {
+    "id": 561,
+    "nombre_emplazamiento": "Toledo",
+    "latitud": 39.85694,
+    "longitud": -4.02444,
+    "mes": 9,
+    "radiacion_media": 162.91,
+    "temp_media": 21.16
+  },
+  {
+    "id": 562,
+    "nombre_emplazamiento": "Toledo",
+    "latitud": 39.85694,
+    "longitud": -4.02444,
+    "mes": 10,
+    "radiacion_media": 117.8,
+    "temp_media": 15.66
+  },
+  {
+    "id": 563,
+    "nombre_emplazamiento": "Toledo",
+    "latitud": 39.85694,
+    "longitud": -4.02444,
+    "mes": 11,
+    "radiacion_media": 76.88,
+    "temp_media": 9.4
+  },
+  {
+    "id": 564,
+    "nombre_emplazamiento": "Toledo",
+    "latitud": 39.85694,
+    "longitud": -4.02444,
+    "mes": 12,
+    "radiacion_media": 65.58,
+    "temp_media": 6.13
+  },
+  {
+    "id": 565,
+    "nombre_emplazamiento": "Valencia",
+    "latitud": 39.47,
+    "longitud": -0.37639,
+    "mes": 1,
+    "radiacion_media": 75.69,
+    "temp_media": 10.27
+  },
+  {
+    "id": 566,
+    "nombre_emplazamiento": "Valencia",
+    "latitud": 39.47,
+    "longitud": -0.37639,
+    "mes": 2,
+    "radiacion_media": 93.1,
+    "temp_media": 10.91
+  },
+  {
+    "id": 567,
+    "nombre_emplazamiento": "Valencia",
+    "latitud": 39.47,
+    "longitud": -0.37639,
+    "mes": 3,
+    "radiacion_media": 139.89,
+    "temp_media": 13.34
+  },
+  {
+    "id": 568,
+    "nombre_emplazamiento": "Valencia",
+    "latitud": 39.47,
+    "longitud": -0.37639,
+    "mes": 4,
+    "radiacion_media": 171.22,
+    "temp_media": 15.99
+  },
+  {
+    "id": 569,
+    "nombre_emplazamiento": "Valencia",
+    "latitud": 39.47,
+    "longitud": -0.37639,
+    "mes": 5,
+    "radiacion_media": 209.27,
+    "temp_media": 19.81
+  },
+  {
+    "id": 570,
+    "nombre_emplazamiento": "Valencia",
+    "latitud": 39.47,
+    "longitud": -0.37639,
+    "mes": 6,
+    "radiacion_media": 222.19,
+    "temp_media": 23.79
+  },
+  {
+    "id": 571,
+    "nombre_emplazamiento": "Valencia",
+    "latitud": 39.47,
+    "longitud": -0.37639,
+    "mes": 7,
+    "radiacion_media": 228.4,
+    "temp_media": 26.33
+  },
+  {
+    "id": 572,
+    "nombre_emplazamiento": "Valencia",
+    "latitud": 39.47,
+    "longitud": -0.37639,
+    "mes": 8,
+    "radiacion_media": 199.7,
+    "temp_media": 25.95
+  },
+  {
+    "id": 573,
+    "nombre_emplazamiento": "Valencia",
+    "latitud": 39.47,
+    "longitud": -0.37639,
+    "mes": 9,
+    "radiacion_media": 151.63,
+    "temp_media": 22.91
+  },
+  {
+    "id": 574,
+    "nombre_emplazamiento": "Valencia",
+    "latitud": 39.47,
+    "longitud": -0.37639,
+    "mes": 10,
+    "radiacion_media": 115.35,
+    "temp_media": 19.04
+  },
+  {
+    "id": 575,
+    "nombre_emplazamiento": "Valencia",
+    "latitud": 39.47,
+    "longitud": -0.37639,
+    "mes": 11,
+    "radiacion_media": 79.09,
+    "temp_media": 13.97
+  },
+  {
+    "id": 576,
+    "nombre_emplazamiento": "Valencia",
+    "latitud": 39.47,
+    "longitud": -0.37639,
+    "mes": 12,
+    "radiacion_media": 68.13,
+    "temp_media": 10.83
+  },
+  {
+    "id": 577,
+    "nombre_emplazamiento": "Valladolid",
+    "latitud": 41.65278,
+    "longitud": -4.72361,
+    "mes": 1,
+    "radiacion_media": 57.42,
+    "temp_media": 4.06
+  },
+  {
+    "id": 578,
+    "nombre_emplazamiento": "Valladolid",
+    "latitud": 41.65278,
+    "longitud": -4.72361,
+    "mes": 2,
+    "radiacion_media": 84.31,
+    "temp_media": 5.14
+  },
+  {
+    "id": 579,
+    "nombre_emplazamiento": "Valladolid",
+    "latitud": 41.65278,
+    "longitud": -4.72361,
+    "mes": 3,
+    "radiacion_media": 130.84,
+    "temp_media": 8.03
+  },
+  {
+    "id": 580,
+    "nombre_emplazamiento": "Valladolid",
+    "latitud": 41.65278,
+    "longitud": -4.72361,
+    "mes": 4,
+    "radiacion_media": 160.77,
+    "temp_media": 11.14
+  },
+  {
+    "id": 581,
+    "nombre_emplazamiento": "Valladolid",
+    "latitud": 41.65278,
+    "longitud": -4.72361,
+    "mes": 5,
+    "radiacion_media": 204.52,
+    "temp_media": 15.4
+  },
+  {
+    "id": 582,
+    "nombre_emplazamiento": "Valladolid",
+    "latitud": 41.65278,
+    "longitud": -4.72361,
+    "mes": 6,
+    "radiacion_media": 221.24,
+    "temp_media": 19.91
+  },
+  {
+    "id": 583,
+    "nombre_emplazamiento": "Valladolid",
+    "latitud": 41.65278,
+    "longitud": -4.72361,
+    "mes": 7,
+    "radiacion_media": 241.24,
+    "temp_media": 23.21
+  },
+  {
+    "id": 584,
+    "nombre_emplazamiento": "Valladolid",
+    "latitud": 41.65278,
+    "longitud": -4.72361,
+    "mes": 8,
+    "radiacion_media": 213.54,
+    "temp_media": 22.69
+  },
+  {
+    "id": 585,
+    "nombre_emplazamiento": "Valladolid",
+    "latitud": 41.65278,
+    "longitud": -4.72361,
+    "mes": 9,
+    "radiacion_media": 160.01,
+    "temp_media": 18.87
+  },
+  {
+    "id": 586,
+    "nombre_emplazamiento": "Valladolid",
+    "latitud": 41.65278,
+    "longitud": -4.72361,
+    "mes": 10,
+    "radiacion_media": 110.57,
+    "temp_media": 13.61
+  },
+  {
+    "id": 587,
+    "nombre_emplazamiento": "Valladolid",
+    "latitud": 41.65278,
+    "longitud": -4.72361,
+    "mes": 11,
+    "radiacion_media": 66.32,
+    "temp_media": 7.62
+  },
+  {
+    "id": 588,
+    "nombre_emplazamiento": "Valladolid",
+    "latitud": 41.65278,
+    "longitud": -4.72361,
+    "mes": 12,
+    "radiacion_media": 53.83,
+    "temp_media": 4.55
+  },
+  {
+    "id": 589,
+    "nombre_emplazamiento": "Vitoria",
+    "latitud": 42.85056,
+    "longitud": -2.67139,
+    "mes": 1,
+    "radiacion_media": 48.04,
+    "temp_media": 4.19
+  },
+  {
+    "id": 590,
+    "nombre_emplazamiento": "Vitoria",
+    "latitud": 42.85056,
+    "longitud": -2.67139,
+    "mes": 2,
+    "radiacion_media": 63.93,
+    "temp_media": 4.6
+  },
+  {
+    "id": 591,
+    "nombre_emplazamiento": "Vitoria",
+    "latitud": 42.85056,
+    "longitud": -2.67139,
+    "mes": 3,
+    "radiacion_media": 108.78,
+    "temp_media": 7.04
+  },
+  {
+    "id": 592,
+    "nombre_emplazamiento": "Vitoria",
+    "latitud": 42.85056,
+    "longitud": -2.67139,
+    "mes": 4,
+    "radiacion_media": 136.19,
+    "temp_media": 9.8
+  },
+  {
+    "id": 593,
+    "nombre_emplazamiento": "Vitoria",
+    "latitud": 42.85056,
+    "longitud": -2.67139,
+    "mes": 5,
+    "radiacion_media": 165.06,
+    "temp_media": 12.82
+  },
+  {
+    "id": 594,
+    "nombre_emplazamiento": "Vitoria",
+    "latitud": 42.85056,
+    "longitud": -2.67139,
+    "mes": 6,
+    "radiacion_media": 181.35,
+    "temp_media": 16.23
+  },
+  {
+    "id": 595,
+    "nombre_emplazamiento": "Vitoria",
+    "latitud": 42.85056,
+    "longitud": -2.67139,
+    "mes": 7,
+    "radiacion_media": 198.28,
+    "temp_media": 18.38
+  },
+  {
+    "id": 596,
+    "nombre_emplazamiento": "Vitoria",
+    "latitud": 42.85056,
+    "longitud": -2.67139,
+    "mes": 8,
+    "radiacion_media": 174.72,
+    "temp_media": 18.59
+  },
+  {
+    "id": 597,
+    "nombre_emplazamiento": "Vitoria",
+    "latitud": 42.85056,
+    "longitud": -2.67139,
+    "mes": 9,
+    "radiacion_media": 132.37,
+    "temp_media": 16.46
+  },
+  {
+    "id": 598,
+    "nombre_emplazamiento": "Vitoria",
+    "latitud": 42.85056,
+    "longitud": -2.67139,
+    "mes": 10,
+    "radiacion_media": 91.9,
+    "temp_media": 12.83
+  },
+  {
+    "id": 599,
+    "nombre_emplazamiento": "Vitoria",
+    "latitud": 42.85056,
+    "longitud": -2.67139,
+    "mes": 11,
+    "radiacion_media": 53.45,
+    "temp_media": 7.61
+  },
+  {
+    "id": 600,
+    "nombre_emplazamiento": "Vitoria",
+    "latitud": 42.85056,
+    "longitud": -2.67139,
+    "mes": 12,
+    "radiacion_media": 44.94,
+    "temp_media": 4.69
+  },
+  {
+    "id": 601,
+    "nombre_emplazamiento": "Zamora",
+    "latitud": 41.50333,
+    "longitud": -5.74833,
+    "mes": 1,
+    "radiacion_media": 58.06,
+    "temp_media": 4.51
+  },
+  {
+    "id": 602,
+    "nombre_emplazamiento": "Zamora",
+    "latitud": 41.50333,
+    "longitud": -5.74833,
+    "mes": 2,
+    "radiacion_media": 88.23,
+    "temp_media": 5.53
+  },
+  {
+    "id": 603,
+    "nombre_emplazamiento": "Zamora",
+    "latitud": 41.50333,
+    "longitud": -5.74833,
+    "mes": 3,
+    "radiacion_media": 135.06,
+    "temp_media": 8.38
+  },
+  {
+    "id": 604,
+    "nombre_emplazamiento": "Zamora",
+    "latitud": 41.50333,
+    "longitud": -5.74833,
+    "mes": 4,
+    "radiacion_media": 164.9,
+    "temp_media": 11.32
+  },
+  {
+    "id": 605,
+    "nombre_emplazamiento": "Zamora",
+    "latitud": 41.50333,
+    "longitud": -5.74833,
+    "mes": 5,
+    "radiacion_media": 209.21,
+    "temp_media": 15.47
+  },
+  {
+    "id": 606,
+    "nombre_emplazamiento": "Zamora",
+    "latitud": 41.50333,
+    "longitud": -5.74833,
+    "mes": 6,
+    "radiacion_media": 222.46,
+    "temp_media": 19.67
+  },
+  {
+    "id": 607,
+    "nombre_emplazamiento": "Zamora",
+    "latitud": 41.50333,
+    "longitud": -5.74833,
+    "mes": 7,
+    "radiacion_media": 243.31,
+    "temp_media": 22.88
+  },
+  {
+    "id": 608,
+    "nombre_emplazamiento": "Zamora",
+    "latitud": 41.50333,
+    "longitud": -5.74833,
+    "mes": 8,
+    "radiacion_media": 214.76,
+    "temp_media": 22.51
+  },
+  {
+    "id": 609,
+    "nombre_emplazamiento": "Zamora",
+    "latitud": 41.50333,
+    "longitud": -5.74833,
+    "mes": 9,
+    "radiacion_media": 161.5,
+    "temp_media": 18.85
+  },
+  {
+    "id": 610,
+    "nombre_emplazamiento": "Zamora",
+    "latitud": 41.50333,
+    "longitud": -5.74833,
+    "mes": 10,
+    "radiacion_media": 109.61,
+    "temp_media": 13.78
+  },
+  {
+    "id": 611,
+    "nombre_emplazamiento": "Zamora",
+    "latitud": 41.50333,
+    "longitud": -5.74833,
+    "mes": 11,
+    "radiacion_media": 66.43,
+    "temp_media": 7.97
+  },
+  {
+    "id": 612,
+    "nombre_emplazamiento": "Zamora",
+    "latitud": 41.50333,
+    "longitud": -5.74833,
+    "mes": 12,
+    "radiacion_media": 53.34,
+    "temp_media": 5
+  },
+  {
+    "id": 613,
+    "nombre_emplazamiento": "Zaragoza",
+    "latitud": 41.65611,
+    "longitud": -0.87722,
+    "mes": 1,
+    "radiacion_media": 64.44,
+    "temp_media": 6.26
+  },
+  {
+    "id": 614,
+    "nombre_emplazamiento": "Zaragoza",
+    "latitud": 41.65611,
+    "longitud": -0.87722,
+    "mes": 2,
+    "radiacion_media": 90.67,
+    "temp_media": 7.24
+  },
+  {
+    "id": 615,
+    "nombre_emplazamiento": "Zaragoza",
+    "latitud": 41.65611,
+    "longitud": -0.87722,
+    "mes": 3,
+    "radiacion_media": 137.35,
+    "temp_media": 10.59
+  },
+  {
+    "id": 616,
+    "nombre_emplazamiento": "Zaragoza",
+    "latitud": 41.65611,
+    "longitud": -0.87722,
+    "mes": 4,
+    "radiacion_media": 169.01,
+    "temp_media": 13.86
+  },
+  {
+    "id": 617,
+    "nombre_emplazamiento": "Zaragoza",
+    "latitud": 41.65611,
+    "longitud": -0.87722,
+    "mes": 5,
+    "radiacion_media": 206.96,
+    "temp_media": 18.09
+  },
+  {
+    "id": 618,
+    "nombre_emplazamiento": "Zaragoza",
+    "latitud": 41.65611,
+    "longitud": -0.87722,
+    "mes": 6,
+    "radiacion_media": 219.91,
+    "temp_media": 22.69
+  },
+  {
+    "id": 619,
+    "nombre_emplazamiento": "Zaragoza",
+    "latitud": 41.65611,
+    "longitud": -0.87722,
+    "mes": 7,
+    "radiacion_media": 236.61,
+    "temp_media": 25.36
+  },
+  {
+    "id": 620,
+    "nombre_emplazamiento": "Zaragoza",
+    "latitud": 41.65611,
+    "longitud": -0.87722,
+    "mes": 8,
+    "radiacion_media": 207.9,
+    "temp_media": 24.55
+  },
+  {
+    "id": 621,
+    "nombre_emplazamiento": "Zaragoza",
+    "latitud": 41.65611,
+    "longitud": -0.87722,
+    "mes": 9,
+    "radiacion_media": 155.82,
+    "temp_media": 20.71
+  },
+  {
+    "id": 622,
+    "nombre_emplazamiento": "Zaragoza",
+    "latitud": 41.65611,
+    "longitud": -0.87722,
+    "mes": 10,
+    "radiacion_media": 111.21,
+    "temp_media": 15.93
+  },
+  {
+    "id": 623,
+    "nombre_emplazamiento": "Zaragoza",
+    "latitud": 41.65611,
+    "longitud": -0.87722,
+    "mes": 11,
+    "radiacion_media": 70.58,
+    "temp_media": 9.82
+  },
+  {
+    "id": 624,
+    "nombre_emplazamiento": "Zaragoza",
+    "latitud": 41.65611,
+    "longitud": -0.87722,
+    "mes": 12,
+    "radiacion_media": 56.26,
+    "temp_media": 6.54
+  },
+  {
+    "id": 625,
+    "nombre_emplazamiento": "Atenas",
+    "latitud": 37.973,
+    "longitud": 23.725,
+    "mes": 1,
+    "radiacion_media": 71.38,
+    "temp_media": 9.17
+  },
+  {
+    "id": 626,
+    "nombre_emplazamiento": "Atenas",
+    "latitud": 37.973,
+    "longitud": 23.725,
+    "mes": 2,
+    "radiacion_media": 89.2,
+    "temp_media": 10.01
+  },
+  {
+    "id": 627,
+    "nombre_emplazamiento": "Atenas",
+    "latitud": 37.973,
+    "longitud": 23.725,
+    "mes": 3,
+    "radiacion_media": 142.34,
+    "temp_media": 12.37
+  },
+  {
+    "id": 628,
+    "nombre_emplazamiento": "Atenas",
+    "latitud": 37.973,
+    "longitud": 23.725,
+    "mes": 4,
+    "radiacion_media": 180.36,
+    "temp_media": 15.75
+  },
+  {
+    "id": 629,
+    "nombre_emplazamiento": "Atenas",
+    "latitud": 37.973,
+    "longitud": 23.725,
+    "mes": 5,
+    "radiacion_media": 213.37,
+    "temp_media": 20.41
+  },
+  {
+    "id": 630,
+    "nombre_emplazamiento": "Atenas",
+    "latitud": 37.973,
+    "longitud": 23.725,
+    "mes": 6,
+    "radiacion_media": 232.71,
+    "temp_media": 24.96
+  },
+  {
+    "id": 631,
+    "nombre_emplazamiento": "Atenas",
+    "latitud": 37.973,
+    "longitud": 23.725,
+    "mes": 7,
+    "radiacion_media": 244.82,
+    "temp_media": 27.65
+  },
+  {
+    "id": 632,
+    "nombre_emplazamiento": "Atenas",
+    "latitud": 37.973,
+    "longitud": 23.725,
+    "mes": 8,
+    "radiacion_media": 221.44,
+    "temp_media": 27.57
+  },
+  {
+    "id": 633,
+    "nombre_emplazamiento": "Atenas",
+    "latitud": 37.973,
+    "longitud": 23.725,
+    "mes": 9,
+    "radiacion_media": 164.87,
+    "temp_media": 23.51
+  },
+  {
+    "id": 634,
+    "nombre_emplazamiento": "Atenas",
+    "latitud": 37.973,
+    "longitud": 23.725,
+    "mes": 10,
+    "radiacion_media": 118.87,
+    "temp_media": 18.7
+  },
+  {
+    "id": 635,
+    "nombre_emplazamiento": "Atenas",
+    "latitud": 37.973,
+    "longitud": 23.725,
+    "mes": 11,
+    "radiacion_media": 80.37,
+    "temp_media": 14.66
+  },
+  {
+    "id": 636,
+    "nombre_emplazamiento": "Atenas",
+    "latitud": 37.973,
+    "longitud": 23.725,
+    "mes": 12,
+    "radiacion_media": 63.24,
+    "temp_media": 10.77
+  },
+  {
+    "id": 637,
+    "nombre_emplazamiento": "Lisboa",
+    "latitud": 38.718,
+    "longitud": -9.134,
+    "mes": 1,
+    "radiacion_media": 69.62,
+    "temp_media": 11.59
+  },
+  {
+    "id": 638,
+    "nombre_emplazamiento": "Lisboa",
+    "latitud": 38.718,
+    "longitud": -9.134,
+    "mes": 2,
+    "radiacion_media": 89.79,
+    "temp_media": 11.84
+  },
+  {
+    "id": 639,
+    "nombre_emplazamiento": "Lisboa",
+    "latitud": 38.718,
+    "longitud": -9.134,
+    "mes": 3,
+    "radiacion_media": 135.38,
+    "temp_media": 13.34
+  },
+  {
+    "id": 640,
+    "nombre_emplazamiento": "Lisboa",
+    "latitud": 38.718,
+    "longitud": -9.134,
+    "mes": 4,
+    "radiacion_media": 167.31,
+    "temp_media": 15.02
+  },
+  {
+    "id": 641,
+    "nombre_emplazamiento": "Lisboa",
+    "latitud": 38.718,
+    "longitud": -9.134,
+    "mes": 5,
+    "radiacion_media": 209.22,
+    "temp_media": 17.52
+  },
+  {
+    "id": 642,
+    "nombre_emplazamiento": "Lisboa",
+    "latitud": 38.718,
+    "longitud": -9.134,
+    "mes": 6,
+    "radiacion_media": 219.86,
+    "temp_media": 19.73
+  },
+  {
+    "id": 643,
+    "nombre_emplazamiento": "Lisboa",
+    "latitud": 38.718,
+    "longitud": -9.134,
+    "mes": 7,
+    "radiacion_media": 236.54,
+    "temp_media": 21.26
+  },
+  {
+    "id": 644,
+    "nombre_emplazamiento": "Lisboa",
+    "latitud": 38.718,
+    "longitud": -9.134,
+    "mes": 8,
+    "radiacion_media": 215.25,
+    "temp_media": 21.94
+  },
+  {
+    "id": 645,
+    "nombre_emplazamiento": "Lisboa",
+    "latitud": 38.718,
+    "longitud": -9.134,
+    "mes": 9,
+    "radiacion_media": 165.25,
+    "temp_media": 20.86
+  },
+  {
+    "id": 646,
+    "nombre_emplazamiento": "Lisboa",
+    "latitud": 38.718,
+    "longitud": -9.134,
+    "mes": 10,
+    "radiacion_media": 113.95,
+    "temp_media": 18.5
+  },
+  {
+    "id": 647,
+    "nombre_emplazamiento": "Lisboa",
+    "latitud": 38.718,
+    "longitud": -9.134,
+    "mes": 11,
+    "radiacion_media": 73.5,
+    "temp_media": 14.59
+  },
+  {
+    "id": 648,
+    "nombre_emplazamiento": "Lisboa",
+    "latitud": 38.718,
+    "longitud": -9.134,
+    "mes": 12,
+    "radiacion_media": 64.26,
+    "temp_media": 12.43
+  },
+  {
+    "id": 649,
+    "nombre_emplazamiento": "Roma",
+    "latitud": 41.884,
+    "longitud": 12.492,
+    "mes": 1,
+    "radiacion_media": 59.94,
+    "temp_media": 7.79
+  },
+  {
+    "id": 650,
+    "nombre_emplazamiento": "Roma",
+    "latitud": 41.884,
+    "longitud": 12.492,
+    "mes": 2,
+    "radiacion_media": 79.54,
+    "temp_media": 8.21
+  },
+  {
+    "id": 651,
+    "nombre_emplazamiento": "Roma",
+    "latitud": 41.884,
+    "longitud": 12.492,
+    "mes": 3,
+    "radiacion_media": 122.96,
+    "temp_media": 10.69
+  },
+  {
+    "id": 652,
+    "nombre_emplazamiento": "Roma",
+    "latitud": 41.884,
+    "longitud": 12.492,
+    "mes": 4,
+    "radiacion_media": 161.38,
+    "temp_media": 14.05
+  },
+  {
+    "id": 653,
+    "nombre_emplazamiento": "Roma",
+    "latitud": 41.884,
+    "longitud": 12.492,
+    "mes": 5,
+    "radiacion_media": 196.87,
+    "temp_media": 17.71
+  },
+  {
+    "id": 654,
+    "nombre_emplazamiento": "Roma",
+    "latitud": 41.884,
+    "longitud": 12.492,
+    "mes": 6,
+    "radiacion_media": 219.79,
+    "temp_media": 22.12
+  },
+  {
+    "id": 655,
+    "nombre_emplazamiento": "Roma",
+    "latitud": 41.884,
+    "longitud": 12.492,
+    "mes": 7,
+    "radiacion_media": 234.73,
+    "temp_media": 25.18
+  },
+  {
+    "id": 656,
+    "nombre_emplazamiento": "Roma",
+    "latitud": 41.884,
+    "longitud": 12.492,
+    "mes": 8,
+    "radiacion_media": 203.03,
+    "temp_media": 25.07
+  },
+  {
+    "id": 657,
+    "nombre_emplazamiento": "Roma",
+    "latitud": 41.884,
+    "longitud": 12.492,
+    "mes": 9,
+    "radiacion_media": 144.47,
+    "temp_media": 21.15
+  },
+  {
+    "id": 658,
+    "nombre_emplazamiento": "Roma",
+    "latitud": 41.884,
+    "longitud": 12.492,
+    "mes": 10,
+    "radiacion_media": 103.07,
+    "temp_media": 16.97
+  },
+  {
+    "id": 659,
+    "nombre_emplazamiento": "Roma",
+    "latitud": 41.884,
+    "longitud": 12.492,
+    "mes": 11,
+    "radiacion_media": 65.07,
+    "temp_media": 12.69
+  },
+  {
+    "id": 660,
+    "nombre_emplazamiento": "Roma",
+    "latitud": 41.884,
+    "longitud": 12.492,
+    "mes": 12,
+    "radiacion_media": 54.18,
+    "temp_media": 8.69
+  },
+  {
+    "id": 661,
+    "nombre_emplazamiento": "Berlín",
+    "latitud": 52.525,
+    "longitud": 13.398,
+    "mes": 1,
+    "radiacion_media": 21.43,
+    "temp_media": 0.61
+  },
+  {
+    "id": 662,
+    "nombre_emplazamiento": "Berlín",
+    "latitud": 52.525,
+    "longitud": 13.398,
+    "mes": 2,
+    "radiacion_media": 39.73,
+    "temp_media": 1.51
+  },
+  {
+    "id": 663,
+    "nombre_emplazamiento": "Berlín",
+    "latitud": 52.525,
+    "longitud": 13.398,
+    "mes": 3,
+    "radiacion_media": 79.27,
+    "temp_media": 4.59
+  },
+  {
+    "id": 664,
+    "nombre_emplazamiento": "Berlín",
+    "latitud": 52.525,
+    "longitud": 13.398,
+    "mes": 4,
+    "radiacion_media": 132.05,
+    "temp_media": 10.08
+  },
+  {
+    "id": 665,
+    "nombre_emplazamiento": "Berlín",
+    "latitud": 52.525,
+    "longitud": 13.398,
+    "mes": 5,
+    "radiacion_media": 158.94,
+    "temp_media": 14.41
+  },
+  {
+    "id": 666,
+    "nombre_emplazamiento": "Berlín",
+    "latitud": 52.525,
+    "longitud": 13.398,
+    "mes": 6,
+    "radiacion_media": 171.56,
+    "temp_media": 18.27
+  },
+  {
+    "id": 667,
+    "nombre_emplazamiento": "Berlín",
+    "latitud": 52.525,
+    "longitud": 13.398,
+    "mes": 7,
+    "radiacion_media": 167.37,
+    "temp_media": 20.16
+  },
+  {
+    "id": 668,
+    "nombre_emplazamiento": "Berlín",
+    "latitud": 52.525,
+    "longitud": 13.398,
+    "mes": 8,
+    "radiacion_media": 143.35,
+    "temp_media": 19.46
+  },
+  {
+    "id": 669,
+    "nombre_emplazamiento": "Berlín",
+    "latitud": 52.525,
+    "longitud": 13.398,
+    "mes": 9,
+    "radiacion_media": 100.61,
+    "temp_media": 15.43
+  },
+  {
+    "id": 670,
+    "nombre_emplazamiento": "Berlín",
+    "latitud": 52.525,
+    "longitud": 13.398,
+    "mes": 10,
+    "radiacion_media": 56.79,
+    "temp_media": 10.43
+  },
+  {
+    "id": 671,
+    "nombre_emplazamiento": "Berlín",
+    "latitud": 52.525,
+    "longitud": 13.398,
+    "mes": 11,
+    "radiacion_media": 26.39,
+    "temp_media": 5.71
+  },
+  {
+    "id": 672,
+    "nombre_emplazamiento": "Berlín",
+    "latitud": 52.525,
+    "longitud": 13.398,
+    "mes": 12,
+    "radiacion_media": 17.35,
+    "temp_media": 2.61
+  },
+  {
+    "id": 673,
+    "nombre_emplazamiento": "Múnich",
+    "latitud": 48.136,
+    "longitud": 11.58,
+    "mes": 1,
+    "radiacion_media": 32.87,
+    "temp_media": -0.38
+  },
+  {
+    "id": 674,
+    "nombre_emplazamiento": "Múnich",
+    "latitud": 48.136,
+    "longitud": 11.58,
+    "mes": 2,
+    "radiacion_media": 51.48,
+    "temp_media": 0.16
+  },
+  {
+    "id": 675,
+    "nombre_emplazamiento": "Múnich",
+    "latitud": 48.136,
+    "longitud": 11.58,
+    "mes": 3,
+    "radiacion_media": 93.01,
+    "temp_media": 4.13
+  },
+  {
+    "id": 676,
+    "nombre_emplazamiento": "Múnich",
+    "latitud": 48.136,
+    "longitud": 11.58,
+    "mes": 4,
+    "radiacion_media": 134.55,
+    "temp_media": 9.31
+  },
+  {
+    "id": 677,
+    "nombre_emplazamiento": "Múnich",
+    "latitud": 48.136,
+    "longitud": 11.58,
+    "mes": 5,
+    "radiacion_media": 150.86,
+    "temp_media": 12.82
+  },
+  {
+    "id": 678,
+    "nombre_emplazamiento": "Múnich",
+    "latitud": 48.136,
+    "longitud": 11.58,
+    "mes": 6,
+    "radiacion_media": 164.81,
+    "temp_media": 16.73
+  },
+  {
+    "id": 679,
+    "nombre_emplazamiento": "Múnich",
+    "latitud": 48.136,
+    "longitud": 11.58,
+    "mes": 7,
+    "radiacion_media": 173.1,
+    "temp_media": 18.56
+  },
+  {
+    "id": 680,
+    "nombre_emplazamiento": "Múnich",
+    "latitud": 48.136,
+    "longitud": 11.58,
+    "mes": 8,
+    "radiacion_media": 148.65,
+    "temp_media": 17.68
+  },
+  {
+    "id": 681,
+    "nombre_emplazamiento": "Múnich",
+    "latitud": 48.136,
+    "longitud": 11.58,
+    "mes": 9,
+    "radiacion_media": 106.29,
+    "temp_media": 13.77
+  },
+  {
+    "id": 682,
+    "nombre_emplazamiento": "Múnich",
+    "latitud": 48.136,
+    "longitud": 11.58,
+    "mes": 10,
+    "radiacion_media": 70.13,
+    "temp_media": 9.2
+  },
+  {
+    "id": 683,
+    "nombre_emplazamiento": "Múnich",
+    "latitud": 48.136,
+    "longitud": 11.58,
+    "mes": 11,
+    "radiacion_media": 38.91,
+    "temp_media": 4.04
+  },
+  {
+    "id": 684,
+    "nombre_emplazamiento": "Múnich",
+    "latitud": 48.136,
+    "longitud": 11.58,
+    "mes": 12,
+    "radiacion_media": 29.53,
+    "temp_media": 0.62
+  },
+  {
+    "id": 685,
+    "nombre_emplazamiento": "Stuttgart",
+    "latitud": 48.784,
+    "longitud": 9.172,
+    "mes": 1,
+    "radiacion_media": 31.28,
+    "temp_media": 0.94
+  },
+  {
+    "id": 686,
+    "nombre_emplazamiento": "Stuttgart",
+    "latitud": 48.784,
+    "longitud": 9.172,
+    "mes": 2,
+    "radiacion_media": 48.56,
+    "temp_media": 1.31
+  },
+  {
+    "id": 687,
+    "nombre_emplazamiento": "Stuttgart",
+    "latitud": 48.784,
+    "longitud": 9.172,
+    "mes": 3,
+    "radiacion_media": 93.47,
+    "temp_media": 4.95
+  },
+  {
+    "id": 688,
+    "nombre_emplazamiento": "Stuttgart",
+    "latitud": 48.784,
+    "longitud": 9.172,
+    "mes": 4,
+    "radiacion_media": 134.8,
+    "temp_media": 9.93
+  },
+  {
+    "id": 689,
+    "nombre_emplazamiento": "Stuttgart",
+    "latitud": 48.784,
+    "longitud": 9.172,
+    "mes": 5,
+    "radiacion_media": 155.64,
+    "temp_media": 13.53
+  },
+  {
+    "id": 690,
+    "nombre_emplazamiento": "Stuttgart",
+    "latitud": 48.784,
+    "longitud": 9.172,
+    "mes": 6,
+    "radiacion_media": 171.2,
+    "temp_media": 17.32
+  },
+  {
+    "id": 691,
+    "nombre_emplazamiento": "Stuttgart",
+    "latitud": 48.784,
+    "longitud": 9.172,
+    "mes": 7,
+    "radiacion_media": 175.66,
+    "temp_media": 19.31
+  },
+  {
+    "id": 692,
+    "nombre_emplazamiento": "Stuttgart",
+    "latitud": 48.784,
+    "longitud": 9.172,
+    "mes": 8,
+    "radiacion_media": 147.58,
+    "temp_media": 18.32
+  },
+  {
+    "id": 693,
+    "nombre_emplazamiento": "Stuttgart",
+    "latitud": 48.784,
+    "longitud": 9.172,
+    "mes": 9,
+    "radiacion_media": 109.23,
+    "temp_media": 14.6
+  },
+  {
+    "id": 694,
+    "nombre_emplazamiento": "Stuttgart",
+    "latitud": 48.784,
+    "longitud": 9.172,
+    "mes": 10,
+    "radiacion_media": 68.77,
+    "temp_media": 10.16
+  },
+  {
+    "id": 695,
+    "nombre_emplazamiento": "Stuttgart",
+    "latitud": 48.784,
+    "longitud": 9.172,
+    "mes": 11,
+    "radiacion_media": 37.95,
+    "temp_media": 5.16
+  },
+  {
+    "id": 696,
+    "nombre_emplazamiento": "Stuttgart",
+    "latitud": 48.784,
+    "longitud": 9.172,
+    "mes": 12,
+    "radiacion_media": 27.11,
+    "temp_media": 1.99
+  },
+  {
+    "id": 697,
+    "nombre_emplazamiento": "París",
+    "latitud": 48.852,
+    "longitud": 2.348,
+    "mes": 1,
+    "radiacion_media": 30.98,
+    "temp_media": 4.37
+  },
+  {
+    "id": 698,
+    "nombre_emplazamiento": "París",
+    "latitud": 48.852,
+    "longitud": 2.348,
+    "mes": 2,
+    "radiacion_media": 49.09,
+    "temp_media": 4.66
+  },
+  {
+    "id": 699,
+    "nombre_emplazamiento": "París",
+    "latitud": 48.852,
+    "longitud": 2.348,
+    "mes": 3,
+    "radiacion_media": 93.44,
+    "temp_media": 7.37
+  },
+  {
+    "id": 700,
+    "nombre_emplazamiento": "París",
+    "latitud": 48.852,
+    "longitud": 2.348,
+    "mes": 4,
+    "radiacion_media": 139.93,
+    "temp_media": 11.19
+  },
+  {
+    "id": 701,
+    "nombre_emplazamiento": "París",
+    "latitud": 48.852,
+    "longitud": 2.348,
+    "mes": 5,
+    "radiacion_media": 159.61,
+    "temp_media": 14.51
+  },
+  {
+    "id": 702,
+    "nombre_emplazamiento": "París",
+    "latitud": 48.852,
+    "longitud": 2.348,
+    "mes": 6,
+    "radiacion_media": 171.84,
+    "temp_media": 18.01
+  },
+  {
+    "id": 703,
+    "nombre_emplazamiento": "París",
+    "latitud": 48.852,
+    "longitud": 2.348,
+    "mes": 7,
+    "radiacion_media": 177.6,
+    "temp_media": 20.19
+  },
+  {
+    "id": 704,
+    "nombre_emplazamiento": "París",
+    "latitud": 48.852,
+    "longitud": 2.348,
+    "mes": 8,
+    "radiacion_media": 151.31,
+    "temp_media": 19.34
+  },
+  {
+    "id": 705,
+    "nombre_emplazamiento": "París",
+    "latitud": 48.852,
+    "longitud": 2.348,
+    "mes": 9,
+    "radiacion_media": 113.23,
+    "temp_media": 16.54
+  },
+  {
+    "id": 706,
+    "nombre_emplazamiento": "París",
+    "latitud": 48.852,
+    "longitud": 2.348,
+    "mes": 10,
+    "radiacion_media": 68.45,
+    "temp_media": 12.71
+  },
+  {
+    "id": 707,
+    "nombre_emplazamiento": "París",
+    "latitud": 48.852,
+    "longitud": 2.348,
+    "mes": 11,
+    "radiacion_media": 37.44,
+    "temp_media": 7.94
+  },
+  {
+    "id": 708,
+    "nombre_emplazamiento": "París",
+    "latitud": 48.852,
+    "longitud": 2.348,
+    "mes": 12,
+    "radiacion_media": 27.76,
+    "temp_media": 4.89
+  },
+  {
+    "id": 709,
+    "nombre_emplazamiento": "Lyon",
+    "latitud": 45.75,
+    "longitud": 4.846,
+    "mes": 1,
+    "radiacion_media": 40.19,
+    "temp_media": 3.34
+  },
+  {
+    "id": 710,
+    "nombre_emplazamiento": "Lyon",
+    "latitud": 45.75,
+    "longitud": 4.846,
+    "mes": 2,
+    "radiacion_media": 60.07,
+    "temp_media": 3.96
+  },
+  {
+    "id": 711,
+    "nombre_emplazamiento": "Lyon",
+    "latitud": 45.75,
+    "longitud": 4.846,
+    "mes": 3,
+    "radiacion_media": 109.41,
+    "temp_media": 7.53
+  },
+  {
+    "id": 712,
+    "nombre_emplazamiento": "Lyon",
+    "latitud": 45.75,
+    "longitud": 4.846,
+    "mes": 4,
+    "radiacion_media": 146.71,
+    "temp_media": 11.86
+  },
+  {
+    "id": 713,
+    "nombre_emplazamiento": "Lyon",
+    "latitud": 45.75,
+    "longitud": 4.846,
+    "mes": 5,
+    "radiacion_media": 168.82,
+    "temp_media": 15.32
+  },
+  {
+    "id": 714,
+    "nombre_emplazamiento": "Lyon",
+    "latitud": 45.75,
+    "longitud": 4.846,
+    "mes": 6,
+    "radiacion_media": 191.76,
+    "temp_media": 19.64
+  },
+  {
+    "id": 715,
+    "nombre_emplazamiento": "Lyon",
+    "latitud": 45.75,
+    "longitud": 4.846,
+    "mes": 7,
+    "radiacion_media": 199.74,
+    "temp_media": 22.01
+  },
+  {
+    "id": 716,
+    "nombre_emplazamiento": "Lyon",
+    "latitud": 45.75,
+    "longitud": 4.846,
+    "mes": 8,
+    "radiacion_media": 171.65,
+    "temp_media": 20.95
+  },
+  {
+    "id": 717,
+    "nombre_emplazamiento": "Lyon",
+    "latitud": 45.75,
+    "longitud": 4.846,
+    "mes": 9,
+    "radiacion_media": 128.4,
+    "temp_media": 17.43
+  },
+  {
+    "id": 718,
+    "nombre_emplazamiento": "Lyon",
+    "latitud": 45.75,
+    "longitud": 4.846,
+    "mes": 10,
+    "radiacion_media": 79.92,
+    "temp_media": 12.88
+  },
+  {
+    "id": 719,
+    "nombre_emplazamiento": "Lyon",
+    "latitud": 45.75,
+    "longitud": 4.846,
+    "mes": 11,
+    "radiacion_media": 45.48,
+    "temp_media": 7.46
+  },
+  {
+    "id": 720,
+    "nombre_emplazamiento": "Lyon",
+    "latitud": 45.75,
+    "longitud": 4.846,
+    "mes": 12,
+    "radiacion_media": 34.37,
+    "temp_media": 4.07
+  },
+  {
+    "id": 721,
+    "nombre_emplazamiento": "Marsella",
+    "latitud": 43.3,
+    "longitud": 5.378,
+    "mes": 1,
+    "radiacion_media": 58.63,
+    "temp_media": 9.02
+  },
+  {
+    "id": 722,
+    "nombre_emplazamiento": "Marsella",
+    "latitud": 43.3,
+    "longitud": 5.378,
+    "mes": 2,
+    "radiacion_media": 81.17,
+    "temp_media": 9.03
+  },
+  {
+    "id": 723,
+    "nombre_emplazamiento": "Marsella",
+    "latitud": 43.3,
+    "longitud": 5.378,
+    "mes": 3,
+    "radiacion_media": 131.92,
+    "temp_media": 11.54
+  },
+  {
+    "id": 724,
+    "nombre_emplazamiento": "Marsella",
+    "latitud": 43.3,
+    "longitud": 5.378,
+    "mes": 4,
+    "radiacion_media": 167.72,
+    "temp_media": 14.4
+  },
+  {
+    "id": 725,
+    "nombre_emplazamiento": "Marsella",
+    "latitud": 43.3,
+    "longitud": 5.378,
+    "mes": 5,
+    "radiacion_media": 205.9,
+    "temp_media": 17.54
+  },
+  {
+    "id": 726,
+    "nombre_emplazamiento": "Marsella",
+    "latitud": 43.3,
+    "longitud": 5.378,
+    "mes": 6,
+    "radiacion_media": 226.53,
+    "temp_media": 21.41
+  },
+  {
+    "id": 727,
+    "nombre_emplazamiento": "Marsella",
+    "latitud": 43.3,
+    "longitud": 5.378,
+    "mes": 7,
+    "radiacion_media": 235.94,
+    "temp_media": 23.83
+  },
+  {
+    "id": 728,
+    "nombre_emplazamiento": "Marsella",
+    "latitud": 43.3,
+    "longitud": 5.378,
+    "mes": 8,
+    "radiacion_media": 203.63,
+    "temp_media": 23.44
+  },
+  {
+    "id": 729,
+    "nombre_emplazamiento": "Marsella",
+    "latitud": 43.3,
+    "longitud": 5.378,
+    "mes": 9,
+    "radiacion_media": 149.32,
+    "temp_media": 20.66
+  },
+  {
+    "id": 730,
+    "nombre_emplazamiento": "Marsella",
+    "latitud": 43.3,
+    "longitud": 5.378,
+    "mes": 10,
+    "radiacion_media": 101.44,
+    "temp_media": 17.21
+  },
+  {
+    "id": 731,
+    "nombre_emplazamiento": "Marsella",
+    "latitud": 43.3,
+    "longitud": 5.378,
+    "mes": 11,
+    "radiacion_media": 63.04,
+    "temp_media": 12.99
+  },
+  {
+    "id": 732,
+    "nombre_emplazamiento": "Marsella",
+    "latitud": 43.3,
+    "longitud": 5.378,
+    "mes": 12,
+    "radiacion_media": 51.64,
+    "temp_media": 10.01
+  },
+  {
+    "id": 733,
+    "nombre_emplazamiento": "Bruselas",
+    "latitud": 50.849,
+    "longitud": 4.351,
+    "mes": 1,
+    "radiacion_media": 24.72,
+    "temp_media": 3.54
+  },
+  {
+    "id": 734,
+    "nombre_emplazamiento": "Bruselas",
+    "latitud": 50.849,
+    "longitud": 4.351,
+    "mes": 2,
+    "radiacion_media": 39.57,
+    "temp_media": 3.82
+  },
+  {
+    "id": 735,
+    "nombre_emplazamiento": "Bruselas",
+    "latitud": 50.849,
+    "longitud": 4.351,
+    "mes": 3,
+    "radiacion_media": 82.32,
+    "temp_media": 6.38
+  },
+  {
+    "id": 736,
+    "nombre_emplazamiento": "Bruselas",
+    "latitud": 50.849,
+    "longitud": 4.351,
+    "mes": 4,
+    "radiacion_media": 128.57,
+    "temp_media": 10.29
+  },
+  {
+    "id": 737,
+    "nombre_emplazamiento": "Bruselas",
+    "latitud": 50.849,
+    "longitud": 4.351,
+    "mes": 5,
+    "radiacion_media": 153.96,
+    "temp_media": 13.64
+  },
+  {
+    "id": 738,
+    "nombre_emplazamiento": "Bruselas",
+    "latitud": 50.849,
+    "longitud": 4.351,
+    "mes": 6,
+    "radiacion_media": 162.04,
+    "temp_media": 16.83
+  },
+  {
+    "id": 739,
+    "nombre_emplazamiento": "Bruselas",
+    "latitud": 50.849,
+    "longitud": 4.351,
+    "mes": 7,
+    "radiacion_media": 162.85,
+    "temp_media": 18.74
+  },
+  {
+    "id": 740,
+    "nombre_emplazamiento": "Bruselas",
+    "latitud": 50.849,
+    "longitud": 4.351,
+    "mes": 8,
+    "radiacion_media": 134.12,
+    "temp_media": 17.91
+  },
+  {
+    "id": 741,
+    "nombre_emplazamiento": "Bruselas",
+    "latitud": 50.849,
+    "longitud": 4.351,
+    "mes": 9,
+    "radiacion_media": 100.5,
+    "temp_media": 15.29
+  },
+  {
+    "id": 742,
+    "nombre_emplazamiento": "Bruselas",
+    "latitud": 50.849,
+    "longitud": 4.351,
+    "mes": 10,
+    "radiacion_media": 59.98,
+    "temp_media": 11.85
+  },
+  {
+    "id": 743,
+    "nombre_emplazamiento": "Bruselas",
+    "latitud": 50.849,
+    "longitud": 4.351,
+    "mes": 11,
+    "radiacion_media": 30.18,
+    "temp_media": 7.3
+  },
+  {
+    "id": 744,
+    "nombre_emplazamiento": "Bruselas",
+    "latitud": 50.849,
+    "longitud": 4.351,
+    "mes": 12,
+    "radiacion_media": 20.47,
+    "temp_media": 4.43
+  },
+  {
+    "id": 745,
+    "nombre_emplazamiento": "Ámsterdam",
+    "latitud": 52.368,
+    "longitud": 4.896,
+    "mes": 1,
+    "radiacion_media": 21.84,
+    "temp_media": 3.93
+  },
+  {
+    "id": 746,
+    "nombre_emplazamiento": "Ámsterdam",
+    "latitud": 52.368,
+    "longitud": 4.896,
+    "mes": 2,
+    "radiacion_media": 37.94,
+    "temp_media": 3.85
+  },
+  {
+    "id": 747,
+    "nombre_emplazamiento": "Ámsterdam",
+    "latitud": 52.368,
+    "longitud": 4.896,
+    "mes": 3,
+    "radiacion_media": 81.5,
+    "temp_media": 6.14
+  },
+  {
+    "id": 748,
+    "nombre_emplazamiento": "Ámsterdam",
+    "latitud": 52.368,
+    "longitud": 4.896,
+    "mes": 4,
+    "radiacion_media": 131.34,
+    "temp_media": 9.92
+  },
+  {
+    "id": 749,
+    "nombre_emplazamiento": "Ámsterdam",
+    "latitud": 52.368,
+    "longitud": 4.896,
+    "mes": 5,
+    "radiacion_media": 159.02,
+    "temp_media": 13.26
+  },
+  {
+    "id": 750,
+    "nombre_emplazamiento": "Ámsterdam",
+    "latitud": 52.368,
+    "longitud": 4.896,
+    "mes": 6,
+    "radiacion_media": 163.92,
+    "temp_media": 16.2
+  },
+  {
+    "id": 751,
+    "nombre_emplazamiento": "Ámsterdam",
+    "latitud": 52.368,
+    "longitud": 4.896,
+    "mes": 7,
+    "radiacion_media": 164.41,
+    "temp_media": 18.21
+  },
+  {
+    "id": 752,
+    "nombre_emplazamiento": "Ámsterdam",
+    "latitud": 52.368,
+    "longitud": 4.896,
+    "mes": 8,
+    "radiacion_media": 134.97,
+    "temp_media": 17.69
+  },
+  {
+    "id": 753,
+    "nombre_emplazamiento": "Ámsterdam",
+    "latitud": 52.368,
+    "longitud": 4.896,
+    "mes": 9,
+    "radiacion_media": 94.62,
+    "temp_media": 15.29
+  },
+  {
+    "id": 754,
+    "nombre_emplazamiento": "Ámsterdam",
+    "latitud": 52.368,
+    "longitud": 4.896,
+    "mes": 10,
+    "radiacion_media": 55.13,
+    "temp_media": 11.84
+  },
+  {
+    "id": 755,
+    "nombre_emplazamiento": "Ámsterdam",
+    "latitud": 52.368,
+    "longitud": 4.896,
+    "mes": 11,
+    "radiacion_media": 26.48,
+    "temp_media": 7.62
+  },
+  {
+    "id": 756,
+    "nombre_emplazamiento": "Ámsterdam",
+    "latitud": 52.368,
+    "longitud": 4.896,
+    "mes": 12,
+    "radiacion_media": 17.02,
+    "temp_media": 5
+  },
+  {
+    "id": 757,
+    "nombre_emplazamiento": "Copenhague",
+    "latitud": 55.679,
+    "longitud": 12.569,
+    "mes": 1,
+    "radiacion_media": 14.93,
+    "temp_media": 1.36
+  },
+  {
+    "id": 758,
+    "nombre_emplazamiento": "Copenhague",
+    "latitud": 55.679,
+    "longitud": 12.569,
+    "mes": 2,
+    "radiacion_media": 30.75,
+    "temp_media": 1.19
+  },
+  {
+    "id": 759,
+    "nombre_emplazamiento": "Copenhague",
+    "latitud": 55.679,
+    "longitud": 12.569,
+    "mes": 3,
+    "radiacion_media": 76.05,
+    "temp_media": 3.31
+  },
+  {
+    "id": 760,
+    "nombre_emplazamiento": "Copenhague",
+    "latitud": 55.679,
+    "longitud": 12.569,
+    "mes": 4,
+    "radiacion_media": 128.86,
+    "temp_media": 7.72
+  },
+  {
+    "id": 761,
+    "nombre_emplazamiento": "Copenhague",
+    "latitud": 55.679,
+    "longitud": 12.569,
+    "mes": 5,
+    "radiacion_media": 167.47,
+    "temp_media": 12.21
+  },
+  {
+    "id": 762,
+    "nombre_emplazamiento": "Copenhague",
+    "latitud": 55.679,
+    "longitud": 12.569,
+    "mes": 6,
+    "radiacion_media": 177.04,
+    "temp_media": 15.71
+  },
+  {
+    "id": 763,
+    "nombre_emplazamiento": "Copenhague",
+    "latitud": 55.679,
+    "longitud": 12.569,
+    "mes": 7,
+    "radiacion_media": 171.39,
+    "temp_media": 17.96
+  },
+  {
+    "id": 764,
+    "nombre_emplazamiento": "Copenhague",
+    "latitud": 55.679,
+    "longitud": 12.569,
+    "mes": 8,
+    "radiacion_media": 138.3,
+    "temp_media": 17.15
+  },
+  {
+    "id": 765,
+    "nombre_emplazamiento": "Copenhague",
+    "latitud": 55.679,
+    "longitud": 12.569,
+    "mes": 9,
+    "radiacion_media": 92.46,
+    "temp_media": 13.96
+  },
+  {
+    "id": 766,
+    "nombre_emplazamiento": "Copenhague",
+    "latitud": 55.679,
+    "longitud": 12.569,
+    "mes": 10,
+    "radiacion_media": 48.71,
+    "temp_media": 9.76
+  },
+  {
+    "id": 767,
+    "nombre_emplazamiento": "Copenhague",
+    "latitud": 55.679,
+    "longitud": 12.569,
+    "mes": 11,
+    "radiacion_media": 18.68,
+    "temp_media": 5.86
+  },
+  {
+    "id": 768,
+    "nombre_emplazamiento": "Copenhague",
+    "latitud": 55.679,
+    "longitud": 12.569,
+    "mes": 12,
+    "radiacion_media": 10.35,
+    "temp_media": 3.17
+  },
+  {
+    "id": 769,
+    "nombre_emplazamiento": "Estocolmo",
+    "latitud": 59.333,
+    "longitud": 18.067,
+    "mes": 1,
+    "radiacion_media": 8.81,
+    "temp_media": -1.4
+  },
+  {
+    "id": 770,
+    "nombre_emplazamiento": "Estocolmo",
+    "latitud": 59.333,
+    "longitud": 18.067,
+    "mes": 2,
+    "radiacion_media": 24.46,
+    "temp_media": -1.43
+  },
+  {
+    "id": 771,
+    "nombre_emplazamiento": "Estocolmo",
+    "latitud": 59.333,
+    "longitud": 18.067,
+    "mes": 3,
+    "radiacion_media": 70.06,
+    "temp_media": 0.67
+  },
+  {
+    "id": 772,
+    "nombre_emplazamiento": "Estocolmo",
+    "latitud": 59.333,
+    "longitud": 18.067,
+    "mes": 4,
+    "radiacion_media": 119.55,
+    "temp_media": 5.7
+  },
+  {
+    "id": 773,
+    "nombre_emplazamiento": "Estocolmo",
+    "latitud": 59.333,
+    "longitud": 18.067,
+    "mes": 5,
+    "radiacion_media": 160.15,
+    "temp_media": 10.77
+  },
+  {
+    "id": 774,
+    "nombre_emplazamiento": "Estocolmo",
+    "latitud": 59.333,
+    "longitud": 18.067,
+    "mes": 6,
+    "radiacion_media": 175.01,
+    "temp_media": 15.09
+  },
+  {
+    "id": 775,
+    "nombre_emplazamiento": "Estocolmo",
+    "latitud": 59.333,
+    "longitud": 18.067,
+    "mes": 7,
+    "radiacion_media": 169.27,
+    "temp_media": 17.97
+  },
+  {
+    "id": 776,
+    "nombre_emplazamiento": "Estocolmo",
+    "latitud": 59.333,
+    "longitud": 18.067,
+    "mes": 8,
+    "radiacion_media": 130.63,
+    "temp_media": 16.93
+  },
+  {
+    "id": 777,
+    "nombre_emplazamiento": "Estocolmo",
+    "latitud": 59.333,
+    "longitud": 18.067,
+    "mes": 9,
+    "radiacion_media": 82.36,
+    "temp_media": 12.97
+  },
+  {
+    "id": 778,
+    "nombre_emplazamiento": "Estocolmo",
+    "latitud": 59.333,
+    "longitud": 18.067,
+    "mes": 10,
+    "radiacion_media": 38.78,
+    "temp_media": 7.63
+  },
+  {
+    "id": 779,
+    "nombre_emplazamiento": "Estocolmo",
+    "latitud": 59.333,
+    "longitud": 18.067,
+    "mes": 11,
+    "radiacion_media": 12.29,
+    "temp_media": 3.7
+  },
+  {
+    "id": 780,
+    "nombre_emplazamiento": "Estocolmo",
+    "latitud": 59.333,
+    "longitud": 18.067,
+    "mes": 12,
+    "radiacion_media": 5.37,
+    "temp_media": 0.67
+  },
+  {
+    "id": 781,
+    "nombre_emplazamiento": "Bergen",
+    "latitud": 60.395,
+    "longitud": 5.321,
+    "mes": 1,
+    "radiacion_media": 4.82,
+    "temp_media": -0.93
+  },
+  {
+    "id": 782,
+    "nombre_emplazamiento": "Bergen",
+    "latitud": 60.395,
+    "longitud": 5.321,
+    "mes": 2,
+    "radiacion_media": 19.52,
+    "temp_media": -0.79
+  },
+  {
+    "id": 783,
+    "nombre_emplazamiento": "Bergen",
+    "latitud": 60.395,
+    "longitud": 5.321,
+    "mes": 3,
+    "radiacion_media": 54.95,
+    "temp_media": 1.26
+  },
+  {
+    "id": 784,
+    "nombre_emplazamiento": "Bergen",
+    "latitud": 60.395,
+    "longitud": 5.321,
+    "mes": 4,
+    "radiacion_media": 98.84,
+    "temp_media": 5.04
+  },
+  {
+    "id": 785,
+    "nombre_emplazamiento": "Bergen",
+    "latitud": 60.395,
+    "longitud": 5.321,
+    "mes": 5,
+    "radiacion_media": 143.21,
+    "temp_media": 8.83
+  },
+  {
+    "id": 786,
+    "nombre_emplazamiento": "Bergen",
+    "latitud": 60.395,
+    "longitud": 5.321,
+    "mes": 6,
+    "radiacion_media": 150.23,
+    "temp_media": 12.19
+  },
+  {
+    "id": 787,
+    "nombre_emplazamiento": "Bergen",
+    "latitud": 60.395,
+    "longitud": 5.321,
+    "mes": 7,
+    "radiacion_media": 136.61,
+    "temp_media": 14.25
+  },
+  {
+    "id": 788,
+    "nombre_emplazamiento": "Bergen",
+    "latitud": 60.395,
+    "longitud": 5.321,
+    "mes": 8,
+    "radiacion_media": 103.1,
+    "temp_media": 13.46
+  },
+  {
+    "id": 789,
+    "nombre_emplazamiento": "Bergen",
+    "latitud": 60.395,
+    "longitud": 5.321,
+    "mes": 9,
+    "radiacion_media": 60.32,
+    "temp_media": 10.74
+  },
+  {
+    "id": 790,
+    "nombre_emplazamiento": "Bergen",
+    "latitud": 60.395,
+    "longitud": 5.321,
+    "mes": 10,
+    "radiacion_media": 31.13,
+    "temp_media": 6.53
+  },
+  {
+    "id": 791,
+    "nombre_emplazamiento": "Bergen",
+    "latitud": 60.395,
+    "longitud": 5.321,
+    "mes": 11,
+    "radiacion_media": 8.34,
+    "temp_media": 2.48
+  },
+  {
+    "id": 792,
+    "nombre_emplazamiento": "Bergen",
+    "latitud": 60.395,
+    "longitud": 5.321,
+    "mes": 12,
+    "radiacion_media": 2.75,
+    "temp_media": 0.09
+  },
+  {
+    "id": 793,
+    "nombre_emplazamiento": "Reikiavik",
+    "latitud": 64.135,
+    "longitud": -21.901,
+    "mes": 1,
+    "radiacion_media": 1.6,
+    "temp_media": -0.82
+  },
+  {
+    "id": 794,
+    "nombre_emplazamiento": "Reikiavik",
+    "latitud": 64.135,
+    "longitud": -21.901,
+    "mes": 2,
+    "radiacion_media": 11.53,
+    "temp_media": -0.23
+  },
+  {
+    "id": 795,
+    "nombre_emplazamiento": "Reikiavik",
+    "latitud": 64.135,
+    "longitud": -21.901,
+    "mes": 3,
+    "radiacion_media": 42.65,
+    "temp_media": 0.64
+  },
+  {
+    "id": 796,
+    "nombre_emplazamiento": "Reikiavik",
+    "latitud": 64.135,
+    "longitud": -21.901,
+    "mes": 4,
+    "radiacion_media": 86.26,
+    "temp_media": 3.42
+  },
+  {
+    "id": 797,
+    "nombre_emplazamiento": "Reikiavik",
+    "latitud": 64.135,
+    "longitud": -21.901,
+    "mes": 5,
+    "radiacion_media": 133.87,
+    "temp_media": 6.64
+  },
+  {
+    "id": 798,
+    "nombre_emplazamiento": "Reikiavik",
+    "latitud": 64.135,
+    "longitud": -21.901,
+    "mes": 6,
+    "radiacion_media": 138.88,
+    "temp_media": 10.05
+  },
+  {
+    "id": 799,
+    "nombre_emplazamiento": "Reikiavik",
+    "latitud": 64.135,
+    "longitud": -21.901,
+    "mes": 7,
+    "radiacion_media": 135.13,
+    "temp_media": 11.84
+  },
+  {
+    "id": 800,
+    "nombre_emplazamiento": "Reikiavik",
+    "latitud": 64.135,
+    "longitud": -21.901,
+    "mes": 8,
+    "radiacion_media": 106.14,
+    "temp_media": 10.71
+  },
+  {
+    "id": 801,
+    "nombre_emplazamiento": "Reikiavik",
+    "latitud": 64.135,
+    "longitud": -21.901,
+    "mes": 9,
+    "radiacion_media": 57.18,
+    "temp_media": 7.8
+  },
+  {
+    "id": 802,
+    "nombre_emplazamiento": "Reikiavik",
+    "latitud": 64.135,
+    "longitud": -21.901,
+    "mes": 10,
+    "radiacion_media": 24.28,
+    "temp_media": 3.98
+  },
+  {
+    "id": 803,
+    "nombre_emplazamiento": "Reikiavik",
+    "latitud": 64.135,
+    "longitud": -21.901,
+    "mes": 11,
+    "radiacion_media": 4.36,
+    "temp_media": 1.25
+  },
+  {
+    "id": 804,
+    "nombre_emplazamiento": "Reikiavik",
+    "latitud": 64.135,
+    "longitud": -21.901,
+    "mes": 12,
+    "radiacion_media": 0.3,
+    "temp_media": -0.75
+  },
+  {
+    "id": 805,
+    "nombre_emplazamiento": "Helsinki",
+    "latitud": 60.169,
+    "longitud": 24.94,
+    "mes": 1,
+    "radiacion_media": 6.54,
+    "temp_media": -4.22
+  },
+  {
+    "id": 806,
+    "nombre_emplazamiento": "Helsinki",
+    "latitud": 60.169,
+    "longitud": 24.94,
+    "mes": 2,
+    "radiacion_media": 20.02,
+    "temp_media": -4.64
+  },
+  {
+    "id": 807,
+    "nombre_emplazamiento": "Helsinki",
+    "latitud": 60.169,
+    "longitud": 24.94,
+    "mes": 3,
+    "radiacion_media": 62.75,
+    "temp_media": -1.46
+  },
+  {
+    "id": 808,
+    "nombre_emplazamiento": "Helsinki",
+    "latitud": 60.169,
+    "longitud": 24.94,
+    "mes": 4,
+    "radiacion_media": 110.82,
+    "temp_media": 4.54
+  },
+  {
+    "id": 809,
+    "nombre_emplazamiento": "Helsinki",
+    "latitud": 60.169,
+    "longitud": 24.94,
+    "mes": 5,
+    "radiacion_media": 165.61,
+    "temp_media": 10.94
+  },
+  {
+    "id": 810,
+    "nombre_emplazamiento": "Helsinki",
+    "latitud": 60.169,
+    "longitud": 24.94,
+    "mes": 6,
+    "radiacion_media": 172.82,
+    "temp_media": 15.14
+  },
+  {
+    "id": 811,
+    "nombre_emplazamiento": "Helsinki",
+    "latitud": 60.169,
+    "longitud": 24.94,
+    "mes": 7,
+    "radiacion_media": 173.67,
+    "temp_media": 18.04
+  },
+  {
+    "id": 812,
+    "nombre_emplazamiento": "Helsinki",
+    "latitud": 60.169,
+    "longitud": 24.94,
+    "mes": 8,
+    "radiacion_media": 131.04,
+    "temp_media": 16.51
+  },
+  {
+    "id": 813,
+    "nombre_emplazamiento": "Helsinki",
+    "latitud": 60.169,
+    "longitud": 24.94,
+    "mes": 9,
+    "radiacion_media": 74.54,
+    "temp_media": 12.04
+  },
+  {
+    "id": 814,
+    "nombre_emplazamiento": "Helsinki",
+    "latitud": 60.169,
+    "longitud": 24.94,
+    "mes": 10,
+    "radiacion_media": 33.38,
+    "temp_media": 6.25
+  },
+  {
+    "id": 815,
+    "nombre_emplazamiento": "Helsinki",
+    "latitud": 60.169,
+    "longitud": 24.94,
+    "mes": 11,
+    "radiacion_media": 9.11,
+    "temp_media": 2.41
+  },
+  {
+    "id": 816,
+    "nombre_emplazamiento": "Helsinki",
+    "latitud": 60.169,
+    "longitud": 24.94,
+    "mes": 12,
+    "radiacion_media": 3.78,
+    "temp_media": -0.72
+  },
+  {
+    "id": 817,
+    "nombre_emplazamiento": "Londres",
+    "latitud": 51.505,
+    "longitud": -0.122,
+    "mes": 1,
+    "radiacion_media": 25.15,
+    "temp_media": 4.8
+  },
+  {
+    "id": 818,
+    "nombre_emplazamiento": "Londres",
+    "latitud": 51.505,
+    "longitud": -0.122,
+    "mes": 2,
+    "radiacion_media": 40.06,
+    "temp_media": 4.79
+  },
+  {
+    "id": 819,
+    "nombre_emplazamiento": "Londres",
+    "latitud": 51.505,
+    "longitud": -0.122,
+    "mes": 3,
+    "radiacion_media": 80.3,
+    "temp_media": 6.61
+  },
+  {
+    "id": 820,
+    "nombre_emplazamiento": "Londres",
+    "latitud": 51.505,
+    "longitud": -0.122,
+    "mes": 4,
+    "radiacion_media": 124.04,
+    "temp_media": 9.7
+  },
+  {
+    "id": 821,
+    "nombre_emplazamiento": "Londres",
+    "latitud": 51.505,
+    "longitud": -0.122,
+    "mes": 5,
+    "radiacion_media": 148.93,
+    "temp_media": 12.84
+  },
+  {
+    "id": 822,
+    "nombre_emplazamiento": "Londres",
+    "latitud": 51.505,
+    "longitud": -0.122,
+    "mes": 6,
+    "radiacion_media": 158.56,
+    "temp_media": 15.89
+  },
+  {
+    "id": 823,
+    "nombre_emplazamiento": "Londres",
+    "latitud": 51.505,
+    "longitud": -0.122,
+    "mes": 7,
+    "radiacion_media": 161,
+    "temp_media": 17.94
+  },
+  {
+    "id": 824,
+    "nombre_emplazamiento": "Londres",
+    "latitud": 51.505,
+    "longitud": -0.122,
+    "mes": 8,
+    "radiacion_media": 130.94,
+    "temp_media": 17.12
+  },
+  {
+    "id": 825,
+    "nombre_emplazamiento": "Londres",
+    "latitud": 51.505,
+    "longitud": -0.122,
+    "mes": 9,
+    "radiacion_media": 97.38,
+    "temp_media": 14.96
+  },
+  {
+    "id": 826,
+    "nombre_emplazamiento": "Londres",
+    "latitud": 51.505,
+    "longitud": -0.122,
+    "mes": 10,
+    "radiacion_media": 57,
+    "temp_media": 11.82
+  },
+  {
+    "id": 827,
+    "nombre_emplazamiento": "Londres",
+    "latitud": 51.505,
+    "longitud": -0.122,
+    "mes": 11,
+    "radiacion_media": 31.41,
+    "temp_media": 7.6
+  },
+  {
+    "id": 828,
+    "nombre_emplazamiento": "Londres",
+    "latitud": 51.505,
+    "longitud": -0.122,
+    "mes": 12,
+    "radiacion_media": 21.07,
+    "temp_media": 5.41
+  },
+  {
+    "id": 829,
+    "nombre_emplazamiento": "Edimburgo",
+    "latitud": 55.952,
+    "longitud": -3.197,
+    "mes": 1,
+    "radiacion_media": 13.38,
+    "temp_media": 3.36
+  },
+  {
+    "id": 830,
+    "nombre_emplazamiento": "Edimburgo",
+    "latitud": 55.952,
+    "longitud": -3.197,
+    "mes": 2,
+    "radiacion_media": 32.48,
+    "temp_media": 3.41
+  },
+  {
+    "id": 831,
+    "nombre_emplazamiento": "Edimburgo",
+    "latitud": 55.952,
+    "longitud": -3.197,
+    "mes": 3,
+    "radiacion_media": 68.51,
+    "temp_media": 4.69
+  },
+  {
+    "id": 832,
+    "nombre_emplazamiento": "Edimburgo",
+    "latitud": 55.952,
+    "longitud": -3.197,
+    "mes": 4,
+    "radiacion_media": 111.47,
+    "temp_media": 7
+  },
+  {
+    "id": 833,
+    "nombre_emplazamiento": "Edimburgo",
+    "latitud": 55.952,
+    "longitud": -3.197,
+    "mes": 5,
+    "radiacion_media": 144.92,
+    "temp_media": 9.75
+  },
+  {
+    "id": 834,
+    "nombre_emplazamiento": "Edimburgo",
+    "latitud": 55.952,
+    "longitud": -3.197,
+    "mes": 6,
+    "radiacion_media": 138.6,
+    "temp_media": 12.56
+  },
+  {
+    "id": 835,
+    "nombre_emplazamiento": "Edimburgo",
+    "latitud": 55.952,
+    "longitud": -3.197,
+    "mes": 7,
+    "radiacion_media": 141.61,
+    "temp_media": 14.31
+  },
+  {
+    "id": 836,
+    "nombre_emplazamiento": "Edimburgo",
+    "latitud": 55.952,
+    "longitud": -3.197,
+    "mes": 8,
+    "radiacion_media": 116.96,
+    "temp_media": 13.67
+  },
+  {
+    "id": 837,
+    "nombre_emplazamiento": "Edimburgo",
+    "latitud": 55.952,
+    "longitud": -3.197,
+    "mes": 9,
+    "radiacion_media": 81.84,
+    "temp_media": 11.95
+  },
+  {
+    "id": 838,
+    "nombre_emplazamiento": "Edimburgo",
+    "latitud": 55.952,
+    "longitud": -3.197,
+    "mes": 10,
+    "radiacion_media": 45,
+    "temp_media": 9.17
+  },
+  {
+    "id": 839,
+    "nombre_emplazamiento": "Edimburgo",
+    "latitud": 55.952,
+    "longitud": -3.197,
+    "mes": 11,
+    "radiacion_media": 20.8,
+    "temp_media": 5.55
+  },
+  {
+    "id": 840,
+    "nombre_emplazamiento": "Edimburgo",
+    "latitud": 55.952,
+    "longitud": -3.197,
+    "mes": 12,
+    "radiacion_media": 7.8,
+    "temp_media": 3.66
+  },
+  {
+    "id": 841,
+    "nombre_emplazamiento": "Dublín",
+    "latitud": 53.344,
+    "longitud": -6.275,
+    "mes": 1,
+    "radiacion_media": 21.88,
+    "temp_media": 4.74
+  },
+  {
+    "id": 842,
+    "nombre_emplazamiento": "Dublín",
+    "latitud": 53.344,
+    "longitud": -6.275,
+    "mes": 2,
+    "radiacion_media": 38.2,
+    "temp_media": 4.69
+  },
+  {
+    "id": 843,
+    "nombre_emplazamiento": "Dublín",
+    "latitud": 53.344,
+    "longitud": -6.275,
+    "mes": 3,
+    "radiacion_media": 77.02,
+    "temp_media": 5.82
+  },
+  {
+    "id": 844,
+    "nombre_emplazamiento": "Dublín",
+    "latitud": 53.344,
+    "longitud": -6.275,
+    "mes": 4,
+    "radiacion_media": 115.28,
+    "temp_media": 8.12
+  },
+  {
+    "id": 845,
+    "nombre_emplazamiento": "Dublín",
+    "latitud": 53.344,
+    "longitud": -6.275,
+    "mes": 5,
+    "radiacion_media": 147.93,
+    "temp_media": 10.89
+  },
+  {
+    "id": 846,
+    "nombre_emplazamiento": "Dublín",
+    "latitud": 53.344,
+    "longitud": -6.275,
+    "mes": 6,
+    "radiacion_media": 150.41,
+    "temp_media": 13.69
+  },
+  {
+    "id": 847,
+    "nombre_emplazamiento": "Dublín",
+    "latitud": 53.344,
+    "longitud": -6.275,
+    "mes": 7,
+    "radiacion_media": 144.42,
+    "temp_media": 15.24
+  },
+  {
+    "id": 848,
+    "nombre_emplazamiento": "Dublín",
+    "latitud": 53.344,
+    "longitud": -6.275,
+    "mes": 8,
+    "radiacion_media": 120.94,
+    "temp_media": 14.62
+  },
+  {
+    "id": 849,
+    "nombre_emplazamiento": "Dublín",
+    "latitud": 53.344,
+    "longitud": -6.275,
+    "mes": 9,
+    "radiacion_media": 88.7,
+    "temp_media": 12.93
+  },
+  {
+    "id": 850,
+    "nombre_emplazamiento": "Dublín",
+    "latitud": 53.344,
+    "longitud": -6.275,
+    "mes": 10,
+    "radiacion_media": 51.61,
+    "temp_media": 10.35
+  },
+  {
+    "id": 851,
+    "nombre_emplazamiento": "Dublín",
+    "latitud": 53.344,
+    "longitud": -6.275,
+    "mes": 11,
+    "radiacion_media": 27.9,
+    "temp_media": 6.83
+  },
+  {
+    "id": 852,
+    "nombre_emplazamiento": "Dublín",
+    "latitud": 53.344,
+    "longitud": -6.275,
+    "mes": 12,
+    "radiacion_media": 17.96,
+    "temp_media": 5.11
+  },
+  {
+    "id": 853,
+    "nombre_emplazamiento": "Casablanca",
+    "latitud": 33.565,
+    "longitud": -7.632,
+    "mes": 1,
+    "radiacion_media": 98.23,
+    "temp_media": 12.26
+  },
+  {
+    "id": 854,
+    "nombre_emplazamiento": "Casablanca",
+    "latitud": 33.565,
+    "longitud": -7.632,
+    "mes": 2,
+    "radiacion_media": 113.8,
+    "temp_media": 12.99
+  },
+  {
+    "id": 855,
+    "nombre_emplazamiento": "Casablanca",
+    "latitud": 33.565,
+    "longitud": -7.632,
+    "mes": 3,
+    "radiacion_media": 160.03,
+    "temp_media": 14.94
+  },
+  {
+    "id": 856,
+    "nombre_emplazamiento": "Casablanca",
+    "latitud": 33.565,
+    "longitud": -7.632,
+    "mes": 4,
+    "radiacion_media": 191.31,
+    "temp_media": 16.76
+  },
+  {
+    "id": 857,
+    "nombre_emplazamiento": "Casablanca",
+    "latitud": 33.565,
+    "longitud": -7.632,
+    "mes": 5,
+    "radiacion_media": 217.52,
+    "temp_media": 19.7
+  },
+  {
+    "id": 858,
+    "nombre_emplazamiento": "Casablanca",
+    "latitud": 33.565,
+    "longitud": -7.632,
+    "mes": 6,
+    "radiacion_media": 224.73,
+    "temp_media": 21.89
+  },
+  {
+    "id": 859,
+    "nombre_emplazamiento": "Casablanca",
+    "latitud": 33.565,
+    "longitud": -7.632,
+    "mes": 7,
+    "radiacion_media": 234.31,
+    "temp_media": 23.53
+  },
+  {
+    "id": 860,
+    "nombre_emplazamiento": "Casablanca",
+    "latitud": 33.565,
+    "longitud": -7.632,
+    "mes": 8,
+    "radiacion_media": 216.69,
+    "temp_media": 24.1
+  },
+  {
+    "id": 861,
+    "nombre_emplazamiento": "Casablanca",
+    "latitud": 33.565,
+    "longitud": -7.632,
+    "mes": 9,
+    "radiacion_media": 174.68,
+    "temp_media": 22.44
+  },
+  {
+    "id": 862,
+    "nombre_emplazamiento": "Casablanca",
+    "latitud": 33.565,
+    "longitud": -7.632,
+    "mes": 10,
+    "radiacion_media": 140.33,
+    "temp_media": 20.29
+  },
+  {
+    "id": 863,
+    "nombre_emplazamiento": "Casablanca",
+    "latitud": 33.565,
+    "longitud": -7.632,
+    "mes": 11,
+    "radiacion_media": 100.49,
+    "temp_media": 16.03
+  },
+  {
+    "id": 864,
+    "nombre_emplazamiento": "Casablanca",
+    "latitud": 33.565,
+    "longitud": -7.632,
+    "mes": 12,
+    "radiacion_media": 92.8,
+    "temp_media": 13.45
+  },
+  {
+    "id": 865,
+    "nombre_emplazamiento": "Dakar",
+    "latitud": 14.717,
+    "longitud": -17.44,
+    "mes": 1,
+    "radiacion_media": 163.19,
+    "temp_media": 21.63
+  },
+  {
+    "id": 866,
+    "nombre_emplazamiento": "Dakar",
+    "latitud": 14.717,
+    "longitud": -17.44,
+    "mes": 2,
+    "radiacion_media": 171.5,
+    "temp_media": 20.54
+  },
+  {
+    "id": 867,
+    "nombre_emplazamiento": "Dakar",
+    "latitud": 14.717,
+    "longitud": -17.44,
+    "mes": 3,
+    "radiacion_media": 214.01,
+    "temp_media": 20.59
+  },
+  {
+    "id": 868,
+    "nombre_emplazamiento": "Dakar",
+    "latitud": 14.717,
+    "longitud": -17.44,
+    "mes": 4,
+    "radiacion_media": 220.04,
+    "temp_media": 20.79
+  },
+  {
+    "id": 869,
+    "nombre_emplazamiento": "Dakar",
+    "latitud": 14.717,
+    "longitud": -17.44,
+    "mes": 5,
+    "radiacion_media": 220.26,
+    "temp_media": 22.23
+  },
+  {
+    "id": 870,
+    "nombre_emplazamiento": "Dakar",
+    "latitud": 14.717,
+    "longitud": -17.44,
+    "mes": 6,
+    "radiacion_media": 199.79,
+    "temp_media": 24.51
+  },
+  {
+    "id": 871,
+    "nombre_emplazamiento": "Dakar",
+    "latitud": 14.717,
+    "longitud": -17.44,
+    "mes": 7,
+    "radiacion_media": 187.31,
+    "temp_media": 26.32
+  },
+  {
+    "id": 872,
+    "nombre_emplazamiento": "Dakar",
+    "latitud": 14.717,
+    "longitud": -17.44,
+    "mes": 8,
+    "radiacion_media": 174.1,
+    "temp_media": 27.01
+  },
+  {
+    "id": 873,
+    "nombre_emplazamiento": "Dakar",
+    "latitud": 14.717,
+    "longitud": -17.44,
+    "mes": 9,
+    "radiacion_media": 166.8,
+    "temp_media": 27.52
+  },
+  {
+    "id": 874,
+    "nombre_emplazamiento": "Dakar",
+    "latitud": 14.717,
+    "longitud": -17.44,
+    "mes": 10,
+    "radiacion_media": 181.7,
+    "temp_media": 27.79
+  },
+  {
+    "id": 875,
+    "nombre_emplazamiento": "Dakar",
+    "latitud": 14.717,
+    "longitud": -17.44,
+    "mes": 11,
+    "radiacion_media": 162.25,
+    "temp_media": 26.31
+  },
+  {
+    "id": 876,
+    "nombre_emplazamiento": "Dakar",
+    "latitud": 14.717,
+    "longitud": -17.44,
+    "mes": 12,
+    "radiacion_media": 157.26,
+    "temp_media": 23.73
+  },
+  {
+    "id": 877,
+    "nombre_emplazamiento": "El Cairo",
+    "latitud": 30.052,
+    "longitud": 31.246,
+    "mes": 1,
+    "radiacion_media": 110.74,
+    "temp_media": 13.13
+  },
+  {
+    "id": 878,
+    "nombre_emplazamiento": "El Cairo",
+    "latitud": 30.052,
+    "longitud": 31.246,
+    "mes": 2,
+    "radiacion_media": 124.9,
+    "temp_media": 14.79
+  },
+  {
+    "id": 879,
+    "nombre_emplazamiento": "El Cairo",
+    "latitud": 30.052,
+    "longitud": 31.246,
+    "mes": 3,
+    "radiacion_media": 178.97,
+    "temp_media": 17.83
+  },
+  {
+    "id": 880,
+    "nombre_emplazamiento": "El Cairo",
+    "latitud": 30.052,
+    "longitud": 31.246,
+    "mes": 4,
+    "radiacion_media": 206.02,
+    "temp_media": 21.34
+  },
+  {
+    "id": 881,
+    "nombre_emplazamiento": "El Cairo",
+    "latitud": 30.052,
+    "longitud": 31.246,
+    "mes": 5,
+    "radiacion_media": 235.66,
+    "temp_media": 25.31
+  },
+  {
+    "id": 882,
+    "nombre_emplazamiento": "El Cairo",
+    "latitud": 30.052,
+    "longitud": 31.246,
+    "mes": 6,
+    "radiacion_media": 247.58,
+    "temp_media": 28.04
+  },
+  {
+    "id": 883,
+    "nombre_emplazamiento": "El Cairo",
+    "latitud": 30.052,
+    "longitud": 31.246,
+    "mes": 7,
+    "radiacion_media": 251.84,
+    "temp_media": 28.96
+  },
+  {
+    "id": 884,
+    "nombre_emplazamiento": "El Cairo",
+    "latitud": 30.052,
+    "longitud": 31.246,
+    "mes": 8,
+    "radiacion_media": 233.64,
+    "temp_media": 29.12
+  },
+  {
+    "id": 885,
+    "nombre_emplazamiento": "El Cairo",
+    "latitud": 30.052,
+    "longitud": 31.246,
+    "mes": 9,
+    "radiacion_media": 196.18,
+    "temp_media": 27.21
+  },
+  {
+    "id": 886,
+    "nombre_emplazamiento": "El Cairo",
+    "latitud": 30.052,
+    "longitud": 31.246,
+    "mes": 10,
+    "radiacion_media": 160.93,
+    "temp_media": 23.74
+  },
+  {
+    "id": 887,
+    "nombre_emplazamiento": "El Cairo",
+    "latitud": 30.052,
+    "longitud": 31.246,
+    "mes": 11,
+    "radiacion_media": 121.21,
+    "temp_media": 18.91
+  },
+  {
+    "id": 888,
+    "nombre_emplazamiento": "El Cairo",
+    "latitud": 30.052,
+    "longitud": 31.246,
+    "mes": 12,
+    "radiacion_media": 106.63,
+    "temp_media": 14.79
+  },
+  {
+    "id": 889,
+    "nombre_emplazamiento": "Nairobi",
+    "latitud": -1.272,
+    "longitud": 36.82,
+    "mes": 1,
+    "radiacion_media": 207.49,
+    "temp_media": 19.92
+  },
+  {
+    "id": 890,
+    "nombre_emplazamiento": "Nairobi",
+    "latitud": -1.272,
+    "longitud": 36.82,
+    "mes": 2,
+    "radiacion_media": 195.96,
+    "temp_media": 20.64
+  },
+  {
+    "id": 891,
+    "nombre_emplazamiento": "Nairobi",
+    "latitud": -1.272,
+    "longitud": 36.82,
+    "mes": 3,
+    "radiacion_media": 205.13,
+    "temp_media": 20.62
+  },
+  {
+    "id": 892,
+    "nombre_emplazamiento": "Nairobi",
+    "latitud": -1.272,
+    "longitud": 36.82,
+    "mes": 4,
+    "radiacion_media": 169.03,
+    "temp_media": 19.41
+  },
+  {
+    "id": 893,
+    "nombre_emplazamiento": "Nairobi",
+    "latitud": -1.272,
+    "longitud": 36.82,
+    "mes": 5,
+    "radiacion_media": 143.91,
+    "temp_media": 18.71
+  },
+  {
+    "id": 894,
+    "nombre_emplazamiento": "Nairobi",
+    "latitud": -1.272,
+    "longitud": 36.82,
+    "mes": 6,
+    "radiacion_media": 123.19,
+    "temp_media": 17.93
+  },
+  {
+    "id": 895,
+    "nombre_emplazamiento": "Nairobi",
+    "latitud": -1.272,
+    "longitud": 36.82,
+    "mes": 7,
+    "radiacion_media": 123.39,
+    "temp_media": 17.25
+  },
+  {
+    "id": 896,
+    "nombre_emplazamiento": "Nairobi",
+    "latitud": -1.272,
+    "longitud": 36.82,
+    "mes": 8,
+    "radiacion_media": 129.33,
+    "temp_media": 17.48
+  },
+  {
+    "id": 897,
+    "nombre_emplazamiento": "Nairobi",
+    "latitud": -1.272,
+    "longitud": 36.82,
+    "mes": 9,
+    "radiacion_media": 157.72,
+    "temp_media": 18.71
+  },
+  {
+    "id": 898,
+    "nombre_emplazamiento": "Nairobi",
+    "latitud": -1.272,
+    "longitud": 36.82,
+    "mes": 10,
+    "radiacion_media": 177.45,
+    "temp_media": 19.46
+  },
+  {
+    "id": 899,
+    "nombre_emplazamiento": "Nairobi",
+    "latitud": -1.272,
+    "longitud": 36.82,
+    "mes": 11,
+    "radiacion_media": 168.84,
+    "temp_media": 18.38
+  },
+  {
+    "id": 900,
+    "nombre_emplazamiento": "Nairobi",
+    "latitud": -1.272,
+    "longitud": 36.82,
+    "mes": 12,
+    "radiacion_media": 192.96,
+    "temp_media": 18.76
+  },
+  {
+    "id": 901,
+    "nombre_emplazamiento": "Kinsasa",
+    "latitud": -4.314,
+    "longitud": 15.309,
+    "mes": 1,
+    "radiacion_media": 161.81,
+    "temp_media": 25.94
+  },
+  {
+    "id": 902,
+    "nombre_emplazamiento": "Kinsasa",
+    "latitud": -4.314,
+    "longitud": 15.309,
+    "mes": 2,
+    "radiacion_media": 148.35,
+    "temp_media": 26.24
+  },
+  {
+    "id": 903,
+    "nombre_emplazamiento": "Kinsasa",
+    "latitud": -4.314,
+    "longitud": 15.309,
+    "mes": 3,
+    "radiacion_media": 169.11,
+    "temp_media": 26.52
+  },
+  {
+    "id": 904,
+    "nombre_emplazamiento": "Kinsasa",
+    "latitud": -4.314,
+    "longitud": 15.309,
+    "mes": 4,
+    "radiacion_media": 156.76,
+    "temp_media": 26.2
+  },
+  {
+    "id": 905,
+    "nombre_emplazamiento": "Kinsasa",
+    "latitud": -4.314,
+    "longitud": 15.309,
+    "mes": 5,
+    "radiacion_media": 140.31,
+    "temp_media": 25.94
+  },
+  {
+    "id": 906,
+    "nombre_emplazamiento": "Kinsasa",
+    "latitud": -4.314,
+    "longitud": 15.309,
+    "mes": 6,
+    "radiacion_media": 130.67,
+    "temp_media": 24.81
+  },
+  {
+    "id": 907,
+    "nombre_emplazamiento": "Kinsasa",
+    "latitud": -4.314,
+    "longitud": 15.309,
+    "mes": 7,
+    "radiacion_media": 147.85,
+    "temp_media": 24.33
+  },
+  {
+    "id": 908,
+    "nombre_emplazamiento": "Kinsasa",
+    "latitud": -4.314,
+    "longitud": 15.309,
+    "mes": 8,
+    "radiacion_media": 156.05,
+    "temp_media": 25.03
+  },
+  {
+    "id": 909,
+    "nombre_emplazamiento": "Kinsasa",
+    "latitud": -4.314,
+    "longitud": 15.309,
+    "mes": 9,
+    "radiacion_media": 153.91,
+    "temp_media": 26.24
+  },
+  {
+    "id": 910,
+    "nombre_emplazamiento": "Kinsasa",
+    "latitud": -4.314,
+    "longitud": 15.309,
+    "mes": 10,
+    "radiacion_media": 149.44,
+    "temp_media": 26.12
+  },
+  {
+    "id": 911,
+    "nombre_emplazamiento": "Kinsasa",
+    "latitud": -4.314,
+    "longitud": 15.309,
+    "mes": 11,
+    "radiacion_media": 150.28,
+    "temp_media": 25.49
+  },
+  {
+    "id": 912,
+    "nombre_emplazamiento": "Kinsasa",
+    "latitud": -4.314,
+    "longitud": 15.309,
+    "mes": 12,
+    "radiacion_media": 150.12,
+    "temp_media": 25.32
+  },
+  {
+    "id": 913,
+    "nombre_emplazamiento": "Pretoria",
+    "latitud": -25.748,
+    "longitud": 28.188,
+    "mes": 1,
+    "radiacion_media": 201.21,
+    "temp_media": 22.4
+  },
+  {
+    "id": 914,
+    "nombre_emplazamiento": "Pretoria",
+    "latitud": -25.748,
+    "longitud": 28.188,
+    "mes": 2,
+    "radiacion_media": 182.82,
+    "temp_media": 22.51
+  },
+  {
+    "id": 915,
+    "nombre_emplazamiento": "Pretoria",
+    "latitud": -25.748,
+    "longitud": 28.188,
+    "mes": 3,
+    "radiacion_media": 172.89,
+    "temp_media": 20.84
+  },
+  {
+    "id": 916,
+    "nombre_emplazamiento": "Pretoria",
+    "latitud": -25.748,
+    "longitud": 28.188,
+    "mes": 4,
+    "radiacion_media": 140.92,
+    "temp_media": 17.64
+  },
+  {
+    "id": 917,
+    "nombre_emplazamiento": "Pretoria",
+    "latitud": -25.748,
+    "longitud": 28.188,
+    "mes": 5,
+    "radiacion_media": 136.78,
+    "temp_media": 15.11
+  },
+  {
+    "id": 918,
+    "nombre_emplazamiento": "Pretoria",
+    "latitud": -25.748,
+    "longitud": 28.188,
+    "mes": 6,
+    "radiacion_media": 121.44,
+    "temp_media": 12.26
+  },
+  {
+    "id": 919,
+    "nombre_emplazamiento": "Pretoria",
+    "latitud": -25.748,
+    "longitud": 28.188,
+    "mes": 7,
+    "radiacion_media": 135.33,
+    "temp_media": 12.18
+  },
+  {
+    "id": 920,
+    "nombre_emplazamiento": "Pretoria",
+    "latitud": -25.748,
+    "longitud": 28.188,
+    "mes": 8,
+    "radiacion_media": 159,
+    "temp_media": 15.43
+  },
+  {
+    "id": 921,
+    "nombre_emplazamiento": "Pretoria",
+    "latitud": -25.748,
+    "longitud": 28.188,
+    "mes": 9,
+    "radiacion_media": 184.98,
+    "temp_media": 19.71
+  },
+  {
+    "id": 922,
+    "nombre_emplazamiento": "Pretoria",
+    "latitud": -25.748,
+    "longitud": 28.188,
+    "mes": 10,
+    "radiacion_media": 204.14,
+    "temp_media": 21.17
+  },
+  {
+    "id": 923,
+    "nombre_emplazamiento": "Pretoria",
+    "latitud": -25.748,
+    "longitud": 28.188,
+    "mes": 11,
+    "radiacion_media": 200.14,
+    "temp_media": 21.45
+  },
+  {
+    "id": 924,
+    "nombre_emplazamiento": "Pretoria",
+    "latitud": -25.748,
+    "longitud": 28.188,
+    "mes": 12,
+    "radiacion_media": 208.6,
+    "temp_media": 22.15
+  },
+  {
+    "id": 925,
+    "nombre_emplazamiento": "Ciudad del Cabo",
+    "latitud": -33.918,
+    "longitud": 18.423,
+    "mes": 1,
+    "radiacion_media": 250.82,
+    "temp_media": 21.44
+  },
+  {
+    "id": 926,
+    "nombre_emplazamiento": "Ciudad del Cabo",
+    "latitud": -33.918,
+    "longitud": 18.423,
+    "mes": 2,
+    "radiacion_media": 206.3,
+    "temp_media": 21.28
+  },
+  {
+    "id": 927,
+    "nombre_emplazamiento": "Ciudad del Cabo",
+    "latitud": -33.918,
+    "longitud": 18.423,
+    "mes": 3,
+    "radiacion_media": 181.78,
+    "temp_media": 19.84
+  },
+  {
+    "id": 928,
+    "nombre_emplazamiento": "Ciudad del Cabo",
+    "latitud": -33.918,
+    "longitud": 18.423,
+    "mes": 4,
+    "radiacion_media": 129.11,
+    "temp_media": 17.42
+  },
+  {
+    "id": 929,
+    "nombre_emplazamiento": "Ciudad del Cabo",
+    "latitud": -33.918,
+    "longitud": 18.423,
+    "mes": 5,
+    "radiacion_media": 88.94,
+    "temp_media": 14.99
+  },
+  {
+    "id": 930,
+    "nombre_emplazamiento": "Ciudad del Cabo",
+    "latitud": -33.918,
+    "longitud": 18.423,
+    "mes": 6,
+    "radiacion_media": 69.89,
+    "temp_media": 12.95
+  },
+  {
+    "id": 931,
+    "nombre_emplazamiento": "Ciudad del Cabo",
+    "latitud": -33.918,
+    "longitud": 18.423,
+    "mes": 7,
+    "radiacion_media": 82.59,
+    "temp_media": 12.49
+  },
+  {
+    "id": 932,
+    "nombre_emplazamiento": "Ciudad del Cabo",
+    "latitud": -33.918,
+    "longitud": 18.423,
+    "mes": 8,
+    "radiacion_media": 103.33,
+    "temp_media": 12.57
+  },
+  {
+    "id": 933,
+    "nombre_emplazamiento": "Ciudad del Cabo",
+    "latitud": -33.918,
+    "longitud": 18.423,
+    "mes": 9,
+    "radiacion_media": 139.06,
+    "temp_media": 14.01
+  },
+  {
+    "id": 934,
+    "nombre_emplazamiento": "Ciudad del Cabo",
+    "latitud": -33.918,
+    "longitud": 18.423,
+    "mes": 10,
+    "radiacion_media": 195.62,
+    "temp_media": 16.26
+  },
+  {
+    "id": 935,
+    "nombre_emplazamiento": "Ciudad del Cabo",
+    "latitud": -33.918,
+    "longitud": 18.423,
+    "mes": 11,
+    "radiacion_media": 223.1,
+    "temp_media": 17.86
+  },
+  {
+    "id": 936,
+    "nombre_emplazamiento": "Ciudad del Cabo",
+    "latitud": -33.918,
+    "longitud": 18.423,
+    "mes": 12,
+    "radiacion_media": 254.26,
+    "temp_media": 19.97
+  },
+  {
+    "id": 937,
+    "nombre_emplazamiento": "Luanda",
+    "latitud": -8.841,
+    "longitud": 13.238,
+    "mes": 1,
+    "radiacion_media": 194.69,
+    "temp_media": 27.03
+  },
+  {
+    "id": 938,
+    "nombre_emplazamiento": "Luanda",
+    "latitud": -8.841,
+    "longitud": 13.238,
+    "mes": 2,
+    "radiacion_media": 175.56,
+    "temp_media": 27.55
+  },
+  {
+    "id": 939,
+    "nombre_emplazamiento": "Luanda",
+    "latitud": -8.841,
+    "longitud": 13.238,
+    "mes": 3,
+    "radiacion_media": 191.06,
+    "temp_media": 27.66
+  },
+  {
+    "id": 940,
+    "nombre_emplazamiento": "Luanda",
+    "latitud": -8.841,
+    "longitud": 13.238,
+    "mes": 4,
+    "radiacion_media": 164.27,
+    "temp_media": 27.09
+  },
+  {
+    "id": 941,
+    "nombre_emplazamiento": "Luanda",
+    "latitud": -8.841,
+    "longitud": 13.238,
+    "mes": 5,
+    "radiacion_media": 161.25,
+    "temp_media": 26.26
+  },
+  {
+    "id": 942,
+    "nombre_emplazamiento": "Luanda",
+    "latitud": -8.841,
+    "longitud": 13.238,
+    "mes": 6,
+    "radiacion_media": 149.04,
+    "temp_media": 23.41
+  },
+  {
+    "id": 943,
+    "nombre_emplazamiento": "Luanda",
+    "latitud": -8.841,
+    "longitud": 13.238,
+    "mes": 7,
+    "radiacion_media": 150.55,
+    "temp_media": 21.89
+  },
+  {
+    "id": 944,
+    "nombre_emplazamiento": "Luanda",
+    "latitud": -8.841,
+    "longitud": 13.238,
+    "mes": 8,
+    "radiacion_media": 156.46,
+    "temp_media": 22.27
+  },
+  {
+    "id": 945,
+    "nombre_emplazamiento": "Luanda",
+    "latitud": -8.841,
+    "longitud": 13.238,
+    "mes": 9,
+    "radiacion_media": 160.09,
+    "temp_media": 23.84
+  },
+  {
+    "id": 946,
+    "nombre_emplazamiento": "Luanda",
+    "latitud": -8.841,
+    "longitud": 13.238,
+    "mes": 10,
+    "radiacion_media": 165.21,
+    "temp_media": 25.44
+  },
+  {
+    "id": 947,
+    "nombre_emplazamiento": "Luanda",
+    "latitud": -8.841,
+    "longitud": 13.238,
+    "mes": 11,
+    "radiacion_media": 174.83,
+    "temp_media": 26.52
+  },
+  {
+    "id": 948,
+    "nombre_emplazamiento": "Luanda",
+    "latitud": -8.841,
+    "longitud": 13.238,
+    "mes": 12,
+    "radiacion_media": 188.65,
+    "temp_media": 26.65
+  },
+  {
+    "id": 949,
+    "nombre_emplazamiento": "Pekín",
+    "latitud": 39.912,
+    "longitud": 116.398,
+    "mes": 1,
+    "radiacion_media": 83.84,
+    "temp_media": -3.56
+  },
+  {
+    "id": 950,
+    "nombre_emplazamiento": "Pekín",
+    "latitud": 39.912,
+    "longitud": 116.398,
+    "mes": 2,
+    "radiacion_media": 101.52,
+    "temp_media": -0.45
+  },
+  {
+    "id": 951,
+    "nombre_emplazamiento": "Pekín",
+    "latitud": 39.912,
+    "longitud": 116.398,
+    "mes": 3,
+    "radiacion_media": 152.42,
+    "temp_media": 6.53
+  },
+  {
+    "id": 952,
+    "nombre_emplazamiento": "Pekín",
+    "latitud": 39.912,
+    "longitud": 116.398,
+    "mes": 4,
+    "radiacion_media": 170.94,
+    "temp_media": 14.64
+  },
+  {
+    "id": 953,
+    "nombre_emplazamiento": "Pekín",
+    "latitud": 39.912,
+    "longitud": 116.398,
+    "mes": 5,
+    "radiacion_media": 191.96,
+    "temp_media": 21.72
+  },
+  {
+    "id": 954,
+    "nombre_emplazamiento": "Pekín",
+    "latitud": 39.912,
+    "longitud": 116.398,
+    "mes": 6,
+    "radiacion_media": 178.14,
+    "temp_media": 26.04
+  },
+  {
+    "id": 955,
+    "nombre_emplazamiento": "Pekín",
+    "latitud": 39.912,
+    "longitud": 116.398,
+    "mes": 7,
+    "radiacion_media": 160.52,
+    "temp_media": 27.16
+  },
+  {
+    "id": 956,
+    "nombre_emplazamiento": "Pekín",
+    "latitud": 39.912,
+    "longitud": 116.398,
+    "mes": 8,
+    "radiacion_media": 153.23,
+    "temp_media": 25.49
+  },
+  {
+    "id": 957,
+    "nombre_emplazamiento": "Pekín",
+    "latitud": 39.912,
+    "longitud": 116.398,
+    "mes": 9,
+    "radiacion_media": 136.59,
+    "temp_media": 20.75
+  },
+  {
+    "id": 958,
+    "nombre_emplazamiento": "Pekín",
+    "latitud": 39.912,
+    "longitud": 116.398,
+    "mes": 10,
+    "radiacion_media": 110.22,
+    "temp_media": 13.13
+  },
+  {
+    "id": 959,
+    "nombre_emplazamiento": "Pekín",
+    "latitud": 39.912,
+    "longitud": 116.398,
+    "mes": 11,
+    "radiacion_media": 77.75,
+    "temp_media": 3.8
+  },
+  {
+    "id": 960,
+    "nombre_emplazamiento": "Pekín",
+    "latitud": 39.912,
+    "longitud": 116.398,
+    "mes": 12,
+    "radiacion_media": 71.87,
+    "temp_media": -2.59
+  },
+  {
+    "id": 961,
+    "nombre_emplazamiento": "Nueva Delhi",
+    "latitud": 28.618,
+    "longitud": 77.199,
+    "mes": 1,
+    "radiacion_media": 122.79,
+    "temp_media": 13.77
+  },
+  {
+    "id": 962,
+    "nombre_emplazamiento": "Nueva Delhi",
+    "latitud": 28.618,
+    "longitud": 77.199,
+    "mes": 2,
+    "radiacion_media": 135.06,
+    "temp_media": 17.19
+  },
+  {
+    "id": 963,
+    "nombre_emplazamiento": "Nueva Delhi",
+    "latitud": 28.618,
+    "longitud": 77.199,
+    "mes": 3,
+    "radiacion_media": 183.93,
+    "temp_media": 22.44
+  },
+  {
+    "id": 964,
+    "nombre_emplazamiento": "Nueva Delhi",
+    "latitud": 28.618,
+    "longitud": 77.199,
+    "mes": 4,
+    "radiacion_media": 208.82,
+    "temp_media": 28.98
+  },
+  {
+    "id": 965,
+    "nombre_emplazamiento": "Nueva Delhi",
+    "latitud": 28.618,
+    "longitud": 77.199,
+    "mes": 5,
+    "radiacion_media": 226.69,
+    "temp_media": 32.52
+  },
+  {
+    "id": 966,
+    "nombre_emplazamiento": "Nueva Delhi",
+    "latitud": 28.618,
+    "longitud": 77.199,
+    "mes": 6,
+    "radiacion_media": 193.37,
+    "temp_media": 33.01
+  },
+  {
+    "id": 967,
+    "nombre_emplazamiento": "Nueva Delhi",
+    "latitud": 28.618,
+    "longitud": 77.199,
+    "mes": 7,
+    "radiacion_media": 152.12,
+    "temp_media": 29.57
+  },
+  {
+    "id": 968,
+    "nombre_emplazamiento": "Nueva Delhi",
+    "latitud": 28.618,
+    "longitud": 77.199,
+    "mes": 8,
+    "radiacion_media": 141.84,
+    "temp_media": 28.71
+  },
+  {
+    "id": 969,
+    "nombre_emplazamiento": "Nueva Delhi",
+    "latitud": 28.618,
+    "longitud": 77.199,
+    "mes": 9,
+    "radiacion_media": 149.72,
+    "temp_media": 27.91
+  },
+  {
+    "id": 970,
+    "nombre_emplazamiento": "Nueva Delhi",
+    "latitud": 28.618,
+    "longitud": 77.199,
+    "mes": 10,
+    "radiacion_media": 159.31,
+    "temp_media": 25.39
+  },
+  {
+    "id": 971,
+    "nombre_emplazamiento": "Nueva Delhi",
+    "latitud": 28.618,
+    "longitud": 77.199,
+    "mes": 11,
+    "radiacion_media": 128.14,
+    "temp_media": 20.37
+  },
+  {
+    "id": 972,
+    "nombre_emplazamiento": "Nueva Delhi",
+    "latitud": 28.618,
+    "longitud": 77.199,
+    "mes": 12,
+    "radiacion_media": 118.01,
+    "temp_media": 15.18
+  },
+  {
+    "id": 973,
+    "nombre_emplazamiento": "Bangkok",
+    "latitud": 13.738,
+    "longitud": 100.528,
+    "mes": 1,
+    "radiacion_media": 155.53,
+    "temp_media": 26.11
+  },
+  {
+    "id": 974,
+    "nombre_emplazamiento": "Bangkok",
+    "latitud": 13.738,
+    "longitud": 100.528,
+    "mes": 2,
+    "radiacion_media": 158.53,
+    "temp_media": 27.59
+  },
+  {
+    "id": 975,
+    "nombre_emplazamiento": "Bangkok",
+    "latitud": 13.738,
+    "longitud": 100.528,
+    "mes": 3,
+    "radiacion_media": 189.87,
+    "temp_media": 28.8
+  },
+  {
+    "id": 976,
+    "nombre_emplazamiento": "Bangkok",
+    "latitud": 13.738,
+    "longitud": 100.528,
+    "mes": 4,
+    "radiacion_media": 187.24,
+    "temp_media": 29.79
+  },
+  {
+    "id": 977,
+    "nombre_emplazamiento": "Bangkok",
+    "latitud": 13.738,
+    "longitud": 100.528,
+    "mes": 5,
+    "radiacion_media": 176.22,
+    "temp_media": 29.46
+  },
+  {
+    "id": 978,
+    "nombre_emplazamiento": "Bangkok",
+    "latitud": 13.738,
+    "longitud": 100.528,
+    "mes": 6,
+    "radiacion_media": 157.68,
+    "temp_media": 28.72
+  },
+  {
+    "id": 979,
+    "nombre_emplazamiento": "Bangkok",
+    "latitud": 13.738,
+    "longitud": 100.528,
+    "mes": 7,
+    "radiacion_media": 150.08,
+    "temp_media": 28.12
+  },
+  {
+    "id": 980,
+    "nombre_emplazamiento": "Bangkok",
+    "latitud": 13.738,
+    "longitud": 100.528,
+    "mes": 8,
+    "radiacion_media": 149.78,
+    "temp_media": 27.99
+  },
+  {
+    "id": 981,
+    "nombre_emplazamiento": "Bangkok",
+    "latitud": 13.738,
+    "longitud": 100.528,
+    "mes": 9,
+    "radiacion_media": 139.33,
+    "temp_media": 27.48
+  },
+  {
+    "id": 982,
+    "nombre_emplazamiento": "Bangkok",
+    "latitud": 13.738,
+    "longitud": 100.528,
+    "mes": 10,
+    "radiacion_media": 141.86,
+    "temp_media": 26.97
+  },
+  {
+    "id": 983,
+    "nombre_emplazamiento": "Bangkok",
+    "latitud": 13.738,
+    "longitud": 100.528,
+    "mes": 11,
+    "radiacion_media": 141.79,
+    "temp_media": 26.86
+  },
+  {
+    "id": 984,
+    "nombre_emplazamiento": "Bangkok",
+    "latitud": 13.738,
+    "longitud": 100.528,
+    "mes": 12,
+    "radiacion_media": 147.03,
+    "temp_media": 25.83
+  },
+  {
+    "id": 985,
+    "nombre_emplazamiento": "Manila",
+    "latitud": 14.594,
+    "longitud": 120.975,
+    "mes": 1,
+    "radiacion_media": 136.15,
+    "temp_media": 26.42
+  },
+  {
+    "id": 986,
+    "nombre_emplazamiento": "Manila",
+    "latitud": 14.594,
+    "longitud": 120.975,
+    "mes": 2,
+    "radiacion_media": 143.15,
+    "temp_media": 26.95
+  },
+  {
+    "id": 987,
+    "nombre_emplazamiento": "Manila",
+    "latitud": 14.594,
+    "longitud": 120.975,
+    "mes": 3,
+    "radiacion_media": 180.8,
+    "temp_media": 28.21
+  },
+  {
+    "id": 988,
+    "nombre_emplazamiento": "Manila",
+    "latitud": 14.594,
+    "longitud": 120.975,
+    "mes": 4,
+    "radiacion_media": 192.85,
+    "temp_media": 29.73
+  },
+  {
+    "id": 989,
+    "nombre_emplazamiento": "Manila",
+    "latitud": 14.594,
+    "longitud": 120.975,
+    "mes": 5,
+    "radiacion_media": 181.24,
+    "temp_media": 29.91
+  },
+  {
+    "id": 990,
+    "nombre_emplazamiento": "Manila",
+    "latitud": 14.594,
+    "longitud": 120.975,
+    "mes": 6,
+    "radiacion_media": 152.6,
+    "temp_media": 29.02
+  },
+  {
+    "id": 991,
+    "nombre_emplazamiento": "Manila",
+    "latitud": 14.594,
+    "longitud": 120.975,
+    "mes": 7,
+    "radiacion_media": 140.26,
+    "temp_media": 28.02
+  },
+  {
+    "id": 992,
+    "nombre_emplazamiento": "Manila",
+    "latitud": 14.594,
+    "longitud": 120.975,
+    "mes": 8,
+    "radiacion_media": 139.63,
+    "temp_media": 27.8
+  },
+  {
+    "id": 993,
+    "nombre_emplazamiento": "Manila",
+    "latitud": 14.594,
+    "longitud": 120.975,
+    "mes": 9,
+    "radiacion_media": 134.06,
+    "temp_media": 27.84
+  },
+  {
+    "id": 994,
+    "nombre_emplazamiento": "Manila",
+    "latitud": 14.594,
+    "longitud": 120.975,
+    "mes": 10,
+    "radiacion_media": 141.31,
+    "temp_media": 27.91
+  },
+  {
+    "id": 995,
+    "nombre_emplazamiento": "Manila",
+    "latitud": 14.594,
+    "longitud": 120.975,
+    "mes": 11,
+    "radiacion_media": 132.64,
+    "temp_media": 27.91
+  },
+  {
+    "id": 996,
+    "nombre_emplazamiento": "Manila",
+    "latitud": 14.594,
+    "longitud": 120.975,
+    "mes": 12,
+    "radiacion_media": 122.25,
+    "temp_media": 26.94
+  },
+  {
+    "id": 997,
+    "nombre_emplazamiento": "Kuala Lumpur",
+    "latitud": 3.149,
+    "longitud": 101.696,
+    "mes": 1,
+    "radiacion_media": 161.38,
+    "temp_media": 25.65
+  },
+  {
+    "id": 998,
+    "nombre_emplazamiento": "Kuala Lumpur",
+    "latitud": 3.149,
+    "longitud": 101.696,
+    "mes": 2,
+    "radiacion_media": 169.52,
+    "temp_media": 26.27
+  },
+  {
+    "id": 999,
+    "nombre_emplazamiento": "Kuala Lumpur",
+    "latitud": 3.149,
+    "longitud": 101.696,
+    "mes": 3,
+    "radiacion_media": 185.05,
+    "temp_media": 26.45
+  },
+  {
+    "id": 1000,
+    "nombre_emplazamiento": "Kuala Lumpur",
+    "latitud": 3.149,
+    "longitud": 101.696,
+    "mes": 4,
+    "radiacion_media": 171.36,
+    "temp_media": 26.49
+  }
+]
