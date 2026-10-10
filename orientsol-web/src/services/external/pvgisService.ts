@@ -44,7 +44,7 @@ export async function fetchPvgisClimateData(
   // Candidate endpoint URLs
   const candidateUrls: { url: string; version: string }[] = [];
 
-  // If in dev server, try proxy first to bypass browser CORS
+  // 1. If in dev server, use proxy to bypass browser CORS
   if (isLocalhost) {
     candidateUrls.push({
       url: `/api-pvgis/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
@@ -52,17 +52,19 @@ export async function fetchPvgisClimateData(
     });
   }
 
-  // Official JRC endpoints
-  candidateUrls.push(
-    {
-      url: `https://re.jrc.ec.europa.eu/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
-      version: '5.3',
-    },
-    {
-      url: `https://re.jrc.ec.europa.eu/api/v5_2/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
-      version: '5.2',
-    }
-  );
+  // 2. If in Electron Desktop, fetch directly without browser CORS restrictions
+  if (electronAPI?.fetchExternalUrl) {
+    candidateUrls.push(
+      {
+        url: `https://re.jrc.ec.europa.eu/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
+        version: '5.3 (Electron IPC Direct)',
+      },
+      {
+        url: `https://re.jrc.ec.europa.eu/api/v5_2/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
+        version: '5.2 (Electron IPC Direct)',
+      }
+    );
+  }
 
   let json: PVGISResponse | null = null;
   let activeVersion = '5.3';

@@ -972,7 +972,7 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
     const btnExportReport = container.querySelector<HTMLButtonElement>('#btn-seasonal-export-report');
     btnExportReport?.addEventListener('click', () => {
       showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn);
+        generateOrientSolPDFReport(res, isEn, 'seasonal');
       });
     });
   }

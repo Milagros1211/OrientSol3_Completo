@@ -363,7 +363,7 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
 
     container.querySelector<HTMLButtonElement>('#btn-polar-export-report')?.addEventListener('click', () => {
       showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn);
+        generateOrientSolPDFReport(res, isEn, 'polar');
       });
     });
   }
