@@ -1,0 +1,15 @@
+{
+  "name": "orientsol-suite",
+  "private": true,
+  "version": "3.0.0",
+  "description": "OrientSol 3 - Plataforma Web y Desktop de Simulación Solar y Fotovoltaica",
+  "scripts": {
+    "dev": "npm run --prefix orientsol-web dev",
+    "build": "npm run --prefix orientsol-web build",
+    "preview": "npm run --prefix orientsol-web preview",
+    "app:desktop": "npm run --prefix orientsol-web app:desktop",
+    "app:dev": "npm run --prefix orientsol-web app:dev",
+    "electron:start": "npm run --prefix orientsol-web electron:start",
+    "electron:test": "npm run --prefix orientsol-web electron:test"
+  }
+}

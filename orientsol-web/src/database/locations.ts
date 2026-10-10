@@ -1,0 +1,161 @@
+import type { LocationData } from '@/types/database';
+
+/**
+ * Solar radiation & climate database based on OrientSol (BBDD.xlsx / Principal.m)
+ *
+ * Each location includes:
+ * - Latitude (in decimal degrees)
+ * - monthlyGdm0: Monthly Global Horizontal Daily Radiation [kWh/m²/day] (12 months)
+ * - monthlyTempC: Monthly Average Ambient Temperature [°C] (12 months)
+ */
+export const LOCATIONS_DATABASE: LocationData[] = [
+  // SPAIN
+  {
+    id: 'es-madrid',
+    name: 'Madrid',
+    country: 'España',
+    region: 'spain',
+    latitude: 40.4168,
+    longitude: -3.7038,
+    elevationM: 667,
+    // [Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dic] in kWh/m2/dia
+    monthlyGdm0: [2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84],
+    monthlyTempC: [6.1, 7.9, 11.2, 13.5, 17.8, 23.3, 27.0, 26.7, 22.0, 15.9, 10.1, 6.9],
+  },
+  {
+    id: 'es-albacete',
+    name: 'Albacete',
+    country: 'España',
+    region: 'spain',
+    latitude: 38.9943,
+    longitude: -1.8585,
+    elevationM: 686,
+    monthlyGdm0: [2.25, 3.28, 4.62, 5.75, 6.78, 7.68, 7.85, 6.92, 5.34, 3.65, 2.45, 1.95],
+    monthlyTempC: [5.6, 7.3, 10.4, 12.9, 17.2, 22.5, 26.4, 26.0, 21.4, 15.3, 9.6, 6.4],
+  },
+  {
+    id: 'es-barcelona',
+    name: 'Barcelona',
+    country: 'España',
+    region: 'spain',
+    latitude: 41.3879,
+    longitude: 2.1699,
+    elevationM: 12,
+    monthlyGdm0: [2.08, 2.98, 4.25, 5.20, 6.25, 6.98, 7.15, 6.30, 4.88, 3.35, 2.22, 1.78],
+    monthlyTempC: [9.2, 9.9, 12.1, 14.3, 17.8, 21.9, 24.8, 24.9, 21.8, 17.7, 13.0, 10.0],
+  },
+  {
+    id: 'es-sevilla',
+    name: 'Sevilla',
+    country: 'España',
+    region: 'spain',
+    latitude: 37.3891,
+    longitude: -5.9845,
+    elevationM: 19,
+    monthlyGdm0: [2.58, 3.62, 4.95, 6.05, 7.12, 8.01, 8.15, 7.28, 5.65, 4.02, 2.82, 2.24],
+    monthlyTempC: [11.0, 12.5, 15.6, 17.9, 21.8, 26.3, 28.2, 28.0, 25.0, 20.2, 15.1, 11.9],
+  },
+  {
+    id: 'es-valencia',
+    name: 'Valencia',
+    country: 'España',
+    region: 'spain',
+    latitude: 39.4699,
+    longitude: -0.3763,
+    elevationM: 15,
+    monthlyGdm0: [2.35, 3.38, 4.65, 5.80, 6.75, 7.52, 7.68, 6.75, 5.20, 3.72, 2.50, 2.05],
+    monthlyTempC: [10.8, 11.8, 14.1, 16.2, 19.8, 23.9, 26.8, 27.1, 24.0, 19.8, 14.8, 11.6],
+  },
+  {
+    id: 'es-bilbao',
+    name: 'Bilbao',
+    country: 'España',
+    region: 'spain',
+    latitude: 43.2630,
+    longitude: -2.9350,
+    elevationM: 19,
+    monthlyGdm0: [1.45, 2.20, 3.35, 4.30, 5.15, 5.75, 5.85, 5.10, 4.10, 2.75, 1.70, 1.25],
+    monthlyTempC: [9.3, 9.7, 11.5, 12.6, 15.7, 18.4, 20.4, 20.9, 19.1, 16.0, 12.2, 10.0],
+  },
+  {
+    id: 'es-zaragoza',
+    name: 'Zaragoza',
+    country: 'España',
+    region: 'spain',
+    latitude: 41.6488,
+    longitude: -0.8891,
+    elevationM: 200,
+    monthlyGdm0: [2.02, 3.12, 4.58, 5.72, 6.85, 7.70, 7.82, 6.80, 5.18, 3.50, 2.25, 1.75],
+    monthlyTempC: [6.6, 8.7, 12.3, 14.8, 19.2, 24.1, 27.5, 27.2, 22.9, 17.1, 10.9, 7.3],
+  },
+  {
+    id: 'es-las-palmas',
+    name: 'Las Palmas de Gran Canaria',
+    country: 'España',
+    region: 'spain',
+    latitude: 28.1235,
+    longitude: -15.4363,
+    elevationM: 8,
+    monthlyGdm0: [3.45, 4.35, 5.48, 6.42, 6.95, 7.15, 7.22, 6.85, 5.92, 4.80, 3.75, 3.18],
+    monthlyTempC: [18.1, 18.4, 19.0, 19.7, 20.8, 22.3, 23.8, 24.6, 24.3, 23.1, 21.1, 19.2],
+  },
+
+  // EUROPE
+  {
+    id: 'eu-amsterdam',
+    name: 'Amsterdam',
+    country: 'Países Bajos',
+    region: 'europe',
+    latitude: 52.3676,
+    longitude: 4.9041,
+    elevationM: -2,
+    monthlyGdm0: [0.85, 1.62, 2.85, 4.30, 5.45, 5.75, 5.60, 4.70, 3.35, 1.95, 1.05, 0.65],
+    monthlyTempC: [3.4, 3.5, 6.1, 9.1, 12.9, 15.6, 17.9, 17.8, 14.8, 10.8, 7.0, 4.2],
+  },
+  {
+    id: 'eu-berlin',
+    name: 'Berlín',
+    country: 'Alemania',
+    region: 'europe',
+    latitude: 52.5200,
+    longitude: 13.4050,
+    elevationM: 34,
+    monthlyGdm0: [0.88, 1.70, 2.95, 4.40, 5.55, 5.85, 5.65, 4.85, 3.40, 1.98, 1.02, 0.68],
+    monthlyTempC: [0.6, 1.8, 5.6, 10.2, 14.9, 18.2, 20.3, 19.9, 15.5, 10.4, 5.4, 1.8],
+  },
+  {
+    id: 'eu-paris',
+    name: 'París',
+    country: 'Francia',
+    region: 'europe',
+    latitude: 48.8566,
+    longitude: 2.3522,
+    elevationM: 35,
+    monthlyGdm0: [1.12, 1.95, 3.25, 4.60, 5.65, 6.05, 5.95, 5.15, 3.80, 2.30, 1.35, 0.92],
+    monthlyTempC: [4.9, 5.6, 8.8, 11.5, 15.2, 18.3, 20.6, 20.4, 16.9, 12.8, 8.3, 5.5],
+  },
+  {
+    id: 'eu-rome',
+    name: 'Roma',
+    country: 'Italia',
+    region: 'europe',
+    latitude: 41.9028,
+    longitude: 12.4964,
+    elevationM: 21,
+    monthlyGdm0: [1.95, 2.85, 4.10, 5.35, 6.45, 7.20, 7.35, 6.40, 4.90, 3.35, 2.15, 1.65],
+    monthlyTempC: [8.1, 8.8, 11.4, 14.1, 18.4, 22.5, 25.4, 25.6, 21.8, 17.4, 12.6, 9.1],
+  },
+  {
+    id: 'eu-london',
+    name: 'Londres',
+    country: 'Reino Unido',
+    region: 'europe',
+    latitude: 51.5074,
+    longitude: -0.1278,
+    elevationM: 11,
+    monthlyGdm0: [0.82, 1.55, 2.75, 4.15, 5.25, 5.60, 5.45, 4.55, 3.20, 1.85, 1.00, 0.62],
+    monthlyTempC: [5.2, 5.3, 7.6, 9.9, 13.3, 16.4, 18.7, 18.5, 15.7, 12.0, 8.0, 5.5],
+  },
+];
+
+export const DEFAULT_LOCATION = LOCATIONS_DATABASE[0]; // Madrid
