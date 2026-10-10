@@ -9,6 +9,7 @@ import {
   generateOrientSolPDFReport,
 } from '@/components/export/pdfReportGenerator';
 import { renderEnergyCalculationPanel } from '@/components/energy/EnergyCalculationPanel';
+import { renderOptimalSeasonalGraphsWindow } from '@/components/charts/OptimalSeasonalGraphsWindow';
 import * as XLSX from 'xlsx';
 
 export type SeasonalRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
@@ -23,6 +24,7 @@ interface OptimalSeasonalStudyProps {
 // Module-level component state
 let stateSeasonalComponent: SeasonalRadiationComponent = 'global';
 let stateSeasonalShowEnergy: boolean = false;
+let stateSeasonalShowGraphs: boolean = false;
 
 const MONTH_NAMES_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -862,8 +864,33 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
 
         <!-- Mount point for Dedicated MATLAB Energy Calculation Window (Imagen 1 / Energia_Osterwald.m) -->
         <div id="opt-seasonal-energy-mount-point"></div>
+
+        <!-- Mount point for Dedicated MATLAB Seasonal Graphs Window (Imagen 2) -->
+        <div id="opt-seasonal-graphs-mount-point"></div>
       </div>
     `;
+
+    // Mount Graphs Panel if active
+    const graphsMountPoint = container.querySelector<HTMLDivElement>('#opt-seasonal-graphs-mount-point');
+    if (graphsMountPoint && stateSeasonalShowGraphs) {
+      graphsMountPoint.innerHTML = '';
+      const graphsWindow = renderOptimalSeasonalGraphsWindow({
+        simulationResult: res,
+        locationName,
+        latitude,
+        initialComponent: stateSeasonalComponent,
+        onBack: () => {
+          stateSeasonalShowGraphs = false;
+          renderInternal();
+          container.querySelector('.opt-seasonal-toolbar')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        },
+        onExit: () => {
+          stateSeasonalShowGraphs = false;
+          renderInternal();
+        },
+      });
+      graphsMountPoint.appendChild(graphsWindow);
+    }
 
     // Mount Energy Panel if active
     const energyMountPoint = container.querySelector<HTMLDivElement>('#opt-seasonal-energy-mount-point');
@@ -899,9 +926,12 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
     // 2. View Charts Action
     const btnViewCharts = container.querySelector<HTMLButtonElement>('#btn-seasonal-view-charts');
     btnViewCharts?.addEventListener('click', () => {
-      const annualCharts = document.querySelector('#opt-charts-panel') || document.querySelector('.charts-grid-2col');
-      if (annualCharts) {
-        annualCharts.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      stateSeasonalShowGraphs = !stateSeasonalShowGraphs;
+      renderInternal();
+      if (stateSeasonalShowGraphs) {
+        setTimeout(() => {
+          container.querySelector('#opt-seasonal-graphs-mount-point')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
       }
     });
 

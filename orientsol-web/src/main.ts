@@ -2,7 +2,6 @@ import './style.css';
 import {
   renderHeader,
   renderStatusBar,
-  renderClimateIntegrationPanel,
   renderDualClimateLoaderPanel,
   renderPythonConsole,
   renderArchitectureOverview,
@@ -100,13 +99,6 @@ function createApp() {
       <span>${isEn ? 'Solar Simulator & Optimization' : 'Simulador & Optimización Solar'}</span>
     </button>
 
-    <button class="dual-tab-btn ${currentAppTab === 'satellite-apis' ? 'active' : ''}" data-app-tab="satellite-apis">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"></path>
-      </svg>
-      <span>${isEn ? 'Satellite Climate APIs' : 'APIs Climáticas Satelitales'}</span>
-    </button>
-
     <button class="dual-tab-btn ${currentAppTab === 'console' ? 'active' : ''}" data-app-tab="console">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -133,15 +125,7 @@ function createApp() {
   simView.appendChild(dualLoaderPanel);
   main.appendChild(simView);
 
-  // Tab 2: Satellite Climate APIs Panel
-  const climateView = document.createElement('div');
-  climateView.id = 'app-view-satellite-apis';
-  climateView.className = `app-tab-view ${currentAppTab === 'satellite-apis' ? '' : 'hidden'}`;
-  const climatePanel = renderClimateIntegrationPanel();
-  climateView.appendChild(climatePanel);
-  main.appendChild(climateView);
-
-  // Tab 3: Interactive Python Console Panel
+  // Tab 2: Interactive Python Console Panel (Verification)
   const consoleView = document.createElement('div');
   consoleView.id = 'app-view-console';
   consoleView.className = `app-tab-view ${currentAppTab === 'console' ? '' : 'hidden'}`;
@@ -149,7 +133,7 @@ function createApp() {
   consoleView.appendChild(consolePanel);
   main.appendChild(consoleView);
 
-  // Tab 4: About OrientSol & TFM View
+  // Tab 3: About OrientSol & TFM View
   const aboutView = document.createElement('div');
   aboutView.id = 'app-view-about';
   aboutView.className = `app-tab-view ${currentAppTab === 'about' ? '' : 'hidden'}`;
@@ -161,7 +145,6 @@ function createApp() {
   const appTabs = navBar.querySelectorAll<HTMLButtonElement>('.dual-tab-btn');
   const appViews: Record<string, HTMLElement> = {
     simulator: simView,
-    'satellite-apis': climateView,
     console: consoleView,
     about: aboutView,
   };
@@ -169,25 +152,6 @@ function createApp() {
   appTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
       const targetTab = (tab.getAttribute('data-app-tab') || 'simulator') as typeof currentAppTab;
-
-      if (targetTab === 'satellite-apis') {
-        // Unify with primary simulator: switch to simulator view and activate Satellite APIs sub-tab
-        currentAppTab = 'simulator';
-        appTabs.forEach((t) => t.classList.remove('active'));
-        const simTabBtn = navBar.querySelector<HTMLButtonElement>('.dual-tab-btn[data-app-tab="simulator"]');
-        if (simTabBtn) simTabBtn.classList.add('active');
-
-        Object.entries(appViews).forEach(([key, viewEl]) => {
-          if (key === 'simulator') {
-            viewEl.classList.remove('hidden');
-          } else {
-            viewEl.classList.add('hidden');
-          }
-        });
-
-        window.dispatchEvent(new CustomEvent('orientsol:switch-climate-tab', { detail: 'api' }));
-        return;
-      }
 
       appTabs.forEach((t) => t.classList.remove('active'));
       tab.classList.add('active');

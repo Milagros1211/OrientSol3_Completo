@@ -10,7 +10,7 @@ export interface EnergyCalculationProps {
   simulationResult: SolarBridgeSimulationResult;
   locationName: string;
   latitude: number;
-  studyType?: 'annual' | 'seasonal';
+  studyType?: 'annual' | 'seasonal' | 'polar' | 'dual';
   initialPeakKw?: number;
   onClose?: () => void;
 }
@@ -202,6 +202,10 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
   const radStudy =
     studyType === 'seasonal'
       ? res.seasonal.monthlyDailyKwh
+      : studyType === 'polar'
+      ? res.tracking.polarAxis.monthlyDailyKwh
+      : studyType === 'dual'
+      ? res.tracking.dualAxis.monthlyDailyKwh
       : res.optimalAnnual.monthlyDailyKwh;
 
   const tempAmb = res.temperatures.ambient.monthlyMeanC;
@@ -212,6 +216,10 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
     const studyTitle =
       studyType === 'seasonal'
         ? (isEn ? 'Seasonal optimal tilt' : 'Inclinación óptima estacional')
+        : studyType === 'polar'
+        ? (isEn ? 'Polar single-axis tracking' : 'Seguimiento a un eje polar')
+        : studyType === 'dual'
+        ? (isEn ? 'Two-axis solar tracking' : 'Seguimiento a dos ejes')
         : (isEn ? 'Annual optimal tilt' : 'Inclinación óptima anual');
 
     const isSeasonal = studyType === 'seasonal';
@@ -219,14 +227,27 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
     const seasonalData = res.seasonal;
 
     let studyColTitle = '';
+    let studyBadge = '';
     if (isSeasonal && seasonalData) {
       studyColTitle = isEn
         ? `Performed study (Inv: ${seasonalData.winterTiltDeg}° / P-O: ${seasonalData.springTiltDeg}° / Ver: ${seasonalData.summerTiltDeg}°)`
         : `Estudio realizado (Inv: ${seasonalData.winterTiltDeg}° / P-O: ${seasonalData.springTiltDeg}° / Ver: ${seasonalData.summerTiltDeg}°)`;
+      studyBadge = isEn ? 'Seasonal Tilts' : 'Inclinación Estacional';
+    } else if (studyType === 'polar') {
+      studyColTitle = isEn
+        ? `Performed study (Polar 1-axis)`
+        : `Estudio realizado (Seg. 1 eje polar)`;
+      studyBadge = isEn ? 'Polar 1-Axis' : 'Eje Polar';
+    } else if (studyType === 'dual') {
+      studyColTitle = isEn
+        ? `Performed study (2-axis tracking)`
+        : `Estudio realizado (Seg. 2 ejes)`;
+      studyBadge = isEn ? '2-Axis Tracking' : '2 Ejes';
     } else {
       studyColTitle = isEn
         ? `Performed study (β = ${optTiltAnnual}°)`
         : `Estudio realizado (β = ${optTiltAnnual}°)`;
+      studyBadge = `β = ${optTiltAnnual}°`;
     }
 
     // Run Osterwald calculation
@@ -255,7 +276,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
               <span class="meta-label">
                 <strong>${isEn ? 'Study:' : 'Estudio:'}</strong>
                 <span style="color: #60a5fa; font-weight: 600;">${studyTitle}</span>
-                <span class="badge badge-source" style="margin-left: 0.75rem; font-size: 0.78rem;">${isSeasonal ? (isEn ? 'Seasonal Tilts' : 'Inclinación Estacional') : `β = ${optTiltAnnual}°`}</span>
+                <span class="badge badge-source" style="margin-left: 0.75rem; font-size: 0.78rem;">${studyBadge}</span>
               </span>
             </div>
           </div>

@@ -21,6 +21,8 @@ import {
   showExcelExportModal,
 } from '@/components/climate/OptimalAnnualStudyPanel';
 import { renderOptimalSeasonalStudyPanel } from '@/components/climate/OptimalSeasonalStudyPanel';
+import { renderTrackingPolarStudyPanel } from '@/components/climate/TrackingPolarStudyPanel';
+import { renderTrackingDualAxisStudyPanel } from '@/components/climate/TrackingDualAxisStudyPanel';
 import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
@@ -30,6 +32,7 @@ import {
 let cachedLastSimulationResult: SolarBridgeSimulationResult | null = null;
 let cachedActiveRecord: ClimateDataRecord | null = null;
 let cachedActiveTab: 'historical' | 'manual' | 'upload' | 'api' = 'historical';
+let cachedActiveStudyOp: 'annual' | 'seasonal' | 'polar' | 'dual' = 'annual';
 
 /**
  * Renders the banner indicating whether online upload to Supabase is permitted or in offline cache mode.
@@ -1214,11 +1217,52 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         </div>
       </div>
 
-      <!-- 2. INCLINACIÓN ÓPTIMA ANUAL: ESTUDIO COMPLETO & TABLA MATRIZ ORIENTSOL 3.0 -->
-      <div id="opt-annual-study-mount-point"></div>
+      <!-- 2. SELECTOR DE OPERACIÓN / ESTUDIO (ORIENTSOL 3.0) -->
+      <div class="operation-selector-container">
+        <div class="operation-selector-label">
+          ${isEn ? 'Solar Operation & Study Mode:' : 'Operación & Estudio Solar a visualizar:'}
+        </div>
+        <div class="operation-selector-bar">
+          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'annual' ? 'active' : ''}" data-study-op="annual">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+            </svg>
+            <span>${isEn ? '1. Annual optimal tilt' : '1. Inclinación óptima anual'}</span>
+          </button>
 
-      <!-- 2.2 INCLINACIÓN ÓPTIMA ESTACIONAL: ESTUDIO COMPLETO & TABLA MATRIZ ORIENTSOL 3.0 (Figura 5.2.89) -->
-      <div id="opt-seasonal-study-mount-point"></div>
+          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'seasonal' ? 'active' : ''}" data-study-op="seasonal">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>${isEn ? '2. Seasonal optimal tilt' : '2. Inclinación óptima estacional'}</span>
+          </button>
+
+          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'polar' ? 'active' : ''}" data-study-op="polar">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="6" y1="18" x2="18" y2="6"></line>
+              <polyline points="10 6 18 6 18 14"></polyline>
+            </svg>
+            <span>${isEn ? '3. Polar 1-axis tracking' : '3. Seguimiento a un eje polar'}</span>
+          </button>
+
+          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'dual' ? 'active' : ''}" data-study-op="dual">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 3v18"></path>
+              <path d="M3 12h18"></path>
+            </svg>
+            <span>${isEn ? '4. Two-axis tracking' : '4. Seguimiento a dos ejes'}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mount point for Active Solar Study Operation -->
+      <div id="active-study-mount-point"></div>
 
       <!-- 2.3 12 Posiciones Mensuales -->
       <div class="result-card wide-card" style="margin-bottom: 1.25rem;">
@@ -1400,31 +1444,66 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     const currentPeakKw = parseFloat(simPeakKw.value) || 5.0;
 
-    // Mount OrientSol 3.0 Inclinación Óptima Anual Study Panel
-    const optStudyMountPoint = resultsContainer.querySelector<HTMLDivElement>('#opt-annual-study-mount-point');
-    if (optStudyMountPoint) {
-      optStudyMountPoint.innerHTML = '';
-      const studyPanel = renderOptimalAnnualStudyPanel({
-        simulationResult: res,
-        locationName: res.locationName,
-        latitude: res.latitude,
-        peakPowerKw: currentPeakKw,
-      });
-      optStudyMountPoint.appendChild(studyPanel);
-    }
+    // Dynamic Study Operation Mount Manager (Prevents Endless HTML)
+    const mountStudyOperation = (op: typeof cachedActiveStudyOp) => {
+      cachedActiveStudyOp = op;
+      const mountPoint = resultsContainer.querySelector<HTMLDivElement>('#active-study-mount-point');
+      if (!mountPoint) return;
+      mountPoint.innerHTML = '';
 
-    // Mount OrientSol 3.0 Inclinación Óptima Estacional Study Panel (Figura 5.2.89)
-    const optSeasonalMountPoint = resultsContainer.querySelector<HTMLDivElement>('#opt-seasonal-study-mount-point');
-    if (optSeasonalMountPoint) {
-      optSeasonalMountPoint.innerHTML = '';
-      const seasonalPanel = renderOptimalSeasonalStudyPanel({
-        simulationResult: res,
-        locationName: res.locationName,
-        latitude: res.latitude,
-        peakPowerKw: currentPeakKw,
+      if (op === 'annual') {
+        const p = renderOptimalAnnualStudyPanel({
+          simulationResult: res,
+          locationName: res.locationName,
+          latitude: res.latitude,
+          peakPowerKw: currentPeakKw,
+        });
+        mountPoint.appendChild(p);
+      } else if (op === 'seasonal') {
+        const p = renderOptimalSeasonalStudyPanel({
+          simulationResult: res,
+          locationName: res.locationName,
+          latitude: res.latitude,
+          peakPowerKw: currentPeakKw,
+        });
+        mountPoint.appendChild(p);
+      } else if (op === 'polar') {
+        const p = renderTrackingPolarStudyPanel({
+          simulationResult: res,
+          locationName: res.locationName,
+          latitude: res.latitude,
+          peakPowerKw: currentPeakKw,
+          onBack: () => {
+            resultsContainer.querySelector('.operation-selector-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          },
+        });
+        mountPoint.appendChild(p);
+      } else if (op === 'dual') {
+        const p = renderTrackingDualAxisStudyPanel({
+          simulationResult: res,
+          locationName: res.locationName,
+          latitude: res.latitude,
+          peakPowerKw: currentPeakKw,
+          onBack: () => {
+            resultsContainer.querySelector('.operation-selector-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          },
+        });
+        mountPoint.appendChild(p);
+      }
+    };
+
+    mountStudyOperation(cachedActiveStudyOp);
+
+    // Wire operation tab button clicks
+    const opBtns = resultsContainer.querySelectorAll<HTMLButtonElement>('.op-tab-btn');
+    opBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetOp = (btn.getAttribute('data-study-op') || 'annual') as typeof cachedActiveStudyOp;
+        opBtns.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        mountStudyOperation(targetOp);
       });
-      optSeasonalMountPoint.appendChild(seasonalPanel);
-    }
+    });
 
     // Event Listeners for Export & Report Actions
     const pdfBtn = resultsContainer.querySelector<HTMLButtonElement>('#btn-export-pdf');
