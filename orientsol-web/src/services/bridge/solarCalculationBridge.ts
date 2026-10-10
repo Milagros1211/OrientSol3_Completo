@@ -53,6 +53,18 @@ export interface SolarBridgeSimulationResult {
     annualMeanDailyKwh: number;
     annualTotalKwh: number;
     gainOverHorizontalPct: number;
+    components91?: {
+      global: number[][];
+      beam: number[][];
+      diffuse: number[][];
+      albedo: number[][];
+    };
+    horizontalComponents?: {
+      global: number[];
+      beam: number[];
+      diffuse: number[];
+      albedo: number[];
+    };
   };
 
   // 4-Season Optimization
@@ -406,6 +418,18 @@ output_data = {
         "annualMeanDailyKwh": round(mean_opt, 3),
         "annualTotalKwh": round(mean_opt * 365.0, 1),
         "gainOverHorizontalPct": round(((mean_opt - mean_g0) / mean_g0) * 100.0, 2),
+        "components91": {
+            "global": [[round(float(v), 2) for v in row] for row in transp["gd_beta_total"]],
+            "beam": [[round(float(v), 2) for v in row] for row in transp["bd_beta_total"]],
+            "diffuse": [[round(float(v), 2) for v in row] for row in transp["dd_beta_total"]],
+            "albedo": [[round(float(v), 2) for v in row] for row in transp["rd_beta_total"]],
+        },
+        "horizontalComponents": {
+            "global": [round(float(v), 2) for v in gdm0],
+            "beam": [round(float(v), 2) for v in val_bdm0],
+            "diffuse": [round(float(v), 2) for v in val_ddm0],
+            "albedo": [0.0] * 12,
+        },
     },
     "seasonal": {
         "winterTiltDeg": int(seasons["winter"]["opt_angle_deg"]),

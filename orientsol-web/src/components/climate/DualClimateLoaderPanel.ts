@@ -19,6 +19,7 @@ import {
 } from '@/components/export/reportExporter';
 import { pyodideService } from '@/services/pyodide';
 import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslations';
+import { renderOptimalAnnualStudyPanel } from '@/components/climate/OptimalAnnualStudyPanel';
 
 // Module-level caches to preserve state across language toggles (ES <-> EN)
 let cachedLastSimulationResult: SolarBridgeSimulationResult | null = null;
@@ -921,7 +922,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       </div>
 
       <!-- 2. GRÁFICOS VISUALES INTERACTIVOS (SVG) -->
-      <div class="results-charts-section">
+      <div id="app-solar-charts" class="results-charts-section">
         <div class="charts-section-header">
           <div class="charts-badge-icon">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
@@ -945,28 +946,11 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         </div>
       </div>
 
-      <!-- 2. OPTIMIZACIÓN DE SUPERFICIES FIJAS (ANUAL, ESTACIONAL, MENSUAL) -->
-      <div class="results-section-grid">
-        <!-- 2.1 Fija Óptima Anual -->
-        <div class="result-card highlight-card">
-          <div class="result-card-header">
-            <h4>${t.results.optAnnualTitle}</h4>
-            <span class="tag-optimum">${res.optimalAnnual.optimalTiltDeg}°</span>
-          </div>
-          <div class="result-stat-main">
-            <span class="stat-highlight">${res.optimalAnnual.annualMeanDailyKwh.toFixed(2)}</span>
-            <span class="stat-unit">kWh/m²/día</span>
-          </div>
-          <div class="result-stat-sub">
-            <span>${t.results.gainOverHoriz}</span>
-            <strong class="text-gain">+${res.optimalAnnual.gainOverHorizontalPct.toFixed(2)}%</strong>
-          </div>
-          <div class="result-stat-sub">
-            <span>${t.results.annualTotalRad}</span>
-            <strong>${Math.round(res.optimalAnnual.annualTotalKwh)} kWh/m²·año</strong>
-          </div>
-        </div>
+      <!-- 2. INCLINACIÓN ÓPTIMA ANUAL: ESTUDIO COMPLETO & TABLA MATRIZ ORIENTSOL 3.0 -->
+      <div id="opt-annual-study-mount-point"></div>
 
+      <!-- OPTIMIZACIONES ADICIONALES: ESTACIONAL (4) Y MENSUAL (12) -->
+      <div class="results-section-grid">
         <!-- 2.2 4 Posiciones Estacionales -->
         <div class="result-card">
           <div class="result-card-header">
@@ -1175,6 +1159,18 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         </div>
       </div>
     `;
+
+    // Mount OrientSol 3.0 Inclinación Óptima Anual Study Panel
+    const optStudyMountPoint = resultsContainer.querySelector<HTMLDivElement>('#opt-annual-study-mount-point');
+    if (optStudyMountPoint) {
+      optStudyMountPoint.innerHTML = '';
+      const studyPanel = renderOptimalAnnualStudyPanel({
+        simulationResult: res,
+        locationName: res.locationName,
+        latitude: res.latitude,
+      });
+      optStudyMountPoint.appendChild(studyPanel);
+    }
 
     // Event Listeners for Export & Report Actions
     const pdfBtn = resultsContainer.querySelector<HTMLButtonElement>('#btn-export-pdf');
