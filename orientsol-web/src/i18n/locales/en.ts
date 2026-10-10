@@ -108,7 +108,7 @@ export const en: Translations = {
     angleRangeNotice: 'Must be a value between 1° and 90°',
     viewChartsBtn: 'View charts',
     energyCalcBtn: 'Energy calculation',
-    exportExcelBtn: 'Export to Excel (CSV)',
+    exportExcelBtn: 'Export to Excel',
     generateReportBtn: 'Generate report',
     monthlyRadSubtitle: 'Monthly mean {comp} radiation (kWh/m²/day)',
     radGlobal: 'global',
@@ -222,7 +222,7 @@ export const en: Translations = {
     // Export Actions
     exportActionsTitle: 'Data Export & Technical Reports',
     exportPdfBtn: 'Export PDF Report / Print',
-    exportCsvBtn: 'Download CSV Dataset',
+    exportCsvBtn: 'Export to Excel',
     exportCopyBtn: 'Copy Technical Summary',
     exportCopied: 'Summary copied to clipboard!',
   },

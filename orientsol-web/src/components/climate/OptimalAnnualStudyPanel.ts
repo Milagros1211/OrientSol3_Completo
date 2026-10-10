@@ -6,6 +6,10 @@ import {
   saveSvgChartLocally,
 } from '@/components/charts/OptimalAnnualCharts';
 import * as XLSX from 'xlsx';
+import {
+  showPdfGenerationNoticeModal,
+  generateOrientSolPDFReport,
+} from '@/components/export/pdfReportGenerator';
 
 export type RadiationComponentType = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 export type TableRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
@@ -166,7 +170,7 @@ function showAlbedoWarningModal(isEn: boolean) {
 /**
  * Shows MATLAB Figura 5.2.65 Choice Dialog for Excel Export
  */
-function showExcelExportModal(
+export function showExcelExportModal(
   res: SolarBridgeSimulationResult,
   angleX: number,
   isEn: boolean
@@ -1288,10 +1292,9 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
     // 8. Generate Report (PDF)
     const btnExportReport = container.querySelector<HTMLButtonElement>('#btn-export-opt-report');
     btnExportReport?.addEventListener('click', () => {
-      const pdfBtn = document.querySelector<HTMLButtonElement>('#btn-export-pdf');
-      if (pdfBtn) {
-        pdfBtn.click();
-      }
+      showPdfGenerationNoticeModal(isEn, () => {
+        generateOrientSolPDFReport(res, isEn);
+      });
     });
   }
 
