@@ -167,11 +167,26 @@ export class ClimateDatabaseService {
 
     if (supabase && this.isOnline()) {
       try {
-        const { data, error } = await supabase
-          .from('datos_mensuales')
-          .select('*');
+        // Paginate through Supabase to retrieve all rows beyond default 1000-row limit
+        const allRows: any[] = [];
+        let from = 0;
+        const PAGE_SIZE = 1000;
 
-        if (!error && Array.isArray(data) && data.length > 0) {
+        while (true) {
+          const { data: page, error: pageErr } = await supabase
+            .from('datos_mensuales')
+            .select('*')
+            .range(from, from + PAGE_SIZE - 1);
+
+          if (pageErr || !page || page.length === 0) break;
+          allRows.push(...page);
+          if (page.length < PAGE_SIZE) break;
+          from += PAGE_SIZE;
+        }
+
+        const data = allRows;
+
+        if (Array.isArray(data) && data.length > 0) {
           // Check if table contains monthly normalized rows (nombre_emplazamiento, mes, radiacion_media, temp_media)
           const isMonthlyRows = data.some((r: any) => r.nombre_emplazamiento !== undefined || r.mes !== undefined);
 
@@ -227,6 +242,22 @@ export class ClimateDatabaseService {
                 },
               });
             }
+
+            // Deduplication: if a location has a version with _VersionOriginal (exact BBDD.xlsx data),
+            // it supersedes the raw collected location
+            const versionOriginalBases = new Set<string>();
+            for (const r of records) {
+              if (r.locationName.endsWith('_VersionOriginal')) {
+                const base = r.locationName.replace('_VersionOriginal', '').trim().toLowerCase();
+                versionOriginalBases.add(base);
+              }
+            }
+
+            records = records.filter((r) => {
+              if (r.locationName.endsWith('_VersionOriginal')) return true;
+              const base = r.locationName.trim().toLowerCase();
+              return !versionOriginalBases.has(base);
+            });
           } else {
             // Fallback for wide format
             records = data.map((row: any) => ({
