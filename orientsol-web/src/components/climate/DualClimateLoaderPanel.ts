@@ -22,7 +22,10 @@ import {
 } from '@/components/climate/OptimalAnnualStudyPanel';
 import { renderOptimalSeasonalStudyPanel } from '@/components/climate/OptimalSeasonalStudyPanel';
 import { renderTrackingPolarStudyPanel } from '@/components/climate/TrackingPolarStudyPanel';
+import { renderTrackingAzimuthalStudyPanel } from '@/components/climate/TrackingAzimuthalStudyPanel';
+import { renderTrackingHorizontalStudyPanel } from '@/components/climate/TrackingHorizontalStudyPanel';
 import { renderTrackingDualAxisStudyPanel } from '@/components/climate/TrackingDualAxisStudyPanel';
+import { renderComparativeStudyPanel } from '@/components/climate/ComparativeStudyPanel';
 import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
@@ -32,7 +35,7 @@ import {
 let cachedLastSimulationResult: SolarBridgeSimulationResult | null = null;
 let cachedActiveRecord: ClimateDataRecord | null = null;
 let cachedActiveTab: 'historical' | 'manual' | 'upload' | 'api' = 'historical';
-let cachedActiveStudyOp: 'annual' | 'seasonal' | 'polar' | 'dual' = 'annual';
+let cachedActiveStudyOp: 'annual' | 'seasonal' | 'polar' | 'azimuthal' | 'horizontal' | 'dual' | 'comparative' = 'annual';
 
 /**
  * Renders the banner indicating whether online upload to Supabase is permitted or in offline cache mode.
@@ -1247,7 +1250,23 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
               <line x1="6" y1="18" x2="18" y2="6"></line>
               <polyline points="10 6 18 6 18 14"></polyline>
             </svg>
-            <span>${isEn ? '3. Polar 1-axis tracking' : '3. Seguimiento a un eje polar'}</span>
+            <span>${isEn ? '3. Polar 1-axis' : '3. Seg. 1 eje polar'}</span>
+          </button>
+
+          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'azimuthal' ? 'active' : ''}" data-study-op="azimuthal">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <ellipse cx="12" cy="12" rx="9" ry="5"></ellipse>
+              <line x1="12" y1="3" x2="12" y2="21"></line>
+            </svg>
+            <span>${isEn ? '4. Azimuthal 1-axis' : '4. Seg. 1 eje azimutal'}</span>
+          </button>
+
+          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'horizontal' ? 'active' : ''}" data-study-op="horizontal">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12" stroke-width="3"></line>
+              <circle cx="12" cy="12" r="6"></circle>
+            </svg>
+            <span>${isEn ? '5. Horizontal 1-axis' : '5. Seg. 1 eje horizontal'}</span>
           </button>
 
           <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'dual' ? 'active' : ''}" data-study-op="dual">
@@ -1256,7 +1275,15 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
               <path d="M12 3v18"></path>
               <path d="M3 12h18"></path>
             </svg>
-            <span>${isEn ? '4. Two-axis tracking' : '4. Seguimiento a dos ejes'}</span>
+            <span>${isEn ? '6. Two-axis tracking' : '6. Seg. a dos ejes'}</span>
+          </button>
+
+          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'comparative' ? 'active' : ''}" data-study-op="comparative" style="border-color: #f59e0b; background: rgba(245, 158, 11, 0.1);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#f59e0b" stroke-width="2">
+              <path d="M3 3v18h18"></path>
+              <path d="M18 9l-5 5-4-4-3 3"></path>
+            </svg>
+            <span style="color: #fbbf24; font-weight: 700;">${isEn ? '7. Comparative study' : '7. Comparativa de estudios'}</span>
           </button>
         </div>
       </div>
@@ -1478,12 +1505,44 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           },
         });
         mountPoint.appendChild(p);
+      } else if (op === 'azimuthal') {
+        const p = renderTrackingAzimuthalStudyPanel({
+          simulationResult: res,
+          locationName: res.locationName,
+          latitude: res.latitude,
+          peakPowerKw: currentPeakKw,
+          onBack: () => {
+            resultsContainer.querySelector('.operation-selector-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          },
+        });
+        mountPoint.appendChild(p);
+      } else if (op === 'horizontal') {
+        const p = renderTrackingHorizontalStudyPanel({
+          simulationResult: res,
+          locationName: res.locationName,
+          latitude: res.latitude,
+          peakPowerKw: currentPeakKw,
+          onBack: () => {
+            resultsContainer.querySelector('.operation-selector-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          },
+        });
+        mountPoint.appendChild(p);
       } else if (op === 'dual') {
         const p = renderTrackingDualAxisStudyPanel({
           simulationResult: res,
           locationName: res.locationName,
           latitude: res.latitude,
           peakPowerKw: currentPeakKw,
+          onBack: () => {
+            resultsContainer.querySelector('.operation-selector-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          },
+        });
+        mountPoint.appendChild(p);
+      } else if (op === 'comparative') {
+        const p = renderComparativeStudyPanel({
+          simulationResult: res,
+          locationName: res.locationName,
+          latitude: res.latitude,
           onBack: () => {
             resultsContainer.querySelector('.operation-selector-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           },
@@ -1513,7 +1572,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     pdfBtn?.addEventListener('click', () => {
       showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn);
+        generateOrientSolPDFReport(res, isEn, cachedActiveStudyOp);
       });
     });
 

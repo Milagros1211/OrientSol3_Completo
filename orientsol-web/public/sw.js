@@ -40,6 +40,11 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
+  // Only intercept same-origin requests; allow external API calls (PVGIS, Open-Meteo, NASA, Supabase) to proceed untouched
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
   // 1. NAVIGATION & HTML REQUESTS: NETWORK-FIRST
   // Guarantees that users always receive the latest application bundle rather than stale cached pages
   const isNavigation =

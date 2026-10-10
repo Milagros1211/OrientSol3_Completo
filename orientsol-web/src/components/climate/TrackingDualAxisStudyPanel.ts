@@ -365,7 +365,7 @@ export function renderTrackingDualAxisStudyPanel(props: TrackingDualStudyProps):
 
     container.querySelector<HTMLButtonElement>('#btn-dual-export-report')?.addEventListener('click', () => {
       showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn);
+        generateOrientSolPDFReport(res, isEn, 'dual');
       });
     });
   }

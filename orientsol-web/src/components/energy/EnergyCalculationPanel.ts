@@ -10,7 +10,7 @@ export interface EnergyCalculationProps {
   simulationResult: SolarBridgeSimulationResult;
   locationName: string;
   latitude: number;
-  studyType?: 'annual' | 'seasonal' | 'polar' | 'dual';
+  studyType?: 'annual' | 'seasonal' | 'polar' | 'azimuthal' | 'horizontal' | 'dual';
   initialPeakKw?: number;
   onClose?: () => void;
 }
@@ -204,6 +204,10 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
       ? res.seasonal.monthlyDailyKwh
       : studyType === 'polar'
       ? res.tracking.polarAxis.monthlyDailyKwh
+      : studyType === 'azimuthal'
+      ? res.tracking.azimuthalAxis.monthlyDailyKwh
+      : studyType === 'horizontal'
+      ? res.tracking.horizontalAxis.monthlyDailyKwh
       : studyType === 'dual'
       ? res.tracking.dualAxis.monthlyDailyKwh
       : res.optimalAnnual.monthlyDailyKwh;
@@ -218,6 +222,10 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
         ? (isEn ? 'Seasonal optimal tilt' : 'Inclinación óptima estacional')
         : studyType === 'polar'
         ? (isEn ? 'Polar single-axis tracking' : 'Seguimiento a un eje polar')
+        : studyType === 'azimuthal'
+        ? (isEn ? 'Azimuthal single-axis tracking' : 'Seguimiento a un eje azimutal')
+        : studyType === 'horizontal'
+        ? (isEn ? 'Horizontal single-axis tracking' : 'Seguimiento a un eje horizontal')
         : studyType === 'dual'
         ? (isEn ? 'Two-axis solar tracking' : 'Seguimiento a dos ejes')
         : (isEn ? 'Annual optimal tilt' : 'Inclinación óptima anual');
@@ -238,6 +246,16 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
         ? `Performed study (Polar 1-axis)`
         : `Estudio realizado (Seg. 1 eje polar)`;
       studyBadge = isEn ? 'Polar 1-Axis' : 'Eje Polar';
+    } else if (studyType === 'azimuthal') {
+      studyColTitle = isEn
+        ? `Performed study (Azimuthal 1-axis)`
+        : `Estudio realizado (Seg. 1 eje azimutal)`;
+      studyBadge = isEn ? 'Azimuthal 1-Axis' : 'Eje Azimutal';
+    } else if (studyType === 'horizontal') {
+      studyColTitle = isEn
+        ? `Performed study (Horizontal 1-axis)`
+        : `Estudio realizado (Seg. 1 eje horizontal)`;
+      studyBadge = isEn ? 'Horizontal 1-Axis' : 'Eje Horizontal';
     } else if (studyType === 'dual') {
       studyColTitle = isEn
         ? `Performed study (2-axis tracking)`
