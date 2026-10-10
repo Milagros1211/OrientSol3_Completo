@@ -33,8 +33,13 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
   const springDeg = res.seasonal.springTiltDeg;
   const summerDeg = res.seasonal.summerTiltDeg;
   const autumnDeg = res.seasonal.autumnTiltDeg;
+  const optTiltAnnual = res.optimalAnnual?.optimalTiltDeg ?? 30;
 
-  // Calculates 12-month array at respective seasonal angles
+  // Calculates 12-month array at respective seasonal angles:
+  // Dec (11), Jan (0), Feb (1) -> winter
+  // Mar (2), Apr (3), May (4) -> spring
+  // Jun (5), Jul (6), Aug (7) -> summer
+  // Sep (8), Oct (9), Nov (10) -> autumn
   function getSeasonalVector(comp: TableRadiationComponent): number[] {
     const vals: number[] = new Array(12).fill(0);
     for (let m = 0; m < 12; m++) {
@@ -54,41 +59,56 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
 
     const compKey = isAll ? 'global' : (selectedComponent as TableRadiationComponent);
     const rad0 = getMonthlyRadiationForAngle(res, compKey, 0);
+    const radOptAnu = getMonthlyRadiationForAngle(res, compKey, optTiltAnnual);
     const radSeas = getSeasonalVector(compKey);
 
     const allData = {
       global: {
         rad0: getMonthlyRadiationForAngle(res, 'global', 0),
+        radOptAnu: getMonthlyRadiationForAngle(res, 'global', optTiltAnnual),
         radSeas: getSeasonalVector('global'),
       },
       beam: {
         rad0: getMonthlyRadiationForAngle(res, 'beam', 0),
+        radOptAnu: getMonthlyRadiationForAngle(res, 'beam', optTiltAnnual),
         radSeas: getSeasonalVector('beam'),
       },
       diffuse: {
         rad0: getMonthlyRadiationForAngle(res, 'diffuse', 0),
+        radOptAnu: getMonthlyRadiationForAngle(res, 'diffuse', optTiltAnnual),
         radSeas: getSeasonalVector('diffuse'),
       },
       albedo: {
         rad0: getMonthlyRadiationForAngle(res, 'albedo', 0),
+        radOptAnu: getMonthlyRadiationForAngle(res, 'albedo', optTiltAnnual),
         radSeas: getSeasonalVector('albedo'),
       },
     };
 
-    const calcGainsPct = (seasArr: number[], zeroArr: number[]) =>
-      seasArr.map((opt, i) => (zeroArr[i] > 0 ? ((opt - zeroArr[i]) / zeroArr[i]) * 100 : 0));
+    const calcGainsPct = (seasArr: number[], baseArr: number[]) =>
+      seasArr.map((seas, i) => (baseArr[i] > 0 ? ((seas - baseArr[i]) / baseArr[i]) * 100 : 0));
 
-    const gainsPct = isAlbedo ? new Array(12).fill(0) : calcGainsPct(radSeas, rad0);
-    const allGainsPct = {
+    // Gains vs 0° and vs Annual optimal tilt
+    const gainsVs0 = isAlbedo ? new Array(12).fill(0) : calcGainsPct(radSeas, rad0);
+    const gainsVsAnu = isAlbedo && optTiltAnnual === 0 ? new Array(12).fill(0) : calcGainsPct(radSeas, radOptAnu);
+
+    const allGainsVs0 = {
       global: calcGainsPct(allData.global.radSeas, allData.global.rad0),
       beam: calcGainsPct(allData.beam.radSeas, allData.beam.rad0),
       diffuse: calcGainsPct(allData.diffuse.radSeas, allData.diffuse.rad0),
       albedo: new Array(12).fill(0),
     };
 
-    const minVal = (arr: number[]) => Math.min(...arr);
-    const meanVal = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
-    const maxVal = (arr: number[]) => Math.max(...arr);
+    const allGainsVsAnu = {
+      global: calcGainsPct(allData.global.radSeas, allData.global.radOptAnu),
+      beam: calcGainsPct(allData.beam.radSeas, allData.beam.radOptAnu),
+      diffuse: calcGainsPct(allData.diffuse.radSeas, allData.diffuse.radOptAnu),
+      albedo: calcGainsPct(allData.albedo.radSeas, allData.albedo.radOptAnu),
+    };
+
+    const minVal = (arr: number[]) => (arr.length ? Math.min(...arr) : 0);
+    const meanVal = (arr: number[]) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0);
+    const maxVal = (arr: number[]) => (arr.length ? Math.max(...arr) : 0);
 
     const compName =
       selectedComponent === 'global'
@@ -126,6 +146,38 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
     const legendText = isDark ? '#f8fafc' : '#0f172a';
 
     // -------------------------------------------------------------
+    // Seasonal Shading Helpers (Matching Table Colors from Imagen 1)
+    // -------------------------------------------------------------
+    // Winter: Dec, Jan, Feb -> Blue/Cyan
+    // Spring: Mar, Apr, May -> Green
+    // Summer: Jun, Jul, Aug -> Amber/Yellow
+    // Autumn: Sep, Oct, Nov -> Brown/Rust
+    const seasonBands = (innerWVal: number, padLeft: number, padTop: number, innerHVal: number) => {
+      const slotW = innerWVal / 12;
+      return `
+        <!-- Invierno (Ene, Feb) -->
+        <rect x="${padLeft}" y="${padTop}" width="${slotW * 2}" height="${innerHVal}" fill="rgba(2, 132, 199, 0.10)" />
+        <text x="${padLeft + slotW}" y="${padTop + 12}" fill="rgba(56, 189, 248, 0.7)" font-size="9" text-anchor="middle" font-weight="700">❄️ INV</text>
+        
+        <!-- Primavera (Mar, Abr, May) -->
+        <rect x="${padLeft + slotW * 2}" y="${padTop}" width="${slotW * 3}" height="${innerHVal}" fill="rgba(22, 163, 74, 0.10)" />
+        <text x="${padLeft + slotW * 3.5}" y="${padTop + 12}" fill="rgba(74, 222, 128, 0.7)" font-size="9" text-anchor="middle" font-weight="700">🌸 PRIM</text>
+        
+        <!-- Verano (Jun, Jul, Ago) -->
+        <rect x="${padLeft + slotW * 5}" y="${padTop}" width="${slotW * 3}" height="${innerHVal}" fill="rgba(217, 119, 6, 0.10)" />
+        <text x="${padLeft + slotW * 6.5}" y="${padTop + 12}" fill="rgba(250, 204, 21, 0.7)" font-size="9" text-anchor="middle" font-weight="700">☀️ VER</text>
+        
+        <!-- Otoño (Sep, Oct, Nov) -->
+        <rect x="${padLeft + slotW * 8}" y="${padTop}" width="${slotW * 3}" height="${innerHVal}" fill="rgba(154, 52, 18, 0.10)" />
+        <text x="${padLeft + slotW * 9.5}" y="${padTop + 12}" fill="rgba(251, 146, 60, 0.7)" font-size="9" text-anchor="middle" font-weight="700">🍂 OTO</text>
+        
+        <!-- Invierno (Dic) -->
+        <rect x="${padLeft + slotW * 11}" y="${padTop}" width="${slotW}" height="${innerHVal}" fill="rgba(2, 132, 199, 0.10)" />
+        <text x="${padLeft + slotW * 11.5}" y="${padTop + 12}" fill="rgba(56, 189, 248, 0.7)" font-size="9" text-anchor="middle" font-weight="700">❄️ INV</text>
+      `;
+    };
+
+    // -------------------------------------------------------------
     // SVG 1: Top Plot (Line Chart of Radiation vs Months)
     // -------------------------------------------------------------
     const plotW = 540;
@@ -136,7 +188,7 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
 
     const maxRadiationY = isAll ? 8 : Math.ceil(Math.max(...radSeas, ...rad0, 1.0) * 1.15);
     const yTop = (v: number) => pad.top + innerH - (Math.min(v, maxRadiationY) / maxRadiationY) * innerH;
-    const xMonth = (idx: number) => pad.left + (idx / 11) * innerW;
+    const xMonth = (idx: number) => pad.left + (idx + 0.5) * (innerW / 12);
 
     let gridLinesTop = '';
     const yTicksCount = maxRadiationY <= 6 ? maxRadiationY : 4;
@@ -170,7 +222,7 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
           ? '#84cc16'
           : selectedComponent === 'albedo'
           ? '#f59e0b'
-          : '#0284c7';
+          : '#38bdf8';
 
       const colorZero =
         selectedComponent === 'beam'
@@ -182,8 +234,8 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
           : '#0369a1';
 
       topSeriesHtml = `
-        <path d="${makeLineD(radSeas)}" fill="none" stroke="${colorSeas}" stroke-width="2.6" stroke-linecap="round" />
-        <path d="${makeLineD(rad0)}" fill="none" stroke="${colorZero}" stroke-width="2.6" stroke-linecap="round" />
+        <path d="${makeLineD(radSeas)}" fill="none" stroke="${colorSeas}" stroke-width="2.8" stroke-linecap="round" />
+        <path d="${makeLineD(rad0)}" fill="none" stroke="${colorZero}" stroke-width="2.8" stroke-linecap="round" />
       `;
 
       topLegendHtml = `
@@ -197,34 +249,34 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
       `;
     } else {
       topSeriesHtml = `
-        <path d="${makeLineD(allData.global.radSeas)}" fill="none" stroke="#0284c7" stroke-width="2.4" />
-        <path d="${makeLineD(allData.global.rad0)}" fill="none" stroke="#0369a1" stroke-width="2.4" />
+        <path d="${makeLineD(allData.global.radSeas)}" fill="none" stroke="#38bdf8" stroke-width="2.4" />
+        <path d="${makeLineD(allData.global.rad0)}" fill="none" stroke="#0284c7" stroke-width="2.4" />
         <path d="${makeLineD(allData.beam.radSeas)}" fill="none" stroke="#ef4444" stroke-width="2.4" />
-        <path d="${makeLineD(allData.beam.rad0)}" fill="none" stroke="#f87171" stroke-width="2.4" />
-        <path d="${makeLineD(allData.diffuse.radSeas)}" fill="none" stroke="#d4ac0d" stroke-width="2.4" />
-        <path d="${makeLineD(allData.diffuse.rad0)}" fill="none" stroke="#27ae60" stroke-width="2.4" />
-        <path d="${makeLineD(allData.albedo.radSeas)}" fill="none" stroke="#e67e22" stroke-width="2.4" />
-        <path d="${makeLineD(allData.albedo.rad0)}" fill="none" stroke="#7e5109" stroke-width="2.4" />
+        <path d="${makeLineD(allData.beam.rad0)}" fill="none" stroke="#b91c1c" stroke-width="2.4" />
+        <path d="${makeLineD(allData.diffuse.radSeas)}" fill="none" stroke="#84cc16" stroke-width="2.4" />
+        <path d="${makeLineD(allData.diffuse.rad0)}" fill="none" stroke="#15803d" stroke-width="2.4" />
+        <path d="${makeLineD(allData.albedo.radSeas)}" fill="none" stroke="#f59e0b" stroke-width="2.4" />
+        <path d="${makeLineD(allData.albedo.rad0)}" fill="none" stroke="#92400e" stroke-width="2.4" />
       `;
 
       topLegendHtml = `
         <g transform="translate(${pad.left + innerW + 8}, ${pad.top - 12})">
           <rect x="0" y="0" width="80" height="152" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-          <line x1="6" y1="14" x2="22" y2="14" stroke="#0284c7" stroke-width="2.5" />
+          <line x1="6" y1="14" x2="22" y2="14" stroke="#38bdf8" stroke-width="2.5" />
           <text x="26" y="17" fill="${legendText}" font-size="9.5" font-weight="600">Gdm(ópt)</text>
-          <line x1="6" y1="32" x2="22" y2="32" stroke="#0369a1" stroke-width="2.5" />
+          <line x1="6" y1="32" x2="22" y2="32" stroke="#0284c7" stroke-width="2.5" />
           <text x="26" y="35" fill="${legendText}" font-size="9.5" font-weight="600">Gdm(0°)</text>
           <line x1="6" y1="50" x2="22" y2="50" stroke="#ef4444" stroke-width="2.5" />
           <text x="26" y="53" fill="${legendText}" font-size="9.5" font-weight="600">Bdm(ópt)</text>
-          <line x1="6" y1="68" x2="22" y2="68" stroke="#f87171" stroke-width="2.5" />
+          <line x1="6" y1="68" x2="22" y2="68" stroke="#b91c1c" stroke-width="2.5" />
           <text x="26" y="71" fill="${legendText}" font-size="9.5" font-weight="600">Bdm(0°)</text>
-          <line x1="6" y1="86" x2="22" y2="86" stroke="#d4ac0d" stroke-width="2.5" />
+          <line x1="6" y1="86" x2="22" y2="86" stroke="#84cc16" stroke-width="2.5" />
           <text x="26" y="89" fill="${legendText}" font-size="9.5" font-weight="600">Ddm(ópt)</text>
-          <line x1="6" y1="104" x2="22" y2="104" stroke="#27ae60" stroke-width="2.5" />
+          <line x1="6" y1="104" x2="22" y2="104" stroke="#15803d" stroke-width="2.5" />
           <text x="26" y="107" fill="${legendText}" font-size="9.5" font-weight="600">Ddm(0°)</text>
-          <line x1="6" y1="122" x2="22" y2="122" stroke="#e67e22" stroke-width="2.5" />
+          <line x1="6" y1="122" x2="22" y2="122" stroke="#f59e0b" stroke-width="2.5" />
           <text x="26" y="125" fill="${legendText}" font-size="9.5" font-weight="600">Rdm(ópt)</text>
-          <line x1="6" y1="140" x2="22" y2="140" stroke="#7e5109" stroke-width="2.5" />
+          <line x1="6" y1="140" x2="22" y2="140" stroke="#92400e" stroke-width="2.5" />
           <text x="26" y="143" fill="${legendText}" font-size="9.5" font-weight="600">Rdm(0°)</text>
         </g>
       `;
@@ -236,17 +288,15 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
         <text x="14" y="${plotH / 2}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle" transform="rotate(-90 14 ${plotH / 2})">${isEn ? 'Radiation' : 'Radiación'}</text>
         <text x="${pad.left + innerW / 2}" y="${plotH - 8}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle">${isEn ? 'Months' : 'Meses'}</text>
 
+        ${seasonBands(innerW, pad.left, pad.top, innerH)}
         ${gridLinesTop}
         ${topSeriesHtml}
 
         <rect x="${pad.left}" y="${pad.top}" width="${innerW}" height="${innerH}" fill="none" stroke="${plotBorder}" />
 
         ${MONTH_NAMES_SHORT.map((m, i) => {
-          if (i % 2 === 1) {
-            const x = xMonth(i);
-            return `<text x="${x}" y="${pad.top + innerH + 15}" fill="${tickColor}" font-size="10" text-anchor="middle" font-family="monospace">${m}</text>`;
-          }
-          return '';
+          const x = xMonth(i);
+          return `<text x="${x}" y="${pad.top + innerH + 15}" fill="${tickColor}" font-size="10" text-anchor="middle" font-family="monospace">${m}</text>`;
         }).join('')}
 
         ${topLegendHtml}
@@ -254,7 +304,7 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
     `;
 
     // -------------------------------------------------------------
-    // SVG 2: Bottom Plot (Bar Chart of Gains %)
+    // SVG 2: Bottom Plot (Bar Chart of Gains %) - Full Negative & Dual-Bar Support
     // -------------------------------------------------------------
     const bottomPlotW = 540;
     const bottomPlotH = 200;
@@ -262,15 +312,46 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
     const bInnerW = bottomPlotW - bPad.left - bPad.right;
     const bInnerH = bottomPlotH - bPad.top - bPad.bottom;
 
-    const maxGainY = 100;
-    const minGainY = 0;
+    // Calculate realistic dynamic Y limits to ensure negative diffuse or tracking gains render properly!
+    const allGainsPool = isAll
+      ? [
+          ...allGainsVs0.global,
+          ...allGainsVs0.beam,
+          ...allGainsVs0.diffuse,
+          ...allGainsVsAnu.global,
+          ...allGainsVsAnu.beam,
+          ...allGainsVsAnu.diffuse,
+        ]
+      : isAlbedo
+      ? gainsVsAnu
+      : [...gainsVs0, ...gainsVsAnu];
+
+    const rawMinGain = Math.min(...allGainsPool, 0);
+    const rawMaxGain = Math.max(...allGainsPool, 10);
+
+    let minGainY = 0;
+    if (rawMinGain < -0.1) {
+      minGainY = Math.floor((rawMinGain * 1.15) / 10) * 10;
+    }
+    let maxGainY = Math.ceil((rawMaxGain * 1.15) / 10) * 10;
+    if (maxGainY - minGainY < 30) maxGainY = minGainY + 30;
+
     const yBottom = (v: number) => {
       const clamped = Math.max(minGainY, Math.min(maxGainY, v));
-      return bPad.top + bInnerH - (clamped / maxGainY) * bInnerH;
+      const ratio = (clamped - minGainY) / (maxGainY - minGainY);
+      return bPad.top + bInnerH - ratio * bInnerH;
     };
 
     let gridLinesBottom = '';
-    const bTicks = [0, 50, 100];
+    // Generate 4 to 5 ticks including 0
+    const bTicks: number[] = [];
+    const step = Math.max(10, Math.round((maxGainY - minGainY) / 4 / 5) * 5);
+    for (let tVal = minGainY; tVal <= maxGainY + 0.1; tVal += step) {
+      bTicks.push(Math.round(tVal));
+    }
+    if (!bTicks.includes(0)) bTicks.push(0);
+    bTicks.sort((a, b) => a - b);
+
     for (const v of bTicks) {
       const y = yBottom(v);
       if (gridBottomEnabled) {
@@ -282,26 +363,48 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
     let bottomBarsHtml = '';
     let bottomLegendHtml = '';
 
+    const yZero = yBottom(0);
+
     if (!isAll) {
-      const colW = (bInnerW / 12) * 0.55;
-      const singleColor = selectedComponent === 'beam' ? '#ef4444' : selectedComponent === 'diffuse' ? '#10b981' : '#0284c7';
-      bottomBarsHtml = gainsPct
-        .map((g, i) => {
-          const x = bPad.left + (i / 11) * (bInnerW - colW);
-          const y = yBottom(Math.max(0, g));
-          const h = Math.abs(yBottom(0) - y);
-          return `<rect x="${x}" y="${y}" width="${colW}" height="${h}" fill="${singleColor}" stroke="#0f172a" stroke-width="0.5" />`;
-        })
-        .join('');
+      // TWO BARS PER MONTH: matching MATLAB OrientSol Grafica_OptEstacional:
+      // Bar 1: Gain vs 0° (Plano horizontal)
+      // Bar 2: Gain vs Ópt. anual
+      const monthSlotW = bInnerW / 12;
+      const barW = Math.max(4, monthSlotW * 0.36);
+      const gap = 2;
+
+      bottomBarsHtml = '';
+      for (let i = 0; i < 12; i++) {
+        const slotX = bPad.left + i * monthSlotW + (monthSlotW - (barW * 2 + gap)) / 2;
+        const g0 = gainsVs0[i];
+        const gAnu = gainsVsAnu[i];
+
+        // Bar 1: vs 0° (Cyan/Blue if positive, darker blue if negative)
+        const y1 = yBottom(g0);
+        const barY1 = Math.min(y1, yZero);
+        const barH1 = Math.max(0.5, Math.abs(y1 - yZero));
+        const color1 = g0 >= 0 ? '#0284c7' : '#0369a1';
+        bottomBarsHtml += `<rect x="${slotX}" y="${barY1}" width="${barW}" height="${barH1}" fill="${color1}" stroke="#0f172a" stroke-width="0.5" rx="1" />`;
+
+        // Bar 2: vs Ópt. anual (Green if positive, red if negative)
+        const y2 = yBottom(gAnu);
+        const barY2 = Math.min(y2, yZero);
+        const barH2 = Math.max(0.5, Math.abs(y2 - yZero));
+        const color2 = gAnu >= 0 ? '#10b981' : '#f43f5e';
+        bottomBarsHtml += `<rect x="${slotX + barW + gap}" y="${barY2}" width="${barW}" height="${barH2}" fill="${color2}" stroke="#0f172a" stroke-width="0.5" rx="1" />`;
+      }
 
       bottomLegendHtml = `
         <g transform="translate(${bPad.left + bInnerW + 10}, ${bPad.top + 10})">
-          <rect x="0" y="0" width="76" height="26" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-          <rect x="8" y="7" width="12" height="12" fill="${singleColor}" stroke="#0f172a" stroke-width="0.5" />
-          <text x="26" y="17" fill="${legendText}" font-size="10" font-weight="600">${isEn ? 'Gain %' : 'Ganancia %'}</text>
+          <rect x="0" y="0" width="76" height="46" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+          <rect x="8" y="8" width="12" height="12" fill="#0284c7" stroke="#0f172a" stroke-width="0.5" />
+          <text x="26" y="18" fill="${legendText}" font-size="10" font-weight="600">0°</text>
+          <rect x="8" y="26" width="12" height="12" fill="#10b981" stroke="#0f172a" stroke-width="0.5" />
+          <text x="26" y="36" fill="${legendText}" font-size="10" font-weight="600">Ópt. anu</text>
         </g>
       `;
     } else {
+      // 4 components grouped bars
       const monthSlotW = bInnerW / 12;
       const barW = Math.max(3, monthSlotW * 0.18);
       const gap = 1;
@@ -309,36 +412,37 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
       bottomBarsHtml = '';
       for (let i = 0; i < 12; i++) {
         const slotX = bPad.left + i * monthSlotW + 4;
-        const gG = allGainsPct.global[i];
-        const gB = allGainsPct.beam[i];
-        const gD = allGainsPct.diffuse[i];
-        const gR = allGainsPct.albedo[i];
+        const gG = allGainsVs0.global[i];
+        const gB = allGainsVs0.beam[i];
+        const gD = allGainsVs0.diffuse[i];
+        const gR = allGainsVs0.albedo[i];
 
         const bars = [
-          { val: gG, color: '#059669' },
-          { val: gB, color: '#10b981' },
+          { val: gG, color: '#0284c7' },
+          { val: gB, color: '#ef4444' },
           { val: gD, color: '#84cc16' },
-          { val: gR, color: '#eab308' },
+          { val: gR, color: '#f59e0b' },
         ];
 
         bars.forEach((b, bIdx) => {
           const bx = slotX + bIdx * (barW + gap);
-          const y = yBottom(Math.max(0, b.val));
-          const h = Math.abs(yBottom(0) - y);
-          bottomBarsHtml += `<rect x="${bx}" y="${y}" width="${barW}" height="${h}" fill="${b.color}" stroke="#064e3b" stroke-width="0.4" />`;
+          const y = yBottom(b.val);
+          const barY = Math.min(y, yZero);
+          const barH = Math.max(0.5, Math.abs(y - yZero));
+          bottomBarsHtml += `<rect x="${bx}" y="${barY}" width="${barW}" height="${barH}" fill="${b.color}" stroke="#0f172a" stroke-width="0.4" rx="1" />`;
         });
       }
 
       bottomLegendHtml = `
         <g transform="translate(${bPad.left + bInnerW + 8}, ${bPad.top + 5})">
           <rect x="0" y="0" width="76" height="84" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-          <rect x="6" y="8" width="10" height="10" fill="#059669" />
+          <rect x="6" y="8" width="10" height="10" fill="#0284c7" />
           <text x="22" y="16" fill="${legendText}" font-size="9" font-weight="600">0° - G</text>
-          <rect x="6" y="26" width="10" height="10" fill="#10b981" />
+          <rect x="6" y="26" width="10" height="10" fill="#ef4444" />
           <text x="22" y="34" fill="${legendText}" font-size="9" font-weight="600">0° - B</text>
           <rect x="6" y="44" width="10" height="10" fill="#84cc16" />
           <text x="22" y="52" fill="${legendText}" font-size="9" font-weight="600">0° - D</text>
-          <rect x="6" y="62" width="10" height="10" fill="#eab308" />
+          <rect x="6" y="62" width="10" height="10" fill="#f59e0b" />
           <text x="22" y="70" fill="${legendText}" font-size="9" font-weight="600">0° - R</text>
         </g>
       `;
@@ -350,8 +454,12 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
         <text x="14" y="${bottomPlotH / 2}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle" transform="rotate(-90 14 ${bottomPlotH / 2})">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</text>
         <text x="${bPad.left + bInnerW / 2}" y="${bottomPlotH - 8}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle">${isEn ? 'Months' : 'Meses'}</text>
 
+        ${seasonBands(bInnerW, bPad.left, bPad.top, bInnerH)}
         ${gridLinesBottom}
-        <line x1="${bPad.left}" y1="${yBottom(0)}" x2="${bPad.left + bInnerW}" y2="${yBottom(0)}" stroke="${zeroLineStroke}" stroke-width="1.2" />
+
+        <!-- Zero Line -->
+        <line x1="${bPad.left}" y1="${yZero}" x2="${bPad.left + bInnerW}" y2="${yZero}" stroke="${zeroLineStroke}" stroke-width="1.4" />
+
         ${bottomBarsHtml}
 
         <rect x="${bPad.left}" y="${bPad.top}" width="${bInnerW}" height="${bInnerH}" fill="none" stroke="${plotBorder}" />
@@ -478,18 +586,34 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
               </div>
 
               <div class="matlab-stat-frame frame-gain">
-                <div class="stat-frame-title title-gain">${isEn ? 'Gain (%)' : 'Ganancia (%)'}</div>
+                <div class="stat-frame-title title-gain">${isEn ? 'Gain vs 0° (%)' : 'Ganancia vs 0° (%)'}</div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Maximum' : 'Máximo'}</span>
-                  <strong>${maxVal(gainsPct).toFixed(2)} %</strong>
+                  <strong>${isAlbedo ? '-' : `${maxVal(gainsVs0).toFixed(2)} %`}</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Minimum' : 'Mínimo'}</span>
-                  <strong>${minVal(gainsPct).toFixed(2)} %</strong>
+                  <strong>${isAlbedo ? '-' : `${minVal(gainsVs0).toFixed(2)} %`}</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Mean' : 'Media'}</span>
-                  <strong>${meanVal(gainsPct).toFixed(2)} %</strong>
+                  <strong>${isAlbedo ? '-' : `${meanVal(gainsVs0).toFixed(2)} %`}</strong>
+                </div>
+              </div>
+
+              <div class="matlab-stat-frame" style="border: 1px solid #10b981; background: rgba(16, 185, 129, 0.08); border-radius: 4px; padding: 6px 10px;">
+                <div class="stat-frame-title" style="color: #34d399; font-weight: 700; font-size: 0.85rem; margin-bottom: 4px;">${isEn ? 'Gain vs Annual Opt (%)' : 'Ganancia vs Ópt. Anual (%)'}</div>
+                <div class="stat-frame-row">
+                  <span>${isEn ? 'Maximum' : 'Máximo'}</span>
+                  <strong>${isAlbedo && optTiltAnnual === 0 ? '-' : `${maxVal(gainsVsAnu).toFixed(2)} %`}</strong>
+                </div>
+                <div class="stat-frame-row">
+                  <span>${isEn ? 'Minimum' : 'Mínimo'}</span>
+                  <strong>${isAlbedo && optTiltAnnual === 0 ? '-' : `${minVal(gainsVsAnu).toFixed(2)} %`}</strong>
+                </div>
+                <div class="stat-frame-row">
+                  <span>${isEn ? 'Mean' : 'Media'}</span>
+                  <strong>${isAlbedo && optTiltAnnual === 0 ? '-' : `${meanVal(gainsVsAnu).toFixed(2)} %`}</strong>
                 </div>
               </div>
             </div>
