@@ -2,7 +2,6 @@ import './style.css';
 import {
   renderHeader,
   renderStatusBar,
-  renderLocationSelector,
   renderClimateIntegrationPanel,
   renderDualClimateLoaderPanel,
   renderPythonConsole,
@@ -11,14 +10,68 @@ import {
 import { pyodideService } from '@/services/pyodide';
 import { i18n } from '@/i18n';
 import { registerServiceWorker } from '@/sw-register';
-import type { LocationData } from '@/types/database';
+
+function renderAboutView(isEn: boolean): HTMLElement {
+  const container = document.createElement('section');
+  container.className = 'panel-card about-view-panel';
+  container.innerHTML = `
+    <div class="panel-header">
+      <div class="panel-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+      </div>
+      <div>
+        <h3 class="panel-title">${isEn ? 'About OrientSol 3.0 & Academic Project' : 'Acerca de OrientSol 3.0 & Proyecto Académico'}</h3>
+        <p class="panel-desc">${isEn ? 'Master Thesis in Renewable Energies — University of Jaén' : 'Trabajo Fin de Máster en Energías Renovables — Universidad de Jaén'}</p>
+      </div>
+    </div>
+
+    <div class="about-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-top: 1rem;">
+      <div class="result-card highlight-card">
+        <h4 style="margin-bottom: 0.75rem; color: var(--solar-amber);">${isEn ? 'Academic Framework (TFM)' : 'Marco Académico (TFM)'}</h4>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.88rem;">
+          <li><strong>${isEn ? 'Institution' : 'Institución'}:</strong> Universidad de Jaén (UJA)</li>
+          <li><strong>${isEn ? 'Degree' : 'Titulación'}:</strong> Máster Universitario en Energías Renovables</li>
+          <li><strong>${isEn ? 'Title' : 'Título'}:</strong> Desarrollo de un entorno software para optimización de posición y movimiento de superficies receptoras de radiación solar en un sistema fotovoltaico</li>
+          <li><strong>${isEn ? 'Student' : 'Alumna'}:</strong> Karina Milagros Baldeón Zárate</li>
+          <li><strong>${isEn ? 'Supervisors' : 'Directores'}:</strong> Dr. Leocadio Hontoria García &amp; Dra. Catalina Rus Casas</li>
+          <li><strong>${isEn ? 'Department' : 'Departamento'}:</strong> Ingeniería Electrónica y Automática</li>
+        </ul>
+      </div>
+
+      <div class="result-card">
+        <h4 style="margin-bottom: 0.75rem; color: var(--accent-cyan);">${isEn ? 'Scientific Modernization from MATLAB (.m)' : 'Modernización Científica desde MATLAB (.m)'}</h4>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 0.75rem;">
+          ${isEn 
+            ? 'OrientSol 3.0 is the complete web reimagining of the original desktop software developed in MATLAB/GUIDE (.m and .fig). All core solar geometry equations, radiation transposition, single and dual-axis tracking, and Osterwald cell thermal models now run client-side via WebAssembly (Pyodide + NumPy).'
+            : 'OrientSol 3.0 es la evolución moderna en entorno web del software original desarrollado en MATLAB/GUIDE (.m y .fig). Toda la geometría solar, transposición de radiación difusa y directa, seguimiento a 1 y 2 ejes y el modelo energético de Osterwald se ejecutan en el cliente mediante WebAssembly (Pyodide + NumPy).'}
+        </p>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="badge badge-success">Vite + TypeScript</span>
+          <span class="badge badge-neutral">NumPy 2.4.6 WASM</span>
+          <span class="badge badge-source">Multiplatform Web/Win/Android</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Attach architecture technical details inside About view
+  const archPanel = renderArchitectureOverview();
+  archPanel.style.marginTop = '1.5rem';
+  container.appendChild(archPanel);
+
+  return container;
+}
 
 function createApp() {
   const app = document.querySelector<HTMLDivElement>('#app')!;
   app.innerHTML = '';
-  const t = i18n.t;
+  const isEn = i18n.getLocale() === 'en';
 
-  // 1. App Header with Language Switcher
+  // 1. App Header with Language Switcher & WebAssembly Status
   const header = renderHeader();
   app.appendChild(header);
 
@@ -26,56 +79,110 @@ function createApp() {
   const main = document.createElement('main');
   main.className = 'main-container';
 
-  // Hero migration banner
-  const heroBanner = document.createElement('section');
-  heroBanner.className = 'hero-banner';
-  heroBanner.innerHTML = `
-    <div class="hero-content">
-      <h2>${t.hero.title}</h2>
-      <p>${t.hero.description}</p>
-    </div>
-    <div class="hero-stats">
-      <div class="hero-stat-card">
-        <span class="stat-number">192</span>
-        <span class="stat-label">${t.hero.statMatlab}</span>
-      </div>
-      <div class="hero-stat-card">
-        <span class="stat-number">0.27+</span>
-        <span class="stat-label">${t.hero.statWasm}</span>
-      </div>
-      <div class="hero-stat-card">
-        <span class="stat-number">100%</span>
-        <span class="stat-label">${t.hero.statPlatform}</span>
-      </div>
-    </div>
+  // 3. Primary Application Navigation Bar
+  const navBar = document.createElement('nav');
+  navBar.className = 'dual-tabs-bar app-main-nav';
+  navBar.style.marginBottom = '1.25rem';
+  navBar.innerHTML = `
+    <button class="dual-tab-btn active" data-app-tab="simulator">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+      </svg>
+      <span>${isEn ? 'Solar Simulator & Optimization' : 'Simulador & Optimización Solar'}</span>
+    </button>
+
+    <button class="dual-tab-btn" data-app-tab="satellite-apis">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"></path>
+      </svg>
+      <span>${isEn ? 'Satellite Climate APIs' : 'APIs Climáticas Satelitales'}</span>
+    </button>
+
+    <button class="dual-tab-btn" data-app-tab="console">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="4 17 10 11 4 5"></polyline>
+        <line x1="12" y1="19" x2="20" y2="19"></line>
+      </svg>
+      <span>${isEn ? 'Python WASM Console' : 'Consola Python (WASM)'}</span>
+    </button>
+
+    <button class="dual-tab-btn" data-app-tab="about">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      <span>${isEn ? 'About OrientSol & TFM' : 'Acerca de OrientSol & TFM'}</span>
+    </button>
   `;
-  main.appendChild(heroBanner);
+  main.appendChild(navBar);
 
-  // Location selector (Database integration)
-  const locationSelector = renderLocationSelector((location: LocationData, albedo: number) => {
-    console.log(`[OrientSol] Location: ${location.name}, Albedo: ${albedo}`);
-  });
-  main.appendChild(locationSelector);
-
-  // Real-time Climate APIs (NASA POWER, PVGIS, Meteonorm) + Supabase + Pyodide Calculation Bridge
-  const climatePanel = renderClimateIntegrationPanel();
-  main.appendChild(climatePanel);
-
-  // Hybrid Data Architecture & Dual Loading (Historical DB + Manual Entry + CSV/JSON Upload)
+  // Tab 1: Core Solar Simulation & Optimization Panel (Primary Application View)
+  const simView = document.createElement('div');
+  simView.id = 'app-view-simulator';
+  simView.className = 'app-tab-view';
   const dualLoaderPanel = renderDualClimateLoaderPanel();
-  main.appendChild(dualLoaderPanel);
+  simView.appendChild(dualLoaderPanel);
+  main.appendChild(simView);
 
-  // Python in-browser console (Pyodide verification)
+  // Tab 2: Satellite Climate APIs Panel
+  const climateView = document.createElement('div');
+  climateView.id = 'app-view-satellite-apis';
+  climateView.className = 'app-tab-view hidden';
+  const climatePanel = renderClimateIntegrationPanel();
+  climateView.appendChild(climatePanel);
+  main.appendChild(climateView);
+
+  // Tab 3: Interactive Python Console Panel
+  const consoleView = document.createElement('div');
+  consoleView.id = 'app-view-console';
+  consoleView.className = 'app-tab-view hidden';
   const consolePanel = renderPythonConsole();
-  main.appendChild(consolePanel);
+  consoleView.appendChild(consolePanel);
+  main.appendChild(consoleView);
 
-  // Architecture overview
-  const archPanel = renderArchitectureOverview();
-  main.appendChild(archPanel);
+  // Tab 4: About OrientSol & TFM View
+  const aboutView = document.createElement('div');
+  aboutView.id = 'app-view-about';
+  aboutView.className = 'app-tab-view hidden';
+  const aboutPanel = renderAboutView(isEn);
+  aboutView.appendChild(aboutPanel);
+  main.appendChild(aboutView);
+
+  // Primary App Navigation Event Listeners
+  const appTabs = navBar.querySelectorAll<HTMLButtonElement>('.dual-tab-btn');
+  const appViews: Record<string, HTMLElement> = {
+    simulator: simView,
+    'satellite-apis': climateView,
+    console: consoleView,
+    about: aboutView,
+  };
+
+  appTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      appTabs.forEach((t) => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const targetTab = tab.getAttribute('data-app-tab') || 'simulator';
+      Object.entries(appViews).forEach(([key, viewEl]) => {
+        if (key === targetTab) {
+          viewEl.classList.remove('hidden');
+        } else {
+          viewEl.classList.add('hidden');
+        }
+      });
+    });
+  });
 
   app.appendChild(main);
 
-  // 3. Status Bar Footer
+  // 4. Status Bar Footer
   const footer = renderStatusBar();
   app.appendChild(footer);
 }

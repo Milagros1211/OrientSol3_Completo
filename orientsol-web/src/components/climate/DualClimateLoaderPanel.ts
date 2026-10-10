@@ -16,6 +16,7 @@ import {
   exportToPDF,
   copyReportToClipboard,
 } from '@/components/export/reportExporter';
+import { pyodideService } from '@/services/pyodide';
 
 export function renderDualClimateLoaderPanel(): HTMLElement {
   const container = document.createElement('section');
@@ -860,6 +861,19 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
   // Initial render with first historical station
   setTimeout(() => renderActiveRecord(currentActiveRecord), 0);
+
+  // Auto-run simulation when Pyodide runtime is ready so the user immediately sees all calculation results
+  const autoUnsub = pyodideService.subscribe((state) => {
+    if (state.status === 'ready') {
+      setTimeout(() => {
+        if (!resultsContainer.hasChildNodes() || resultsContainer.classList.contains('hidden')) {
+          console.log('[OrientSol] Auto-triggering initial simulation for immediate full results');
+          simBtn.click();
+        }
+      }, 200);
+      autoUnsub();
+    }
+  });
 
   return container;
 }
