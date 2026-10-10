@@ -11,6 +11,18 @@ import type { LocationData } from '@/types/database';
 export const LOCATIONS_DATABASE: LocationData[] = [
   // SPAIN
   {
+    id: 'es-jaen',
+    name: 'Jaén',
+    country: 'España',
+    region: 'spain',
+    latitude: 37.77,
+    longitude: -3.78,
+    elevationM: 570,
+    // OrientSol MATLAB BBDD.xlsx canonical values:
+    monthlyGdm0: [2.47, 3.18, 4.72, 5.34, 6.62, 7.18, 7.04, 6.22, 4.98, 3.77, 2.50, 2.10],
+    monthlyTempC: [7.3, 8.7, 11.7, 14.1, 18.1, 23.7, 26.8, 26.7, 22.0, 16.7, 10.8, 8.0],
+  },
+  {
     id: 'es-madrid',
     name: 'Madrid',
     country: 'España',

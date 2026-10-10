@@ -1,5 +1,9 @@
 import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
+import {
+  renderInclinationEvolutionSvg,
+  renderMonthlyOptimumAndGainsSvg,
+} from '@/components/charts/OptimalAnnualCharts';
 
 export type RadiationComponentType = 'global' | 'beam' | 'diffuse' | 'albedo';
 
@@ -9,11 +13,30 @@ interface OptimalAnnualStudyProps {
   latitude: number;
 }
 
-// Module-level state to remember selected angle X and component across re-renders
+// Module-level state to remember selected angle X, component, and charts across re-renders
 let stateComponent: RadiationComponentType = 'global';
 let stateAngleX: number = 45;
 let stateComparisonMode: boolean = true; // Shows Angle X alongside optimal
 let stateShowAnglePicker: boolean = false;
+let stateShowCharts: boolean = true;
+let stateActiveChartTab: 'evolution' | 'monthly' = 'evolution';
+let stateGridEnabled: boolean = true;
+
+/**
+ * Computes the 91-point annual daily mean radiation curve across tilt angles 0° to 90°.
+ */
+export function getRadiationCurve91(
+  res: SolarBridgeSimulationResult,
+  component: RadiationComponentType
+): number[] {
+  const curve: number[] = [];
+  for (let deg = 0; deg <= 90; deg++) {
+    const vals = getMonthlyRadiationForAngle(res, component, deg);
+    const mean = vals.reduce((a, b) => a + b, 0) / (vals.length || 1);
+    curve.push(mean);
+  }
+  return curve;
+}
 
 /**
  * Extracts the 12 monthly daily radiation values for a specific tilt angle (0 to 90 degrees)
@@ -245,6 +268,8 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
     const meanFactorX = meanOf(gainsX.factors);
     const meanPctX = meanOf(gainsX.pcts);
 
+    const radiationCurve91 = getRadiationCurve91(res, stateComponent);
+
     const compSymbol =
       stateComponent === 'global' ? 'Gdm' : stateComponent === 'beam' ? 'Bdm' : stateComponent === 'diffuse' ? 'Ddm' : 'Rdm';
 
@@ -362,12 +387,12 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
               <span>${t.results.selectOtherAngleBtn} (β = ${stateAngleX}°)</span>
             </button>
 
-            <button id="btn-scroll-charts" class="btn-study-action" type="button">
+            <button id="btn-toggle-charts-view" class="btn-study-action ${stateShowCharts ? 'active' : ''}" type="button">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 3v18h18"></path>
                 <path d="m19 9-5 5-4-4-3 3"></path>
               </svg>
-              <span>${t.results.viewChartsBtn}</span>
+              <span>${stateShowCharts ? (isEn ? 'Hide Charts' : 'Ocultar gráficas') : t.results.viewChartsBtn}</span>
             </button>
           </div>
         </div>
@@ -579,6 +604,129 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
           </div>
         </div>
 
+        <!-- 6.1 Graphical Visualization Section matching MATLAB OrientSol 3.0 (Grafica_Inclinaciones.fig & Grafica_OptAnual.fig) -->
+        ${stateShowCharts ? `
+          <div id="opt-charts-panel" class="opt-charts-panel">
+            <div class="opt-charts-header">
+              <div class="opt-charts-tabs">
+                <button
+                  type="button"
+                  id="btn-chart-tab-evolution"
+                  class="opt-chart-tab-btn ${stateActiveChartTab === 'evolution' ? 'active' : ''}"
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"></path>
+                    <path d="m19 9-5 5-4-4-3 3"></path>
+                  </svg>
+                  <span>${t.results.chartEvolutionTab}</span>
+                </button>
+                <button
+                  type="button"
+                  id="btn-chart-tab-monthly"
+                  class="opt-chart-tab-btn ${stateActiveChartTab === 'monthly' ? 'active' : ''}"
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="12" width="4" height="9"></rect>
+                    <rect x="10" y="7" width="4" height="14"></rect>
+                    <rect x="17" y="3" width="4" height="18"></rect>
+                  </svg>
+                  <span>${t.results.chartMonthlyTab}</span>
+                </button>
+              </div>
+
+              <div class="opt-charts-controls">
+                <label class="opt-grid-toggle">
+                  <input type="checkbox" id="chk-chart-grid" ${stateGridEnabled ? 'checked' : ''} />
+                  <span>${t.results.chartEnableGrid}</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Sub-view 1: Grafica_Inclinaciones (4th Image) -->
+            ${stateActiveChartTab === 'evolution' ? `
+              <div class="opt-chart-view opt-view-evolution">
+                <div class="opt-chart-view-intro">
+                  <h4 class="opt-chart-question">${t.results.chartHowVariesQuestion}</h4>
+                  <div class="opt-chart-badge-comp">
+                    <span>${isEn ? 'Component' : 'Componente'}:</span>
+                    <strong>${compSymbol} (${stateComponent.toUpperCase()})</strong>
+                  </div>
+                </div>
+
+                <div class="opt-svg-wrapper">
+                  ${renderInclinationEvolutionSvg({
+                    radiationCurve: radiationCurve91,
+                    component: stateComponent,
+                    optimalAngle: optAngle,
+                    selectedAngleX: stateAngleX,
+                    gridEnabled: stateGridEnabled,
+                    isEn,
+                  })}
+                </div>
+
+                <div class="opt-chart-note">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  <span>${isEn
+                    ? `Peak radiation occurs at β = ${optAngle}° with ${meanOpt.toFixed(2)} kWh/m²/day. Horizontal plane (0°) yields ${mean0.toFixed(2)} kWh/m²/day, and selected Angle X (β = ${stateAngleX}°) yields ${meanX.toFixed(2)} kWh/m²/day.`
+                    : `El punto de máxima captación se sitúa en β = ${optAngle}° con ${meanOpt.toFixed(2)} kWh/m²/día. La superficie horizontal (0°) capta ${mean0.toFixed(2)} kWh/m²/día, y el ángulo seleccionado X (β = ${stateAngleX}°) capta ${meanX.toFixed(2)} kWh/m²/día.`
+                  }</span>
+                </div>
+              </div>
+            ` : `
+              <!-- Sub-view 2: Grafica_OptAnual (5th Image) -->
+              <div class="opt-chart-view opt-view-monthly">
+                <div class="opt-svg-wrapper">
+                  ${renderMonthlyOptimumAndGainsSvg({
+                    rad0,
+                    radOpt,
+                    radX,
+                    gainsPct: gainsHoriz.pcts,
+                    component: stateComponent,
+                    optimalAngle: optAngle,
+                    selectedAngleX: stateAngleX,
+                    gridEnabled: stateGridEnabled,
+                    isEn,
+                  })}
+                </div>
+
+                <!-- Values Panel matching MATLAB Valores_Rad & Valores_Gan -->
+                <div class="opt-matlab-stats-grid">
+                  <div class="matlab-stat-box box-horiz">
+                    <span class="stat-box-title">${isEn ? 'Horizontal Plane (0°)' : 'Plano Horizontal (0°)'}</span>
+                    <div class="stat-box-values">
+                      <div class="stat-chip"><span class="chip-k">${t.results.chartMinLabel}:</span> <span class="chip-v">${Math.min(...rad0).toFixed(2)}</span></div>
+                      <div class="stat-chip"><span class="chip-k">${t.results.chartMedLabel}:</span> <span class="chip-v highlight-c0">${mean0.toFixed(2)}</span></div>
+                      <div class="stat-chip"><span class="chip-k">${t.results.chartMaxLabel}:</span> <span class="chip-v">${Math.max(...rad0).toFixed(2)}</span></div>
+                    </div>
+                  </div>
+
+                  <div class="matlab-stat-box box-opt">
+                    <span class="stat-box-title">${isEn ? `Annual Optimal Tilt (${optAngle}°)` : `Inclinación Óptima Anual (${optAngle}°)`}</span>
+                    <div class="stat-box-values">
+                      <div class="stat-chip"><span class="chip-k">${t.results.chartMinLabel}:</span> <span class="chip-v">${Math.min(...radOpt).toFixed(2)}</span></div>
+                      <div class="stat-chip"><span class="chip-k">${t.results.chartMedLabel}:</span> <span class="chip-v highlight-opt">${meanOpt.toFixed(2)}</span></div>
+                      <div class="stat-chip"><span class="chip-k">${t.results.chartMaxLabel}:</span> <span class="chip-v">${Math.max(...radOpt).toFixed(2)}</span></div>
+                    </div>
+                  </div>
+
+                  <div class="matlab-stat-box box-gain">
+                    <span class="stat-box-title">${isEn ? 'Annual Gains vs 0° (%)' : 'Ganancias Óptima Anual s/ 0° (%)'}</span>
+                    <div class="stat-box-values">
+                      <div class="stat-chip"><span class="chip-k">${t.results.chartMinLabel}:</span> <span class="chip-v">${Math.min(...gainsHoriz.pcts).toFixed(2)}%</span></div>
+                      <div class="stat-chip"><span class="chip-k">${t.results.chartMedLabel}:</span> <span class="chip-v highlight-gain">+${meanPctHoriz.toFixed(2)}%</span></div>
+                      <div class="stat-chip"><span class="chip-k">${t.results.chartMaxLabel}:</span> <span class="chip-v">+${Math.max(...gainsHoriz.pcts).toFixed(2)}%</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `}
+          </div>
+        ` : ''}
+
         <!-- 7. Action Button Footer matching OrientSol MATLAB window -->
         <div class="opt-study-footer-actions">
           <button id="btn-goto-energy" class="btn-study-foot" type="button">
@@ -659,13 +807,36 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
       });
     });
 
-    // 5. Scroll to Charts
-    const btnScrollCharts = container.querySelector<HTMLButtonElement>('#btn-scroll-charts');
-    btnScrollCharts?.addEventListener('click', () => {
-      const target = document.querySelector('.results-charts-section');
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // 5. Toggle and Scroll to Charts View
+    const btnToggleCharts = container.querySelector<HTMLButtonElement>('#btn-toggle-charts-view');
+    btnToggleCharts?.addEventListener('click', () => {
+      stateShowCharts = !stateShowCharts;
+      renderInternal();
+      if (stateShowCharts) {
+        setTimeout(() => {
+          container.querySelector('#opt-charts-panel')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 50);
       }
+    });
+
+    // 5.1 Chart Sub-tabs
+    const btnTabEvolution = container.querySelector<HTMLButtonElement>('#btn-chart-tab-evolution');
+    btnTabEvolution?.addEventListener('click', () => {
+      stateActiveChartTab = 'evolution';
+      renderInternal();
+    });
+
+    const btnTabMonthly = container.querySelector<HTMLButtonElement>('#btn-chart-tab-monthly');
+    btnTabMonthly?.addEventListener('click', () => {
+      stateActiveChartTab = 'monthly';
+      renderInternal();
+    });
+
+    // 5.2 Grid Checkbox
+    const chkGrid = container.querySelector<HTMLInputElement>('#chk-chart-grid');
+    chkGrid?.addEventListener('change', () => {
+      stateGridEnabled = chkGrid.checked;
+      renderInternal();
     });
 
     // 6. Scroll to Energy Yield Section

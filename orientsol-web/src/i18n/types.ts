@@ -191,6 +191,21 @@ export interface Translations {
     legendEnergyProd: string;
     legendAmbTemp: string;
     legendCellTemp: string;
+    // Inclinación Óptima Anual Charts (MATLAB Grafica_Inclinaciones & Grafica_OptAnual)
+    chartEvolutionTab: string;
+    chartMonthlyTab: string;
+    chartHowVariesQuestion: string;
+    chartEnableGrid: string;
+    chartEvolutionTitle: string;
+    chartAxisTilt: string;
+    chartAxisRadiation: string;
+    chartAxisMonths: string;
+    chartMonthlyRadiationTitle: string;
+    chartGainsTitle: string;
+    chartMinLabel: string;
+    chartMedLabel: string;
+    chartMaxLabel: string;
+    chartToggleChartsBtn: string;
     // Export Actions
     exportActionsTitle: string;
     exportPdfBtn: string;
