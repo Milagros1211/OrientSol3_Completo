@@ -39,7 +39,7 @@ export function renderHeader(): HTMLElement {
       <button id="supabase-sync-pill" class="runtime-pill status-supabase ${isConfigured && isOnline ? 'status-online' : 'status-offline'}" type="button" title="${isEn ? 'Supabase Database: datos_mensuales' : 'Base de Datos Supabase: datos_mensuales'}">
         <span class="status-dot ${isConfigured && isOnline ? 'status-dot-active' : ''}"></span>
         <span id="supabase-status-text">
-          ${isConfigured && isOnline ? (isEn ? 'Supabase: Conectado' : 'Supabase: Conectado') : (isEn ? 'Supabase: Desconectado' : 'Supabase: Desconectado')}${queueCount > 0 ? ` <span class="pill-badge-counter">${queueCount}</span>` : ''}
+          ${isConfigured && isOnline ? (isEn ? 'Supabase: Connected' : 'Supabase: Conectado') : (isEn ? 'Supabase: Disconnected' : 'Supabase: Desconectado')}${queueCount > 0 ? ` <span class="pill-badge-counter">${queueCount}</span>` : ''}
         </span>
       </button>
 
@@ -85,8 +85,8 @@ export function renderHeader(): HTMLElement {
       pillEl.className = `runtime-pill status-supabase ${isConn ? 'status-online' : 'status-offline'}`;
     }
     const label = isConn
-      ? (isEn ? 'Supabase: Conectado' : 'Supabase: Conectado')
-      : (isEn ? 'Supabase: Desconectado' : 'Supabase: Desconectado');
+      ? (isEn ? 'Supabase: Connected' : 'Supabase: Conectado')
+      : (isEn ? 'Supabase: Disconnected' : 'Supabase: Desconectado');
     textEl.innerHTML = `${label}${count > 0 ? ` <span class="pill-badge-counter">${count}</span>` : ''}`;
     if (dotEl) {
       dotEl.className = `status-dot ${isConn ? 'status-dot-active' : ''}`;

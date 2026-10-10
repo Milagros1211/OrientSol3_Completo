@@ -1,4 +1,5 @@
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
+import { getSurfaceDisplayName } from '@/i18n/surfaceTranslations';
 
 const MONTHS_ES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -257,16 +258,17 @@ export function renderSurfacesRankingChart(res: SolarBridgeSimulationResult, isE
     else if (surf.key === 'horizontal_plane') color = '#64748b';
 
     const gainText = surf.gainOverHorizontalPct > 0 ? `+${surf.gainOverHorizontalPct.toFixed(1)}%` : 'Base (0%)';
+    const displayName = getSurfaceDisplayName(surf, isEn);
 
     return `
       <g class="ranking-row">
         <!-- Label Left -->
         <text x="${padding.left - 12}" y="${y + barHeight * 0.7}" fill="#f3f4f6" font-size="12" font-weight="${isDual || isOptFixed ? '700' : '500'}" text-anchor="end">
-          ${surf.name}
+          ${displayName}
         </text>
         <!-- Bar -->
         <rect x="${padding.left}" y="${y}" width="${bWidth}" height="${barHeight}" fill="${color}" rx="5" opacity="0.85">
-          <title>${surf.name}: ${Math.round(surf.annualRadiationKwhM2)} kWh/m²·año (${gainText})</title>
+          <title>${displayName}: ${Math.round(surf.annualRadiationKwhM2)} kWh/m²·${isEn ? 'yr' : 'año'} (${gainText})</title>
         </rect>
         <!-- Number Right -->
         <text x="${padding.left + bWidth + 10}" y="${y + barHeight * 0.7}" fill="#e5e7eb" font-size="12" font-weight="600" font-family="monospace">

@@ -268,13 +268,13 @@ export class HybridClimateManager {
   /**
    * Reads a browser File object and parses it into a ClimateDataRecord.
    */
-  public async parseUploadedClimateFile(file: File): Promise<ClimateDataRecord> {
+  public async parseUploadedClimateFile(file: File): Promise<{ record: ClimateDataRecord; records?: ClimateDataRecord[] }> {
     const text = await file.text();
     const res = this.parseUploadedDocument(text, file.name);
     if (!res.success || !res.record) {
       throw new Error(res.error || 'Failed to parse file');
     }
-    return res.record;
+    return { record: res.record, records: res.records };
   }
 
   // --------------------------------------------------------------------------
