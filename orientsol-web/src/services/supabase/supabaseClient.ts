@@ -6,32 +6,48 @@ const STORAGE_KEY_KEY = 'orientsol_supabase_anon_key';
 let clientInstance: SupabaseClient | null = null;
 
 /**
- * Returns the effective Supabase URL and Anon Key, prioritizing user-saved localStorage credentials,
- * with fallback to build-time environment variables.
+ * Returns the effective Supabase URL and Anon Key.
+ * Prioritizes build-time environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).
+ * Falls back to localStorage only if build variables are absent.
  */
 export function getEffectiveSupabaseConfig(): { url: string; key: string } {
-  let url = '';
-  let key = '';
+  let envUrl = '';
+  let envKey = '';
 
+  if (typeof import.meta.env?.VITE_SUPABASE_URL === 'string') {
+    envUrl = import.meta.env.VITE_SUPABASE_URL.trim();
+  }
+
+  if (typeof import.meta.env?.VITE_SUPABASE_ANON_KEY === 'string') {
+    envKey = import.meta.env.VITE_SUPABASE_ANON_KEY.trim();
+  }
+
+  // If valid environment variables were injected at build time, ALWAYS use them!
+  if (
+    envUrl.length > 0 &&
+    !envUrl.includes('tu-proyecto') &&
+    !envUrl.includes('placeholder') &&
+    envKey.length > 0 &&
+    !envKey.includes('tu-anon-key') &&
+    !envKey.includes('placeholder')
+  ) {
+    return { url: envUrl, key: envKey };
+  }
+
+  // Fallback to localStorage if any
+  let storageUrl = '';
+  let storageKey = '';
   try {
     if (typeof localStorage !== 'undefined') {
-      url = localStorage.getItem(STORAGE_KEY_URL) || '';
-      key = localStorage.getItem(STORAGE_KEY_KEY) || '';
+      storageUrl = (localStorage.getItem(STORAGE_KEY_URL) || '').trim();
+      storageKey = (localStorage.getItem(STORAGE_KEY_KEY) || '').trim();
     }
   } catch {}
 
-  if (!url && typeof import.meta.env?.VITE_SUPABASE_URL === 'string') {
-    url = import.meta.env.VITE_SUPABASE_URL;
-  }
+  const url = storageUrl || envUrl;
+  const key = storageKey || envKey;
 
-  if (!key && typeof import.meta.env?.VITE_SUPABASE_ANON_KEY === 'string') {
-    key = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  }
-
-  return {
-    url: url.trim(),
-    key: key.trim(),
-  };
+  return { url, key };
 }
 
 /**
