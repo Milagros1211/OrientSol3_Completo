@@ -33,6 +33,7 @@
    - **Base de Datos Histórica:** Localidades españolas, albedos y días característicos.
    - **Carga Dual:** Formulario manual de 12 meses y subida de archivos digitales (`CSV` y `JSON`).
 4. **Modelos de Simulación y Optimización Solar:**
+   - **Inclinación Óptima Anual y Comparativa con Ángulo X:** Reproducción fiel y modernizada de la interfaz original de MATLAB (`Tabla_OptAnual.m` y `Tabla_OptAnual_IncliX.m`) en formato tabular interactivo. Permite visualizar las 7 inclinaciones fijas de referencia (0°, 15°, 30°, 45°, 60°, 75°, 90°), la inclinación óptima calculada ($\beta_{opt}$) y comparar en tiempo real contra cualquier ángulo seleccionado $X \in [1^\circ, 90^\circ]$ para todas las componentes solares (Global, Directa, Difusa, Albedo), desglosando factores y porcentajes de ganancia mensuales y anuales con exportación directa a Excel (CSV).
    - **Superficies Fijas:** Inclinación óptima anual, 4 posiciones estacionales y 12 posiciones mensuales.
    - **Seguimiento Solar:** Eje horizontal (N-S y E-O), eje polar, eje azimutal y seguimiento completo a 2 ejes.
    - **Generación Energética Fotovoltaica:** Modelo térmico de Osterwald con cálculo de temperatura de célula ($T_c$) y pérdidas térmicas.
