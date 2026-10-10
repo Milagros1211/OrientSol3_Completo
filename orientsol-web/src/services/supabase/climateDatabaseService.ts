@@ -623,3 +623,29 @@ export class ClimateDatabaseService {
 }
 
 export const climateDatabaseService = ClimateDatabaseService.getInstance();
+
+/**
+ * Formats an emplacement name with the required source DB and timestamp suffix.
+ * e.g. "Madrid (PVGIS - 2026-10-10 21:20)"
+ */
+export function formatEmplacementNameWithSuffix(baseName: string, source: string): string {
+  let clean = baseName
+    .replace(/\s*\([^)]*\b(?:pvgis|nasa|meteonorm|supabase|era5|local|db)\b[^)]*\)/gi, '')
+    .trim();
+
+  if (!clean) clean = 'Emplazamiento Solar';
+
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+  let sourceTag = 'DB';
+  const s = source.toLowerCase();
+  if (s.includes('pvgis')) sourceTag = 'PVGIS';
+  else if (s.includes('nasa')) sourceTag = 'NASA POWER';
+  else if (s.includes('meteo')) sourceTag = 'METEONORM';
+  else if (s.includes('supa')) sourceTag = 'SUPABASE';
+  else sourceTag = source.toUpperCase();
+
+  return `${clean} (${sourceTag} - ${dateStr})`;
+}

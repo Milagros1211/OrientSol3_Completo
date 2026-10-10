@@ -76,15 +76,20 @@ export async function fetchUnifiedClimateData(req: UnifiedClimateRequest): Promi
     return result;
   } catch (fetchError: any) {
     console.warn(
-      `[Offline Resilience] External fetch from ${source} failed (${fetchError?.message || fetchError}). Activating offline fallback...`
+      `[Offline Resilience] External fetch from ${source} failed (${fetchError?.message || fetchError}).`
     );
 
-    // Fallback 1: Electron local disk cache
+    // If user specifically requested an external API (PVGIS, NASA, Meteonorm), propagate error
+    if (source === 'pvgis' || source === 'nasa_power' || source === 'meteonorm') {
+      throw fetchError;
+    }
+
+    // For local or generic lookups, fallback to local database / cache
     if (electronAPI) {
       try {
         const match = await electronAPI.getOfflineRecordByCoords(latitude, longitude, 2.0);
         if (match) {
-          console.log(`[Offline Resilience] Successfully recovered nearest cached dataset: ${match.locationName}`);
+          console.log(`[Offline Resilience] Recovered nearest cached dataset: ${match.locationName}`);
           return {
             ...match,
             metadata: { ...match.metadata, isOfflineFallback: true, originalError: fetchError?.message },
@@ -95,10 +100,8 @@ export async function fetchUnifiedClimateData(req: UnifiedClimateRequest): Promi
       }
     }
 
-    // Fallback 2: Default offline datasets from database service
     const offlineList = await climateDatabaseService.getClimateDatasets();
     if (offlineList.length > 0) {
-      console.log(`[Offline Resilience] Using default offline dataset: ${offlineList[0].locationName}`);
       return {
         ...offlineList[0],
         metadata: { ...offlineList[0].metadata, isOfflineFallback: true, originalError: fetchError?.message },

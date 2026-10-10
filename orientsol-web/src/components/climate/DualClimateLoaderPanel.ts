@@ -5,7 +5,8 @@ import {
 } from '@/services/bridge/solarCalculationBridge';
 import { generateSampleCSV, generateSampleJSON } from '@/services/hybrid/climateFileParser';
 import type { ClimateDataRecord } from '@/types/climate';
-import { climateDatabaseService } from '@/services/supabase';
+import { climateDatabaseService, formatEmplacementNameWithSuffix } from '@/services/supabase';
+import { fetchUnifiedClimateData } from '@/services/external';
 import { i18n } from '@/i18n';
 import {
   renderRadiationChart,
@@ -28,7 +29,7 @@ import {
 // Module-level caches to preserve state across language toggles (ES <-> EN)
 let cachedLastSimulationResult: SolarBridgeSimulationResult | null = null;
 let cachedActiveRecord: ClimateDataRecord | null = null;
-let cachedActiveTab: 'historical' | 'manual' | 'upload' = 'historical';
+let cachedActiveTab: 'historical' | 'manual' | 'upload' | 'api' = 'historical';
 
 /**
  * Renders the banner indicating whether online upload to Supabase is permitted or in offline cache mode.
@@ -109,6 +110,16 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <line x1="12" y1="3" x2="12" y2="15"></line>
         </svg>
         <span>${t.hybridLoader.tabUpload}</span>
+      </button>
+
+      <button class="dual-tab-btn ${cachedActiveTab === 'api' ? 'active' : ''}" data-tab="api">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"></path>
+        </svg>
+        <span>${isEn ? '4. Satellite Climate APIs (PVGIS / NASA)' : '4. APIs Climáticas Satelitales (PVGIS / NASA)'}</span>
       </button>
     </div>
 
@@ -250,6 +261,67 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       </div>
     </div>
 
+    <!-- TAB 4: SATELLITE CLIMATE APIS -->
+    <div id="tab-content-api" class="dual-tab-content ${cachedActiveTab === 'api' ? '' : 'hidden'}">
+      <div class="climate-controls-grid">
+        <div class="form-group">
+          <label for="api-source-select" class="form-label">${isEn ? 'Data Source' : 'Fuente de Datos'}</label>
+          <select id="api-source-select" class="form-select">
+            <option value="pvgis">${isEn ? 'PVGIS 5.3 API (European Commission JRC)' : 'PVGIS 5.3 API (Comisión Europea JRC)'}</option>
+            <option value="nasa">${isEn ? 'NASA POWER API (Global Satellite Climatology)' : 'NASA POWER API (Climatología Satelital Global)'}</option>
+            <option value="meteonorm">${isEn ? 'Meteonorm / Open-Meteo Reanalysis (ERA5)' : 'Meteonorm / Open-Meteo Reanalysis (ERA5)'}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="api-city-preset-select" class="form-label">${isEn ? 'City Preset' : 'Preajuste de Ciudad'}</label>
+          <select id="api-city-preset-select" class="form-select">
+            <option value="0">Madrid (España)</option>
+            <option value="1">Barcelona (España)</option>
+            <option value="2">Sevilla (España)</option>
+            <option value="3">Valencia (España)</option>
+            <option value="4">Bilbao (España)</option>
+            <option value="5">Santa Cruz de Tenerife (España)</option>
+            <option value="6">Jaén (España)</option>
+            <option value="7">Roma (Italia)</option>
+            <option value="8">Atenas (Grecia)</option>
+            <option value="custom">${isEn ? 'Custom Coordinates...' : 'Coordenadas Personalizadas...'}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="api-input-lat" class="form-label">${t.location.latitude} [°]</label>
+          <input type="number" id="api-input-lat" class="form-input" step="0.0001" value="40.4168" />
+        </div>
+
+        <div class="form-group">
+          <label for="api-input-lon" class="form-label">${t.location.longitude} [°]</label>
+          <input type="number" id="api-input-lon" class="form-input" step="0.0001" value="-3.7038" />
+        </div>
+      </div>
+
+      <div class="climate-actions-row">
+        <button id="btn-fetch-satellite-api" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+            <path d="M21 21v-5h-5"></path>
+          </svg>
+          <span>${isEn ? 'Fetch Satellite Climate' : 'Consultar Climatología'}</span>
+        </button>
+
+        <button id="btn-save-api-to-supabase" class="btn btn-secondary" disabled>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+          <span>${isEn ? 'Save to Supabase' : 'Guardar en Supabase'}</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Active Dataset Preview Card -->
     <div id="active-dataset-card" class="active-dataset-card">
       <!-- Dynamically filled with active dataset -->
@@ -288,6 +360,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     historical: container.querySelector('#tab-content-historical') as HTMLElement,
     manual: container.querySelector('#tab-content-manual') as HTMLElement,
     upload: container.querySelector('#tab-content-upload') as HTMLElement,
+    api: container.querySelector('#tab-content-api') as HTMLElement,
   };
 
   const histSearchInput = container.querySelector('#hist-search-input') as HTMLInputElement;
@@ -311,6 +384,14 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   const downloadJsonBtn = container.querySelector('#btn-download-json-template') as HTMLButtonElement;
   const downloadJsonMultiBtn = container.querySelector('#btn-download-json-multi-template') as HTMLButtonElement;
 
+  // Tab 4: Satellite Climate APIs Queries
+  const apiSourceSelect = container.querySelector('#api-source-select') as HTMLSelectElement;
+  const apiCitySelect = container.querySelector('#api-city-preset-select') as HTMLSelectElement;
+  const apiLatInput = container.querySelector('#api-input-lat') as HTMLInputElement;
+  const apiLonInput = container.querySelector('#api-input-lon') as HTMLInputElement;
+  const apiFetchBtn = container.querySelector('#btn-fetch-satellite-api') as HTMLButtonElement;
+  const apiSaveBtn = container.querySelector('#btn-save-api-to-supabase') as HTMLButtonElement;
+
   const activeCard = container.querySelector('#active-dataset-card') as HTMLElement;
   const simBtn = container.querySelector('#btn-run-hybrid-simulation') as HTMLButtonElement;
   const simPeakKw = container.querySelector('#sim-peak-kw') as HTMLInputElement;
@@ -328,13 +409,130 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       tabButtons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
 
-      const tabKey = btn.getAttribute('data-tab') as 'historical' | 'manual' | 'upload';
+      const tabKey = btn.getAttribute('data-tab') as 'historical' | 'manual' | 'upload' | 'api';
       cachedActiveTab = tabKey;
       Object.entries(tabContents).forEach(([key, el]) => {
-        if (key === tabKey) el.classList.remove('hidden');
-        else el.classList.add('hidden');
+        if (key === tabKey) el?.classList.remove('hidden');
+        else el?.classList.add('hidden');
       });
     });
+  });
+
+  // Listen to external navigation triggers (e.g., from top navigation bar)
+  const handleSwitchClimateTab = (e: Event) => {
+    const customEvt = e as CustomEvent<'historical' | 'manual' | 'upload' | 'api'>;
+    const targetKey = customEvt.detail;
+    const btn = container.querySelector<HTMLButtonElement>(`.dual-tab-btn[data-tab="${targetKey}"]`);
+    if (btn) {
+      btn.click();
+      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  window.addEventListener('orientsol:switch-climate-tab', handleSwitchClimateTab);
+
+  // Satellite API City Presets
+  const API_CITY_PRESETS = [
+    { name: 'Madrid (España)', lat: 40.4168, lon: -3.7038 },
+    { name: 'Barcelona (España)', lat: 41.3879, lon: 2.1699 },
+    { name: 'Sevilla (España)', lat: 37.3891, lon: -5.9845 },
+    { name: 'Valencia (España)', lat: 39.4699, lon: -0.3763 },
+    { name: 'Bilbao (España)', lat: 43.263, lon: -2.935 },
+    { name: 'Santa Cruz de Tenerife (España)', lat: 28.4636, lon: -16.2518 },
+    { name: 'Jaén (España)', lat: 37.7796, lon: -3.7849 },
+    { name: 'Roma (Italia)', lat: 41.9028, lon: 12.4964 },
+    { name: 'Atenas (Grecia)', lat: 37.9838, lon: 23.7275 },
+  ];
+
+  apiCitySelect?.addEventListener('change', () => {
+    const val = apiCitySelect.value;
+    if (val !== 'custom') {
+      const idx = parseInt(val, 10);
+      const preset = API_CITY_PRESETS[idx];
+      if (preset) {
+        apiLatInput.value = preset.lat.toFixed(4);
+        apiLonInput.value = preset.lon.toFixed(4);
+      }
+    }
+  });
+
+  // Fetch Satellite Climate Data Handler
+  apiFetchBtn?.addEventListener('click', async () => {
+    const sourceKey = apiSourceSelect.value;
+    const actualSource = sourceKey === 'nasa' ? 'nasa_power' : (sourceKey as any);
+    const lat = parseFloat(apiLatInput.value);
+    const lon = parseFloat(apiLonInput.value);
+
+    let locationName = 'Coordenadas Personalizadas';
+    if (apiCitySelect.value !== 'custom') {
+      const idx = parseInt(apiCitySelect.value, 10);
+      locationName = API_CITY_PRESETS[idx]?.name || locationName;
+    }
+
+    const srcName = actualSource === 'nasa_power' ? 'NASA POWER' : actualSource.toUpperCase();
+    setStatus(isEn ? `Fetching data from ${srcName}...` : `Consultando datos climáticos desde ${srcName}...`, 'info');
+    apiFetchBtn.disabled = true;
+
+    try {
+      const record = await fetchUnifiedClimateData({
+        source: actualSource,
+        latitude: lat,
+        longitude: lon,
+        locationName,
+      });
+
+      renderActiveRecord(record);
+      apiSaveBtn.disabled = false;
+      setStatus(
+        isEn
+          ? `✓ Satellite data retrieved successfully from ${srcName} for "${record.locationName}". Ready to calculate with Pyodide below.`
+          : `✓ Datos satelitales obtenidos con éxito desde ${srcName} para "${record.locationName}". Listo para calcular con Pyodide en la barra inferior.`,
+        'success'
+      );
+    } catch (err: any) {
+      console.error('[API Fetch Error]', err);
+      setStatus(`Error al consultar API: ${err.message || String(err)}`, 'error');
+    } finally {
+      apiFetchBtn.disabled = false;
+    }
+  });
+
+  // Save Satellite API Record to Supabase with Required [DB + Timestamp] Suffix
+  apiSaveBtn?.addEventListener('click', async () => {
+    if (!currentActiveRecord) return;
+
+    apiSaveBtn.disabled = true;
+    setStatus(isEn ? 'Registering dataset in Supabase...' : 'Registrando emplazamiento en Supabase...', 'info');
+
+    try {
+      const formattedName = formatEmplacementNameWithSuffix(currentActiveRecord.locationName, currentActiveRecord.source);
+      const recordToSave: ClimateDataRecord = {
+        ...currentActiveRecord,
+        locationName: formattedName,
+      };
+
+      const reg = await climateDatabaseService.registerEmplacement(recordToSave);
+      if (reg.isDuplicate) {
+        setStatus(
+          isEn
+            ? `⚠️ Emplacement already registered (${reg.similarityPct}% match with "${reg.matchedRecord?.locationName}").`
+            : `⚠️ El emplazamiento ya ha sido registrado previamente (${reg.similarityPct}% de coincidencia con "${reg.matchedRecord?.locationName}").`,
+          'warning'
+        );
+      } else {
+        renderActiveRecord(recordToSave);
+        await updateSearchableStations();
+        setStatus(
+          isEn
+            ? `✓ Emplacement "${formattedName}" successfully saved to Supabase (12 monthly records in datos_mensuales).`
+            : `✓ Emplazamiento "${formattedName}" guardado con éxito en Supabase (12 registros mensuales en datos_mensuales).`,
+          'success'
+        );
+      }
+    } catch (err: any) {
+      setStatus(`Error al guardar en Supabase: ${err.message || String(err)}`, 'error');
+    } finally {
+      apiSaveBtn.disabled = false;
+    }
   });
 
   function setStatus(msg: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') {

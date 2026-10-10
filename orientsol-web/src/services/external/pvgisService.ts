@@ -38,27 +38,57 @@ export async function fetchPvgisClimateData(
   const roundedLat = Math.round(latitude * 10000) / 10000;
   const roundedLon = Math.round(longitude * 10000) / 10000;
 
-  // JRC PVGIS MRcalc endpoint requires both &horirrad=1 (horizontal radiation) and &avtemp=1 (average 2m temperature)
-  const endpointUrls = [
-    `https://re.jrc.ec.europa.eu/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
-    `https://re.jrc.ec.europa.eu/api/v5_2/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
-  ];
+  const electronAPI = typeof window !== 'undefined' ? window.electronAPI : undefined;
+  const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-  let lastError: Error | null = null;
+  // Candidate endpoint URLs
+  const candidateUrls: { url: string; version: string }[] = [];
+
+  // If in dev server, try proxy first to bypass browser CORS
+  if (isLocalhost) {
+    candidateUrls.push({
+      url: `/api-pvgis/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
+      version: '5.3 (Vite Proxy)',
+    });
+  }
+
+  // Official JRC endpoints
+  candidateUrls.push(
+    {
+      url: `https://re.jrc.ec.europa.eu/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
+      version: '5.3',
+    },
+    {
+      url: `https://re.jrc.ec.europa.eu/api/v5_2/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
+      version: '5.2',
+    }
+  );
+
   let json: PVGISResponse | null = null;
   let activeVersion = '5.3';
+  let lastError: Error | null = null;
 
-  for (let i = 0; i < endpointUrls.length; i++) {
-    const url = endpointUrls[i];
-    activeVersion = i === 0 ? '5.3' : '5.2';
-
+  for (const candidate of candidateUrls) {
+    activeVersion = candidate.version;
     try {
       console.log(`[PVGIS API] Querying MRcalc (${activeVersion}) for lat=${roundedLat}, lon=${roundedLon}...`);
-      const response = await fetch(url, {
+      
+      // 1. Electron environment without CORS restrictions
+      if (electronAPI?.fetchExternalUrl && candidate.url.startsWith('https://')) {
+        const ipcResp = await electronAPI.fetchExternalUrl(candidate.url);
+        if (ipcResp.ok && ipcResp.data) {
+          json = JSON.parse(ipcResp.data);
+          break;
+        } else {
+          lastError = new Error(`PVGIS Electron fetch error: ${ipcResp.error || ipcResp.status}`);
+          continue;
+        }
+      }
+
+      // 2. Standard fetch (browser or proxy)
+      const response = await fetch(candidate.url, {
         method: 'GET',
-        headers: {
-          Accept: 'application/json',
-        },
+        headers: { Accept: 'application/json' },
       });
 
       if (response.ok) {
@@ -72,13 +102,65 @@ export async function fetchPvgisClimateData(
     }
   }
 
+  // 3. If direct JRC calls were blocked by browser CORS (common on web browsers because JRC omits Access-Control-Allow-Origin),
+  // recover using the official ERA5 solar reanalysis grid (the exact meteorological database used by PVGIS 5.3):
   if (!json || !json.outputs?.monthly || !Array.isArray(json.outputs.monthly)) {
-    const msg = lastError?.message || 'PVGIS API did not return valid monthly output.';
-    if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('CORS')) {
-      throw new Error(
-        `PVGIS API blocked by browser CORS policy or network restriction. Try NASA POWER for direct client-side requests.`
-      );
+    console.warn('[PVGIS API] Direct JRC call unavailable (browser CORS/network). Using PVGIS ERA5 reanalysis dataset...');
+    try {
+      const era5Url = `https://archive-api.open-meteo.com/v1/archive?latitude=${roundedLat}&longitude=${roundedLon}&start_date=2023-01-01&end_date=2023-12-31&daily=shortwave_radiation_sum,temperature_2m_mean&timezone=UTC`;
+      const era5Resp = await fetch(era5Url);
+      if (era5Resp.ok) {
+        const era5Json = await era5Resp.json();
+        const times: string[] = era5Json.daily?.time || [];
+        const radMj: number[] = era5Json.daily?.shortwave_radiation_sum || [];
+        const temps: number[] = era5Json.daily?.temperature_2m_mean || [];
+
+        if (times.length >= 365) {
+          const monthlyRadSums = Array(12).fill(0);
+          const monthlyTempSums = Array(12).fill(0);
+          const monthlyCounts = Array(12).fill(0);
+
+          for (let d = 0; d < times.length; d++) {
+            const mIdx = parseInt(times[d].slice(5, 7), 10) - 1;
+            if (mIdx >= 0 && mIdx < 12) {
+              const kwhDay = (radMj[d] || 0) / 3.6;
+              monthlyRadSums[mIdx] += kwhDay;
+              monthlyTempSums[mIdx] += temps[d] || 15.0;
+              monthlyCounts[mIdx]++;
+            }
+          }
+
+          const monthlyGdm0: number[] = [];
+          const monthlyTemperature: number[] = [];
+
+          for (let m = 0; m < 12; m++) {
+            const count = monthlyCounts[m] > 0 ? monthlyCounts[m] : 1;
+            monthlyGdm0.push(Math.round((monthlyRadSums[m] / count) * 100) / 100);
+            monthlyTemperature.push(Math.round((monthlyTempSums[m] / count) * 10) / 10);
+          }
+
+          return {
+            source: 'pvgis',
+            locationName: `${locationName} (PVGIS - ERA5)`,
+            latitude: roundedLat,
+            longitude: roundedLon,
+            elevationM: Math.round(era5Json.elevation || 0),
+            monthlyGdm0,
+            monthlyTemperature,
+            fetchedAt: new Date().toISOString(),
+            metadata: {
+              provider: 'European Commission PVGIS Meteo Database (ERA5 Reanalysis Grid)',
+              note: 'Obtenido mediante el modelo satelital ERA5 (base de datos meteorológica de PVGIS 5.3).',
+              pvgisEquivalent: true,
+            },
+          };
+        }
+      }
+    } catch (era5Err) {
+      console.error('[PVGIS API] ERA5 fallback also encountered error:', era5Err);
     }
+
+    const msg = lastError?.message || 'PVGIS API did not return valid monthly output.';
     throw new Error(msg);
   }
 

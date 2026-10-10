@@ -176,6 +176,16 @@ function setupIpcHandlers() {
     return checkNetworkConnectivity();
   });
 
+  ipcMain.handle('network:fetch-url', async (_event, targetUrl) => {
+    try {
+      const resp = await net.fetch(targetUrl);
+      const text = await resp.text();
+      return { ok: resp.ok, status: resp.status, data: text };
+    } catch (err) {
+      return { ok: false, status: 500, error: err.message };
+    }
+  });
+
   ipcMain.handle('app:get-info', async () => {
     return {
       appName: 'OrientSol 3 Web & Desktop',

@@ -15,6 +15,7 @@ export interface ElectronAPI {
   isElectron: boolean;
   platform: string;
   checkNetworkStatus: () => Promise<boolean>;
+  fetchExternalUrl?: (url: string) => Promise<{ ok: boolean; status: number; data?: string; error?: string }>;
   onNetworkStatusChanged: (callback: (isOnline: boolean) => void) => () => void;
   getOfflineClimateCache: () => Promise<ClimateDataRecord[]>;
   saveOfflineClimateRecord: (record: ClimateDataRecord) => Promise<boolean>;
