@@ -20,7 +20,7 @@
     "cap:sync": "npm run build && cap sync android",
     "cap:open:android": "cap open android",
     "build:apk": "npm run build && cap sync android && node scripts/build-android-apk.mjs",
-    "deploy": "npm run build && gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist --no-history"
   },
   "devDependencies": {
     "@capacitor/android": "^8.5.2",
