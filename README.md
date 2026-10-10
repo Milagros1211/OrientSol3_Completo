@@ -188,45 +188,6 @@ Para facilitar la creación de tus archivos, la plataforma cuenta con botones de
 
 ---
 
-## 🌐 Cómo Activar el Hosting Permanente en GitHub Pages (Paso a Paso)
-
-Tu aplicación web se aloja de forma **100% gratuita, permanente y sin límite de tiempo** en los servidores de GitHub Pages.
-
-### Paso 1: Ir a la configuración de Pages en tu repositorio
-Abre en tu navegador la siguiente dirección directa:  
-👉 [https://github.com/Milagros1211/OrientSol3_Completo/settings/pages](https://github.com/Milagros1211/OrientSol3_Completo/settings/pages)
-
-### Paso 2: Seleccionar la fuente de despliegue
-En la sección **Build and deployment**:
-1. En el desplegable **Source**, selecciona: **Deploy from a branch**.
-2. En el desplegable **Branch**:
-   - Selecciona la rama: **`gh-pages`**
-   - Carpeta: **`/ (root)`**
-3. Haz clic en el botón **Save**.
-
-*(Nota: La rama `gh-pages` ya fue creada y subida al repositorio con la compilación optimizada del proyecto).*
-
-### Paso 3: Confirmación y Acceso Permanente
-En aproximadamente 60 segundos, verás un mensaje verde en la parte superior confirmando:
-> *"Your site is live at https://Milagros1211.github.io/OrientSol3_Completo/"*
-
-A partir de ese momento, el enlace quedará **activo de forma permanente las 24 horas del día**, listo para incluirlo en la memoria del TFM y para ser evaluado por el tribunal.
-
----
-
-### 🔄 ¿Cómo actualizar el sitio web cuando hagas cambios en el código?
-
-Siempre que realices mejoras en la aplicación, puedes volver a desplegar la versión actualizada ejecutando un solo comando desde tu terminal:
-
-```powershell
-# Desde la carpeta raíz del proyecto:
-npm run deploy
-```
-
-Este comando recompila automáticamente la aplicación y actualiza la rama `gh-pages` en GitHub al instante.
-
----
-
 ## 📊 Estado de Cumplimiento de los Objetivos del TFM
 
 En base al documento oficial aprobado: **`[Master EERR] FormatoPropuestaTFMKarinaBaldeon.pdf`**

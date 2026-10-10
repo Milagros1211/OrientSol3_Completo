@@ -1,5 +1,6 @@
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { getSurfaceDisplayName } from '@/i18n/surfaceTranslations';
+import { themeManager } from '@/services/theme/themeManager';
 
 const MONTHS_ES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -23,6 +24,13 @@ export function renderRadiationChart(res: SolarBridgeSimulationResult, isEn: boo
   const optGdm = res.optimalAnnual.monthlyDailyKwh;
   const monGdm = res.monthlyOptimum12.monthlyDailyKwh;
 
+  const isDark = themeManager.isDark();
+  const plotBg = isDark ? '#08131a' : '#ffffff';
+  const gridStroke = isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0';
+  const tickColor = isDark ? '#9ca3af' : '#475569';
+  const monthLabelColor = isDark ? '#e5e7eb' : '#0f172a';
+  const axisStroke = isDark ? '#4b5563' : '#94a3b8';
+
   const maxVal = Math.ceil(Math.max(...hGdm, ...optGdm, ...monGdm, 1.0) * 1.15);
   const yScale = (val: number) => padding.top + chartHeight - (val / maxVal) * chartHeight;
 
@@ -32,8 +40,8 @@ export function renderRadiationChart(res: SolarBridgeSimulationResult, isEn: boo
     const val = (maxVal / yTicks) * i;
     const y = yScale(val);
     return `
-      <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-dasharray="3,3" />
-      <text x="${padding.left - 10}" y="${y + 4}" fill="#9ca3af" font-size="11" text-anchor="end" font-family="monospace">${val.toFixed(1)}</text>
+      <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="${gridStroke}" stroke-dasharray="3,3" />
+      <text x="${padding.left - 10}" y="${y + 4}" fill="${tickColor}" font-size="11" text-anchor="end" font-family="monospace">${val.toFixed(1)}</text>
     `;
   }).join('');
 
@@ -71,7 +79,7 @@ export function renderRadiationChart(res: SolarBridgeSimulationResult, isEn: boo
           <title>${month} - ${isEn ? 'Monthly Optimum' : 'Óptimo Mensual'} (${res.monthlyOptimum12.optimalTiltsDeg[idx]}°): ${monVal.toFixed(2)} kWh/m²/d</title>
         </rect>
         <!-- X-Axis Month Label -->
-        <text x="${colCenterX}" y="${height - 20}" fill="#e5e7eb" font-size="12" font-weight="500" text-anchor="middle">${month}</text>
+        <text x="${colCenterX}" y="${height - 20}" fill="${monthLabelColor}" font-size="12" font-weight="600" text-anchor="middle">${month}</text>
       </g>
     `;
   }).join('');
@@ -105,9 +113,10 @@ export function renderRadiationChart(res: SolarBridgeSimulationResult, isEn: boo
               <stop offset="100%" stop-color="#059669" stop-opacity="0.65" />
             </linearGradient>
           </defs>
+          <rect x="${padding.left}" y="${padding.top}" width="${chartWidth}" height="${chartHeight}" fill="${plotBg}" rx="4" stroke="${axisStroke}" stroke-width="0.8" />
           ${gridLines}
-          <line x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}" stroke="#4b5563" stroke-width="1.5" />
-          <line x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}" stroke="#4b5563" stroke-width="1.5" />
+          <line x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}" stroke="${axisStroke}" stroke-width="1.5" />
+          <line x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}" stroke="${axisStroke}" stroke-width="1.5" />
           ${bars}
         </svg>
       </div>
@@ -135,6 +144,12 @@ export function renderEnergyAndTemperatureChart(res: SolarBridgeSimulationResult
   const maxEnergy = Math.ceil(Math.max(...energyKwh, 100) * 1.15 / 100) * 100;
   const maxTemp = Math.ceil(Math.max(...cellTemp, 40) * 1.2 / 10) * 10;
 
+  const isDark = themeManager.isDark();
+  const plotBg = isDark ? '#08131a' : '#ffffff';
+  const gridStroke = isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0';
+  const monthLabelColor = isDark ? '#e5e7eb' : '#0f172a';
+  const axisStroke = isDark ? '#4b5563' : '#94a3b8';
+
   const yEnergyScale = (val: number) => padding.top + chartHeight - (val / maxEnergy) * chartHeight;
   const yTempScale = (val: number) => padding.top + chartHeight - (val / maxTemp) * chartHeight;
 
@@ -145,9 +160,9 @@ export function renderEnergyAndTemperatureChart(res: SolarBridgeSimulationResult
     const y = yEnergyScale(valEnergy);
     const valTemp = (maxTemp / yTicks) * i;
     return `
-      <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-dasharray="3,3" />
-      <text x="${padding.left - 10}" y="${y + 4}" fill="#34d399" font-size="11" text-anchor="end" font-family="monospace">${Math.round(valEnergy)}</text>
-      <text x="${width - padding.right + 10}" y="${y + 4}" fill="#f87171" font-size="11" text-anchor="start" font-family="monospace">${Math.round(valTemp)}°C</text>
+      <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="${gridStroke}" stroke-dasharray="3,3" />
+      <text x="${padding.left - 10}" y="${y + 4}" fill="#059669" font-size="11" text-anchor="end" font-family="monospace">${Math.round(valEnergy)}</text>
+      <text x="${width - padding.right + 10}" y="${y + 4}" fill="#dc2626" font-size="11" text-anchor="start" font-family="monospace">${Math.round(valTemp)}°C</text>
     `;
   }).join('');
 
@@ -165,7 +180,7 @@ export function renderEnergyAndTemperatureChart(res: SolarBridgeSimulationResult
       <rect x="${colCenterX - barWidth / 2}" y="${y}" width="${barWidth}" height="${barH}" fill="url(#grad-energy)" rx="4" class="chart-bar">
         <title>${month}: ${Math.round(val)} kWh | T_cel: ${cellTemp[idx]?.toFixed(1)}°C</title>
       </rect>
-      <text x="${colCenterX}" y="${height - 20}" fill="#e5e7eb" font-size="12" font-weight="500" text-anchor="middle">${month}</text>
+      <text x="${colCenterX}" y="${height - 20}" fill="${monthLabelColor}" font-size="12" font-weight="600" text-anchor="middle">${month}</text>
     `;
   }).join('');
 
@@ -218,8 +233,10 @@ export function renderEnergyAndTemperatureChart(res: SolarBridgeSimulationResult
               <stop offset="100%" stop-color="#047857" stop-opacity="0.6" />
             </linearGradient>
           </defs>
+          <rect x="${padding.left}" y="${padding.top}" width="${chartWidth}" height="${chartHeight}" fill="${plotBg}" rx="4" stroke="${axisStroke}" stroke-width="0.8" />
           ${gridLines}
-          <line x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}" stroke="#4b5563" stroke-width="1.5" />
+          <line x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}" stroke="${axisStroke}" stroke-width="1.5" />
+          <line x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}" stroke="${axisStroke}" stroke-width="1.5" />
           ${energyBars}
           <!-- Temperature Lines -->
           <polyline points="${ambPoints}" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-dasharray="4,4" />
@@ -242,6 +259,11 @@ export function renderSurfacesRankingChart(res: SolarBridgeSimulationResult, isE
   const padding = { top: 35, right: 140, bottom: 30, left: 240 };
   const height = padding.top + padding.bottom + surfaces.length * (barHeight + gap);
 
+  const isDark = themeManager.isDark();
+  const labelColor = isDark ? '#f3f4f6' : '#0f172a';
+  const numColor = isDark ? '#e5e7eb' : '#0f172a';
+  const unitColor = isDark ? '#9ca3af' : '#475569';
+
   const maxVal = Math.max(...surfaces.map((s) => s.annualRadiationKwhM2), 100);
   const chartWidth = width - padding.left - padding.right;
 
@@ -263,7 +285,7 @@ export function renderSurfacesRankingChart(res: SolarBridgeSimulationResult, isE
     return `
       <g class="ranking-row">
         <!-- Label Left -->
-        <text x="${padding.left - 12}" y="${y + barHeight * 0.7}" fill="#f3f4f6" font-size="12" font-weight="${isDual || isOptFixed ? '700' : '500'}" text-anchor="end">
+        <text x="${padding.left - 12}" y="${y + barHeight * 0.7}" fill="${labelColor}" font-size="12" font-weight="${isDual || isOptFixed ? '700' : '600'}" text-anchor="end">
           ${displayName}
         </text>
         <!-- Bar -->
@@ -271,9 +293,9 @@ export function renderSurfacesRankingChart(res: SolarBridgeSimulationResult, isE
           <title>${displayName}: ${Math.round(surf.annualRadiationKwhM2)} kWh/m²·${isEn ? 'yr' : 'año'} (${gainText})</title>
         </rect>
         <!-- Number Right -->
-        <text x="${padding.left + bWidth + 10}" y="${y + barHeight * 0.7}" fill="#e5e7eb" font-size="12" font-weight="600" font-family="monospace">
-          ${Math.round(surf.annualRadiationKwhM2)} <tspan fill="#9ca3af" font-size="11">kWh/m²</tspan>
-          <tspan fill="${surf.gainOverHorizontalPct > 0 ? '#34d399' : '#9ca3af'}" font-size="11" font-weight="bold"> (${gainText})</tspan>
+        <text x="${padding.left + bWidth + 10}" y="${y + barHeight * 0.7}" fill="${numColor}" font-size="12" font-weight="600" font-family="monospace">
+          ${Math.round(surf.annualRadiationKwhM2)} <tspan fill="${unitColor}" font-size="11">kWh/m²</tspan>
+          <tspan fill="${surf.gainOverHorizontalPct > 0 ? '#16a34a' : '#dc2626'}" font-size="11" font-weight="bold"> (${gainText})</tspan>
         </text>
       </g>
     `;

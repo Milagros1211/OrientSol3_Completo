@@ -2,6 +2,7 @@ import { pyodideService } from '@/services/pyodide';
 import { climateDatabaseService } from '@/services/supabase';
 import { openSupabaseSyncModal } from '@/components/supabase/SupabaseSyncModal';
 import { i18n } from '@/i18n';
+import { themeManager } from '@/services/theme/themeManager';
 
 export function renderHeader(): HTMLElement {
   const header = document.createElement('header');
@@ -13,6 +14,7 @@ export function renderHeader(): HTMLElement {
   const queueCount = climateDatabaseService.getOfflineQueueCount();
   const isConfigured = climateDatabaseService.isConfigured();
   const isOnline = climateDatabaseService.isOnline();
+  const isDarkMode = themeManager.isDark();
 
   header.innerHTML = `
     <div class="header-brand">
@@ -41,6 +43,12 @@ export function renderHeader(): HTMLElement {
         <span id="supabase-status-text">
           ${isConfigured && isOnline ? (isEn ? 'Supabase: Connected' : 'Supabase: Conectado') : (isEn ? 'Supabase: Disconnected' : 'Supabase: Desconectado')}${queueCount > 0 ? ` <span class="pill-badge-counter">${queueCount}</span>` : ''}
         </span>
+      </button>
+
+      <!-- Theme Switcher Toggle (Modo Claro / Modo Oscuro) -->
+      <button id="header-theme-toggle" class="theme-toggle-pill" type="button" title="${isEn ? 'Switch between Light and Dark mode' : 'Alternar entre Modo Claro y Modo Oscuro'}">
+        <span class="theme-icon">${isDarkMode ? '🌙' : '☀️'}</span>
+        <span class="theme-text">${isDarkMode ? (isEn ? 'Dark' : 'Oscuro') : (isEn ? 'Light' : 'Claro')}</span>
       </button>
 
       <!-- Language Switcher Toggle -->
@@ -91,6 +99,18 @@ export function renderHeader(): HTMLElement {
     if (dotEl) {
       dotEl.className = `status-dot ${isConn ? 'status-dot-active' : ''}`;
     }
+  });
+
+  // Attach theme toggle switcher event
+  const themeBtn = header.querySelector<HTMLButtonElement>('#header-theme-toggle');
+  themeBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const newTheme = themeManager.toggleTheme();
+    const isDark = newTheme === 'dark';
+    const iconEl = themeBtn.querySelector('.theme-icon');
+    const textEl = themeBtn.querySelector('.theme-text');
+    if (iconEl) iconEl.textContent = isDark ? '🌙' : '☀️';
+    if (textEl) textEl.textContent = isDark ? (isEn ? 'Dark' : 'Oscuro') : (isEn ? 'Light' : 'Claro');
   });
 
   // Attach language switcher events

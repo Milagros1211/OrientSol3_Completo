@@ -1,4 +1,5 @@
 import type { RadiationComponentType } from '@/components/climate/OptimalAnnualStudyPanel';
+import { themeManager } from '@/services/theme/themeManager';
 
 export interface InclinationEvolutionChartProps {
   radiationCurve: number[]; // 91 elements (angles 0° to 90°)
@@ -205,6 +206,17 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
   const xScale = (deg: number) => padding.left + (deg / 90) * plotWidth;
   const yScale = (rad: number) => padding.top + plotHeight - ((rad - minRad) / radSpan) * plotHeight;
 
+  const isDark = themeManager.isDark();
+  const plotBg = isDark ? '#08131a' : '#ffffff';
+  const axisLabelFill = isDark ? '#cbd5e1' : '#1e293b';
+  const axisLineStroke = isDark ? '#475569' : '#94a3b8';
+  const gridLineStroke = isDark ? 'rgba(255,255,255,0.10)' : '#e2e8f0';
+  const tickTextFill = isDark ? '#94a3b8' : '#334155';
+  const titleFill = isDark ? '#f8fafc' : '#0f172a';
+  const legendBoxFill = isDark ? 'rgba(15, 23, 42, 0.92)' : '#ffffff';
+  const legendBoxStroke = isDark ? 'rgba(255,255,255,0.18)' : '#cbd5e1';
+  const legendTextFill = isDark ? '#f8fafc' : '#0f172a';
+
   // Gridlines
   let gridLinesSvg = '';
   if (gridEnabled) {
@@ -213,15 +225,15 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
       const val = minRad + (radSpan / ySteps) * i;
       const y = yScale(val);
       gridLinesSvg += `
-        <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="rgba(255,255,255,0.12)" stroke-dasharray="3,3" />
-        <text x="${padding.left - 10}" y="${y + 4}" fill="#94a3b8" font-size="11" text-anchor="end" font-family="monospace">${val.toFixed(1)}</text>
+        <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="${gridLineStroke}" stroke-dasharray="3,3" />
+        <text x="${padding.left - 10}" y="${y + 4}" fill="${tickTextFill}" font-size="11" text-anchor="end" font-family="monospace">${val.toFixed(1)}</text>
       `;
     }
     for (let deg = 0; deg <= 90; deg += 10) {
       const x = xScale(deg);
       gridLinesSvg += `
-        <line x1="${x}" y1="${padding.top}" x2="${x}" y2="${height - padding.bottom}" stroke="rgba(255,255,255,0.08)" stroke-dasharray="3,3" />
-        <text x="${x}" y="${height - padding.bottom + 18}" fill="#94a3b8" font-size="11" text-anchor="middle" font-family="monospace">${deg}°</text>
+        <line x1="${x}" y1="${padding.top}" x2="${x}" y2="${height - padding.bottom}" stroke="${gridLineStroke}" stroke-dasharray="3,3" />
+        <text x="${x}" y="${height - padding.bottom + 18}" fill="${tickTextFill}" font-size="11" text-anchor="middle" font-family="monospace">${deg}°</text>
       `;
     }
   } else {
@@ -230,13 +242,13 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
       const val = minRad + (radSpan / ySteps) * i;
       const y = yScale(val);
       gridLinesSvg += `
-        <text x="${padding.left - 10}" y="${y + 4}" fill="#94a3b8" font-size="11" text-anchor="end" font-family="monospace">${val.toFixed(1)}</text>
+        <text x="${padding.left - 10}" y="${y + 4}" fill="${tickTextFill}" font-size="11" text-anchor="end" font-family="monospace">${val.toFixed(1)}</text>
       `;
     }
     for (let deg = 0; deg <= 90; deg += 15) {
       const x = xScale(deg);
       gridLinesSvg += `
-        <text x="${x}" y="${height - padding.bottom + 18}" fill="#94a3b8" font-size="11" text-anchor="middle" font-family="monospace">${deg}°</text>
+        <text x="${x}" y="${height - padding.bottom + 18}" fill="${tickTextFill}" font-size="11" text-anchor="middle" font-family="monospace">${deg}°</text>
       `;
     }
   }
@@ -290,19 +302,19 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
   if (isAll) {
     legendSvg = `
       <g transform="translate(${width - padding.right + 12}, ${padding.top + 8})">
-        <rect x="0" y="0" width="88" height="110" rx="4" fill="rgba(15, 23, 42, 0.9)" stroke="rgba(255,255,255,0.15)" />
+        <rect x="0" y="0" width="88" height="110" rx="4" fill="${legendBoxFill}" stroke="${legendBoxStroke}" />
         <!-- Gdm: Cyan -->
         <line x1="10" y1="20" x2="34" y2="20" stroke="#00b4d8" stroke-width="3" />
-        <text x="42" y="24" fill="#f8fafc" font-size="12" font-weight="700" font-family="monospace">Gdm</text>
+        <text x="42" y="24" fill="${legendTextFill}" font-size="12" font-weight="700" font-family="monospace">Gdm</text>
         <!-- Bdm: Red -->
         <line x1="10" y1="45" x2="34" y2="45" stroke="#ef4444" stroke-width="3" />
-        <text x="42" y="49" fill="#f8fafc" font-size="12" font-weight="700" font-family="monospace">Bdm</text>
+        <text x="42" y="49" fill="${legendTextFill}" font-size="12" font-weight="700" font-family="monospace">Bdm</text>
         <!-- Ddm: Lime Green -->
         <line x1="10" y1="70" x2="34" y2="70" stroke="#84cc16" stroke-width="3" />
-        <text x="42" y="74" fill="#f8fafc" font-size="12" font-weight="700" font-family="monospace">Ddm</text>
+        <text x="42" y="74" fill="${legendTextFill}" font-size="12" font-weight="700" font-family="monospace">Ddm</text>
         <!-- Rdm: Orange -->
         <line x1="10" y1="95" x2="34" y2="95" stroke="#f59e0b" stroke-width="3" />
-        <text x="42" y="99" fill="#f8fafc" font-size="12" font-weight="700" font-family="monospace">Rdm</text>
+        <text x="42" y="99" fill="${legendTextFill}" font-size="12" font-weight="700" font-family="monospace">Rdm</text>
       </g>
     `;
   } else {
@@ -312,9 +324,9 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
       component === 'global' ? '#00b4d8' : component === 'beam' ? '#ef4444' : component === 'diffuse' ? '#84cc16' : '#f59e0b';
     legendSvg = `
       <g transform="translate(${width - padding.right + 12}, ${padding.top + 10})">
-        <rect x="0" y="0" width="84" height="32" rx="4" fill="rgba(15, 23, 42, 0.85)" stroke="rgba(255,255,255,0.15)" />
+        <rect x="0" y="0" width="84" height="32" rx="4" fill="${legendBoxFill}" stroke="${legendBoxStroke}" />
         <line x1="10" y1="16" x2="32" y2="16" stroke="${compColor}" stroke-width="3" />
-        <text x="40" y="20" fill="#f8fafc" font-size="12" font-weight="700" font-family="monospace">${compSymbol}</text>
+        <text x="40" y="20" fill="${legendTextFill}" font-size="12" font-weight="700" font-family="monospace">${compSymbol}</text>
       </g>
     `;
   }
@@ -335,22 +347,25 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
       </defs>
 
       <!-- Chart Title -->
-      <text x="${width / 2}" y="28" fill="#f8fafc" font-size="16" font-weight="700" text-anchor="middle">
+      <text x="${width / 2}" y="28" fill="${titleFill}" font-size="16" font-weight="700" text-anchor="middle">
         ${chartTitle}
       </text>
+
+      <!-- Plot Background -->
+      <rect x="${padding.left}" y="${padding.top}" width="${plotWidth}" height="${plotHeight}" fill="${plotBg}" rx="4" stroke="${axisLineStroke}" stroke-width="0.8" />
 
       <!-- Grid and Axes -->
       ${gridLinesSvg}
 
       <!-- Main Axis Lines -->
-      <line x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}" stroke="#475569" stroke-width="1.5" />
-      <line x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}" stroke="#475569" stroke-width="1.5" />
+      <line x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}" stroke="${axisLineStroke}" stroke-width="1.5" />
+      <line x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}" stroke="${axisLineStroke}" stroke-width="1.5" />
 
       <!-- Axis Labels -->
-      <text x="${padding.left + plotWidth / 2}" y="${height - 12}" fill="#cbd5e1" font-size="13" font-weight="600" text-anchor="middle">
+      <text x="${padding.left + plotWidth / 2}" y="${height - 12}" fill="${axisLabelFill}" font-size="13" font-weight="600" text-anchor="middle">
         ${xLabel}
       </text>
-      <text transform="rotate(-90)" x="${-height / 2}" y="20" fill="#cbd5e1" font-size="13" font-weight="600" text-anchor="middle">
+      <text transform="rotate(-90)" x="${-height / 2}" y="20" fill="${axisLabelFill}" font-size="13" font-weight="600" text-anchor="middle">
         ${yLabel}
       </text>
 
@@ -527,6 +542,16 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
       ]
     : [...rad0, ...radOpt, ...radX];
 
+  const isDark = themeManager.isDark();
+  const plotBg = isDark ? '#08131a' : '#ffffff';
+  const title1Fill = isDark ? '#f8fafc' : '#0f172a';
+  const title2Fill = isDark ? '#f8fafc' : '#0f172a';
+  const gridStroke = isDark ? 'rgba(255,255,255,0.08)' : '#e2e8f0';
+  const tickFill = isDark ? '#94a3b8' : '#334155';
+  const axisLineStroke = isDark ? '#475569' : '#94a3b8';
+  const legendBoxFill = isDark ? 'rgba(15, 23, 42, 0.92)' : '#ffffff';
+  const legendBoxStroke = isDark ? 'rgba(255,255,255,0.15)' : '#cbd5e1';
+
   const maxRad = Math.ceil(Math.max(...allRadVals, 1.0) * 1.15 * 10) / 10;
   const yTopScale = (v: number) => topY1 - (v / maxRad) * topH;
   const xMonthScale = (idx: number) => padding.left + (idx + 0.5) * (plotW / 12);
@@ -539,15 +564,15 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
       const v = (maxRad / ticks) * i;
       const y = yTopScale(v);
       topGrid += `
-        <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-dasharray="3,3" />
-        <text x="${padding.left - 10}" y="${y + 4}" fill="#94a3b8" font-size="10" text-anchor="end" font-family="monospace">${v.toFixed(1)}</text>
+        <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="${gridStroke}" stroke-dasharray="3,3" />
+        <text x="${padding.left - 10}" y="${y + 4}" fill="${tickFill}" font-size="10" text-anchor="end" font-family="monospace">${v.toFixed(1)}</text>
       `;
     }
   } else {
     for (let i = 0; i <= 4; i++) {
       const v = (maxRad / 4) * i;
       const y = yTopScale(v);
-      topGrid += `<text x="${padding.left - 10}" y="${y + 4}" fill="#94a3b8" font-size="10" text-anchor="end" font-family="monospace">${v.toFixed(1)}</text>`;
+      topGrid += `<text x="${padding.left - 10}" y="${y + 4}" fill="${tickFill}" font-size="10" text-anchor="end" font-family="monospace">${v.toFixed(1)}</text>`;
     }
   }
 
@@ -597,13 +622,13 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
 
   // Bottom Grid and Month Labels
   let bottomGrid = `
-    <line x1="${padding.left}" y1="${zeroY}" x2="${width - padding.right}" y2="${zeroY}" stroke="#64748b" stroke-width="1.5" />
+    <line x1="${padding.left}" y1="${zeroY}" x2="${width - padding.right}" y2="${zeroY}" stroke="${axisLineStroke}" stroke-width="1.5" />
   `;
 
   months.forEach((m, idx) => {
     const cx = xMonthScale(idx);
     bottomGrid += `
-      <text x="${cx}" y="${bottomY1 + 18}" fill="#94a3b8" font-size="11" text-anchor="middle" font-weight="600">${m}</text>
+      <text x="${cx}" y="${bottomY1 + 18}" fill="${tickFill}" font-size="11" text-anchor="middle" font-weight="600">${m}</text>
     `;
   });
 
@@ -628,13 +653,16 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
   return `
     <svg viewBox="0 0 ${width} ${height}" class="opt-svg-chart" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
       <!-- SUBPLOT 1: Monthly Radiations -->
-      <text x="${width / 2}" y="24" fill="#f8fafc" font-size="15" font-weight="700" text-anchor="middle">
+      <text x="${width / 2}" y="24" fill="${title1Fill}" font-size="15" font-weight="700" text-anchor="middle">
         ${title1}
       </text>
 
+      <!-- Subplot 1 Background -->
+      <rect x="${padding.left}" y="${topY0}" width="${plotW}" height="${topH}" fill="${plotBg}" rx="4" stroke="${axisLineStroke}" stroke-width="0.8" />
+
       ${topGrid}
-      <line x1="${padding.left}" y1="${topY1}" x2="${width - padding.right}" y2="${topY1}" stroke="#475569" stroke-width="1.2" />
-      <line x1="${padding.left}" y1="${topY0}" x2="${padding.left}" y2="${topY1}" stroke="#475569" stroke-width="1.2" />
+      <line x1="${padding.left}" y1="${topY1}" x2="${width - padding.right}" y2="${topY1}" stroke="${axisLineStroke}" stroke-width="1.2" />
+      <line x1="${padding.left}" y1="${topY0}" x2="${padding.left}" y2="${topY1}" stroke="${axisLineStroke}" stroke-width="1.2" />
 
       ${
         isAll
@@ -654,18 +682,18 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
 
         <!-- Top Legend: Todas (4 components) -->
         <g transform="translate(${width - padding.right - 280}, ${topY0 + 6})">
-          <rect x="0" y="0" width="275" height="26" rx="4" fill="rgba(15, 23, 42, 0.9)" stroke="rgba(255,255,255,0.15)" />
+          <rect x="0" y="0" width="275" height="26" rx="4" fill="${legendBoxFill}" stroke="${legendBoxStroke}" />
           <circle cx="12" cy="13" r="4" fill="#00b4d8" />
-          <text x="20" y="17" fill="#7dd3fc" font-size="11" font-weight="700">Gdm</text>
+          <text x="20" y="17" fill="#0284c7" font-size="11" font-weight="700">Gdm</text>
           
           <circle cx="75" cy="13" r="4" fill="#ef4444" />
-          <text x="83" y="17" fill="#fca5a5" font-size="11" font-weight="700">Bdm</text>
+          <text x="83" y="17" fill="#dc2626" font-size="11" font-weight="700">Bdm</text>
 
           <circle cx="138" cy="13" r="4" fill="#84cc16" />
-          <text x="146" y="17" fill="#bef264" font-size="11" font-weight="700">Ddm</text>
+          <text x="146" y="17" fill="#65a30d" font-size="11" font-weight="700">Ddm</text>
 
           <circle cx="202" cy="13" r="4" fill="#f59e0b" />
-          <text x="210" y="17" fill="#fed7aa" font-size="11" font-weight="700">Rdm</text>
+          <text x="210" y="17" fill="#d97706" font-size="11" font-weight="700">Rdm</text>
         </g>
       `
           : `
@@ -687,18 +715,18 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
 
         <!-- Top Legend -->
         <g transform="translate(${width - padding.right - 260}, ${topY0 + 6})">
-          <rect x="0" y="0" width="250" height="26" rx="4" fill="rgba(15, 23, 42, 0.85)" stroke="rgba(255,255,255,0.12)" />
+          <rect x="0" y="0" width="250" height="26" rx="4" fill="${legendBoxFill}" stroke="${legendBoxStroke}" />
           <circle cx="12" cy="13" r="4" fill="#fbbf24" />
-          <text x="20" y="17" fill="#fef08a" font-size="11" font-weight="700">${isEn ? 'Opt' : 'Ópt'}. (${optimalAngle}°)</text>
+          <text x="20" y="17" fill="#d97706" font-size="11" font-weight="700">${isEn ? 'Opt' : 'Ópt'}. (${optimalAngle}°)</text>
           
           <circle cx="95" cy="13" r="4" fill="#0ea5e9" />
-          <text x="103" y="17" fill="#7dd3fc" font-size="11" font-weight="600">0° (Horiz)</text>
+          <text x="103" y="17" fill="#0284c7" font-size="11" font-weight="600">0° (Horiz)</text>
 
           ${
             selectedAngleX !== optimalAngle
               ? `
             <circle cx="178" cy="13" r="4" fill="#a855f7" />
-            <text x="186" y="17" fill="#e9d5ff" font-size="11" font-weight="600">X (${selectedAngleX}°)</text>
+            <text x="186" y="17" fill="#9333ea" font-size="11" font-weight="600">X (${selectedAngleX}°)</text>
           `
               : ''
           }
@@ -707,9 +735,12 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
       }
 
       <!-- SUBPLOT 2: Gains Bar Chart (%) -->
-      <text x="${width / 2}" y="${bottomY0 - 14}" fill="#f8fafc" font-size="14" font-weight="700" text-anchor="middle">
+      <text x="${width / 2}" y="${bottomY0 - 14}" fill="${title2Fill}" font-size="14" font-weight="700" text-anchor="middle">
         ${title2}
       </text>
+
+      <!-- Subplot 2 Background -->
+      <rect x="${padding.left}" y="${bottomY0}" width="${plotW}" height="${bottomH}" fill="${plotBg}" rx="4" stroke="${axisLineStroke}" stroke-width="0.8" />
 
       ${bottomGrid}
       ${gainBars}
