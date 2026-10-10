@@ -32,7 +32,14 @@ Thumbs.db
 !.vscode/extensions.json
 .idea/
 scratch/
-*.pdf
-*.fig
-*.jpg
-*.png
+
+# MATLAB & Legacy files (kept locally, excluded from Git)
+/*.m
+/*.fig
+/*.rpt
+/*.xlsx
+/*.pdf
+/*.jpg
+/*.png
+/*.JPG
+/*.PNG
