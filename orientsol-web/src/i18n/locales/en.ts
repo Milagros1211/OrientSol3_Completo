@@ -210,6 +210,15 @@ export const en: Translations = {
     saveChartLocalBtn: 'Save chart locally',
     saveChartSuccess: 'Chart saved locally successfully',
     chartBackBtn: 'Back',
+    // Albedo Warning (MATLAB Figura 5.2.48)
+    albedoWarningTitle: 'Warning',
+    albedoWarningMessage: 'Albedo gains relative to the horizontal plane cannot be calculated, as Rdm(0°) = 0',
+    // Excel Export Modal (MATLAB Figura 5.2.65)
+    excelModalTitle: 'Select the desired option',
+    excelModalQuestion: 'What do you want to export to an Excel file?',
+    excelOptionSingle: 'Only the currently displayed component',
+    excelOptionAll: 'All components',
+    excelExportSuccess: 'Excel file exported successfully',
     // Export Actions
     exportActionsTitle: 'Data Export & Technical Reports',
     exportPdfBtn: 'Export PDF Report / Print',

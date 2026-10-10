@@ -36,7 +36,8 @@
   "dependencies": {
     "@capacitor/core": "^8.5.2",
     "@supabase/supabase-js": "^2.117.2",
-    "pyodide": "^314.0.7"
+    "pyodide": "^314.0.7",
+    "xlsx": "^0.18.5"
   },
   "build": {
     "appId": "com.orientsol.app",

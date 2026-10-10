@@ -5,8 +5,10 @@ import {
   renderMonthlyOptimumAndGainsSvg,
   saveSvgChartLocally,
 } from '@/components/charts/OptimalAnnualCharts';
+import * as XLSX from 'xlsx';
 
 export type RadiationComponentType = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
+export type TableRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
 
 interface OptimalAnnualStudyProps {
   simulationResult: SolarBridgeSimulationResult;
@@ -14,8 +16,9 @@ interface OptimalAnnualStudyProps {
   latitude: number;
 }
 
-// Module-level state to remember selected angle X, component, and charts across re-renders
-let stateComponent: RadiationComponentType = 'global';
+// Module-level state: decoupled table component and chart component
+let stateTableComponent: TableRadiationComponent = 'global';
+let stateChartComponent: RadiationComponentType = 'all';
 let stateAngleX: number = 45;
 let stateComparisonMode: boolean = true; // Shows Angle X alongside optimal
 let stateShowAnglePicker: boolean = false;
@@ -71,11 +74,11 @@ export function getMonthlyRadiationForAngle(
 
   if (comp91) {
     const matrix =
-      component === 'global'
+      actualComp === 'global'
         ? comp91.global
-        : component === 'beam'
+        : actualComp === 'beam'
         ? comp91.beam
-        : component === 'diffuse'
+        : actualComp === 'diffuse'
         ? comp91.diffuse
         : comp91.albedo;
 
@@ -114,106 +117,269 @@ function calculateGains(optimalVals: number[], baseVals: number[]): { factors: n
 }
 
 /**
- * Exports the Optimal Annual study table directly to a CSV spreadsheet file.
+ * Shows MATLAB Figura 5.2.48 Warning Dialog for Albedo Radiation
  */
-function exportOptimalAnnualTableToCSV(
+function showAlbedoWarningModal(isEn: boolean) {
+  const existing = document.getElementById('matlab-albedo-warning-modal');
+  if (existing) existing.remove();
+
+  const backdrop = document.createElement('div');
+  backdrop.id = 'matlab-albedo-warning-modal';
+  backdrop.className = 'matlab-modal-backdrop';
+
+  backdrop.innerHTML = `
+    <div class="matlab-dialog-box" role="dialog" aria-modal="true">
+      <div class="matlab-dialog-titlebar">
+        <span class="matlab-title-text">${isEn ? 'Warning' : 'Aviso'}</span>
+        <button type="button" class="matlab-close-btn" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="matlab-dialog-body">
+        <div class="matlab-dialog-icon">
+          <svg viewBox="0 0 48 48" width="44" height="44" fill="none">
+            <path d="M24 4L2 42h44L24 4z" fill="#f59e0b" stroke="#b45309" stroke-width="2"/>
+            <path d="M24 16v14" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="24" cy="35" r="2.5" fill="#ffffff"/>
+          </svg>
+        </div>
+        <p class="matlab-dialog-msg">
+          ${isEn
+            ? 'Albedo radiation gains with respect to the horizontal plane cannot be calculated, since Rdm(0º) = 0'
+            : 'Las ganancias de albedo respecto al plano horizontal no se pueden calcular, ya que Rdm(0º) = 0'}
+        </p>
+      </div>
+      <div class="matlab-dialog-actions">
+        <button type="button" class="matlab-btn-default btn-close-modal">OK</button>
+      </div>
+    </div>
+  `;
+
+  const close = () => backdrop.remove();
+  backdrop.querySelector('.matlab-close-btn')?.addEventListener('click', close);
+  backdrop.querySelector('.btn-close-modal')?.addEventListener('click', close);
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop) close();
+  });
+
+  document.body.appendChild(backdrop);
+}
+
+/**
+ * Shows MATLAB Figura 5.2.65 Choice Dialog for Excel Export
+ */
+function showExcelExportModal(
   res: SolarBridgeSimulationResult,
-  component: RadiationComponentType,
   angleX: number,
   isEn: boolean
 ) {
-  const t = i18n.t;
-  const MONTHS = t.common.monthNamesFull;
+  const existing = document.getElementById('matlab-excel-export-modal');
+  if (existing) existing.remove();
+
+  const backdrop = document.createElement('div');
+  backdrop.id = 'matlab-excel-export-modal';
+  backdrop.className = 'matlab-modal-backdrop';
+
+  backdrop.innerHTML = `
+    <div class="matlab-dialog-box" role="dialog" aria-modal="true" style="max-width: 520px;">
+      <div class="matlab-dialog-titlebar">
+        <span class="matlab-title-text">${isEn ? 'Select the desired option' : 'Seleccione la opción deseada'}</span>
+        <button type="button" class="matlab-close-btn" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="matlab-dialog-body">
+        <div class="matlab-dialog-icon">
+          <svg viewBox="0 0 48 48" width="46" height="46" fill="none">
+            <circle cx="24" cy="24" r="22" fill="#0284c7" stroke="#38bdf8" stroke-width="2"/>
+            <path d="M19 18a5 5 0 0 1 10 0c0 3-4 4.5-4 7m0 5.5h.01" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="matlab-dialog-msg" style="font-weight: 600;">
+          ${isEn ? 'What would you like to export to an Excel file?' : '¿Qué desea exportar a un fichero Excel?'}
+        </p>
+      </div>
+      <div class="matlab-dialog-actions" style="justify-content: center; gap: 1rem; padding-bottom: 1.25rem;">
+        <button type="button" id="btn-excel-export-single" class="matlab-btn-default">
+          ${isEn ? 'Only displayed component' : 'Sólo la componente visualizada'}
+        </button>
+        <button type="button" id="btn-excel-export-all" class="matlab-btn-primary">
+          ${isEn ? 'All components' : 'Todas las componentes'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  const close = () => backdrop.remove();
+  backdrop.querySelector('.matlab-close-btn')?.addEventListener('click', close);
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop) close();
+  });
+
+  backdrop.querySelector('#btn-excel-export-single')?.addEventListener('click', () => {
+    close();
+    exportOptimalAnnualToExcel(res, 'single', stateTableComponent, angleX, isEn);
+  });
+
+  backdrop.querySelector('#btn-excel-export-all')?.addEventListener('click', () => {
+    close();
+    exportOptimalAnnualToExcel(res, 'all', stateTableComponent, angleX, isEn);
+  });
+
+  document.body.appendChild(backdrop);
+}
+
+/**
+ * Generates and saves the Excel file (.xlsx) with 1 or 4 sheets, waiting for a save directory.
+ */
+async function exportOptimalAnnualToExcel(
+  res: SolarBridgeSimulationResult,
+  mode: 'single' | 'all',
+  activeComponent: TableRadiationComponent,
+  angleX: number,
+  isEn: boolean
+) {
+  const wb = XLSX.utils.book_new();
+  const componentsToExport: TableRadiationComponent[] =
+    mode === 'all'
+      ? ['global', 'beam', 'diffuse', 'albedo']
+      : [activeComponent];
+
+  const MONTHS = isEn
+    ? ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
   const optAngle = res.optimalAnnual.optimalTiltDeg;
   const tempVals = res.temperatures.ambient.monthlyMeanC;
 
-  const rad0 = getMonthlyRadiationForAngle(res, component, 0);
-  const rad15 = getMonthlyRadiationForAngle(res, component, 15);
-  const rad30 = getMonthlyRadiationForAngle(res, component, 30);
-  const rad45 = getMonthlyRadiationForAngle(res, component, 45);
-  const rad60 = getMonthlyRadiationForAngle(res, component, 60);
-  const rad75 = getMonthlyRadiationForAngle(res, component, 75);
-  const rad90 = getMonthlyRadiationForAngle(res, component, 90);
-  const radOpt = getMonthlyRadiationForAngle(res, component, optAngle);
-  const radX = getMonthlyRadiationForAngle(res, component, angleX);
+  for (const comp of componentsToExport) {
+    const isAlbedo = comp === 'albedo';
+    const compLabel =
+      comp === 'global' ? 'Gdm' : comp === 'beam' ? 'Bdm' : comp === 'diffuse' ? 'Ddm' : 'Rdm';
+    const compTitle =
+      comp === 'global'
+        ? (isEn ? 'Global Radiation' : 'Radiacion Global')
+        : comp === 'beam'
+        ? (isEn ? 'Direct Radiation' : 'Radiacion Directa')
+        : comp === 'diffuse'
+        ? (isEn ? 'Diffuse Radiation' : 'Radiacion Difusa')
+        : (isEn ? 'Albedo Radiation' : 'Radiacion Albedo');
 
-  const gainsHoriz = calculateGains(radOpt, rad0);
-  const gainsX = calculateGains(radOpt, radX);
+    const rad0 = getMonthlyRadiationForAngle(res, comp, 0);
+    const rad15 = getMonthlyRadiationForAngle(res, comp, 15);
+    const rad30 = getMonthlyRadiationForAngle(res, comp, 30);
+    const rad45 = getMonthlyRadiationForAngle(res, comp, 45);
+    const rad60 = getMonthlyRadiationForAngle(res, comp, 60);
+    const rad75 = getMonthlyRadiationForAngle(res, comp, 75);
+    const rad90 = getMonthlyRadiationForAngle(res, comp, 90);
+    const radOpt = getMonthlyRadiationForAngle(res, comp, optAngle);
+    const radX = getMonthlyRadiationForAngle(res, comp, angleX);
 
-  const compLabel =
-    component === 'global' ? 'Gdm' : component === 'beam' ? 'Bdm' : component === 'diffuse' ? 'Ddm' : 'Rdm';
+    const gainsHoriz = calculateGains(radOpt, rad0);
+    const gainsX = calculateGains(radOpt, radX);
 
-  const rows: string[][] = [
-    [`OrientSol 3.0 - ${isEn ? 'Annual Optimal Tilt Study' : 'Estudio de Inclinación Óptima Anual'}`],
-    [`${isEn ? 'Location' : 'Ciudad'}: ${res.locationName}`, `Lat: ${res.latitude.toFixed(2)}°`],
-    [`${isEn ? 'Component' : 'Componente'}: ${component.toUpperCase()}`, `${isEn ? 'Unit' : 'Unidad'}: kWh/m²/day`],
-    [`${isEn ? 'Optimal Tilt' : 'Inclinación Óptima'}: ${optAngle}°`, `${isEn ? 'Comparison Angle X' : 'Ángulo Comparativo X'}: ${angleX}°`],
-    [],
-    [
-      isEn ? 'Month' : 'Mes',
-      `${compLabel} (0°)`,
-      `${compLabel} (15°)`,
-      `${compLabel} (30°)`,
-      `${compLabel} (45°)`,
-      `${compLabel} (60°)`,
-      `${compLabel} (75°)`,
-      `${compLabel} (90°)`,
-      `${compLabel} Ópt (${optAngle}°)`,
-      `${compLabel} X (${angleX}°)`,
-      `${isEn ? 'Mean Temp (°C)' : 'Tª media (°C)'}`,
-      `${isEn ? 'Gain vs Horiz (Factor)' : 'Ganancia s/ Horiz (Factor)'}`,
-      `${isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)'}`,
-      `${isEn ? 'Gain vs Angle X (Factor)' : 'Ganancia s/ Ángulo X (Factor)'}`,
-      `${isEn ? 'Gain vs Angle X (%)' : 'Ganancia s/ Ángulo X (%)'}`,
-    ],
-  ];
+    const sheetData: (string | number)[][] = [
+      [`OrientSol 3.0 - ${isEn ? 'Annual Optimal Tilt Study' : 'Estudio de Inclinación Óptima Anual'}`],
+      [`${isEn ? 'Location' : 'Ciudad'}: ${res.locationName}`, `Lat: ${res.latitude.toFixed(2)}°`],
+      [`${isEn ? 'Component' : 'Componente'}: ${compTitle}`, `${isEn ? 'Unit' : 'Unidad'}: kWh/m²/día`],
+      [`${isEn ? 'Optimal Tilt' : 'Inclinación Óptima'}: ${optAngle}°`, `${isEn ? 'Comparison Angle X' : 'Ángulo Comparativo X'}: ${angleX}°`],
+      [],
+      [
+        isEn ? 'Month' : 'Mes',
+        `${compLabel} (0°)`,
+        `${compLabel} (15°)`,
+        `${compLabel} (30°)`,
+        `${compLabel} (45°)`,
+        `${compLabel} (60°)`,
+        `${compLabel} (75°)`,
+        `${compLabel} (90°)`,
+        `${compLabel} Ópt (${optAngle}°)`,
+        `${compLabel} X (${angleX}°)`,
+        `${isEn ? 'Mean Temp (°C)' : 'Tª media (°C)'}`,
+        `${isEn ? 'Gain vs Horiz (Factor)' : 'Ganancia s/ Horiz (Factor)'}`,
+        `${isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)'}`,
+        `${isEn ? 'Gain vs Angle X (Factor)' : 'Ganancia s/ Ángulo X (Factor)'}`,
+        `${isEn ? 'Gain vs Angle X (%)' : 'Ganancia s/ Ángulo X (%)'}`,
+      ],
+    ];
 
-  for (let i = 0; i < 12; i++) {
-    rows.push([
-      MONTHS[i],
-      rad0[i].toFixed(2),
-      rad15[i].toFixed(2),
-      rad30[i].toFixed(2),
-      rad45[i].toFixed(2),
-      rad60[i].toFixed(2),
-      rad75[i].toFixed(2),
-      rad90[i].toFixed(2),
-      radOpt[i].toFixed(2),
-      radX[i].toFixed(2),
-      tempVals[i].toFixed(1),
-      gainsHoriz.factors[i].toFixed(2),
-      `${gainsHoriz.pcts[i] >= 0 ? '+' : ''}${gainsHoriz.pcts[i].toFixed(2)}%`,
-      gainsX.factors[i].toFixed(2),
-      `${gainsX.pcts[i] >= 0 ? '+' : ''}${gainsX.pcts[i].toFixed(2)}%`,
+    for (let i = 0; i < 12; i++) {
+      sheetData.push([
+        MONTHS[i],
+        Number(rad0[i].toFixed(2)),
+        Number(rad15[i].toFixed(2)),
+        Number(rad30[i].toFixed(2)),
+        Number(rad45[i].toFixed(2)),
+        Number(rad60[i].toFixed(2)),
+        Number(rad75[i].toFixed(2)),
+        Number(rad90[i].toFixed(2)),
+        Number(radOpt[i].toFixed(2)),
+        Number(radX[i].toFixed(2)),
+        Number(tempVals[i].toFixed(1)),
+        isAlbedo ? '-' : Number(gainsHoriz.factors[i].toFixed(2)),
+        isAlbedo ? '-' : `${gainsHoriz.pcts[i] >= 0 ? '+' : ''}${gainsHoriz.pcts[i].toFixed(2)}%`,
+        Number(gainsX.factors[i].toFixed(2)),
+        `${gainsX.pcts[i] >= 0 ? '+' : ''}${gainsX.pcts[i].toFixed(2)}%`,
+      ]);
+    }
+
+    const meanOf = (arr: number[]) => Number((arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2));
+    sheetData.push([
+      isEn ? 'MEAN' : 'MEDIA',
+      meanOf(rad0),
+      meanOf(rad15),
+      meanOf(rad30),
+      meanOf(rad45),
+      meanOf(rad60),
+      meanOf(rad75),
+      meanOf(rad90),
+      meanOf(radOpt),
+      meanOf(radX),
+      meanOf(tempVals),
+      isAlbedo ? '-' : meanOf(gainsHoriz.factors),
+      isAlbedo ? '-' : `${meanOf(gainsHoriz.pcts) >= 0 ? '+' : ''}${meanOf(gainsHoriz.pcts).toFixed(2)}%`,
+      meanOf(gainsX.factors),
+      `${meanOf(gainsX.pcts) >= 0 ? '+' : ''}${meanOf(gainsX.pcts).toFixed(2)}%`,
     ]);
+
+    const ws = XLSX.utils.aoa_to_sheet(sheetData);
+    let sheetName = compTitle.replace(/\s+/g, '_');
+    if (sheetName.length > 31) sheetName = sheetName.substring(0, 31);
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
   }
 
-  // Row MEDIA / MEAN
-  const meanOf = (arr: number[]) => (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2);
-  rows.push([
-    isEn ? 'MEAN' : 'MEDIA',
-    meanOf(rad0),
-    meanOf(rad15),
-    meanOf(rad30),
-    meanOf(rad45),
-    meanOf(rad60),
-    meanOf(rad75),
-    meanOf(rad90),
-    meanOf(radOpt),
-    meanOf(radX),
-    meanOf(tempVals),
-    meanOf(gainsHoriz.factors),
-    `${Number(meanOf(gainsHoriz.pcts)) >= 0 ? '+' : ''}${meanOf(gainsHoriz.pcts)}%`,
-    meanOf(gainsX.factors),
-    `${Number(meanOf(gainsX.pcts)) >= 0 ? '+' : ''}${meanOf(gainsX.pcts)}%`,
-  ]);
+  const excelBuf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const filename = `OrientSol3_Inclinacion_Optima_${cleanLoc}_${mode === 'all' ? 'Todas' : activeComponent}.xlsx`;
 
-  const csvContent = '\uFEFF' + rows.map((r) => r.map((c) => `"${c}"`).join(';')).join('\r\n');
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  // Native File System Access API waiting for save location
+  if ('showSaveFilePicker' in window) {
+    try {
+      const handle = await (window as any).showSaveFilePicker({
+        suggestedName: filename,
+        types: [
+          {
+            description: 'Microsoft Excel (*.xlsx)',
+            accept: {
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+            },
+          },
+        ],
+      });
+      const writable = await handle.createWritable();
+      await writable.write(excelBuf);
+      await writable.close();
+      return;
+    } catch (err: any) {
+      if (err.name === 'AbortError') return; // User cancelled
+      console.warn('showSaveFilePicker failed or was rejected, falling back to download:', err);
+    }
+  }
+
+  // Fallback direct download
+  const blob = new Blob([excelBuf], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `orientsol_inclinacion_optima_${res.locationName.toLowerCase().replace(/\s+/g, '_')}_${component}.csv`;
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -236,17 +402,17 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
     const tempMeanAnnual = res.temperatures.ambient.annualMeanC;
 
     // Standard tilt angles matching MATLAB OrientSol: 0°, 15°, 30°, 45°, 60°, 75°, 90°
-    const rad0 = getMonthlyRadiationForAngle(res, stateComponent, 0);
-    const rad15 = getMonthlyRadiationForAngle(res, stateComponent, 15);
-    const rad30 = getMonthlyRadiationForAngle(res, stateComponent, 30);
-    const rad45 = getMonthlyRadiationForAngle(res, stateComponent, 45);
-    const rad60 = getMonthlyRadiationForAngle(res, stateComponent, 60);
-    const rad75 = getMonthlyRadiationForAngle(res, stateComponent, 75);
-    const rad90 = getMonthlyRadiationForAngle(res, stateComponent, 90);
+    const rad0 = getMonthlyRadiationForAngle(res, stateTableComponent, 0);
+    const rad15 = getMonthlyRadiationForAngle(res, stateTableComponent, 15);
+    const rad30 = getMonthlyRadiationForAngle(res, stateTableComponent, 30);
+    const rad45 = getMonthlyRadiationForAngle(res, stateTableComponent, 45);
+    const rad60 = getMonthlyRadiationForAngle(res, stateTableComponent, 60);
+    const rad75 = getMonthlyRadiationForAngle(res, stateTableComponent, 75);
+    const rad90 = getMonthlyRadiationForAngle(res, stateTableComponent, 90);
 
-    // Optimal Angle and Angle X
-    const radOpt = getMonthlyRadiationForAngle(res, stateComponent, optAngle);
-    const radX = getMonthlyRadiationForAngle(res, stateComponent, stateAngleX);
+    // Optimal Angle and Angle X for current table component
+    const radOpt = getMonthlyRadiationForAngle(res, stateTableComponent, optAngle);
+    const radX = getMonthlyRadiationForAngle(res, stateTableComponent, stateAngleX);
 
     // Compute annual totals and daily means
     const meanOf = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
@@ -261,6 +427,7 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
     const meanX = meanOf(radX);
 
     // Gains vs Horizontal
+    const isAlbedo = stateTableComponent === 'albedo';
     const gainsHoriz = calculateGains(radOpt, rad0);
     const meanFactorHoriz = meanOf(gainsHoriz.factors);
     const meanPctHoriz = meanOf(gainsHoriz.pcts);
@@ -270,7 +437,8 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
     const meanFactorX = meanOf(gainsX.factors);
     const meanPctX = meanOf(gainsX.pcts);
 
-    const radiationCurve91 = getRadiationCurve91(res, stateComponent);
+    // Chart 91-point curves
+    const radiationCurve91 = getRadiationCurve91(res, stateChartComponent);
     const allCurves = {
       global: getRadiationCurve91(res, 'global'),
       beam: getRadiationCurve91(res, 'beam'),
@@ -278,25 +446,49 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
       albedo: getRadiationCurve91(res, 'albedo'),
     };
 
+    // All monthly components data for the monthly tab
+    const allMonthlyData = {
+      global: {
+        rad0: getMonthlyRadiationForAngle(res, 'global', 0),
+        radOpt: getMonthlyRadiationForAngle(res, 'global', optAngle),
+        radX: getMonthlyRadiationForAngle(res, 'global', stateAngleX),
+        gainsPct: calculateGains(getMonthlyRadiationForAngle(res, 'global', optAngle), getMonthlyRadiationForAngle(res, 'global', 0)).pcts,
+      },
+      beam: {
+        rad0: getMonthlyRadiationForAngle(res, 'beam', 0),
+        radOpt: getMonthlyRadiationForAngle(res, 'beam', optAngle),
+        radX: getMonthlyRadiationForAngle(res, 'beam', stateAngleX),
+        gainsPct: calculateGains(getMonthlyRadiationForAngle(res, 'beam', optAngle), getMonthlyRadiationForAngle(res, 'beam', 0)).pcts,
+      },
+      diffuse: {
+        rad0: getMonthlyRadiationForAngle(res, 'diffuse', 0),
+        radOpt: getMonthlyRadiationForAngle(res, 'diffuse', optAngle),
+        radX: getMonthlyRadiationForAngle(res, 'diffuse', stateAngleX),
+        gainsPct: calculateGains(getMonthlyRadiationForAngle(res, 'diffuse', optAngle), getMonthlyRadiationForAngle(res, 'diffuse', 0)).pcts,
+      },
+      albedo: {
+        rad0: getMonthlyRadiationForAngle(res, 'albedo', 0),
+        radOpt: getMonthlyRadiationForAngle(res, 'albedo', optAngle),
+        radX: getMonthlyRadiationForAngle(res, 'albedo', stateAngleX),
+        gainsPct: new Array(12).fill(0),
+      },
+    };
+
     const compSymbol =
-      stateComponent === 'all'
-        ? (isEn ? 'All' : 'Todas')
-        : stateComponent === 'global'
+      stateTableComponent === 'global'
         ? 'Gdm'
-        : stateComponent === 'beam'
+        : stateTableComponent === 'beam'
         ? 'Bdm'
-        : stateComponent === 'diffuse'
+        : stateTableComponent === 'diffuse'
         ? 'Ddm'
         : 'Rdm';
 
     const compLabelName =
-      stateComponent === 'all'
-        ? t.results.compAll
-        : stateComponent === 'global'
+      stateTableComponent === 'global'
         ? t.results.radGlobal
-        : stateComponent === 'beam'
+        : stateTableComponent === 'beam'
         ? t.results.radBeam
-        : stateComponent === 'diffuse'
+        : stateTableComponent === 'diffuse'
         ? t.results.radDiffuse
         : t.results.radAlbedo;
 
@@ -377,23 +569,22 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
           </div>
         </div>
 
-        <!-- 2. Interactive Control Bar (Component selector, Angle X picker, Actions) -->
+        <!-- 2. Interactive Control Bar (Top component selector: only global, beam, diffuse, albedo) -->
         <div class="opt-study-controls-bar">
           <div class="control-group-comp">
             <label for="opt-study-comp-select" class="comp-label">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="12" x2="12" y2="3"></line>
                 <line x1="12" y1="21" x2="12" y2="23"></line>
               </svg>
               <span>${t.results.selectComponent}</span>
             </label>
             <select id="opt-study-comp-select" class="select-comp-dropdown">
-              <option value="global" ${stateComponent === 'global' ? 'selected' : ''}>${t.results.compGlobal}</option>
-              <option value="beam" ${stateComponent === 'beam' ? 'selected' : ''}>${t.results.compBeam}</option>
-              <option value="diffuse" ${stateComponent === 'diffuse' ? 'selected' : ''}>${t.results.compDiffuse}</option>
-              <option value="albedo" ${stateComponent === 'albedo' ? 'selected' : ''}>${t.results.compAlbedo}</option>
-              <option value="all" ${stateComponent === 'all' ? 'selected' : ''}>${t.results.compAll}</option>
+              <option value="global" ${stateTableComponent === 'global' ? 'selected' : ''}>${t.results.compGlobal}</option>
+              <option value="beam" ${stateTableComponent === 'beam' ? 'selected' : ''}>${t.results.compBeam}</option>
+              <option value="diffuse" ${stateTableComponent === 'diffuse' ? 'selected' : ''}>${t.results.compDiffuse}</option>
+              <option value="albedo" ${stateTableComponent === 'albedo' ? 'selected' : ''}>${t.results.compAlbedo}</option>
             </select>
           </div>
 
@@ -541,6 +732,10 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
                 const factX = gainsX.factors[idx];
                 const pctX = gainsX.pcts[idx];
 
+                // For Albedo radiation, display hyphens (-) matching MATLAB Figura 5.2.49
+                const displayFactH = isAlbedo ? '-' : factH.toFixed(2);
+                const displayPctH = isAlbedo ? '-' : `${pctH >= 0 ? '+' : ''}${pctH.toFixed(2)}`;
+
                 return `
                   <tr>
                     <td class="td-month-name"><strong>${monthName}</strong></td>
@@ -554,8 +749,8 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
                     <td class="td-num td-col-opt"><strong>${gOpt.toFixed(2)}</strong></td>
                     ${stateComparisonMode ? `<td class="td-num td-col-anglex"><strong>${gX.toFixed(2)}</strong></td>` : ''}
                     <td class="td-num td-col-temp">${temp.toFixed(1)}</td>
-                    <td class="td-num td-gain-factor">${factH.toFixed(2)}</td>
-                    <td class="td-num td-gain-pct ${pctH >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${pctH >= 0 ? '+' : ''}${pctH.toFixed(2)}</td>
+                    <td class="td-num td-gain-factor">${displayFactH}</td>
+                    <td class="td-num td-gain-pct ${!isAlbedo && pctH >= 0 ? 'text-gain-pos' : !isAlbedo ? 'text-gain-neg' : ''}">${displayPctH}</td>
                     ${
                       stateComparisonMode
                         ? `
@@ -581,8 +776,8 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
                 <td class="td-num td-col-opt"><strong>${meanOpt.toFixed(2)}</strong></td>
                 ${stateComparisonMode ? `<td class="td-num td-col-anglex"><strong>${meanX.toFixed(2)}</strong></td>` : ''}
                 <td class="td-num td-col-temp"><strong>${tempMeanAnnual.toFixed(1)}</strong></td>
-                <td class="td-num td-gain-factor"><strong>${meanFactorHoriz.toFixed(2)}</strong></td>
-                <td class="td-num td-gain-pct ${meanPctHoriz >= 0 ? 'text-gain-pos' : 'text-gain-neg'}"><strong>${meanPctHoriz >= 0 ? '+' : ''}${meanPctHoriz.toFixed(2)}</strong></td>
+                <td class="td-num td-gain-factor"><strong>${isAlbedo ? '-' : meanFactorHoriz.toFixed(2)}</strong></td>
+                <td class="td-num td-gain-pct ${!isAlbedo && meanPctHoriz >= 0 ? 'text-gain-pos' : !isAlbedo ? 'text-gain-neg' : ''}"><strong>${isAlbedo ? '-' : `${meanPctHoriz >= 0 ? '+' : ''}${meanPctHoriz.toFixed(2)}`}</strong></td>
                 ${
                   stateComparisonMode
                     ? `
@@ -618,8 +813,8 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
 
           <div class="kpi-mini-card kpi-horiz">
             <span class="kpi-mini-title">${isEn ? 'Gain over Horizontal (0°)' : 'Ganancia s/ Horizontal (0°)'}</span>
-            <div class="kpi-mini-main" style="color: var(--accent-cyan);">+${meanPctHoriz.toFixed(2)}%</div>
-            <span class="kpi-mini-sub">+${Math.round((meanOpt - mean0) * 365)} kWh/m²·${isEn ? 'yr' : 'año'}</span>
+            <div class="kpi-mini-main" style="color: var(--accent-cyan);">${isAlbedo ? '-' : `+${meanPctHoriz.toFixed(2)}%`}</div>
+            <span class="kpi-mini-sub">${isAlbedo ? 'Rdm(0°) = 0' : `+${Math.round((meanOpt - mean0) * 365)} kWh/m²·${isEn ? 'yr' : 'año'}`}</span>
           </div>
         </div>
 
@@ -671,22 +866,22 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
                     <span class="opt-chart-matlab-brand">ORIENT<strong>SOL 3.0</strong></span>
                   </div>
 
-                  <!-- Component Selector matching Figure 5.2.57 & 5.2.58 -->
+                  <!-- Component Selector with 'Todas' included -->
                   <div class="opt-chart-inline-toolbar">
                     <div class="opt-chart-comp-picker">
                       <label for="chart-comp-dropdown" class="chart-comp-label">
                         ${isEn ? 'Select a component:' : 'Seleccione una componente:'}
                       </label>
                       <select id="chart-comp-dropdown" class="form-select select-chart-comp">
-                        <option value="global" ${stateComponent === 'global' ? 'selected' : ''}>${t.results.compGlobal}</option>
-                        <option value="beam" ${stateComponent === 'beam' ? 'selected' : ''}>${t.results.compBeam}</option>
-                        <option value="diffuse" ${stateComponent === 'diffuse' ? 'selected' : ''}>${t.results.compDiffuse}</option>
-                        <option value="albedo" ${stateComponent === 'albedo' ? 'selected' : ''}>${t.results.compAlbedo}</option>
-                        <option value="all" ${stateComponent === 'all' ? 'selected' : ''}>${t.results.compAll}</option>
+                        <option value="global" ${stateChartComponent === 'global' ? 'selected' : ''}>${t.results.compGlobal}</option>
+                        <option value="beam" ${stateChartComponent === 'beam' ? 'selected' : ''}>${t.results.compBeam}</option>
+                        <option value="diffuse" ${stateChartComponent === 'diffuse' ? 'selected' : ''}>${t.results.compDiffuse}</option>
+                        <option value="albedo" ${stateChartComponent === 'albedo' ? 'selected' : ''}>${t.results.compAlbedo}</option>
+                        <option value="all" ${stateChartComponent === 'all' ? 'selected' : ''}>${t.results.compAll}</option>
                       </select>
                     </div>
 
-                    <!-- Standalone Local Save Button (File System Access / Local Computer) -->
+                    <!-- Standalone Local Save Button -->
                     <div class="opt-chart-export-tools">
                       <button
                         type="button"
@@ -712,7 +907,7 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
                   ${renderInclinationEvolutionSvg({
                     radiationCurve: radiationCurve91,
                     allCurves,
-                    component: stateComponent,
+                    component: stateChartComponent,
                     optimalAngle: optAngle,
                     selectedAngleX: stateAngleX,
                     gridEnabled: stateGridEnabled,
@@ -751,13 +946,29 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
             ` : `
               <!-- Sub-view 2: Grafica_OptAnual (5th Image) -->
               <div class="opt-chart-view opt-view-monthly">
+                <div class="opt-chart-view-intro" style="margin-bottom: 0.75rem;">
+                  <div class="opt-chart-comp-picker">
+                    <label for="chart-comp-dropdown-monthly" class="chart-comp-label">
+                      ${isEn ? 'Select a component:' : 'Seleccione una componente:'}
+                    </label>
+                    <select id="chart-comp-dropdown-monthly" class="form-select select-chart-comp">
+                      <option value="global" ${stateChartComponent === 'global' ? 'selected' : ''}>${t.results.compGlobal}</option>
+                      <option value="beam" ${stateChartComponent === 'beam' ? 'selected' : ''}>${t.results.compBeam}</option>
+                      <option value="diffuse" ${stateChartComponent === 'diffuse' ? 'selected' : ''}>${t.results.compDiffuse}</option>
+                      <option value="albedo" ${stateChartComponent === 'albedo' ? 'selected' : ''}>${t.results.compAlbedo}</option>
+                      <option value="all" ${stateChartComponent === 'all' ? 'selected' : ''}>${t.results.compAll}</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div class="opt-svg-wrapper">
                   ${renderMonthlyOptimumAndGainsSvg({
                     rad0,
                     radOpt,
                     radX,
                     gainsPct: gainsHoriz.pcts,
-                    component: stateComponent,
+                    allMonthlyData,
+                    component: stateChartComponent,
                     optimalAngle: optAngle,
                     selectedAngleX: stateAngleX,
                     gridEnabled: stateGridEnabled,
@@ -788,9 +999,9 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
                   <div class="matlab-stat-box box-gain">
                     <span class="stat-box-title">${isEn ? 'Annual Gains vs 0° (%)' : 'Ganancias Óptima Anual s/ 0° (%)'}</span>
                     <div class="stat-box-values">
-                      <div class="stat-chip"><span class="chip-k">${t.results.chartMinLabel}:</span> <span class="chip-v">${Math.min(...gainsHoriz.pcts).toFixed(2)}%</span></div>
-                      <div class="stat-chip"><span class="chip-k">${t.results.chartMedLabel}:</span> <span class="chip-v highlight-gain">+${meanPctHoriz.toFixed(2)}%</span></div>
-                      <div class="stat-chip"><span class="chip-k">${t.results.chartMaxLabel}:</span> <span class="chip-v">+${Math.max(...gainsHoriz.pcts).toFixed(2)}%</span></div>
+                      <div class="stat-chip"><span class="chip-k">${t.results.chartMinLabel}:</span> <span class="chip-v">${isAlbedo ? '-' : `${Math.min(...gainsHoriz.pcts).toFixed(2)}%`}</span></div>
+                      <div class="stat-chip"><span class="chip-k">${t.results.chartMedLabel}:</span> <span class="chip-v highlight-gain">${isAlbedo ? '-' : `+${meanPctHoriz.toFixed(2)}%`}</span></div>
+                      <div class="stat-chip"><span class="chip-k">${t.results.chartMaxLabel}:</span> <span class="chip-v">${isAlbedo ? '-' : `+${Math.max(...gainsHoriz.pcts).toFixed(2)}%`}</span></div>
                     </div>
                   </div>
                 </div>
@@ -831,10 +1042,15 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
     `;
 
     // Attach Event Listeners
-    // 1. Component Dropdown Change
+    // 1. Top Component Dropdown Change (Only global, beam, diffuse, albedo)
     const compSelect = container.querySelector<HTMLSelectElement>('#opt-study-comp-select');
     compSelect?.addEventListener('change', () => {
-      stateComponent = (compSelect.value || 'global') as RadiationComponentType;
+      const val = (compSelect.value || 'global') as TableRadiationComponent;
+      stateTableComponent = val;
+      stateChartComponent = val; // Synchronized
+      if (val === 'albedo') {
+        showAlbedoWarningModal(isEn);
+      }
       renderInternal();
     });
 
@@ -917,21 +1133,46 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
       renderInternal();
     });
 
-    // 5.3 Inline Chart Component Dropdown (Figures 5.2.57 & 5.2.58)
+    // 5.3 Inline Chart Component Dropdown (Evolution Tab)
     const chartCompDropdown = container.querySelector<HTMLSelectElement>('#chart-comp-dropdown');
     chartCompDropdown?.addEventListener('change', () => {
-      stateComponent = (chartCompDropdown.value || 'global') as RadiationComponentType;
+      const val = (chartCompDropdown.value || 'all') as RadiationComponentType;
+      if (val === 'all') {
+        stateChartComponent = 'all';
+      } else {
+        stateChartComponent = val;
+        stateTableComponent = val as TableRadiationComponent; // Synchronized for non-'all'
+        if (val === 'albedo') {
+          showAlbedoWarningModal(isEn);
+        }
+      }
       renderInternal();
     });
 
-    // 5.4 Standalone Local Save Action (Local Computer directory via showSaveFilePicker / download)
+    // 5.3.1 Inline Chart Component Dropdown (Monthly Tab)
+    const chartCompDropdownMonthly = container.querySelector<HTMLSelectElement>('#chart-comp-dropdown-monthly');
+    chartCompDropdownMonthly?.addEventListener('change', () => {
+      const val = (chartCompDropdownMonthly.value || 'all') as RadiationComponentType;
+      if (val === 'all') {
+        stateChartComponent = 'all';
+      } else {
+        stateChartComponent = val;
+        stateTableComponent = val as TableRadiationComponent;
+        if (val === 'albedo') {
+          showAlbedoWarningModal(isEn);
+        }
+      }
+      renderInternal();
+    });
+
+    // 5.4 Standalone Local Save Action
     const btnSaveChart = container.querySelector<HTMLButtonElement>('#btn-save-chart-local');
     const saveFeedback = container.querySelector<HTMLElement>('#chart-save-feedback');
     btnSaveChart?.addEventListener('click', async () => {
       const svgEl = container.querySelector<SVGSVGElement>('#svg-inclination-evolution');
       if (!svgEl) return;
 
-      const compName = stateComponent === 'all' ? (isEn ? 'All_Components' : 'Todas_Componentes') : stateComponent;
+      const compName = stateChartComponent === 'all' ? (isEn ? 'All_Components' : 'Todas_Componentes') : stateChartComponent;
       const cleanLoc = locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
       const fileName = `OrientSol3_Variacion_Radiacion_${cleanLoc}_${compName}`;
 
@@ -958,7 +1199,7 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
       }
     });
 
-    // 5.5 Chart "Volver" button (Figure 5.2.57)
+    // 5.5 Chart "Volver" button
     const btnChartBack = container.querySelector<HTMLButtonElement>('#btn-chart-back');
     btnChartBack?.addEventListener('click', () => {
       const topTable = container.querySelector('.opt-table-responsive');
@@ -978,10 +1219,10 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
       }
     });
 
-    // 7. Export Table to Excel (CSV)
+    // 7. Export Table to Excel (Figura 5.2.64 & 5.2.65 modal)
     const btnExportExcel = container.querySelector<HTMLButtonElement>('#btn-export-opt-excel');
     btnExportExcel?.addEventListener('click', () => {
-      exportOptimalAnnualTableToCSV(res, stateComponent, stateAngleX, isEn);
+      showExcelExportModal(res, stateAngleX, isEn);
     });
 
     // 8. Generate Report (PDF)

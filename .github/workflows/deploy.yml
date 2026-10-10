@@ -44,19 +44,9 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || vars.VITE_SUPABASE_ANON_KEY }}
 
-      # 1. Despliegue a la rama gh-pages (por si GitHub Pages está configurado desde rama)
+      # Despliegue a la rama gh-pages (fuente configurada en el repositorio)
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./orientsol-web/dist
-
-      # 2. Despliegue oficial de GitHub Pages Artifact (por si GitHub Pages está configurado desde Actions)
-      - name: Upload GitHub Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: orientsol-web/dist
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

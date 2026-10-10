@@ -210,6 +210,15 @@ export interface Translations {
     saveChartLocalBtn: string;
     saveChartSuccess: string;
     chartBackBtn: string;
+    // Albedo Warning (MATLAB Figura 5.2.48)
+    albedoWarningTitle: string;
+    albedoWarningMessage: string;
+    // Excel Export Modal (MATLAB Figura 5.2.65)
+    excelModalTitle: string;
+    excelModalQuestion: string;
+    excelOptionSingle: string;
+    excelOptionAll: string;
+    excelExportSuccess: string;
     // Export Actions
     exportActionsTitle: string;
     exportPdfBtn: string;

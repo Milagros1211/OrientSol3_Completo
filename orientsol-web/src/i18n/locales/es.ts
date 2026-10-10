@@ -210,6 +210,15 @@ export const es: Translations = {
     saveChartLocalBtn: 'Guardar gráfico en local',
     saveChartSuccess: 'Gráfico guardado en local con éxito',
     chartBackBtn: 'Volver',
+    // Albedo Warning (MATLAB Figura 5.2.48)
+    albedoWarningTitle: 'Aviso',
+    albedoWarningMessage: 'Las ganancias de albedo respecto al plano horizontal no se pueden calcular, ya que Rdm(0º) = 0',
+    // Excel Export Modal (MATLAB Figura 5.2.65)
+    excelModalTitle: 'Seleccione la opción deseada',
+    excelModalQuestion: '¿Qué desea exportar a un fichero Excel?',
+    excelOptionSingle: 'Sólo la componente visualizada',
+    excelOptionAll: 'Todas las componentes',
+    excelExportSuccess: 'Fichero Excel exportado con éxito',
     // Export Actions
     exportActionsTitle: 'Exportación de Datos e Informes',
     exportPdfBtn: 'Exportar Informe PDF / Imprimir',
