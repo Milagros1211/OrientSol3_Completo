@@ -1,4 +1,6 @@
 import { pyodideService } from '@/services/pyodide';
+import { climateDatabaseService } from '@/services/supabase';
+import { openSupabaseSyncModal } from '@/components/supabase/SupabaseSyncModal';
 import { i18n } from '@/i18n';
 
 export function renderHeader(): HTMLElement {
@@ -7,6 +9,10 @@ export function renderHeader(): HTMLElement {
 
   const t = i18n.t;
   const currentLocale = i18n.getLocale();
+  const isEn = currentLocale === 'en';
+  const queueCount = climateDatabaseService.getOfflineQueueCount();
+  const isConfigured = climateDatabaseService.isConfigured();
+  const isOnline = climateDatabaseService.isOnline();
 
   header.innerHTML = `
     <div class="header-brand">
@@ -29,6 +35,14 @@ export function renderHeader(): HTMLElement {
       </div>
     </div>
     <div class="header-actions">
+      <!-- Supabase Connection & Offline Sync Pill -->
+      <button id="supabase-sync-pill" class="runtime-pill status-supabase" type="button" title="${isEn ? 'Supabase Connection & Offline Sync' : 'Conexión y Sincronización Supabase'}">
+        <span class="status-dot ${isConfigured && isOnline ? 'status-dot-active' : ''}"></span>
+        <span id="supabase-status-text">
+          ☁️ Supabase ${queueCount > 0 ? `<span class="pill-badge-counter">${queueCount}</span>` : ''}
+        </span>
+      </button>
+
       <!-- Language Switcher Toggle -->
       <div class="lang-switch-group" role="group" aria-label="${t.header.langSelect}">
         <button type="button" class="lang-btn ${currentLocale === 'es' ? 'active' : ''}" data-lang="es" title="${t.header.toggleSpanish}">
@@ -48,6 +62,27 @@ export function renderHeader(): HTMLElement {
       </a>
     </div>
   `;
+
+  // Attach Supabase sync modal event
+  const supabasePill = header.querySelector<HTMLButtonElement>('#supabase-sync-pill');
+  supabasePill?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openSupabaseSyncModal();
+  });
+
+  // Subscribe to Supabase database state updates (queue count, etc.)
+  climateDatabaseService.subscribe(() => {
+    const textEl = header.querySelector('#supabase-status-text');
+    const dotEl = header.querySelector('#supabase-sync-pill .status-dot');
+    if (!textEl) return;
+    const count = climateDatabaseService.getOfflineQueueCount();
+    const configured = climateDatabaseService.isConfigured();
+    const online = climateDatabaseService.isOnline();
+    textEl.innerHTML = `☁️ Supabase ${count > 0 ? `<span class="pill-badge-counter">${count}</span>` : ''}`;
+    if (dotEl) {
+      dotEl.className = `status-dot ${configured && online ? 'status-dot-active' : ''}`;
+    }
+  });
 
   // Attach language switcher events
   header.querySelectorAll<HTMLButtonElement>('.lang-btn').forEach((btn) => {

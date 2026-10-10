@@ -76,6 +76,7 @@ export interface Translations {
     peakPowerLabel: string;
     prLabel: string;
     albedoLabel: string;
+    toncLabel: string;
     runSimulationBtn: string;
     runningSimulationBtn: string;
   };

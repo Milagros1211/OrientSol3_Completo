@@ -5,6 +5,7 @@ import {
 } from '@/services/bridge/solarCalculationBridge';
 import { generateSampleCSV, generateSampleJSON } from '@/services/hybrid/climateFileParser';
 import type { ClimateDataRecord } from '@/types/climate';
+import { climateDatabaseService } from '@/services/supabase';
 import { i18n } from '@/i18n';
 import {
   renderRadiationChart,
@@ -207,6 +208,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         <label>${t.hybridLoader.peakPowerLabel}: <input type="number" id="sim-peak-kw" class="form-input input-compact" value="5.0" step="0.5" min="0.1" /></label>
         <label>${t.hybridLoader.prLabel}: <input type="number" id="sim-pr" class="form-input input-compact" value="0.80" step="0.05" min="0.5" max="1.0" /></label>
         <label>${t.hybridLoader.albedoLabel}: <input type="number" id="sim-albedo" class="form-input input-compact" value="0.20" step="0.05" min="0.0" max="1.0" /></label>
+        <label>${t.hybridLoader.toncLabel}: <input type="number" id="sim-tonc" class="form-input input-compact" value="47.0" step="0.5" min="30.0" max="65.0" /></label>
       </div>
       <button id="btn-run-hybrid-simulation" class="btn btn-solar btn-lg">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
@@ -257,6 +259,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   const simPeakKw = container.querySelector('#sim-peak-kw') as HTMLInputElement;
   const simPr = container.querySelector('#sim-pr') as HTMLInputElement;
   const simAlbedo = container.querySelector('#sim-albedo') as HTMLInputElement;
+  const simTonc = container.querySelector('#sim-tonc') as HTMLInputElement;
   const statusBar = container.querySelector('#hybrid-status-bar') as HTMLElement;
   const resultsContainer = container.querySelector('#hybrid-simulation-results') as HTMLElement;
 
@@ -277,7 +280,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     });
   });
 
-  function setStatus(msg: string, type: 'info' | 'success' | 'error' = 'info') {
+  function setStatus(msg: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') {
     statusBar.textContent = msg;
     statusBar.className = `climate-status-bar status-${type}`;
   }
@@ -361,7 +364,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     setStatus(isEn ? `Template "${rec.locationName}" applied to form.` : `Plantilla "${rec.locationName}" aplicada al formulario.`, 'info');
   });
 
-  validateManualBtn.addEventListener('click', () => {
+  validateManualBtn.addEventListener('click', async () => {
     const gInputs = container.querySelectorAll<HTMLInputElement>('.manual-g-input');
     const tInputs = container.querySelectorAll<HTMLInputElement>('.manual-t-input');
 
@@ -384,7 +387,19 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       });
 
       renderActiveRecord(rec);
-      setStatus(isEn ? '✓ Manual dataset validated successfully.' : '✓ Dataset manual validado correctamente.', 'success');
+
+      // Register in Supabase (Online auto-insert or Offline queue with >=90% duplicate detection)
+      const reg = await climateDatabaseService.registerEmplacement(rec);
+      if (reg.isDuplicate) {
+        setStatus(
+          isEn
+            ? `⚠️ Emplacement already registered (${reg.similarityPct}% data match with "${reg.matchedRecord?.locationName}").`
+            : `⚠️ El emplazamiento ya ha sido registrado previamente (${reg.similarityPct}% de coincidencia en datos ingresados con "${reg.matchedRecord?.locationName}").`,
+          'warning'
+        );
+      } else {
+        setStatus(reg.message, 'success');
+      }
     } catch (err: any) {
       setStatus(`Error: ${err.message}`, 'error');
     }
@@ -398,12 +413,26 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     hybridClimateManager
       .parseUploadedClimateFile(file)
-      .then((record: ClimateDataRecord) => {
+      .then(async (record: ClimateDataRecord) => {
         renderActiveRecord(record);
-        setStatus(
-          isEn ? `✓ File "${file.name}" loaded successfully (${record.locationName}).` : `✓ Archivo "${file.name}" cargado con éxito (${record.locationName}).`,
-          'success'
-        );
+
+        // Register in Supabase (Online auto-insert or Offline queue with >=90% duplicate detection)
+        const reg = await climateDatabaseService.registerEmplacement(record);
+        if (reg.isDuplicate) {
+          setStatus(
+            isEn
+              ? `⚠️ File loaded, but emplacement was already registered (${reg.similarityPct}% data match with "${reg.matchedRecord?.locationName}").`
+              : `⚠️ Archivo cargado, pero el emplazamiento ya estaba registrado (${reg.similarityPct}% de coincidencia con "${reg.matchedRecord?.locationName}").`,
+            'warning'
+          );
+        } else {
+          setStatus(
+            isEn
+              ? `✓ File "${file.name}" loaded: ${reg.message}`
+              : `✓ Archivo "${file.name}" cargado: ${reg.message}`,
+            'success'
+          );
+        }
       })
       .catch((err: any) => {
         console.error('[Upload Error]', err);
@@ -458,6 +487,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     const peakKw = parseFloat(simPeakKw.value) || 5.0;
     const pr = parseFloat(simPr.value) || 0.80;
     const albedo = parseFloat(simAlbedo.value) || 0.20;
+    const tonc = parseFloat(simTonc?.value) || 47.0;
 
     simBtn.disabled = true;
     simBtn.innerHTML = `
@@ -472,6 +502,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         peakPowerKw: peakKw,
         performanceRatio: pr,
         albedo,
+        tonc,
       });
 
       const result = await executeSolarSimulationFromClimateData(params);
@@ -574,7 +605,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         <div class="temp-stat-card">
           <span class="temp-stat-title">${t.results.tempCellOperating}</span>
           <div class="temp-stat-value temp-cell">${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)} <small style="font-size:0.9rem">°C</small></div>
-          <span class="temp-stat-sub">${t.results.tempCellOperatingDesc.replace('{max}', res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1))}</span>
+          <span class="temp-stat-sub">${isEn ? `NOCT / TONC ${(parseFloat(simTonc?.value) || 47.0).toFixed(1)}°C Model (Max: ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)}°C)` : `Modelo TONC ${(parseFloat(simTonc?.value) || 47.0).toFixed(1)}°C (Máx: ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)}°C)`}</span>
         </div>
       </div>
 
