@@ -254,92 +254,152 @@ async function exportOptimalAnnualToExcel(
       comp === 'global' ? 'Gdm' : comp === 'beam' ? 'Bdm' : comp === 'diffuse' ? 'Ddm' : 'Rdm';
     const compTitle =
       comp === 'global'
-        ? (isEn ? 'Global Radiation' : 'Radiacion Global')
+        ? (isEn ? 'DAILY GLOBAL RADIATION (kWh/m²/day)' : 'RADIACIÓN GLOBAL DIARIA (kWh/m²/día)')
         : comp === 'beam'
-        ? (isEn ? 'Direct Radiation' : 'Radiacion Directa')
+        ? (isEn ? 'DAILY DIRECT RADIATION (kWh/m²/day)' : 'RADIACIÓN DIRECTA DIARIA (kWh/m²/día)')
         : comp === 'diffuse'
-        ? (isEn ? 'Diffuse Radiation' : 'Radiacion Difusa')
-        : (isEn ? 'Albedo Radiation' : 'Radiacion Albedo');
+        ? (isEn ? 'DAILY DIFFUSE RADIATION (kWh/m²/day)' : 'RADIACIÓN DIFUSA DIARIA (kWh/m²/día)')
+        : (isEn ? 'DAILY ALBEDO RADIATION (kWh/m²/day)' : 'RADIACIÓN DE ALBEDO DIARIA (kWh/m²/día)');
 
-    const rad0 = getMonthlyRadiationForAngle(res, comp, 0);
-    const rad15 = getMonthlyRadiationForAngle(res, comp, 15);
-    const rad30 = getMonthlyRadiationForAngle(res, comp, 30);
-    const rad45 = getMonthlyRadiationForAngle(res, comp, 45);
-    const rad60 = getMonthlyRadiationForAngle(res, comp, 60);
-    const rad75 = getMonthlyRadiationForAngle(res, comp, 75);
-    const rad90 = getMonthlyRadiationForAngle(res, comp, 90);
+    // 1. Pre-calculate 91 angle values for all 12 months (0° to 90°)
+    const angles91Data: number[][] = []; // [deg 0..90][m 0..11]
+    for (let deg = 0; deg <= 90; deg++) {
+      angles91Data.push(getMonthlyRadiationForAngle(res, comp, deg));
+    }
+
+    const rad0 = angles91Data[0];
     const radOpt = getMonthlyRadiationForAngle(res, comp, optAngle);
     const radX = getMonthlyRadiationForAngle(res, comp, angleX);
 
     const gainsHoriz = calculateGains(radOpt, rad0);
     const gainsX = calculateGains(radOpt, radX);
 
-    const sheetData: (string | number)[][] = [
-      [`OrientSol 3.0 - ${isEn ? 'Annual Optimal Tilt Study' : 'Estudio de Inclinación Óptima Anual'}`],
-      [`${isEn ? 'Location' : 'Ciudad'}: ${res.locationName}`, `Lat: ${res.latitude.toFixed(2)}°`],
-      [`${isEn ? 'Component' : 'Componente'}: ${compTitle}`, `${isEn ? 'Unit' : 'Unidad'}: kWh/m²/día`],
-      [`${isEn ? 'Optimal Tilt' : 'Inclinación Óptima'}: ${optAngle}°`, `${isEn ? 'Comparison Angle X' : 'Ángulo Comparativo X'}: ${angleX}°`],
-      [],
-      [
-        isEn ? 'Month' : 'Mes',
-        `${compLabel} (0°)`,
-        `${compLabel} (15°)`,
-        `${compLabel} (30°)`,
-        `${compLabel} (45°)`,
-        `${compLabel} (60°)`,
-        `${compLabel} (75°)`,
-        `${compLabel} (90°)`,
-        `${compLabel} Ópt (${optAngle}°)`,
-        `${compLabel} X (${angleX}°)`,
-        `${isEn ? 'Mean Temp (°C)' : 'Tª media (°C)'}`,
-        `${isEn ? 'Gain vs Horiz (Factor)' : 'Ganancia s/ Horiz (Factor)'}`,
-        `${isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)'}`,
-        `${isEn ? 'Gain vs Angle X (Factor)' : 'Ganancia s/ Ángulo X (Factor)'}`,
-        `${isEn ? 'Gain vs Angle X (%)' : 'Ganancia s/ Ángulo X (%)'}`,
-      ],
-    ];
+    const meanOf = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / (arr.length || 1);
+    const meanOpt = meanOf(radOpt);
+    const meanTemp = meanOf(tempVals);
+    const meanFactorHoriz = meanOf(gainsHoriz.factors);
+    const meanPctHoriz = meanOf(gainsHoriz.pcts);
+    const meanFactorX = meanOf(gainsX.factors);
+    const meanPctX = meanOf(gainsX.pcts);
 
-    for (let i = 0; i < 12; i++) {
+    // Build Sheet Data strictly matching Figura 5.2.68 & MATLAB Tabla_OptAnual.m
+    const sheetData: (string | number | null)[][] = [];
+
+    // Fila 1 (Cabecera)
+    sheetData.push([
+      res.locationName,
+      isEn ? 'Latitude' : 'Latitud',
+      Number(res.latitude.toFixed(6)),
+      '',
+      isEn ? 'Annual optimal tilt' : 'Inclinación óptima anual',
+      '',
+      optAngle,
+    ]);
+
+    // Fila 2 (Vacía)
+    sheetData.push([]);
+
+    // Fila 3 (Título del bloque de radiación)
+    sheetData.push(['', compTitle]);
+
+    // Fila 4 (Cabecera de columnas: ángulos de 0º a 90º)
+    const angleHeaders: string[] = [''];
+    for (let deg = 0; deg <= 90; deg++) {
+      angleHeaders.push(`${compLabel}(${deg}º)`);
+    }
+    sheetData.push(angleHeaders);
+
+    // Filas 5 a 16 (12 Meses con todos los valores de 0º a 90º)
+    for (let m = 0; m < 12; m++) {
+      const rowVals: (string | number)[] = [MONTHS[m]];
+      for (let deg = 0; deg <= 90; deg++) {
+        const val = angles91Data[deg][m];
+        rowVals.push(Number(val.toFixed(8)));
+      }
+      sheetData.push(rowVals);
+    }
+
+    // Fila 17 (MEDIA de cada inclinación 0º a 90º)
+    const mediaRow: (string | number)[] = [isEn ? 'MEAN' : 'MEDIA'];
+    for (let deg = 0; deg <= 90; deg++) {
+      const avgDeg = meanOf(angles91Data[deg]);
+      mediaRow.push(Number(avgDeg.toFixed(8)));
+    }
+    sheetData.push(mediaRow);
+
+    // Fila 18 (Vacía)
+    sheetData.push([]);
+
+    // Fila 19 (Cabecera bloque inferior de ganancias)
+    sheetData.push(['', '', '', '', isEn ? 'GAINS' : 'GANANCIAS', isEn ? 'Respect to:' : 'Respecto a:']);
+
+    // Fila 20 (Referencia de ganancia)
+    sheetData.push([
+      '',
+      '',
+      '',
+      '',
+      '',
+      isEn ? 'Horizontal plane' : 'Plano horizontal',
+      '',
+      isEn ? `Angle X (${angleX}º)` : `Ángulo X (${angleX}º)`,
+    ]);
+
+    // Fila 21 (Subcabeceras tabla inferior: Óptimo, Temp, Ganancias)
+    sheetData.push([
+      '',
+      `${compLabel}(${isEn ? 'Opt.' : 'Ópt.'})`,
+      isEn ? 'Temp.(°C)' : 'Temp.(ºC)',
+      '',
+      '',
+      isEn ? 'Gain Factor' : 'Fc.Ganancia',
+      isEn ? 'Gain(%)' : 'Ganancia(%)',
+      isEn ? 'Gain Factor (X)' : 'Fc.Ganancia (X)',
+      isEn ? 'Gain(%) (X)' : 'Ganancia(%) (X)',
+    ]);
+
+    // Filas 22 a 33 (12 Meses en tabla de ganancias)
+    for (let m = 0; m < 12; m++) {
       sheetData.push([
-        MONTHS[i],
-        Number(rad0[i].toFixed(2)),
-        Number(rad15[i].toFixed(2)),
-        Number(rad30[i].toFixed(2)),
-        Number(rad45[i].toFixed(2)),
-        Number(rad60[i].toFixed(2)),
-        Number(rad75[i].toFixed(2)),
-        Number(rad90[i].toFixed(2)),
-        Number(radOpt[i].toFixed(2)),
-        Number(radX[i].toFixed(2)),
-        Number(tempVals[i].toFixed(1)),
-        isAlbedo ? '-' : Number(gainsHoriz.factors[i].toFixed(2)),
-        isAlbedo ? '-' : `${gainsHoriz.pcts[i] >= 0 ? '+' : ''}${gainsHoriz.pcts[i].toFixed(2)}%`,
-        Number(gainsX.factors[i].toFixed(2)),
-        `${gainsX.pcts[i] >= 0 ? '+' : ''}${gainsX.pcts[i].toFixed(2)}%`,
+        MONTHS[m],
+        Number(radOpt[m].toFixed(8)),
+        Number(tempVals[m].toFixed(1)),
+        '',
+        '',
+        isAlbedo ? '-' : Number(gainsHoriz.factors[m].toFixed(8)),
+        isAlbedo ? '-' : Number(gainsHoriz.pcts[m].toFixed(7)),
+        Number(gainsX.factors[m].toFixed(8)),
+        Number(gainsX.pcts[m].toFixed(7)),
       ]);
     }
 
-    const meanOf = (arr: number[]) => Number((arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2));
+    // Fila 34 (MEDIA de valores óptimos y ganancias)
     sheetData.push([
       isEn ? 'MEAN' : 'MEDIA',
-      meanOf(rad0),
-      meanOf(rad15),
-      meanOf(rad30),
-      meanOf(rad45),
-      meanOf(rad60),
-      meanOf(rad75),
-      meanOf(rad90),
-      meanOf(radOpt),
-      meanOf(radX),
-      meanOf(tempVals),
-      isAlbedo ? '-' : meanOf(gainsHoriz.factors),
-      isAlbedo ? '-' : `${meanOf(gainsHoriz.pcts) >= 0 ? '+' : ''}${meanOf(gainsHoriz.pcts).toFixed(2)}%`,
-      meanOf(gainsX.factors),
-      `${meanOf(gainsX.pcts) >= 0 ? '+' : ''}${meanOf(gainsX.pcts).toFixed(2)}%`,
+      Number(meanOpt.toFixed(8)),
+      Number(meanTemp.toFixed(1)),
+      '',
+      '',
+      isAlbedo ? '-' : Number(meanFactorHoriz.toFixed(8)),
+      isAlbedo ? '-' : Number(meanPctHoriz.toFixed(7)),
+      Number(meanFactorX.toFixed(8)),
+      Number(meanPctX.toFixed(7)),
     ]);
 
     const ws = XLSX.utils.aoa_to_sheet(sheetData);
-    let sheetName = compTitle.replace(/\s+/g, '_');
+
+    // Sheet Name matching MATLAB Tabla_OptAnual.m (Hoja1..Hoja4)
+    let sheetName =
+      mode === 'all'
+        ? comp === 'global'
+          ? 'Hoja1_Global'
+          : comp === 'beam'
+          ? 'Hoja2_Directa'
+          : comp === 'diffuse'
+          ? 'Hoja3_Difusa'
+          : 'Hoja4_Albedo'
+        : `Hoja1_${compLabel}`;
+
     if (sheetName.length > 31) sheetName = sheetName.substring(0, 31);
     XLSX.utils.book_append_sheet(wb, ws, sheetName);
   }
