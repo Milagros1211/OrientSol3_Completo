@@ -206,6 +206,10 @@ export interface Translations {
     chartMedLabel: string;
     chartMaxLabel: string;
     chartToggleChartsBtn: string;
+    compAll: string;
+    saveChartLocalBtn: string;
+    saveChartSuccess: string;
+    chartBackBtn: string;
     // Export Actions
     exportActionsTitle: string;
     exportPdfBtn: string;
