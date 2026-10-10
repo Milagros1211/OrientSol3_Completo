@@ -18,6 +18,9 @@ const CITY_PRESETS = [
   { name: 'Atenas (Grecia)', lat: 37.9838, lon: 23.7275 },
 ];
 
+let cachedExternalClimateData: ClimateDataRecord | null = null;
+let cachedExternalSimulationResult: SolarBridgeSimulationResult | null = null;
+
 export function renderClimateIntegrationPanel(): HTMLElement {
   const container = document.createElement('section');
   container.className = 'panel-card climate-panel';
@@ -134,7 +137,7 @@ export function renderClimateIntegrationPanel(): HTMLElement {
   const dataCard = container.querySelector('#climate-data-card') as HTMLElement;
   const resultsContainer = container.querySelector('#climate-simulation-results') as HTMLElement;
 
-  let activeClimateData: ClimateDataRecord | null = null;
+  let activeClimateData: ClimateDataRecord | null = cachedExternalClimateData;
 
   // City preset change handler
   citySelect.addEventListener('change', () => {
@@ -182,6 +185,7 @@ export function renderClimateIntegrationPanel(): HTMLElement {
       }
 
       activeClimateData = record;
+      cachedExternalClimateData = record;
       renderClimateDataPreview(record);
       setStatus(isEn ? `✓ Data retrieved successfully from ${source.toUpperCase()}.` : `✓ Datos obtenidos con éxito desde ${source.toUpperCase()}.`, 'success');
       runBtn.disabled = false;
@@ -234,6 +238,7 @@ export function renderClimateIntegrationPanel(): HTMLElement {
       });
 
       const totalTime = Math.round(performance.now() - startTime);
+      cachedExternalSimulationResult = results;
       setStatus(isEn ? `✓ Pyodide simulation finished in ${totalTime}ms.` : `✓ Simulación Pyodide finalizada en ${totalTime}ms.`, 'success');
       renderSimulationResults(results);
     } catch (err: any) {
@@ -387,6 +392,16 @@ export function renderClimateIntegrationPanel(): HTMLElement {
       </div>
     `;
     resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // Restore cached preview if available
+  if (activeClimateData) {
+    renderClimateDataPreview(activeClimateData);
+    runBtn.disabled = false;
+    saveBtn.disabled = false;
+    if (cachedExternalSimulationResult) {
+      renderSimulationResults(cachedExternalSimulationResult);
+    }
   }
 
   return container;

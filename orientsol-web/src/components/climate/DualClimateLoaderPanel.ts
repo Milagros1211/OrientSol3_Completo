@@ -18,12 +18,18 @@ import {
 } from '@/components/export/reportExporter';
 import { pyodideService } from '@/services/pyodide';
 
+// Module-level caches to preserve state across language toggles (ES <-> EN)
+let cachedLastSimulationResult: SolarBridgeSimulationResult | null = null;
+let cachedActiveRecord: ClimateDataRecord | null = null;
+let cachedActiveTab: 'historical' | 'manual' | 'upload' = 'historical';
+
 export function renderDualClimateLoaderPanel(): HTMLElement {
   const container = document.createElement('section');
   container.className = 'panel-card dual-climate-panel';
   const t = i18n.t;
   const isEn = i18n.getLocale() === 'en';
   const MONTH_NAMES = t.common.monthNamesShort;
+  const currentActiveRecordInit: ClimateDataRecord = cachedActiveRecord || hybridClimateManager.getHistoricalLocations()[0];
 
   container.innerHTML = `
     <div class="panel-header">
@@ -42,7 +48,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     <!-- Mode Navigation Tabs -->
     <div class="dual-tabs-bar">
-      <button class="dual-tab-btn active" data-tab="historical">
+      <button class="dual-tab-btn ${cachedActiveTab === 'historical' ? 'active' : ''}" data-tab="historical">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
           <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -50,7 +56,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         <span>${t.hybridLoader.tabHistorical}</span>
       </button>
 
-      <button class="dual-tab-btn" data-tab="manual">
+      <button class="dual-tab-btn ${cachedActiveTab === 'manual' ? 'active' : ''}" data-tab="manual">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -58,7 +64,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         <span>${t.hybridLoader.tabManual}</span>
       </button>
 
-      <button class="dual-tab-btn" data-tab="upload">
+      <button class="dual-tab-btn ${cachedActiveTab === 'upload' ? 'active' : ''}" data-tab="upload">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
           <polyline points="17 8 12 3 7 8"></polyline>
@@ -69,7 +75,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     </div>
 
     <!-- TAB 1: HISTORICAL DATABASE -->
-    <div id="tab-content-historical" class="dual-tab-content">
+    <div id="tab-content-historical" class="dual-tab-content ${cachedActiveTab === 'historical' ? '' : 'hidden'}">
       <div class="historical-search-row">
         <div class="form-group flex-1">
           <label for="hist-select-station" class="form-label">${t.hybridLoader.historicalLabel}</label>
@@ -78,7 +84,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
               .getHistoricalLocations()
               .map(
                 (loc) =>
-                  `<option value="${loc.id}">
+                  `<option value="${loc.id}" ${currentActiveRecordInit.id === loc.id ? 'selected' : ''}>
                     ${loc.locationName} (${loc.country}) — Lat: ${loc.latitude.toFixed(2)}°, Alt: ${loc.elevationM ?? 'N/D'} m
                   </option>`
               )
@@ -92,7 +98,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     </div>
 
     <!-- TAB 2: MANUAL FORM -->
-    <div id="tab-content-manual" class="dual-tab-content hidden">
+    <div id="tab-content-manual" class="dual-tab-content ${cachedActiveTab === 'manual' ? '' : 'hidden'}">
       <div class="manual-preset-row">
         <span class="manual-preset-label">${t.hybridLoader.manualPresetLabel}</span>
         <select id="manual-template-select" class="form-select select-compact">
@@ -254,7 +260,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   const statusBar = container.querySelector('#hybrid-status-bar') as HTMLElement;
   const resultsContainer = container.querySelector('#hybrid-simulation-results') as HTMLElement;
 
-  let currentActiveRecord: ClimateDataRecord = hybridClimateManager.getHistoricalLocations()[0];
+  let currentActiveRecord: ClimateDataRecord = currentActiveRecordInit;
 
   // Tab switching
   tabButtons.forEach((btn) => {
@@ -263,6 +269,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       btn.classList.add('active');
 
       const tabKey = btn.getAttribute('data-tab') as 'historical' | 'manual' | 'upload';
+      cachedActiveTab = tabKey;
       Object.entries(tabContents).forEach(([key, el]) => {
         if (key === tabKey) el.classList.remove('hidden');
         else el.classList.add('hidden');
@@ -277,6 +284,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
   function renderActiveRecord(record: ClimateDataRecord) {
     currentActiveRecord = record;
+    cachedActiveRecord = record;
     const annualG = record.monthlyGdm0.reduce((a, b) => a + b, 0) / 12;
     const annualT = record.monthlyTemperature.reduce((a, b) => a + b, 0) / 12;
 
@@ -469,13 +477,16 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       const result = await executeSolarSimulationFromClimateData(params);
       const elapsed = Math.round(performance.now() - startTime);
 
+      cachedLastSimulationResult = result;
+      cachedActiveRecord = currentActiveRecord;
+
       setStatus(
         isEn
           ? `✓ Simulation completed in ${elapsed}ms via Python WebAssembly engine.`
           : `✓ Simulación finalizada en ${elapsed}ms con el motor Python en WebAssembly.`,
         'success'
       );
-      renderResults(result);
+      renderResults(result, true);
     } catch (err: any) {
       console.error('[OrientSol Hybrid Simulation] Error:', err);
       setStatus(`Error en la ejecución de Pyodide: ${err.message || String(err)}`, 'error');
@@ -490,7 +501,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     }
   });
 
-  function renderResults(res: SolarBridgeSimulationResult) {
+  function renderResults(res: SolarBridgeSimulationResult, shouldScroll: boolean = false) {
     resultsContainer.classList.remove('hidden');
 
     const getCteClass = (loss: number) => {
@@ -856,24 +867,31 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       }
     });
 
-    resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (shouldScroll) {
+      resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
 
-  // Initial render with first historical station
-  setTimeout(() => renderActiveRecord(currentActiveRecord), 0);
+  // Initial render with current station
+  renderActiveRecord(currentActiveRecord);
 
-  // Auto-run simulation when Pyodide runtime is ready so the user immediately sees all calculation results
-  const autoUnsub = pyodideService.subscribe((state) => {
-    if (state.status === 'ready') {
-      setTimeout(() => {
-        if (!resultsContainer.hasChildNodes() || resultsContainer.classList.contains('hidden')) {
-          console.log('[OrientSol] Auto-triggering initial simulation for immediate full results');
-          simBtn.click();
-        }
-      }, 200);
-      autoUnsub();
-    }
-  });
+  if (cachedLastSimulationResult) {
+    // If we already have simulation results computed, render them immediately in the selected language!
+    renderResults(cachedLastSimulationResult, false);
+  } else {
+    // Auto-run simulation ONLY ONCE when Pyodide runtime is ready if results have not yet been produced
+    const autoUnsub = pyodideService.subscribe((state) => {
+      if (state.status === 'ready' && !cachedLastSimulationResult) {
+        setTimeout(() => {
+          if (!cachedLastSimulationResult) {
+            console.log('[OrientSol] Auto-triggering initial simulation for immediate full results');
+            simBtn.click();
+          }
+        }, 150);
+        autoUnsub();
+      }
+    });
+  }
 
   return container;
 }
