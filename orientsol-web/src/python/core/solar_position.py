@@ -49,28 +49,41 @@ def solar_azimuth(
     is_valid = np.abs(ratio) <= 1.0
     azimuth = np.zeros_like(ratio, dtype=np.float64) if np.ndim(ratio) > 0 else 0.0
 
+    tropic_rad = 23.45 * np.pi / 180.0
     if np.ndim(ratio) == 0:
         if is_valid:
             return float(np.arccos(np.clip(ratio, -1.0, 1.0)))
+        decli = float(dec_rad)
         if lat_rad > 0:
+            if lat_rad < tropic_rad:
+                return 0.0 if decli < 0 else float(np.pi)
             return 0.0
         elif lat_rad < 0:
+            if lat_rad > -tropic_rad:
+                return 0.0 if decli < 0 else float(np.pi)
             return float(np.pi)
-        return 0.0
+        return 0.0 if decli < 0 else float(np.pi)
 
     # Array handling
     valid_mask = np.abs(ratio) <= 1.0
     azimuth[valid_mask] = np.arccos(np.clip(ratio[valid_mask], -1.0, 1.0))
 
-    # Boundary cases from Azimut_Solar.m:
+    # Boundary cases from Ec. (4.31) y Pág. 220 (PFC OrientSol):
     invalid_mask = ~valid_mask
     if np.any(invalid_mask):
+        decli_arr = np.broadcast_to(dec_rad, ratio.shape)
         if lat_rad > 0:
-            azimuth[invalid_mask] = 0.0
+            if lat_rad < tropic_rad:
+                azimuth[invalid_mask] = np.where(decli_arr[invalid_mask] < 0, 0.0, np.pi)
+            else:
+                azimuth[invalid_mask] = 0.0
         elif lat_rad < 0:
-            azimuth[invalid_mask] = np.pi
+            if lat_rad > -tropic_rad:
+                azimuth[invalid_mask] = np.where(decli_arr[invalid_mask] < 0, 0.0, np.pi)
+            else:
+                azimuth[invalid_mask] = np.pi
         else:
-            azimuth[invalid_mask] = 0.0
+            azimuth[invalid_mask] = np.where(decli_arr[invalid_mask] < 0, 0.0, np.pi)
 
     return azimuth
 
@@ -183,13 +196,22 @@ def azimut_solar(
             if abs(ratio) <= 1.0:
                 azimut_solar_mat[i, j] = np.arccos(np.clip(ratio, -1.0, 1.0))
             else:
-                # MATLAB boundary fallbacks
-                if lat_rad > 0:
-                    azimut_solar_mat[i, j] = 0.0
-                elif lat_rad < 0:
-                    azimut_solar_mat[i, j] = np.pi
-                else:
-                    azimut_solar_mat[i, j] = 0.0
+                # Reglas exactas de la Ec. (4.31) y Pág. 220 (PFC OrientSol):
+                # A las 12 horas o cruce cenital:
+                tropic_rad = 23.45 * np.pi / 180.0
+                decli = val_decli[i]
+                if lat_rad > 0:  # Hemisferio Norte
+                    if lat_rad < tropic_rad:  # Latitud tropical
+                        azimut_solar_mat[i, j] = 0.0 if decli < 0 else np.pi
+                    else:
+                        azimut_solar_mat[i, j] = 0.0
+                elif lat_rad < 0:  # Hemisferio Sur
+                    if lat_rad > -tropic_rad:  # Latitud tropical
+                        azimut_solar_mat[i, j] = 0.0 if decli < 0 else np.pi
+                    else:
+                        azimut_solar_mat[i, j] = np.pi
+                else:  # Ecuador
+                    azimut_solar_mat[i, j] = 0.0 if decli < 0 else np.pi
 
     return azimut_solar_mat
 
