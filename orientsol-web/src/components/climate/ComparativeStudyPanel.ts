@@ -130,7 +130,7 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
           </div>
 
           <div class="tracking-toolbar-actions">
-            <button type="button" id="btn-comp-view-graphs" class="btn btn-sm btn-outline-cyan">
+            <button type="button" id="btn-comp-view-graphs" class="btn-study-view-charts ${stateCompShowGraphs ? 'active' : ''}">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 3v18h18"></path>
                 <path d="m19 9-5 5-4-4-3 3"></path>
@@ -193,12 +193,20 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
         </div>
 
         <!-- 5. Footer Buttons Matching OrientSol Design System -->
-        <div class="opt-tracking-footer-buttons" style="margin-top: 1.5rem;">
+        <div class="opt-study-footer-actions" style="margin-top: 1.5rem;">
           <div class="footer-btn-left-group">
             <button type="button" id="btn-comp-volver" class="btn-study-foot btn-volver">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
               <span>${isEn ? 'Back' : 'Volver'}</span>
             </button>
             <button type="button" id="btn-comp-salir" class="btn-study-foot btn-salir">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
               <span>${isEn ? 'Exit' : 'Salir'}</span>
             </button>
           </div>

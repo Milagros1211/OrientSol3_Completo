@@ -20,6 +20,8 @@ interface OptimalAnnualStudyProps {
   locationName: string;
   latitude: number;
   peakPowerKw?: number;
+  onBack?: () => void;
+  onExit?: () => void;
 }
 
 // Module-level state: decoupled table component and chart component
@@ -636,7 +638,7 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
               <span>${t.results.selectOtherAngleBtn} (β = ${stateAngleX}°)</span>
             </button>
 
-            <button id="btn-toggle-charts-view" class="btn-study-action ${stateShowCharts ? 'active' : ''}" type="button">
+            <button id="btn-toggle-charts-view" class="btn-study-view-charts ${stateShowCharts ? 'active' : ''}" type="button">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 3v18h18"></path>
                 <path d="m19 9-5 5-4-4-3 3"></path>
@@ -991,31 +993,50 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
 
         <!-- 7. Action Button Footer matching OrientSol MATLAB window -->
         <div class="opt-study-footer-actions">
-          <button id="btn-goto-energy" class="btn-study-foot ${stateShowEnergy ? 'active' : ''}" type="button">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
-            </svg>
-            <span>${stateShowEnergy ? (isEn ? 'Hide Energy Calculation' : 'Ocultar cálculo de energía') : t.results.energyCalcBtn}</span>
-          </button>
+          <div class="footer-btn-left-group">
+            <button id="btn-opt-volver" class="btn-study-foot btn-volver" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+              <span>${isEn ? 'Back' : 'Volver'}</span>
+            </button>
+            <button id="btn-opt-salir" class="btn-study-foot btn-salir" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              <span>${isEn ? 'Exit' : 'Salir'}</span>
+            </button>
+          </div>
 
-          <button id="btn-export-opt-excel" class="btn-study-foot btn-excel" type="button">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            <span>${t.results.exportExcelBtn}</span>
-          </button>
+          <div class="footer-btn-right-group">
+            <button id="btn-goto-energy" class="btn-study-foot btn-energy ${stateShowEnergy ? 'active' : ''}" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>${stateShowEnergy ? (isEn ? 'Hide Energy Calculation' : 'Ocultar cálculo de energía') : t.results.energyCalcBtn}</span>
+            </button>
 
-          <button id="btn-export-opt-report" class="btn-study-foot btn-report" type="button">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-            </svg>
-            <span>${t.results.generateReportBtn}</span>
-          </button>
+            <button id="btn-export-opt-excel" class="btn-study-foot btn-excel" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>${t.results.exportExcelBtn}</span>
+            </button>
+
+            <button id="btn-export-opt-report" class="btn-study-foot btn-report" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>${t.results.generateReportBtn}</span>
+            </button>
+          </div>
         </div>
 
         <!-- 8. Mount point for Dedicated MATLAB Energy Calculation Window (Imagen 1 / Energia_Osterwald.m) -->
@@ -1259,6 +1280,15 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
       showPdfGenerationNoticeModal(isEn, () => {
         generateOrientSolPDFReport(res, isEn);
       });
+    });
+
+    // 9. Volver & Salir actions
+    container.querySelector<HTMLButtonElement>('#btn-opt-volver')?.addEventListener('click', () => {
+      if (props.onBack) props.onBack();
+    });
+    container.querySelector<HTMLButtonElement>('#btn-opt-salir')?.addEventListener('click', () => {
+      if (props.onExit) props.onExit();
+      else window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
 

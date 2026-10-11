@@ -148,13 +148,12 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
             </select>
           </div>
 
-          <button id="btn-azim-view-charts" class="btn-tracking-charts" type="button">
+          <button id="btn-azim-view-charts" class="btn-study-view-charts ${stateAzimShowGraphs ? 'active' : ''}" type="button">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="20" x2="18" y2="10"></line>
-              <line x1="12" y1="20" x2="12" y2="4"></line>
-              <line x1="6" y1="20" x2="6" y2="14"></line>
+              <path d="M3 3v18h18"></path>
+              <path d="m19 9-5 5-4-4-3 3"></path>
             </svg>
-            <span>${isEn ? 'View charts' : 'Ver gráficas'}</span>
+            <span>${stateAzimShowGraphs ? (isEn ? 'Hide charts' : 'Ocultar gráficas') : (isEn ? 'View charts' : 'Ver gráficas')}</span>
           </button>
         </div>
 
@@ -233,18 +232,26 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
           </div>
         </div>
 
-        <div class="opt-tracking-footer-buttons">
-          <div class="footer-left-buttons">
-            <button id="btn-azim-salir" class="btn-study-foot btn-salir" type="button">
-              ${isEn ? 'Exit' : 'Salir'}
-            </button>
+        <div class="opt-study-footer-actions">
+          <div class="footer-btn-left-group">
             <button id="btn-azim-volver" class="btn-study-foot btn-volver" type="button">
-              ${isEn ? 'Back' : 'Volver'}
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+              <span>${isEn ? 'Back' : 'Volver'}</span>
+            </button>
+            <button id="btn-azim-salir" class="btn-study-foot btn-salir" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              <span>${isEn ? 'Exit' : 'Salir'}</span>
             </button>
           </div>
 
-          <div class="footer-right-buttons">
-            <button id="btn-azim-goto-energy" class="btn-study-foot btn-energy" type="button">
+          <div class="footer-btn-right-group">
+            <button id="btn-azim-goto-energy" class="btn-study-foot btn-energy ${stateAzimShowEnergy ? 'active' : ''}" type="button">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
               </svg>

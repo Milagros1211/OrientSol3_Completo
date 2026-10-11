@@ -21,6 +21,7 @@ import {
   renderOptimalAnnualStudyPanel,
   showExcelExportModal,
 } from '@/components/climate/OptimalAnnualStudyPanel';
+import { renderOptimalMonthlyStudyPanel } from '@/components/climate/OptimalMonthlyStudyPanel';
 import { renderOptimalSeasonalStudyPanel } from '@/components/climate/OptimalSeasonalStudyPanel';
 import { renderTrackingPolarStudyPanel } from '@/components/climate/TrackingPolarStudyPanel';
 import { renderTrackingAzimuthalStudyPanel } from '@/components/climate/TrackingAzimuthalStudyPanel';
@@ -36,7 +37,7 @@ import {
 let cachedLastSimulationResult: SolarBridgeSimulationResult | null = null;
 let cachedActiveRecord: ClimateDataRecord | null = null;
 let cachedActiveTab: 'historical' | 'manual' | 'upload' | 'api' = 'historical';
-let cachedActiveStudyOp: 'annual' | 'seasonal' | 'polar' | 'azimuthal' | 'horizontal' | 'dual' | 'comparative' = 'annual';
+let cachedActiveStudyOp: 'annual' | 'monthly' | 'seasonal' | 'polar' | 'azimuthal' | 'horizontal' | 'dual' | 'comparative' = 'annual';
 
 /**
  * Renders the banner indicating whether online upload to Supabase is permitted or in offline cache mode.
@@ -1253,98 +1254,59 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
       <!-- 2. SELECTOR DE OPERACIÓN / ESTUDIO (ORIENTSOL 3.0) -->
       <div class="operation-selector-container">
-        <div class="operation-selector-label">
-          ${isEn ? 'Solar Operation & Study Mode:' : 'Operación & Estudio Solar a visualizar:'}
-        </div>
-        <div class="operation-selector-bar">
-          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'annual' ? 'active' : ''}" data-study-op="annual">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="operation-selector-header">
+          <label for="study-operation-select" class="operation-selector-label">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="5"></circle>
               <line x1="12" y1="1" x2="12" y2="3"></line>
               <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
-            <span>${isEn ? '1. Annual optimal tilt' : '1. Inclinación óptima anual'}</span>
-          </button>
-
-          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'seasonal' ? 'active' : ''}" data-study-op="seasonal">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-            <span>${isEn ? '2. Seasonal optimal tilt' : '2. Inclinación óptima estacional'}</span>
-          </button>
-
-          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'polar' ? 'active' : ''}" data-study-op="polar">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="6" y1="18" x2="18" y2="6"></line>
-              <polyline points="10 6 18 6 18 14"></polyline>
-            </svg>
-            <span>${isEn ? '3. Polar 1-axis' : '3. Seg. 1 eje polar'}</span>
-          </button>
-
-          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'azimuthal' ? 'active' : ''}" data-study-op="azimuthal">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <ellipse cx="12" cy="12" rx="9" ry="5"></ellipse>
-              <line x1="12" y1="3" x2="12" y2="21"></line>
-            </svg>
-            <span>${isEn ? '4. Azimuthal 1-axis' : '4. Seg. 1 eje azimutal'}</span>
-          </button>
-
-          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'horizontal' ? 'active' : ''}" data-study-op="horizontal">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="3" y1="12" x2="21" y2="12" stroke-width="3"></line>
-              <circle cx="12" cy="12" r="6"></circle>
-            </svg>
-            <span>${isEn ? '5. Horizontal 1-axis' : '5. Seg. 1 eje horizontal'}</span>
-          </button>
-
-          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'dual' ? 'active' : ''}" data-study-op="dual">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="9"></circle>
-              <path d="M12 3v18"></path>
-              <path d="M3 12h18"></path>
-            </svg>
-            <span>${isEn ? '6. Two-axis tracking' : '6. Seg. a dos ejes'}</span>
-          </button>
-
-          <button type="button" class="op-tab-btn ${cachedActiveStudyOp === 'comparative' ? 'active' : ''}" data-study-op="comparative" style="border-color: #f59e0b; background: rgba(245, 158, 11, 0.1);">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#f59e0b" stroke-width="2">
-              <path d="M3 3v18h18"></path>
-              <path d="M18 9l-5 5-4-4-3 3"></path>
-            </svg>
-            <span style="color: #fbbf24; font-weight: 700;">${isEn ? '7. Comparative study' : '7. Comparativa de estudios'}</span>
-          </button>
+            <span>${isEn ? 'Solar Operation & Study Mode:' : 'Operación & Estudio Solar a visualizar:'}</span>
+          </label>
+          <span class="operation-selector-hint">
+            ${isEn
+              ? 'Select an optimization or tracking model to view its detailed calculation table, graphics, and energy analysis.'
+              : 'Seleccione el modelo de optimización o seguimiento para ver su tabla de cálculo detallada, gráficas y balance energético.'}
+          </span>
+        </div>
+        <div class="operation-dropdown-wrap">
+          <select id="study-operation-select" class="form-select operation-dropdown-select">
+            <option value="annual" ${cachedActiveStudyOp === 'annual' ? 'selected' : ''}>
+              ${isEn ? '1. Annual optimal tilt' : '1. Inclinación óptima anual'}
+            </option>
+            <option value="monthly" ${cachedActiveStudyOp === 'monthly' ? 'selected' : ''}>
+              ${isEn ? '2. Monthly optimization (12 independent positions)' : '2. Optimización mensual (12 posiciones independientes)'}
+            </option>
+            <option value="seasonal" ${cachedActiveStudyOp === 'seasonal' ? 'selected' : ''}>
+              ${isEn ? '3. Seasonal optimal tilt' : '3. Inclinación óptima estacional'}
+            </option>
+            <option value="polar" ${cachedActiveStudyOp === 'polar' ? 'selected' : ''}>
+              ${isEn ? '4. Single-axis polar tracking' : '4. Seg. 1 eje polar'}
+            </option>
+            <option value="azimuthal" ${cachedActiveStudyOp === 'azimuthal' ? 'selected' : ''}>
+              ${isEn ? '5. Single-axis azimuthal tracking' : '5. Seg. 1 eje azimutal'}
+            </option>
+            <option value="horizontal" ${cachedActiveStudyOp === 'horizontal' ? 'selected' : ''}>
+              ${isEn ? '6. Single-axis horizontal tracking' : '6. Seg. 1 eje horizontal'}
+            </option>
+            <option value="dual" ${cachedActiveStudyOp === 'dual' ? 'selected' : ''}>
+              ${isEn ? '7. Two-axis tracking' : '7. Seg. a dos ejes'}
+            </option>
+            <option value="comparative" ${cachedActiveStudyOp === 'comparative' ? 'selected' : ''}>
+              ${isEn ? '8. Comparative study of all models' : '8. Comparativa de todos los tipos de estudios'}
+            </option>
+          </select>
         </div>
       </div>
 
       <!-- Mount point for Active Solar Study Operation -->
       <div id="active-study-mount-point"></div>
-
-      <!-- 2.3 12 Posiciones Mensuales -->
-      <div class="result-card wide-card" style="margin-bottom: 1.25rem;">
-        <div class="result-card-header" style="margin-bottom: 0.5rem;">
-          <h4>${t.results.monthlyTitle}</h4>
-          <div>
-            <span class="badge badge-neutral" style="margin-right: 0.5rem;">${t.results.monthlyDailyMean.replace('{mean}', res.monthlyOptimum12.annualMeanDailyKwh.toFixed(2))}</span>
-            <span class="badge badge-success">${t.results.vsFixedAnnual.replace('{gain}', res.monthlyOptimum12.gainOverOptimalAnnualPct.toFixed(2)).replace('{gainHoriz}', res.monthlyOptimum12.gainOverHorizontalPct.toFixed(2))}</span>
-          </div>
-        </div>
-        <div class="monthly-tilts-grid">
-          ${res.monthlyOptimum12.optimalTiltsDeg
-            .map(
-              (deg, idx) => `
-            <div class="monthly-tilt-badge">
-              <span class="monthly-tilt-name">${MONTH_NAMES[idx]}</span>
-              <span class="monthly-tilt-angle">${deg}°</span>
-              <span class="monthly-tilt-rad">${res.monthlyOptimum12.monthlyDailyKwh[idx].toFixed(2)}</span>
-            </div>
-          `
-            )
-            .join('')}
-        </div>
-      </div>
 
       <!-- 3. BALANCE ENERGÉTICO: ENERGÍA RECIBIDA VS ENERGÍA PRODUCIDA -->
       <div class="result-card wide-card" style="margin-bottom: 1.25rem;">
@@ -1515,6 +1477,26 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           locationName: res.locationName,
           latitude: res.latitude,
           peakPowerKw: currentPeakKw,
+          onBack: () => {
+            resultsContainer.querySelector('.operation-selector-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          },
+          onExit: () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          },
+        });
+        mountPoint.appendChild(p);
+      } else if (op === 'monthly') {
+        const p = renderOptimalMonthlyStudyPanel({
+          simulationResult: res,
+          locationName: res.locationName,
+          latitude: res.latitude,
+          peakPowerKw: currentPeakKw,
+          onBack: () => {
+            resultsContainer.querySelector('.operation-selector-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          },
+          onExit: () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          },
         });
         mountPoint.appendChild(p);
       } else if (op === 'seasonal') {
@@ -1584,15 +1566,11 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     mountStudyOperation(cachedActiveStudyOp);
 
-    // Wire operation tab button clicks
-    const opBtns = resultsContainer.querySelectorAll<HTMLButtonElement>('.op-tab-btn');
-    opBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const targetOp = (btn.getAttribute('data-study-op') || 'annual') as typeof cachedActiveStudyOp;
-        opBtns.forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
-        mountStudyOperation(targetOp);
-      });
+    // Wire operation dropdown select change
+    const opSelect = resultsContainer.querySelector<HTMLSelectElement>('#study-operation-select');
+    opSelect?.addEventListener('change', () => {
+      const targetOp = (opSelect.value || 'annual') as typeof cachedActiveStudyOp;
+      mountStudyOperation(targetOp);
     });
 
     // Event Listeners for Export & Report Actions
