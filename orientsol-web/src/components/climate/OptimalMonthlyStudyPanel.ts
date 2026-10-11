@@ -7,6 +7,7 @@ import {
 } from '@/components/export/pdfReportGenerator';
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
+import { renderCaptureLossMapSection } from '@/components/climate/CaptureLossMapSection';
 
 export type MonthlyRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
 
@@ -435,6 +436,9 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
           </table>
         </div>
 
+        <!-- 6.5 Mapa de Pérdidas de Captación (CTE DB-HE4) para Optimizaciones Mensuales -->
+        <div id="monthly-loss-map-mount-point"></div>
+
         <!-- 7. Standardized Action Button Footer -->
         <div class="opt-study-footer-actions">
           <div class="footer-btn-left-group">
@@ -487,6 +491,18 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
         <div id="monthly-energy-mount-point"></div>
       </div>
     `;
+
+    // Hook CTE DB-HE4 Monthly Capture Loss Map
+    const lossMapMountPoint = container.querySelector<HTMLDivElement>('#monthly-loss-map-mount-point');
+    if (lossMapMountPoint) {
+      lossMapMountPoint.innerHTML = '';
+      const lossMapSection = renderCaptureLossMapSection({
+        mode: 'monthly',
+        simulationResult: res,
+        isEn,
+      });
+      lossMapMountPoint.appendChild(lossMapSection);
+    }
 
     // Hook Active Energy Panel
     const energyMountPoint = container.querySelector<HTMLDivElement>('#monthly-energy-mount-point');

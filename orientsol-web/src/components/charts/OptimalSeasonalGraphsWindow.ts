@@ -128,10 +128,10 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
       : `Radiación ${compName} (kWh/m²/día)`;
 
     const bottomPlotTitle = isAll
-      ? (isEn ? 'Gains of all components for seasonal optimal tilt' : 'Ganancias de todas las componentes para la inclinación óptima estacional')
+      ? (isEn ? 'Gains of all components vs horizontal plane (0°) for seasonal optimal tilt' : 'Ganancias de todas las componentes respecto al plano horizontal (0°) para la inclinación óptima estacional')
       : isEn
-      ? `Gains of ${compName} radiation for seasonal optimal tilt`
-      : `Ganancias de radiación ${compName} para la inclinación óptima estacional`;
+      ? `Gains of ${compName} radiation vs horizontal plane (0°) for seasonal optimal tilt`
+      : `Ganancias de radiación ${compName} respecto al plano horizontal (0°) para la inclinación óptima estacional`;
 
     const isDark = themeManager.isDark();
     const plotBg = isDark ? '#0b171f' : '#ffffff';
@@ -395,12 +395,12 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
       }
 
       bottomLegendHtml = `
-        <g transform="translate(${bPad.left + bInnerW + 10}, ${bPad.top + 10})">
-          <rect x="0" y="0" width="76" height="46" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-          <rect x="8" y="8" width="12" height="12" fill="#0284c7" stroke="#0f172a" stroke-width="0.5" />
-          <text x="26" y="18" fill="${legendText}" font-size="10" font-weight="600">0°</text>
-          <rect x="8" y="26" width="12" height="12" fill="#10b981" stroke="#0f172a" stroke-width="0.5" />
-          <text x="26" y="36" fill="${legendText}" font-size="10" font-weight="600">Ópt. anu</text>
+        <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 8})">
+          <rect x="0" y="0" width="84" height="48" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+          <rect x="6" y="8" width="10" height="10" fill="#0284c7" stroke="#0f172a" stroke-width="0.5" />
+          <text x="22" y="17" fill="${legendText}" font-size="8.5" font-weight="600">${isEn ? 'vs 0° (Horiz)' : 'vs 0° (Plano hor.)'}</text>
+          <rect x="6" y="26" width="10" height="10" fill="#10b981" stroke="#0f172a" stroke-width="0.5" />
+          <text x="22" y="35" fill="${legendText}" font-size="8.5" font-weight="600">${isEn ? 'vs Ann. opt' : 'vs Ópt. anu'}</text>
         </g>
       `;
     } else {
@@ -434,16 +434,17 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
       }
 
       bottomLegendHtml = `
-        <g transform="translate(${bPad.left + bInnerW + 8}, ${bPad.top + 5})">
-          <rect x="0" y="0" width="76" height="84" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-          <rect x="6" y="8" width="10" height="10" fill="#0284c7" />
-          <text x="22" y="16" fill="${legendText}" font-size="9" font-weight="600">0° - G</text>
-          <rect x="6" y="26" width="10" height="10" fill="#ef4444" />
-          <text x="22" y="34" fill="${legendText}" font-size="9" font-weight="600">0° - B</text>
-          <rect x="6" y="44" width="10" height="10" fill="#84cc16" />
-          <text x="22" y="52" fill="${legendText}" font-size="9" font-weight="600">0° - D</text>
-          <rect x="6" y="62" width="10" height="10" fill="#f59e0b" />
-          <text x="22" y="70" fill="${legendText}" font-size="9" font-weight="600">0° - R</text>
+        <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 4})">
+          <rect x="0" y="0" width="84" height="96" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+          <text x="42" y="11" fill="${legendText}" font-size="8" font-weight="700" text-anchor="middle">${isEn ? 'vs 0° (Horiz)' : 'vs 0° (Plano hor.)'}</text>
+          <rect x="6" y="18" width="10" height="10" fill="#0284c7" />
+          <text x="22" y="26" fill="${legendText}" font-size="8.5" font-weight="600">Gdm (Glob)</text>
+          <rect x="6" y="36" width="10" height="10" fill="#ef4444" />
+          <text x="22" y="44" fill="${legendText}" font-size="8.5" font-weight="600">Bdm (Dir)</text>
+          <rect x="6" y="54" width="10" height="10" fill="#84cc16" />
+          <text x="22" y="62" fill="${legendText}" font-size="8.5" font-weight="600">Ddm (Dif)</text>
+          <rect x="6" y="72" width="10" height="10" fill="#f59e0b" />
+          <text x="22" y="80" fill="${legendText}" font-size="8.5" font-weight="600">Rdm (Alb)</text>
         </g>
       `;
     }

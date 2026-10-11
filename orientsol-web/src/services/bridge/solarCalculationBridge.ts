@@ -10,6 +10,42 @@ export interface SolarBridgeSimulationParams {
   tonc?: number;
 }
 
+export interface MonthlyCaptureLossMap {
+  monthIndex: number;
+  monthName: string;
+  optimalPoint: {
+    betaDeg: number;
+    alphaDeg: number;
+    maxDailyRadiationKwh: number;
+  };
+  radiationMatrixKwhM2Day: number[][];
+  lossPercentageMatrix: number[][];
+  cteZones: {
+    generalPctCompliant: number;
+    superpositionPctCompliant: number;
+    integrationPctCompliant: number;
+  };
+}
+
+export interface CaptureLossMapResult {
+  betasDeg: number[];
+  alphasDeg: number[];
+  radiationMatrixKwhM2Day: number[][];
+  lossPercentageMatrix: number[][];
+  optimalPoint: {
+    betaDeg: number;
+    alphaDeg: number;
+    maxDailyRadiationKwh: number;
+    maxAnnualRadiationKwhM2: number;
+  };
+  cteZones: {
+    generalPctCompliant: number;
+    superpositionPctCompliant: number;
+    integrationPctCompliant: number;
+  };
+  monthlyMaps?: MonthlyCaptureLossMap[];
+}
+
 export interface SolarBridgeSimulationResult {
   source: string;
   locationName: string;
@@ -177,23 +213,8 @@ export interface SolarBridgeSimulationResult {
   };
 
   // 2D Capture Loss Map (CTE DB-HE4)
-  captureLossMap: {
-    betasDeg: number[];
-    alphasDeg: number[];
-    radiationMatrixKwhM2Day: number[][];
-    lossPercentageMatrix: number[][];
-    optimalPoint: {
-      betaDeg: number;
-      alphaDeg: number;
-      maxDailyRadiationKwh: number;
-      maxAnnualRadiationKwhM2: number;
-    };
-    cteZones: {
-      generalPctCompliant: number;
-      superpositionPctCompliant: number;
-      integrationPctCompliant: number;
-    };
-  };
+  captureLossMap: CaptureLossMapResult;
+
 
   // Global Surface Comparison across all 8 surfaces
   surfaceComparison: Array<{
@@ -572,6 +593,7 @@ output_data = {
             "superpositionPctCompliant": round(float(loss_map.get("cte_zones", {}).get("superpositionPctCompliant", loss_map.get("cte_zones", {}).get("superposition_pct_compliant", 0.0))), 1),
             "integrationPctCompliant": round(float(loss_map.get("cte_zones", {}).get("integrationPctCompliant", loss_map.get("cte_zones", {}).get("integration_pct_compliant", 0.0))), 1),
         },
+        "monthlyMaps": loss_map.get("monthly_maps", []),
     },
     "surfaceComparison": [
         {

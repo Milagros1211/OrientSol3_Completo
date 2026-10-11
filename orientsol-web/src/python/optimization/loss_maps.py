@@ -57,10 +57,10 @@ def generate_capture_loss_map(
     alphas = np.arange(alpha_range_deg[0], alpha_range_deg[1] + 1, alpha_step_deg, dtype=np.float64)
 
     n_betas = len(betas)
-    n_alphas = len(alphas)
-
-    # 2D output matrices (annual mean daily radiation and loss percentage)
+    n_alphas = len(alphas)    # 2D output matrices (annual mean daily radiation and loss percentage)
     radiation_annual_daily = np.zeros((n_betas, n_alphas), dtype=np.float64)
+    # 3D output matrices for each of the 12 calendar months
+    radiation_monthly = np.zeros((12, n_betas, n_alphas), dtype=np.float64)
 
     sin_phi = np.sin(lat_rad)
     cos_phi = np.cos(lat_rad)
@@ -104,7 +104,7 @@ def generate_capture_loss_map(
                 #           - sin(delta)*cos(phi)*sin(beta)*cos(alpha)
                 #           + cos(delta)*cos(phi)*cos(beta)*cos(omega)
                 #           + cos(delta)*sin(phi)*sin(beta)*cos(alpha)*cos(omega)
-                #           + cos(delta)*sin(beta)*sin(alpha)*sin(omega)
+                #           + cos(delta)*sin(beta)*sin(alpha)*np.sin(omega)
                 term1 = sin_delta * sin_phi * cos_beta
                 term2 = -sin_delta * cos_phi * sin_beta * cos_alpha
                 term3 = cos_delta * cos_phi * cos_beta * np.cos(omegas)
@@ -136,6 +136,8 @@ def generate_capture_loss_map(
 
             # Annual daily mean radiation
             radiation_annual_daily[i_b, i_a] = float(np.mean(g_daily_month))
+            for m in range(12):
+                radiation_monthly[m, i_b, i_a] = g_daily_month[m]
 
     # Reference maximum (South-facing optimal tilt)
     max_radiation = float(np.max(radiation_annual_daily))
@@ -161,6 +163,42 @@ def generate_capture_loss_map(
     gen_pct = round(float(np.sum(cte_general_compliant) / total_cells * 100.0), 1)
     sup_pct = round(float(np.sum(cte_superposition_compliant) / total_cells * 100.0), 1)
     int_pct = round(float(np.sum(cte_integration_compliant) / total_cells * 100.0), 1)
+
+    # Generate 12 independent monthly capture loss maps (CTE DB-HE4)
+    MONTH_NAMES_ES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    monthly_maps = []
+    for m in range(12):
+        m_rad = radiation_monthly[m]
+        max_rad_m = float(np.max(m_rad))
+        opt_indices_m = np.unravel_index(np.argmax(m_rad), m_rad.shape)
+        opt_beta_m = float(betas[opt_indices_m[0]])
+        opt_alpha_m = float(alphas[opt_indices_m[1]])
+
+        loss_pct_m = np.where(
+            max_rad_m > 0,
+            ((max_rad_m - m_rad) / max_rad_m) * 100.0,
+            0.0
+        )
+        gen_pct_m = round(float(np.sum(loss_pct_m <= 10.0) / total_cells * 100.0), 1)
+        sup_pct_m = round(float(np.sum(loss_pct_m <= 20.0) / total_cells * 100.0), 1)
+        int_pct_m = round(float(np.sum(loss_pct_m <= 40.0) / total_cells * 100.0), 1)
+
+        monthly_maps.append({
+            "monthIndex": m,
+            "monthName": MONTH_NAMES_ES[m],
+            "optimalPoint": {
+                "betaDeg": opt_beta_m,
+                "alphaDeg": opt_alpha_m,
+                "maxDailyRadiationKwh": round(max_rad_m, 3),
+            },
+            "radiationMatrixKwhM2Day": [[round(float(v), 3) for v in row] for row in m_rad],
+            "lossPercentageMatrix": [[round(float(v), 2) for v in row] for row in loss_pct_m],
+            "cteZones": {
+                "generalPctCompliant": gen_pct_m,
+                "superpositionPctCompliant": sup_pct_m,
+                "integrationPctCompliant": int_pct_m,
+            },
+        })
 
     return {
         "betas_deg": [int(b) for b in betas],
@@ -191,4 +229,6 @@ def generate_capture_loss_map(
             "superposition_limit_pct": 20.0,
             "architectural_integration_limit_pct": 40.0,
         },
+        "monthly_maps": monthly_maps,
+        "monthlyMaps": monthly_maps,
     }
