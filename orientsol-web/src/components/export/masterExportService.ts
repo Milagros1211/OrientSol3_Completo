@@ -40,16 +40,34 @@ export function exportOrientSolMasterExcel(
 
   const wb = XLSX.utils.book_new();
 
+  // Timestamp of download / export
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const day = pad(now.getDate());
+  const month = pad(now.getMonth() + 1);
+  const year = now.getFullYear();
+  const hours = pad(now.getHours());
+  const minutes = pad(now.getMinutes());
+  const seconds = pad(now.getSeconds());
+
+  const formattedDateTime = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  const isoTimestamp = now.toISOString();
+  const fileTimestamp = `${year}${month}${day}_${hours}${minutes}${seconds}`;
+
   // =========================================================================
   // HOJA 1: RESUMEN GENERAL & BALANCE ENERGÉTICO
   // =========================================================================
   const summaryData: (string | number)[][] = [
     ['ORIENTSOL 3.0 - ' + (isEn ? 'SIMULATION REPORT & ENERGY BALANCE' : 'INFORME DE SIMULACIÓN Y BALANCE ENERGÉTICO')],
+    [isEn ? 'DOWNLOAD TIMESTAMP' : 'REGISTRO DE DESCARGA'],
+    [isEn ? 'Download Date & Time' : 'Fecha y Hora de Descarga', formattedDateTime],
+    [isEn ? 'ISO Timestamp' : 'Marca Temporal ISO', isoTimestamp],
     [],
     [isEn ? 'GENERAL PROJECT DATA' : 'DATOS GENERALES DEL PROYECTO'],
     [isEn ? 'Location' : 'Localidad / Ciudad', res.locationName],
     [isEn ? 'Latitude (°)' : 'Latitud (°)', Number(res.latitude.toFixed(4))],
     [isEn ? 'Longitude (°)' : 'Longitud (°)', Number(res.longitude.toFixed(4))],
+    [isEn ? 'Download Date & Time' : 'Fecha y Hora de Descarga', formattedDateTime],
     [isEn ? 'Climate Data Source' : 'Fuente de Datos Climáticos', res.source.toUpperCase()],
     [isEn ? 'Execution Engine' : 'Motor de Simulación', 'Python 3.14 (Pyodide WebAssembly)'],
     [isEn ? 'Execution Time' : 'Tiempo de Cálculo', `${res.executionTimeMs} ms`],
@@ -112,6 +130,13 @@ export function exportOrientSolMasterExcel(
     '',
     studyTitles[activeOp] || activeOp,
     isEn ? `Component: ${activeComp}` : `Componente: ${activeComp}`
+  ]);
+  activeTableData.push([
+    isEn ? 'Download Date & Time:' : 'Fecha y hora de descarga:',
+    formattedDateTime,
+    '',
+    isEn ? 'ISO Timestamp:' : 'Marca temporal ISO:',
+    isoTimestamp,
   ]);
   activeTableData.push([]);
 
@@ -266,10 +291,11 @@ export function exportOrientSolMasterExcel(
   // =========================================================================
   const anglesSheetData: (string | number)[][] = [
     [isEn ? 'RADIATION DEVELOPMENT ACROSS TILT ANGLES 1° TO 90°' : 'DESARROLLO DE RADIACIÓN EN EL RANGO DE ÁNGULOS 1° A 90°'],
-    [res.locationName, `Latitud: ${res.latitude.toFixed(4)}°`, `Óptimo Anual: β = ${optAngle}°`],
+    [isEn ? 'Download Date & Time:' : 'Fecha y hora de descarga:', formattedDateTime, '', isEn ? 'ISO Timestamp:' : 'Marca temporal ISO:', isoTimestamp],
+    [res.locationName, `Latitud: ${res.latitude.toFixed(4)}°`, `Óptimo Anual: Inc = ${optAngle}°`],
     [],
     [
-      isEn ? 'Tilt Angle β (°)' : 'Ángulo Inclinación β (°)',
+      isEn ? 'Tilt Angle (°)' : 'Ángulo de Inclinación (°)',
       isEn ? 'Annual Mean Gdm' : 'Media Anual Gdm (Global)',
       isEn ? 'Annual Mean Bdm' : 'Media Anual Bdm (Directa)',
       isEn ? 'Annual Mean Ddm' : 'Media Anual Ddm (Difusa)',
@@ -307,6 +333,7 @@ export function exportOrientSolMasterExcel(
   // =========================================================================
   const compSheetData: (string | number)[][] = [
     [isEn ? 'BENCHMARK COMPARISON OF ALL 7 SOLAR CAPTURE METHODS' : 'COMPARATIVA DE TODOS LOS 7 MÉTODOS DE CAPTACIÓN SOLAR'],
+    [isEn ? 'Download Date & Time:' : 'Fecha y hora de descarga:', formattedDateTime, '', isEn ? 'ISO Timestamp:' : 'Marca temporal ISO:', isoTimestamp],
     [],
     [
       isEn ? 'Month' : 'Mes',
@@ -352,8 +379,8 @@ export function exportOrientSolMasterExcel(
   const wsComp = XLSX.utils.aoa_to_sheet(compSheetData);
   XLSX.utils.book_append_sheet(wb, wsComp, isEn ? 'Models_Comparative' : 'Comparativa_Modelos');
 
-  // Download File
+  // Download File with Default Timestamp in Filename
   const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `OrientSol3_${activeOp.toUpperCase()}_Completo_${cleanLoc}.xlsx`;
+  const filename = `OrientSol3_${activeOp.toUpperCase()}_Completo_${cleanLoc}_${fileTimestamp}.xlsx`;
   XLSX.writeFile(wb, filename);
 }

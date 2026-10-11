@@ -22,18 +22,25 @@ export function exportToCSV(
   // UTF-8 BOM
   const BOM = '\uFEFF';
 
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const downloadDateFormatted = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  const fileTimestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+
   // 1. Header Metadata
   lines.push('======================================================================');
   lines.push(`ORIENTSOL 3.0 - ${isEn ? 'SOLAR ENERGY SIMULATION REPORT' : 'INFORME DE SIMULACIÓN ENERGÉTICA SOLAR'}`);
   lines.push('======================================================================');
+  lines.push(`${isEn ? 'Download Date & Time' : 'Fecha y Hora de Descarga'};${downloadDateFormatted}`);
+  lines.push(`${isEn ? 'ISO Timestamp' : 'Marca Temporal ISO'};${now.toISOString()}`);
   lines.push(`${isEn ? 'Location' : 'Localidad'};${res.locationName}`);
   lines.push(`${isEn ? 'Latitude' : 'Latitud'};${res.latitude.toFixed(4)}°`);
   lines.push(`${isEn ? 'Longitude' : 'Longitud'};${res.longitude.toFixed(4)}°`);
   lines.push(`${isEn ? 'Data Source' : 'Fuente de Datos'};${res.source.toUpperCase()}`);
   lines.push(`${isEn ? 'PV Peak Power' : 'Potencia Pico FV'};${peakKw.toFixed(2)} kWp`);
   lines.push(`Performance Ratio (PR);${(pr * 100).toFixed(1)} %`);
-  lines.push(`${isEn ? 'Execution Date' : 'Fecha de Cálculo'};${new Date().toLocaleString()}`);
-  lines.push(`${isEn ? 'Calculation Time' : 'Tiempo de Motor'};${res.executionTimeMs} ms (Pyodide Python WASM)`);
+  lines.push(`${isEn ? 'Execution Engine' : 'Motor de Simulación'};Python 3.14 (Pyodide Python WASM)`);
+  lines.push(`${isEn ? 'Calculation Time' : 'Tiempo de Motor'};${res.executionTimeMs} ms`);
   lines.push('');
 
   // 2. Executive Annual Totals
@@ -132,8 +139,7 @@ export function exportToCSV(
   const url = URL.createObjectURL(blob);
 
   const cleanName = res.locationName.replace(/[^a-zA-Z0-9_\-]/g, '_');
-  const dateStr = new Date().toISOString().slice(0, 10);
-  const fileName = `OrientSol_${cleanName}_${dateStr}.csv`;
+  const fileName = `OrientSol_${cleanName}_${fileTimestamp}.csv`;
 
   const link = document.createElement('a');
   link.setAttribute('href', url);

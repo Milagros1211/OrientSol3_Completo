@@ -1063,6 +1063,11 @@ export async function generateOrientSolEnergyPDFReport(
     ? ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const downloadDateFormatted = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  const fileTimestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+
   const drawAcademicHeader = (pageNumber: number) => {
     doc.setFont('helvetica', 'italic');
     doc.setFontSize(8.5);
@@ -1089,6 +1094,9 @@ export async function generateOrientSolEnergyPDFReport(
     doc.line(20, 20, 190, 20);
 
     doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`${isEn ? 'Downloaded on' : 'Fecha y hora de descarga'}: ${downloadDateFormatted}`, 20, 287);
     doc.setFontSize(9);
     doc.text(String(pageNumber), 185, 287);
   };
@@ -1192,7 +1200,7 @@ export async function generateOrientSolEnergyPDFReport(
 
   doc.setFillColor(255, 255, 255);
   doc.setDrawColor(203, 213, 225);
-  doc.roundedRect(20, 138, 170, 68, 2, 2, 'FD');
+  doc.roundedRect(20, 138, 170, 74, 2, 2, 'FD');
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9.5);
@@ -1207,29 +1215,34 @@ export async function generateOrientSolEnergyPDFReport(
   doc.text(`${res.latitude.toFixed(4)}°`, 135, 146);
 
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Study' : 'Estudio'}:`, 25, 155);
+  doc.text(`${isEn ? 'Study' : 'Estudio'}:`, 25, 154);
   doc.setFont('helvetica', 'normal');
-  doc.text(studyTitle, 55, 155);
+  doc.text(studyTitle, 55, 154);
 
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Method' : 'Método'}:`, 110, 155);
+  doc.text(`${isEn ? 'Method' : 'Método'}:`, 110, 154);
   doc.setFont('helvetica', 'normal');
-  doc.text('Osterwald Thermal & Yield Model', 135, 155);
+  doc.text('Osterwald Thermal & Yield Model', 135, 154);
 
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Installed peak power' : 'Potencia pico instalada'}:`, 25, 164);
+  doc.text(`${isEn ? 'Installed peak power' : 'Potencia pico instalada'}:`, 25, 162);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${peakKw} kWp`, 80, 164);
+  doc.text(`${peakKw} kWp`, 80, 162);
 
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Temperature coefficient' : 'Coeficiente de temperatura'} (γ):`, 25, 173);
+  doc.text(`${isEn ? 'Temperature coefficient' : 'Coeficiente de temperatura'} (γ):`, 25, 170);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${coefTemp} 1/°C`, 85, 173);
+  doc.text(`${coefTemp} 1/°C`, 85, 170);
 
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'NOCT / TONC' : 'TONC'}:`, 25, 182);
+  doc.text(`${isEn ? 'NOCT / TONC' : 'TONC'}:`, 25, 178);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${tonc} °C`, 85, 182);
+  doc.text(`${tonc} °C`, 85, 178);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Download timestamp' : 'Fecha y hora de descarga'}:`, 25, 186);
+  doc.setFont('helvetica', 'normal');
+  doc.text(downloadDateFormatted, 85, 186);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
@@ -1239,14 +1252,14 @@ export async function generateOrientSolEnergyPDFReport(
       ? 'Calculation implemented according to Osterwald formula: PM = PM,STC · (G/1000) · [1 + γ · (Tc - 25)]'
       : 'Cálculo implementado según la fórmula de Osterwald: PM = PM,STC · (G/1000) · [1 + γ · (Tc - 25)]',
     25,
-    195
+    199
   );
   doc.text(
     isEn
       ? 'where cell temperature is given by: Tc = Tamb + [(TONC - 20) / 800] · G'
       : 'donde la temperatura de célula viene dada por: Tc = Tamb + [(TONC - 20) / 800] · G',
     25,
-    200
+    205
   );
 
   // =========================================================================
@@ -1446,7 +1459,7 @@ export async function generateOrientSolEnergyPDFReport(
 
   // Save the PDF
   const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `OrientSol3_Informe_Energia_${cleanLoc}.pdf`;
+  const filename = `OrientSol3_Informe_Energia_${cleanLoc}_${fileTimestamp}.pdf`;
   const pdfBlob = doc.output('blob');
 
   let savedDirectoryLabel = 'C:\\OrientSol3\\InformesPDF';
