@@ -1148,13 +1148,6 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   function renderResults(res: SolarBridgeSimulationResult, shouldScroll: boolean = false) {
     resultsContainer.classList.remove('hidden');
 
-    const getCteClass = (loss: number) => {
-      if (loss <= 10.0) return 'loss-cell-green';
-      if (loss <= 20.0) return 'loss-cell-yellow';
-      if (loss <= 40.0) return 'loss-cell-orange';
-      return 'loss-cell-red';
-    };
-
     const getBadgeClass = (category: string) => {
       if (category.includes('2')) return 'badge-2ejes';
       if (category.includes('1')) return 'badge-1eje';
@@ -1334,63 +1327,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         </div>
       </div>
 
-      <!-- 4. MAPA DE PÉRDIDAS DE CAPTACIÓN (CTE DB-HE4) -->
-      <div class="result-card wide-card" style="margin-bottom: 1.25rem;">
-        <div class="result-card-header">
-          <h4>${t.results.lossMapTitle}</h4>
-          <span class="badge badge-success">${t.results.lossMapOptimal.replace('{beta}', String(res.captureLossMap.optimalPoint.betaDeg ?? 0)).replace('{alpha}', String(res.captureLossMap.optimalPoint.alphaDeg ?? 0)).replace('{rad}', (res.captureLossMap.optimalPoint.maxDailyRadiationKwh ?? 0).toFixed(2))}</span>
-        </div>
-        <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.25rem;">
-          ${t.results.lossMapSubtitle}
-        </p>
-
-        <div class="cte-legend-bar">
-          <div class="cte-legend-item">
-            <span class="cte-color-box box-green"></span>
-            <span>${t.results.cteGeneral} <strong>${res.captureLossMap.cteZones.generalPctCompliant}%</strong> ${t.results.ofMap}</span>
-          </div>
-          <div class="cte-legend-item">
-            <span class="cte-color-box box-yellow"></span>
-            <span>${t.results.cteSuperposition} <strong>${res.captureLossMap.cteZones.superpositionPctCompliant}%</strong></span>
-          </div>
-          <div class="cte-legend-item">
-            <span class="cte-color-box box-orange"></span>
-            <span>${t.results.cteIntegration} <strong>${res.captureLossMap.cteZones.integrationPctCompliant}%</strong></span>
-          </div>
-          <div class="cte-legend-item">
-            <span class="cte-color-box box-red"></span>
-            <span>${t.results.cteNonCompliant}</span>
-          </div>
-        </div>
-
-        <div class="loss-map-container">
-          <table class="loss-map-matrix-table">
-            <thead>
-              <tr>
-                <th class="corner-th">${t.results.tiltHeader}</th>
-                ${res.captureLossMap.alphasDeg.map((a) => `<th>${a > 0 ? '+' : ''}${a}°</th>`).join('')}
-              </tr>
-            </thead>
-            <tbody>
-              ${res.captureLossMap.betasDeg
-                .map((b, i_b) => {
-                  const cells = res.captureLossMap.alphasDeg
-                    .map((a, i_a) => {
-                      const loss = res.captureLossMap.lossPercentageMatrix[i_b][i_a];
-                      const rad = res.captureLossMap.radiationMatrixKwhM2Day[i_b][i_a];
-                      const cls = getCteClass(loss);
-                      return `<td class="${cls}" title="&beta;=${b}°, &alpha;=${a}°: Pérdida ${loss.toFixed(1)}% (${rad.toFixed(2)} kWh/m²/d)">${loss.toFixed(0)}%</td>`;
-                    })
-                    .join('');
-                  return `<tr><td class="row-header-beta">${b}°</td>${cells}</tr>`;
-                })
-                .join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- 5. COMPARATIVA GLOBAL DE SUPERFICIES (8 TOPOLOGÍAS COMPLETAS) -->
+      <!-- 4. COMPARATIVA GLOBAL DE SUPERFICIES (8 TOPOLOGÍAS COMPLETAS) -->
       <div class="result-card wide-card">
         <div class="result-card-header">
           <h4>${t.results.surfacesTableTitle}</h4>

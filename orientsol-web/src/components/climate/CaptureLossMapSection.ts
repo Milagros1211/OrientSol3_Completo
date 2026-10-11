@@ -77,17 +77,17 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
     const monthSelectorHtml = mode === 'monthly'
       ? `
         <div style="display: flex; align-items: center; gap: 0.6rem; margin-top: 0.5rem; flex-wrap: wrap;">
-          <label for="loss-map-month-select" style="font-size: 0.82rem; font-weight: 700; color: #a5f3fc;">
+          <label for="loss-map-month-select" style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">
             ${isEn ? 'Select Month for Capture Map:' : 'Seleccionar mes para el mapa de captación:'}
           </label>
-          <select id="loss-map-month-select" class="form-select form-select-sm" style="width: auto; min-width: 170px; font-weight: 600; background: #0f172a; color: #38bdf8; border: 1px solid #38bdf8;">
+          <select id="loss-map-month-select" class="form-select form-select-sm loss-map-month-dropdown" style="width: auto; min-width: 170px; font-weight: 600;">
             ${monthNames.map((name: string, i: number) => `
               <option value="${i}" ${i === selectedMonthIdx ? 'selected' : ''}>
                 ${i + 1}. ${name} (β = ${lossMap.monthlyMaps ? lossMap.monthlyMaps[i].optimalPoint.betaDeg : 0}°)
               </option>
             `).join('')}
           </select>
-          <span style="font-size: 0.76rem; color: #94a3b8;">
+          <span style="font-size: 0.76rem; color: var(--text-dim);">
             ${isEn ? 'Displays CTE losses and highlights optimum for the selected month' : 'Muestra pérdidas CTE y ángulo óptimo del mes seleccionado'}
           </span>
         </div>
@@ -98,7 +98,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       <div class="result-card-header" style="flex-wrap: wrap; gap: 0.5rem; align-items: center;">
         <div>
           <h4 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#38bdf8" stroke-width="2">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-cyan, #0284c7);">
               <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
               <polyline points="2 17 12 22 22 17"></polyline>
               <polyline points="2 12 12 17 22 12"></polyline>
@@ -135,12 +135,12 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
         </div>
       </div>
 
-      <div class="loss-map-container" style="margin-top: 0.75rem; max-height: 480px; overflow: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;">
+      <div class="loss-map-container" style="margin-top: 0.75rem; max-height: 480px; overflow: auto; border: 1px solid var(--border-subtle); border-radius: 6px;">
         <table class="loss-map-matrix-table" style="font-size: 0.76rem;">
           <thead>
             <tr>
-              <th class="corner-th" style="background: #0b1329; color: #38bdf8;">β \\ α</th>
-              ${currentAlphas.map((a) => `<th style="background: #0b1329;">${a > 0 ? '+' : ''}${a}°</th>`).join('')}
+              <th class="corner-th">β \\ α</th>
+              ${currentAlphas.map((a) => `<th>${a > 0 ? '+' : ''}${a}°</th>`).join('')}
             </tr>
           </thead>
           <tbody>
@@ -151,15 +151,15 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
                     const loss = currentLossMatrix[i_b][i_a];
                     const rad = currentRadMatrix[i_b][i_a];
                     const cls = getCteClass(loss);
-                    const isOptimalCell = (b === Math.round(currentOptPoint.betaDeg) || (i_b === 0 && currentOptPoint.betaDeg === 0)) && a === Math.round(currentOptPoint.alphaDeg);
+                    const isOptimalCell = Math.abs(b - currentOptPoint.betaDeg) < 0.01 && Math.abs(a - currentOptPoint.alphaDeg) < 0.01;
                     const optStyle = isOptimalCell
-                      ? 'border: 2px solid #38bdf8 !important; box-shadow: inset 0 0 8px #38bdf8; font-weight: 800; transform: scale(1.08);'
+                      ? 'border: 2px solid var(--accent-cyan, #0284c7) !important; box-shadow: inset 0 0 8px rgba(2, 132, 199, 0.4); font-weight: 800; transform: scale(1.08);'
                       : '';
                     const starText = isOptimalCell ? ' ★' : '';
                     return `<td class="${cls}" style="${optStyle}" title="β=${b}°, α=${a}°: Pérdida ${loss.toFixed(1)}% (${rad.toFixed(2)} kWh/m²/d)">${loss.toFixed(0)}%${starText}</td>`;
                   })
                   .join('');
-                return `<tr><td class="row-header-beta" style="background: #0b1329; color: #a5f3fc;">${b}°</td>${cells}</tr>`;
+                return `<tr><td class="row-header-beta">${b}°</td>${cells}</tr>`;
               })
               .join('')}
           </tbody>
