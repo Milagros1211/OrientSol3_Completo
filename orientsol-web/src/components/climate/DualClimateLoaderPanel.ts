@@ -1280,7 +1280,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       <div class="result-card wide-card" style="margin-bottom: 1.25rem;">
         <div class="result-card-header">
           <h4>${t.results.energyBalanceTitle}</h4>
-          <span class="badge badge-neutral">${simPeakKw.value} kWp | PR=${(parseFloat(simPr.value) * 100).toFixed(0)}%</span>
+          <span id="energy-balance-header-badge" class="badge badge-neutral">${simPeakKw.value} kWp | PR=${(parseFloat(simPr.value) * 100).toFixed(0)}%</span>
         </div>
         <div class="energy-models-grid">
           <div class="energy-box">
@@ -1288,19 +1288,29 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             <div id="solar-received-annual-val" class="energy-val-large" style="color: #fbbf24;">
               ${Math.round(res.energyYield.recibida.annualTotalKwh).toLocaleString()} <small>kWh/${isEn ? 'yr' : 'año'}</small>
             </div>
-            <div class="energy-details">
+            <div class="energy-details" style="display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap;">
               <span>${t.results.collectorArea}</span>
-              <div style="display: inline-flex; align-items: center; gap: 4px;">
+              <div style="display: inline-flex; align-items: center; gap: 6px;">
                 <input
                   type="number"
                   id="input-collector-area-interactive"
                   class="form-input form-input-sm"
-                  style="width: 82px; text-align: right; padding: 2px 6px; font-weight: 700; height: 26px; border-radius: 4px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-primary);"
+                  style="width: 78px; text-align: right; padding: 2px 6px; font-weight: 700; height: 28px; border-radius: 4px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-primary); cursor: not-allowed;"
                   value="${(res.energyYield.collectorAreaM2 ?? 25.0).toFixed(1)}"
                   min="0.1"
                   step="0.5"
+                  disabled
                 />
                 <strong>m²</strong>
+                <button
+                  type="button"
+                  id="btn-edit-save-area"
+                  class="btn btn-sm"
+                  style="padding: 2px 10px; font-size: 0.78rem; font-weight: 600; height: 28px; border-radius: 4px; background: #0284c7; color: #ffffff; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;"
+                  title="${isEn ? 'Edit / Save & Calculate Area' : 'Editar / Guardar y Calcular Metraje'}"
+                >
+                  <span id="btn-edit-save-area-label">${isEn ? 'Edit' : 'Editar'}</span>
+                </button>
               </div>
             </div>
             <div class="energy-details">
@@ -1315,7 +1325,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
           <div class="energy-box">
             <span class="energy-title">${t.results.solarProducedTitle}</span>
-            <div class="energy-val-large" style="color: #34d399;">
+            <div id="solar-produced-annual-val" class="energy-val-large" style="color: #34d399;">
               ${Math.round(res.energyYield.producida.osterwald.annualKwh ?? 0).toLocaleString()} <small>kWh/${isEn ? 'yr' : 'año'}</small>
             </div>
             <div class="energy-details">
@@ -1324,11 +1334,11 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             </div>
             <div class="energy-details">
               <span>${t.results.cellThermalLosses}</span>
-              <strong style="color: #f87171;">-${Math.abs(res.energyYield.producida.osterwald.thermalLossKwh ?? 0).toFixed(0)} kWh (-${Math.abs(res.energyYield.producida.osterwald.thermalLossPct ?? 0).toFixed(2)}%)</strong>
+              <strong id="solar-thermal-losses-val" style="color: #f87171;">-${Math.abs(res.energyYield.producida.osterwald.thermalLossKwh ?? 0).toFixed(0)} kWh (-${Math.abs(res.energyYield.producida.osterwald.thermalLossPct ?? 0).toFixed(2)}%)</strong>
             </div>
             <div class="energy-row-track">
               <span>${t.results.simplifiedModel}</span>
-              <strong>${Math.round(res.energyYield.producida.simplified.annualKwh ?? 0).toLocaleString()} kWh/${isEn ? 'yr' : 'año'}</strong>
+              <strong id="solar-produced-simplified-val">${Math.round(res.energyYield.producida.simplified.annualKwh ?? 0).toLocaleString()} kWh/${isEn ? 'yr' : 'año'}</strong>
             </div>
           </div>
         </div>
@@ -1496,15 +1506,129 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       mountStudyOperation(targetOp);
     });
 
-    // Wire Interactive Collector Area Input
+    // Wire Interactive Collector Area Input & Edit/Save Button
     const areaInput = resultsContainer.querySelector<HTMLInputElement>('#input-collector-area-interactive');
+    const btnEditSave = resultsContainer.querySelector<HTMLButtonElement>('#btn-edit-save-area');
+    const labelEditSave = resultsContainer.querySelector<HTMLSpanElement>('#btn-edit-save-area-label');
+
+    const baseArea = res.energyYield?.collectorAreaM2 ?? 25.0;
+    const baseRecibida = res.energyYield?.recibida?.annualTotalKwh ?? 45166;
+    const baseOsterwald = res.energyYield?.producida?.osterwald?.annualKwh ?? 7265;
+    const baseSimp = res.energyYield?.producida?.simplified?.annualKwh ?? 7215;
+    const baseTherm = res.energyYield?.producida?.osterwald?.thermalLossKwh ?? -38;
+    const baseThermPct = Math.abs(res.energyYield?.producida?.osterwald?.thermalLossPct ?? 0.53);
+    const basePotKw = parseFloat(simPeakKw.value) || 5.0;
+    const prPct = (parseFloat(simPr.value) * 100).toFixed(0);
+    const unitRadM2 = res.energyYield?.recibida?.annualKwhM2 ?? (baseArea > 0 ? baseRecibida / baseArea : 1806.6);
+
+    const applyAreaRecalculation = (newArea: number) => {
+      if (newArea <= 0 || isNaN(newArea)) return;
+      const ratio = baseArea > 0 ? newArea / baseArea : 1.0;
+      const newRecibida = Math.round(newArea * unitRadM2);
+      const newOsterwald = Math.round(baseOsterwald * ratio);
+      const newSimp = Math.round(baseSimp * ratio);
+      const newTherm = Math.round(baseTherm * ratio);
+      const newPotKw = (basePotKw * ratio).toFixed(1);
+
+      // 1. Update Energía Solar Recibida
+      const elRecibida = resultsContainer.querySelector<HTMLElement>('#solar-received-annual-val');
+      if (elRecibida) {
+        elRecibida.innerHTML = `${newRecibida.toLocaleString()} <small>kWh/${isEn ? 'yr' : 'año'}</small>`;
+      }
+
+      // 2. Update Energía Solar Producida (Osterwald)
+      const elProducida = resultsContainer.querySelector<HTMLElement>('#solar-produced-annual-val');
+      if (elProducida) {
+        elProducida.innerHTML = `${newOsterwald.toLocaleString()} <small>kWh/${isEn ? 'yr' : 'año'}</small>`;
+      }
+
+      // 3. Update Modelo Simplificado
+      const elSimp = resultsContainer.querySelector<HTMLElement>('#solar-produced-simplified-val');
+      if (elSimp) {
+        elSimp.innerHTML = `${newSimp.toLocaleString()} kWh/${isEn ? 'yr' : 'año'}`;
+      }
+
+      // 4. Update Pérdidas Térmicas Célula
+      const elTherm = resultsContainer.querySelector<HTMLElement>('#solar-thermal-losses-val');
+      if (elTherm) {
+        elTherm.innerHTML = `-${Math.abs(newTherm).toFixed(0)} kWh (-${baseThermPct.toFixed(2)}%)`;
+      }
+
+      // 5. Update Header Badge (Potencia Pico equivalente)
+      const elBadge = resultsContainer.querySelector<HTMLElement>('#energy-balance-header-badge');
+      if (elBadge) {
+        elBadge.textContent = `${newPotKw} kWp | PR=${prPct}%`;
+      }
+
+      // 6. Persist changes in res.energyYield
+      if (res.energyYield) {
+        res.energyYield.collectorAreaM2 = newArea;
+        if (res.energyYield.recibida) {
+          res.energyYield.recibida.annualTotalKwh = newRecibida;
+        }
+        if (res.energyYield.producida?.osterwald) {
+          res.energyYield.producida.osterwald.annualKwh = newOsterwald;
+          res.energyYield.producida.osterwald.thermalLossKwh = newTherm;
+        }
+        if (res.energyYield.producida?.simplified) {
+          res.energyYield.producida.simplified.annualKwh = newSimp;
+        }
+      }
+    };
+
+    let isEditingArea = false;
+    btnEditSave?.addEventListener('click', () => {
+      if (!isEditingArea) {
+        // Switch to Edit Mode
+        isEditingArea = true;
+        if (areaInput) {
+          areaInput.disabled = false;
+          areaInput.style.cursor = 'text';
+          areaInput.style.borderColor = '#0284c7';
+          areaInput.style.background = 'rgba(2, 132, 199, 0.08)';
+          areaInput.focus();
+          areaInput.select();
+        }
+        if (btnEditSave) {
+          btnEditSave.style.background = '#059669'; // Emerald Save
+        }
+        if (labelEditSave) {
+          labelEditSave.textContent = isEn ? 'Save & Calculate' : 'Guardar y Calcular';
+        }
+      } else {
+        // Save and Calculate
+        isEditingArea = false;
+        const enteredVal = parseFloat(areaInput?.value || '') || baseArea;
+        if (areaInput) {
+          areaInput.disabled = true;
+          areaInput.style.cursor = 'not-allowed';
+          areaInput.style.borderColor = 'var(--border-subtle)';
+          areaInput.style.background = 'var(--bg-card)';
+          areaInput.value = enteredVal.toFixed(1);
+        }
+        if (btnEditSave) {
+          btnEditSave.style.background = '#0284c7'; // Primary Blue
+        }
+        if (labelEditSave) {
+          labelEditSave.textContent = isEn ? 'Edit' : 'Editar';
+        }
+        applyAreaRecalculation(enteredVal);
+      }
+    });
+
+    // Support Enter key inside input to save and calculate
+    areaInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        btnEditSave?.click();
+      }
+    });
+
+    // Real-time recalculation as user types
     areaInput?.addEventListener('input', () => {
-      const newArea = parseFloat(areaInput.value) || 0;
-      const unitRad = res.energyYield?.recibida?.annualKwhM2 ?? 0;
-      const newTotal = Math.round(newArea * unitRad);
-      const valEl = resultsContainer.querySelector<HTMLElement>('#solar-received-annual-val');
-      if (valEl) {
-        valEl.innerHTML = `${newTotal.toLocaleString()} <small>kWh/${isEn ? 'yr' : 'año'}</small>`;
+      const liveVal = parseFloat(areaInput.value);
+      if (!isNaN(liveVal) && liveVal > 0) {
+        applyAreaRecalculation(liveVal);
       }
     });
 
