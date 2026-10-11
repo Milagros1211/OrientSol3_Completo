@@ -55,7 +55,7 @@ export const es: Translations = {
     previewTitle: 'Datos Meteorológicos Recuperados',
   },
   hybridLoader: {
-    title: '3. Arquitectura Híbrida & Carga Dual de Climatología',
+    title: 'Arquitectura Híbrida & Carga Dual de Climatología',
     subtitle: 'Consulta la Base Histórica OrientSol 3.0, introduce datos manualmente mes a mes, o sube documentos digitales (CSV / JSON) para alimentar el motor de cálculo Python.',
     tabHistorical: '1. Base Histórica OrientSol',
     tabManual: '2. Introducción Manual (Formulario)',

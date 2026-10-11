@@ -2234,18 +2234,38 @@ body.theme-dark .temp-stat-value {
 }
 
 .monthly-tilt-badge {
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
   padding: 0.55rem 0.35rem;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: transform 0.15s ease, border-color 0.15s ease;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 
-.monthly-tilt-badge:hover {
+[data-theme="light"] .monthly-tilt-badge,
+body.theme-light .monthly-tilt-badge {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .monthly-tilt-badge:hover,
+body.theme-light .monthly-tilt-badge:hover {
+  transform: translateY(-2px);
+  background: #f0f9ff;
+  border-color: #0284c7;
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.12);
+}
+
+[data-theme="dark"] .monthly-tilt-badge,
+body.theme-dark .monthly-tilt-badge {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .monthly-tilt-badge:hover,
+body.theme-dark .monthly-tilt-badge:hover {
   transform: translateY(-2px);
   border-color: #38bdf8;
   background: rgba(56, 189, 248, 0.08);
@@ -2253,24 +2273,58 @@ body.theme-dark .temp-stat-value {
 
 .monthly-tilt-name {
   font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+[data-theme="light"] .monthly-tilt-name,
+body.theme-light .monthly-tilt-name {
+  color: #334155;
+}
+
+[data-theme="dark"] .monthly-tilt-name,
+body.theme-dark .monthly-tilt-name {
+  color: var(--text-muted);
 }
 
 .monthly-tilt-angle {
   font-size: 1.25rem;
   font-weight: 800;
   font-family: var(--font-mono);
-  color: #38bdf8;
   line-height: 1.2;
   margin: 0.15rem 0;
 }
 
+[data-theme="light"] .monthly-tilt-angle,
+body.theme-light .monthly-tilt-angle {
+  color: #0284c7;
+}
+
+[data-theme="dark"] .monthly-tilt-angle,
+body.theme-dark .monthly-tilt-angle {
+  color: #38bdf8;
+}
+
 .monthly-tilt-rad {
   font-size: 0.7rem;
-  color: var(--text-dim);
   font-family: var(--font-mono);
+}
+
+[data-theme="light"] .monthly-tilt-rad,
+body.theme-light .monthly-tilt-rad {
+  color: #64748b;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .monthly-tilt-rad,
+body.theme-dark .monthly-tilt-rad {
+  color: var(--text-dim);
+}
+
+[data-theme="light"] .opt-study-subtitle,
+body.theme-light .opt-study-subtitle {
+  color: #475569;
 }
 
 /* 2D Capture Loss Map Matrix */
@@ -2552,22 +2606,55 @@ body.theme-dark .loss-map-month-dropdown {
 }
 
 .all-surfaces-table th {
-  background: rgba(255, 255, 255, 0.05);
   padding: 0.65rem 0.85rem;
   text-align: left;
-  color: var(--text-muted);
-  font-weight: 600;
-  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 700;
   font-family: var(--font-sans);
+}
+
+[data-theme="light"] .all-surfaces-table th,
+body.theme-light .all-surfaces-table th {
+  background: #f1f5f9;
+  color: #1e293b;
+  border-bottom: 1.5px solid #cbd5e1;
+}
+
+[data-theme="dark"] .all-surfaces-table th,
+body.theme-dark .all-surfaces-table th {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .all-surfaces-table td {
   padding: 0.6rem 0.85rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  color: #e2e8f0;
+  font-family: var(--font-mono);
 }
 
-.all-surfaces-table tr:hover {
+[data-theme="light"] .all-surfaces-table td,
+body.theme-light .all-surfaces-table td {
+  color: #0f172a !important;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .all-surfaces-table td strong,
+body.theme-light .all-surfaces-table td strong {
+  color: #0f172a !important;
+}
+
+[data-theme="dark"] .all-surfaces-table td,
+body.theme-dark .all-surfaces-table td {
+  color: #e2e8f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="light"] .all-surfaces-table tr:hover,
+body.theme-light .all-surfaces-table tr:hover {
+  background: #f8fafc;
+}
+
+[data-theme="dark"] .all-surfaces-table tr:hover,
+body.theme-dark .all-surfaces-table tr:hover {
   background: rgba(255, 255, 255, 0.02);
 }
 
@@ -2576,13 +2663,77 @@ body.theme-dark .loss-map-month-dropdown {
   font-size: 0.68rem;
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
-.badge-fija { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
-.badge-1eje { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-.badge-2ejes { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+[data-theme="light"] .badge-fija,
+body.theme-light .badge-fija {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+[data-theme="light"] .badge-1eje,
+body.theme-light .badge-1eje {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+[data-theme="light"] .badge-2ejes,
+body.theme-light .badge-2ejes {
+  background: #d1fae5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+[data-theme="dark"] .badge-fija,
+body.theme-dark .badge-fija {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .badge-1eje,
+body.theme-dark .badge-1eje {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .badge-2ejes,
+body.theme-dark .badge-2ejes {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+/* Specific Cell Colors in Table: Osterwald Prod and Cell Temp */
+.all-surfaces-table .cell-val-osterwald {
+  font-weight: 700;
+}
+
+[data-theme="light"] .all-surfaces-table .cell-val-osterwald,
+body.theme-light .all-surfaces-table .cell-val-osterwald {
+  color: #059669;
+}
+
+[data-theme="dark"] .all-surfaces-table .cell-val-osterwald,
+body.theme-dark .all-surfaces-table .cell-val-osterwald {
+  color: #34d399;
+}
+
+.all-surfaces-table .cell-val-temp {
+  font-weight: 700;
+}
+
+[data-theme="light"] .all-surfaces-table .cell-val-temp,
+body.theme-light .all-surfaces-table .cell-val-temp {
+  color: #b45309;
+}
+
+[data-theme="dark"] .all-surfaces-table .cell-val-temp,
+body.theme-dark .all-surfaces-table .cell-val-temp {
+  color: #fbbf24;
+}
 
 /* ==========================================================================
    Language Switcher (Bilingual ES / EN)

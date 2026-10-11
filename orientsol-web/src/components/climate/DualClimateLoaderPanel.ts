@@ -189,10 +189,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <label class="form-label">${t.location.longitude} [°]</label>
           <input type="number" id="manual-lon" class="form-input" step="0.001" value="-5.984" />
         </div>
-        <div class="form-group">
-          <label class="form-label">${t.location.elevation} [m]</label>
-          <input type="number" id="manual-elev" class="form-input" value="35" />
-        </div>
+        <input type="hidden" id="manual-elev" value="0" />
         <div class="form-group">
           <label class="form-label">${t.location.albedoLabel} (&rho;<sub>g</sub>)</label>
           <input type="number" id="manual-albedo" class="form-input" step="0.01" min="0" max="1" value="0.20" />
@@ -816,7 +813,6 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
                   <div class="suggestion-meta">
                     <span>Lat: ${m.latitude.toFixed(2)}°</span>
                     <span>Lon: ${m.longitude.toFixed(2)}°</span>
-                    <span>Alt: ${m.elevationM != null ? `${m.elevationM} m` : 'N/D'}</span>
                     <span>G<sub>dm</sub>(0): ${annualG.toFixed(2)} kWh/m²/d</span>
                   </div>
                 </div>
@@ -1289,12 +1285,23 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         <div class="energy-models-grid">
           <div class="energy-box">
             <span class="energy-title">${t.results.solarReceivedTitle}</span>
-            <div class="energy-val-large" style="color: #fbbf24;">
+            <div id="solar-received-annual-val" class="energy-val-large" style="color: #fbbf24;">
               ${Math.round(res.energyYield.recibida.annualTotalKwh).toLocaleString()} <small>kWh/${isEn ? 'yr' : 'año'}</small>
             </div>
             <div class="energy-details">
               <span>${t.results.collectorArea}</span>
-              <strong>${(res.energyYield.collectorAreaM2 ?? 0).toFixed(1)} m²</strong>
+              <div style="display: inline-flex; align-items: center; gap: 4px;">
+                <input
+                  type="number"
+                  id="input-collector-area-interactive"
+                  class="form-input form-input-sm"
+                  style="width: 82px; text-align: right; padding: 2px 6px; font-weight: 700; height: 26px; border-radius: 4px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-primary);"
+                  value="${(res.energyYield.collectorAreaM2 ?? 25.0).toFixed(1)}"
+                  min="0.1"
+                  step="0.5"
+                />
+                <strong>m²</strong>
+              </div>
             </div>
             <div class="energy-details">
               <span>${t.results.annualIrradiationM2}</span>
@@ -1317,7 +1324,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             </div>
             <div class="energy-details">
               <span>${t.results.cellThermalLosses}</span>
-              <strong style="color: #f87171;">-${(res.energyYield.producida.osterwald.thermalLossKwh ?? 0).toFixed(0)} kWh (-${(res.energyYield.producida.osterwald.thermalLossPct ?? 0).toFixed(2)}%)</strong>
+              <strong style="color: #f87171;">-${Math.abs(res.energyYield.producida.osterwald.thermalLossKwh ?? 0).toFixed(0)} kWh (-${Math.abs(res.energyYield.producida.osterwald.thermalLossPct ?? 0).toFixed(2)}%)</strong>
             </div>
             <div class="energy-row-track">
               <span>${t.results.simplifiedModel}</span>
@@ -1362,10 +1369,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
                   <td class="${(surf.gainOverAnnualFixedPct ?? 0) > 0 ? 'text-gain' : ''}">
                     ${(surf.gainOverAnnualFixedPct ?? 0) >= 0 ? '+' : ''}${(surf.gainOverAnnualFixedPct ?? 0).toFixed(2)}%
                   </td>
-                  <td style="color: #34d399; font-weight: 600;">
+                  <td class="cell-val-osterwald">
                     ${Math.round(surf.energyProducedOsterwaldKwhYear ?? 0).toLocaleString()} kWh/${isEn ? 'yr' : 'año'}
                   </td>
-                  <td style="color: #fbbf24;">
+                  <td class="cell-val-temp">
                     ${(surf.meanCellTempDegC ?? 0).toFixed(1)} °C
                   </td>
                 </tr>
@@ -1487,6 +1494,18 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     opSelect?.addEventListener('change', () => {
       const targetOp = (opSelect.value || 'annual') as typeof cachedActiveStudyOp;
       mountStudyOperation(targetOp);
+    });
+
+    // Wire Interactive Collector Area Input
+    const areaInput = resultsContainer.querySelector<HTMLInputElement>('#input-collector-area-interactive');
+    areaInput?.addEventListener('input', () => {
+      const newArea = parseFloat(areaInput.value) || 0;
+      const unitRad = res.energyYield?.recibida?.annualKwhM2 ?? 0;
+      const newTotal = Math.round(newArea * unitRad);
+      const valEl = resultsContainer.querySelector<HTMLElement>('#solar-received-annual-val');
+      if (valEl) {
+        valEl.innerHTML = `${newTotal.toLocaleString()} <small>kWh/${isEn ? 'yr' : 'año'}</small>`;
+      }
     });
 
     // Event Listeners for Summary Copy
