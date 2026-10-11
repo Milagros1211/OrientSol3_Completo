@@ -406,11 +406,13 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                     const e = energyData.e_mes[idx];
                     const g = energyData.ganancia_mes[idx];
 
-                    const monthAngle = isSeasonal && seasonalData
-                      ? (idx === 0 || idx === 1 || idx === 11 ? seasonalData.winterTiltDeg
-                         : idx === 5 || idx === 6 || idx === 7 ? seasonalData.summerTiltDeg
-                         : seasonalData.springTiltDeg)
-                      : optTiltAnnual;
+                    const showAngleTag = studyType === 'monthly' || studyType === 'annual' || studyType === 'seasonal' || studyType === 'azimuthal';
+                    const angleText =
+                      studyType === 'monthly'
+                        ? `${res.monthlyOptimum12?.optimalTiltsDeg ? res.monthlyOptimum12.optimalTiltsDeg[idx] : optTiltAnnual}°`
+                        : isSeasonal && seasonalData
+                        ? `${idx === 0 || idx === 1 || idx === 11 ? seasonalData.winterTiltDeg : idx === 5 || idx === 6 || idx === 7 ? seasonalData.summerTiltDeg : seasonalData.springTiltDeg}°`
+                        : `${optTiltAnnual}°`;
 
                     return `
                       <tr>
@@ -418,7 +420,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                         <td class="td-num">${e0.toFixed(2)}</td>
                         <td class="td-num td-ener-study-val">
                           <strong>${e.toFixed(2)}</strong>
-                          <span class="energy-angle-tag" style="font-size: 0.78rem; opacity: 0.85; margin-left: 5px;">(${monthAngle}°)</span>
+                          ${showAngleTag ? `<span class="energy-angle-tag" style="font-size: 0.78rem; opacity: 0.85; margin-left: 5px;">(${angleText})</span>` : ''}
                         </td>
                         <td class="td-num td-ener-gain-val ${g >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
                           ${g.toFixed(2)}

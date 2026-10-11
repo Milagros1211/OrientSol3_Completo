@@ -92,10 +92,10 @@ export function renderTrackingHorizontalGraphsWindow(props: TrackingHorizontalGr
       : `Radiación ${compName} (kWh/m²/día)`;
 
     const bottomPlotTitle = isAll
-      ? (isEn ? 'Gains of all components for horizontal tracking' : 'Ganancias de todas las componentes para el seguimiento horizontal')
+      ? (isEn ? 'Gains of all components for horizontal tracking (vs horizontal plane 0°)' : 'Ganancias de todas las componentes para el seguimiento horizontal (respecto a 0° plano hor.)')
       : isEn
-      ? `Gains of ${compName} radiation for horizontal tracking`
-      : `Ganancias de radiación ${compName} para el seguimiento a un eje horizontal`;
+      ? `Gains of ${compName} radiation for horizontal tracking (vs horizontal plane 0°)`
+      : `Ganancias de radiación ${compName} para el seguimiento a un eje horizontal (respecto a 0° plano hor.)`;
 
     const isDark = themeManager.isDark();
     const plotBg = isDark ? '#0b171f' : '#ffffff';
@@ -311,16 +311,17 @@ export function renderTrackingHorizontalGraphsWindow(props: TrackingHorizontalGr
       }
 
       bottomLegendHtml = `
-        <g transform="translate(${bPad.left + bInnerW + 6}, ${bPad.top + 8})">
-          <rect x="0" y="0" width="80" height="80" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-          <rect x="5" y="8" width="9" height="9" fill="#0284c7" />
-          <text x="18" y="16" fill="${legendText}" font-size="8.5" font-weight="600">Gdm (Glob)</text>
-          <rect x="5" y="24" width="9" height="9" fill="#ef4444" />
-          <text x="18" y="32" fill="${legendText}" font-size="8.5" font-weight="600">Bdm (Dir)</text>
-          <rect x="5" y="40" width="9" height="9" fill="#84cc16" />
-          <text x="18" y="48" fill="${legendText}" font-size="8.5" font-weight="600">Ddm (Dif)</text>
-          <rect x="5" y="56" width="9" height="9" fill="#f59e0b" />
-          <text x="18" y="64" fill="${legendText}" font-size="8.5" font-weight="600">Rdm (Alb)</text>
+        <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 4})">
+          <rect x="0" y="0" width="86" height="88" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+          <text x="5" y="11" fill="${legendText}" font-size="7.5" font-weight="700">vs 0° (Plano hor.):</text>
+          <rect x="5" y="16" width="9" height="9" fill="#0284c7" />
+          <text x="18" y="24" fill="${legendText}" font-size="8.5" font-weight="600">Gdm (Glob)</text>
+          <rect x="5" y="32" width="9" height="9" fill="#ef4444" />
+          <text x="18" y="40" fill="${legendText}" font-size="8.5" font-weight="600">Bdm (Dir)</text>
+          <rect x="5" y="48" width="9" height="9" fill="#84cc16" />
+          <text x="18" y="56" fill="${legendText}" font-size="8.5" font-weight="600">Ddm (Dif)</text>
+          <rect x="5" y="64" width="9" height="9" fill="#f59e0b" />
+          <text x="18" y="72" fill="${legendText}" font-size="8.5" font-weight="600">Rdm (Alb)</text>
         </g>
       `;
     } else {
@@ -348,18 +349,18 @@ export function renderTrackingHorizontalGraphsWindow(props: TrackingHorizontalGr
       }
 
       bottomLegendHtml = `
-        <g transform="translate(${bPad.left + bInnerW + 6}, ${bPad.top + 2})">
-          <rect x="0" y="0" width="80" height="96" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+        <g transform="translate(${bPad.left + bInnerW + 2}, ${bPad.top + 2})">
+          <rect x="0" y="0" width="92" height="96" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
           <rect x="5" y="8" width="9" height="9" fill="#0284c7" />
-          <text x="18" y="16" fill="${legendText}" font-size="8.5" font-weight="600">0°</text>
+          <text x="18" y="16" fill="${legendText}" font-size="7.5" font-weight="600">vs 0° (Plano hor.)</text>
           <rect x="5" y="24" width="9" height="9" fill="#10b981" />
-          <text x="18" y="32" fill="${legendText}" font-size="8.5" font-weight="600">Ópt. anu</text>
+          <text x="18" y="32" fill="${legendText}" font-size="7.5" font-weight="600">vs Ópt. anu</text>
           <rect x="5" y="40" width="9" height="9" fill="#f59e0b" />
-          <text x="18" y="48" fill="${legendText}" font-size="8.5" font-weight="600">Ópt. est</text>
+          <text x="18" y="48" fill="${legendText}" font-size="7.5" font-weight="600">vs Ópt. est</text>
           <rect x="5" y="56" width="9" height="9" fill="#38bdf8" />
-          <text x="18" y="64" fill="${legendText}" font-size="8.5" font-weight="600">Seg. pol</text>
+          <text x="18" y="64" fill="${legendText}" font-size="7.5" font-weight="600">vs Seg. pol</text>
           <rect x="5" y="72" width="9" height="9" fill="#8b5cf6" />
-          <text x="18" y="80" fill="${legendText}" font-size="8.5" font-weight="600">Seg. azi</text>
+          <text x="18" y="80" fill="${legendText}" font-size="7.5" font-weight="600">vs Seg. azi</text>
         </g>
       `;
     }

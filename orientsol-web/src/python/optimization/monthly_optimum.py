@@ -51,8 +51,15 @@ def optimize_monthly_tilts(
     # Vectorized / looped month by month optimal search
     for m in range(12):
         row = gd_mat[m, :]
-        best_angle = int(np.argmax(row))  # index in [0..90] corresponds to angle in degrees
-        best_val = float(row[best_angle])
+        best_idx = int(np.argmax(row))  # 0..90
+        best_val = float(row[best_idx])
+        best_angle = best_idx + 1  # 1-based degrees: index 0 -> 1°, index 90 -> 91°
+
+        # If horizontal 0° yields more or equal radiation, 0° is the optimum
+        if float(g0_arr[m]) >= best_val:
+            best_angle = 0
+            best_val = float(g0_arr[m])
+
         optimal_tilts_deg.append(best_angle)
         optimal_daily_gdm.append(best_val)
         optimal_monthly_h.append(best_val * DAYS_PER_MONTH[m])

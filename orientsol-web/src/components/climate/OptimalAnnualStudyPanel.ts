@@ -13,6 +13,7 @@ import {
 } from '@/components/export/pdfReportGenerator';
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
+import { renderCaptureLossMapSection } from '@/components/climate/CaptureLossMapSection';
 
 export type RadiationComponentType = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 export type TableRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
@@ -993,6 +994,9 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
           </div>
         ` : ''}
 
+        <!-- 6.5 Mapa de Pérdidas de Captación (CTE DB-HE4) para Inclinación Óptima Anual -->
+        <div id="annual-loss-map-mount-point"></div>
+
         <!-- 7. Action Button Footer matching OrientSol MATLAB window -->
         <div class="opt-study-footer-actions">
           <div class="footer-btn-left-group">
@@ -1047,6 +1051,18 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
     `;
 
     // Mount Active Sub-Windows
+    // 0.0 CTE DB-HE4 Capture Loss Map
+    const lossMapMountPoint = container.querySelector<HTMLDivElement>('#annual-loss-map-mount-point');
+    if (lossMapMountPoint) {
+      lossMapMountPoint.innerHTML = '';
+      const lossMapSection = renderCaptureLossMapSection({
+        mode: 'annual',
+        simulationResult: res,
+        isEn,
+      });
+      lossMapMountPoint.appendChild(lossMapSection);
+    }
+
     // 0.1 Dedicated MATLAB Graphs Window (Figuras 5.2.99 / 5.2.107 / 5.2.108 / 5.2.109 / 5.2.110)
     const graphsMountPoint = container.querySelector<HTMLDivElement>('#matlab-opt-graphs-mount-point');
     if (graphsMountPoint && stateShowCharts && stateActiveChartTab === 'monthly') {
