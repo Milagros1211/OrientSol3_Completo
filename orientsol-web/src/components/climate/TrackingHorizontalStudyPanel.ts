@@ -109,148 +109,126 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
         <line x1="130" y1="90" x2="120" y2="135" stroke="#ffffff" stroke-width="1" stroke-opacity="0.6" />
         <line x1="45" y1="112" x2="165" y2="112" stroke="#ffffff" stroke-width="1" stroke-opacity="0.6" />
         <!-- Rotation curvature arrow (East-West tracking roll) -->
-        <path d="M 110,65 A 35,35 0 0,1 138,82" fill="none" stroke="#e11d48" stroke-width="3" marker-end="url(#arrow-h)" stroke-dasharray="4,2" />
-        <!-- Text labels -->
-        <text x="110" y="45" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">Eje Horizontal N-S (Roll E-O)</text>
+        <path d="M 110,65 A 35,35 0 0,1 138,82" fill="none" stroke="#ea580c" stroke-width="3.5" stroke-linecap="round" />
+        <polygon points="142,80 134,74 136,86" fill="#ea580c" />
       </svg>
     `;
 
     container.innerHTML = `
-      <div class="opt-tracking-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0284c7; padding-bottom: 0.6rem; margin-bottom: 1rem;">
-        <div>
-          <span style="font-size: 0.95rem; font-weight: 700; color: #64748b; text-transform: uppercase;">
-            ${isEn ? 'Study:' : 'Estudio:'}
-          </span>
-          <span style="font-size: 1.15rem; font-weight: 800; color: #0284c7; margin-left: 0.4rem;">
-            ${isEn ? 'Single-Axis Horizontal Tracking' : 'Seguimiento a un eje horizontal'}
-          </span>
-          <div style="font-size: 0.88rem; color: #94a3b8; margin-top: 0.2rem;">
-            <span>${isEn ? 'City:' : 'Ciudad:'} <strong style="color: #f8fafc;">${locationName}</strong></span>
-            <span style="margin-left: 1.2rem;">${isEn ? 'Latitude:' : 'Latitud:'} <strong style="color: #38bdf8;">${latitude.toFixed(2)}°</strong></span>
-            <span style="margin-left: 1.2rem;">${isEn ? 'Axis Orientation:' : 'Orientación de eje:'} <strong style="color: #f97316;">Horizontal E-O / N-S</strong></span>
+      <div class="opt-tracking-window-frame">
+        <!-- 1. Header Bar matching Image 1 Guide -->
+        <div class="opt-tracking-header-bar">
+          <div class="opt-tracking-header-left">
+            <div class="opt-tracking-meta-row">
+              <span class="meta-label"><strong>${isEn ? 'City:' : 'Ciudad:'}</strong> ${locationName}</span>
+              <span class="meta-label" style="margin-left: 2rem;">
+                <strong>${isEn ? 'Latitude (°):' : 'Latitud (°):'}</strong>
+                <span style="color: #38bdf8; font-weight: 700;">${latitude.toFixed(2)}</span>
+              </span>
+            </div>
+            <div class="opt-tracking-study-title-row">
+              <span class="meta-label">
+                <strong>${isEn ? 'Study:' : 'Estudio:'}</strong>
+                <span style="color: #38bdf8; font-weight: 600;">${isEn ? 'Horizontal single-axis tracking' : 'Seguimiento a un eje horizontal'}</span>
+              </span>
+            </div>
+          </div>
+          <div class="opt-tracking-header-right">
+            <div class="opt-matlab-brand-title">
+              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>3.0</strong>
+            </div>
           </div>
         </div>
-        <div class="orientsol-brand-badge" style="font-size: 1.3rem; font-weight: 900; letter-spacing: 1px; color: #38bdf8;">
-          ORIENT<span style="color: #f59e0b;">SOL</span> 3.0
-        </div>
-      </div>
 
-      <div class="tracking-top-controls" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
-        <div style="display: flex; align-items: center; gap: 0.6rem;">
-          <label for="select-horiz-comp" style="font-weight: 700; font-size: 0.92rem; color: #cbd5e1;">
-            ${isEn ? 'Select a component:' : 'Seleccione una componente:'}
-          </label>
-          <select id="select-horiz-comp" class="matlab-select" style="min-width: 140px; padding: 0.35rem 0.6rem; font-weight: 600;">
-            <option value="global" ${stateHorizComponent === 'global' ? 'selected' : ''}>${isEn ? 'Global' : 'Global'}</option>
-            <option value="beam" ${stateHorizComponent === 'beam' ? 'selected' : ''}>${isEn ? 'Direct' : 'Directa'}</option>
-            <option value="diffuse" ${stateHorizComponent === 'diffuse' ? 'selected' : ''}>${isEn ? 'Diffuse' : 'Difusa'}</option>
-            <option value="albedo" ${stateHorizComponent === 'albedo' ? 'selected' : ''}>${isEn ? 'Albedo' : 'Albedo'}</option>
-          </select>
-        </div>
-        <div>
-          <button type="button" id="btn-horiz-graphs" class="btn-study-view-charts ${stateHorizShowGraphs ? 'active' : ''}">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 3v18h18"></path>
-              <path d="m19 9-5 5-4-4-3 3"></path>
-            </svg>
-            <span>${stateHorizShowGraphs ? (isEn ? 'Hide Charts' : 'Ocultar gráficas') : (isEn ? 'View Charts' : 'Ver gráficas')}</span>
-          </button>
-        </div>
-      </div>
+        <!-- 2. Controls Toolbar -->
+        <div class="opt-tracking-toolbar">
+          <div class="tracking-comp-select-group">
+            <label for="select-horiz-comp" class="tracking-comp-label">
+              ${isEn ? 'Select a component' : 'Seleccione una componente'}
+            </label>
+            <select id="select-horiz-comp" class="form-select tracking-comp-dropdown">
+              <option value="global" ${stateHorizComponent === 'global' ? 'selected' : ''}>Global</option>
+              <option value="beam" ${stateHorizComponent === 'beam' ? 'selected' : ''}>${isEn ? 'Direct' : 'Directa'}</option>
+              <option value="diffuse" ${stateHorizComponent === 'diffuse' ? 'selected' : ''}>${isEn ? 'Diffuse' : 'Difusa'}</option>
+              <option value="albedo" ${stateHorizComponent === 'albedo' ? 'selected' : ''}>${isEn ? 'Albedo' : 'Albedo'}</option>
+            </select>
+          </div>
 
-      <!-- 3. Table Caption -->
-      <div class="opt-tracking-table-caption">
-        ${isEn ? `Mean monthly daily ${compLabel} radiation (kWh/m²/day)` : `Radiación ${compLabel} media mensual (kWh/m²/día)`}
-      </div>
+          <div class="tracking-toolbar-actions">
+            <button type="button" id="btn-horiz-graphs" class="btn-study-view-charts ${stateHorizShowGraphs ? 'active' : ''}">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v18h18"></path>
+                <path d="m19 9-5 5-4-4-3 3"></path>
+              </svg>
+              <span>${stateHorizShowGraphs ? (isEn ? 'Hide charts' : 'Ocultar gráficas') : (isEn ? 'View charts' : 'Ver gráficas')}</span>
+            </button>
+          </div>
+        </div>
 
-      <!-- Main Layout: Table on left, Illustration & Summary on right -->
-      <div class="opt-tracking-content-grid">
-        <div class="opt-tracking-table-wrap">
-          <table class="opt-tracking-table">
-            <thead>
-              <tr class="tracking-top-th-row">
-                <th class="th-track-month">${isEn ? 'Month' : 'Mes'}</th>
-                <th>${compSym} (0°)</th>
-                <th class="th-track-opt">${compSym} (Seg. horizontal)</th>
-                <th>% Gan. 0°</th>
-                <th>% Gan. Ópt. Anual</th>
-                <th>% Gan. Ópt. Estac.</th>
-                <th>% Gan. Seg. Polar</th>
-                <th>% Gan. Seg. Azim.</th>
-                <th class="th-track-temp">Tª Med (°C)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${months.map((mName, i) => `
-                <tr>
-                  <td class="td-track-month"><strong>${mName}</strong></td>
-                  <td>${radHoriz[i].toFixed(2)}</td>
-                  <td class="td-track-opt"><strong>${radHorizTrack[i].toFixed(2)}</strong></td>
-                  <td class="${gainsOverHoriz[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                    ${gainsOverHoriz[i] >= 0 ? '+' : ''}${gainsOverHoriz[i].toFixed(1)}%
-                  </td>
-                  <td class="${gainsOverAnnual[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                    ${gainsOverAnnual[i] >= 0 ? '+' : ''}${gainsOverAnnual[i].toFixed(1)}%
-                  </td>
-                  <td class="${gainsOverSeasonal[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                    ${gainsOverSeasonal[i] >= 0 ? '+' : ''}${gainsOverSeasonal[i].toFixed(1)}%
-                  </td>
-                  <td class="${gainsOverPolar[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                    ${gainsOverPolar[i] >= 0 ? '+' : ''}${gainsOverPolar[i].toFixed(1)}%
-                  </td>
-                  <td class="${gainsOverAzim[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                    ${gainsOverAzim[i] >= 0 ? '+' : ''}${gainsOverAzim[i].toFixed(1)}%
-                  </td>
-                  <td class="td-track-temp-val"><strong>${tempMean[i].toFixed(1)}</strong></td>
+        <!-- 3. Table Caption -->
+        <div class="opt-tracking-table-caption">
+          ${isEn ? `Mean monthly daily ${compLabel} radiation (kWh/m²/day)` : `Radiación ${compLabel} media mensual (kWh/m²/día)`}
+        </div>
+
+        <!-- 4. Main Matrix Table + Diagram Layout (Figura 6.3.20) -->
+        <div class="opt-tracking-content-grid">
+          <div class="opt-tracking-table-wrap">
+            <table class="opt-tracking-table">
+              <thead>
+                <tr class="tracking-top-th-row">
+                  <th rowspan="2" class="th-track-month">${isEn ? 'Month' : 'Mes'}</th>
+                  <th rowspan="2" class="th-track-h0">${compSym} (0°)</th>
+                  <th rowspan="2" class="th-track-opt">${compSym}</th>
+                  <th rowspan="2" class="th-track-temp">${isEn ? 'Mean Temp' : 'Tª media'}</th>
+                  <th colspan="5" class="th-track-gains-super">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</th>
                 </tr>
-              `).join('')}
-            </tbody>
-            <tfoot>
-              <tr class="tracking-media-row">
-                <td class="td-track-month"><strong>${isEn ? 'Mean' : 'Media'}</strong></td>
-                <td><strong>${meanHoriz.toFixed(2)}</strong></td>
-                <td class="td-track-opt"><strong>${meanHorizTrack.toFixed(2)}</strong></td>
-                <td class="${meanGainHoriz >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                  <strong>${meanGainHoriz >= 0 ? '+' : ''}${meanGainHoriz.toFixed(1)}%</strong>
-                </td>
-                <td class="${meanGainAnnual >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                  <strong>${meanGainAnnual >= 0 ? '+' : ''}${meanGainAnnual.toFixed(1)}%</strong>
-                </td>
-                <td class="${meanGainSeasonal >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                  <strong>${meanGainSeasonal >= 0 ? '+' : ''}${meanGainSeasonal.toFixed(1)}%</strong>
-                </td>
-                <td class="${meanGainPolar >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                  <strong>${meanGainPolar >= 0 ? '+' : ''}${meanGainPolar.toFixed(1)}%</strong>
-                </td>
-                <td class="${meanGainAzim >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                  <strong>${meanGainAzim >= 0 ? '+' : ''}${meanGainAzim.toFixed(1)}%</strong>
-                </td>
-                <td class="td-track-temp-val"><strong>${tempAnnualMean.toFixed(1)}</strong></td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
+                <tr class="tracking-sub-th-row">
+                  <th class="th-gain-sub">${isEn ? 'Horizontal plane' : 'Plano horizontal'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Annual opt. tilt' : 'Inclinación ópt. anual'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Seasonal opt. tilt' : 'Inclin. ópt. estacional'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Polar 1-axis' : 'Seg. a un eje polar'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Azimuthal 1-axis' : 'Seg. a un eje azimutal'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${months.map((mName, i) => `
+                  <tr>
+                    <td class="td-track-month"><strong>${mName}</strong></td>
+                    <td class="td-num">${radHoriz[i].toFixed(2)}</td>
+                    <td class="td-num td-track-val"><strong>${radHorizTrack[i].toFixed(2)}</strong></td>
+                    <td class="td-num td-track-temp">${tempMean[i].toFixed(1)}</td>
+                    <td class="td-num">${gainsOverHoriz[i].toFixed(2)}</td>
+                    <td class="td-num">${gainsOverAnnual[i].toFixed(2)}</td>
+                    <td class="td-num">${gainsOverSeasonal[i].toFixed(2)}</td>
+                    <td class="td-num">${gainsOverPolar[i].toFixed(2)}</td>
+                    <td class="td-num">${gainsOverAzim[i].toFixed(2)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+              <tfoot>
+                <tr class="tracking-media-row">
+                  <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+                  <td class="td-num"><strong>${meanHoriz.toFixed(2)}</strong></td>
+                  <td class="td-num td-track-val"><strong>${meanHorizTrack.toFixed(2)}</strong></td>
+                  <td class="td-num td-track-temp"><strong>${tempAnnualMean.toFixed(1)}</strong></td>
+                  <td class="td-num"><strong>${meanGainHoriz.toFixed(2)}</strong></td>
+                  <td class="td-num"><strong>${meanGainAnnual.toFixed(2)}</strong></td>
+                  <td class="td-num"><strong>${meanGainSeasonal.toFixed(2)}</strong></td>
+                  <td class="td-num"><strong>${meanGainPolar.toFixed(2)}</strong></td>
+                  <td class="td-num"><strong>${meanGainAzim.toFixed(2)}</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
 
-        <!-- Sidebar illustration and tracker configuration info -->
-        <div class="opt-tracking-diagram-sidebar">
-          <h4 style="margin: 0 0 0.8rem; font-size: 0.9rem; color: var(--accent-cyan); text-transform: uppercase;">
-            ${isEn ? 'Horizontal Tracker Setup' : 'Geometría del Seguidor'}
-          </h4>
-          ${horizDiagramSvg}
-          <div class="tracking-diagram-caption" style="margin-top: 1rem; text-align: left; line-height: 1.4;">
-            <p style="margin: 0 0 0.4rem;">
-              <strong>${isEn ? 'Axis Elevation:' : 'Elevación de eje:'}</strong> 0° (${isEn ? 'Horizontal' : 'Horizontal'})
-            </p>
-            <p style="margin: 0 0 0.4rem;">
-              <strong>${isEn ? 'Tracking Range:' : 'Rango de giro:'}</strong> ±45° / ±60° ${isEn ? 'E-W roll' : 'balanceo E-O'}
-            </p>
-            <p style="margin: 0;">
-              <strong>${isEn ? 'Annual Gain vs 0°:' : 'Ganancia anual vs 0°:'}</strong>
-              <span class="text-gain-pos">+${meanGainHoriz.toFixed(1)}%</span>
-            </p>
+          <!-- Illustration Sidebar matching Image 1 -->
+          <div class="opt-tracking-diagram-sidebar">
+            ${horizDiagramSvg}
+            <div class="tracking-diagram-caption">
+              ${isEn ? 'Single-axis horizontal tracking with North-South axis and East-West roll rotation' : 'Seguimiento a un eje horizontal con rotación alrededor del eje orientado norte-sur'}
+            </div>
           </div>
         </div>
-      </div>
 
       <!-- Action Buttons Bar -->
       <div class="opt-study-footer-actions">
