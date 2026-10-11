@@ -5137,6 +5137,73 @@ body.theme-dark .seasonal-media-row .highlight-media {
 }
 
 /* KPI Metric Grid - 4 cards in one single row, fully responsive */
+/* Comparative Table Cell with Angle Beside Value */
+.td-comp-val-cell {
+  padding: 0.35rem 0.5rem !important;
+  text-align: right !important;
+}
+
+.comp-cell-flex {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+
+.comp-val-main {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  min-width: 36px;
+  text-align: right;
+}
+
+.comp-angle-chip {
+  display: inline-block;
+  font-size: 0.69rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  background: rgba(100, 116, 139, 0.1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 0.08rem 0.35rem;
+  font-family: var(--font-mono);
+  letter-spacing: -0.01em;
+}
+
+.comp-angle-chip.chip-dual {
+  color: #059669;
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  font-weight: 700;
+}
+
+[data-theme="light"] .comp-val-main,
+body.theme-light .comp-val-main {
+  color: #0f172a;
+}
+
+[data-theme="light"] .comp-angle-chip,
+body.theme-light .comp-angle-chip {
+  color: #475569;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+[data-theme="dark"] .comp-val-main,
+body.theme-dark .comp-val-main {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .comp-angle-chip,
+body.theme-dark .comp-angle-chip {
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.6);
+  border-color: #1e293b;
+}
+
 .opt-kpis-summary-grid,
 .opt-comparative-kpi-grid {
   display: grid;
