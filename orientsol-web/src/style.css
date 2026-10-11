@@ -2275,29 +2275,43 @@ body.theme-dark .temp-stat-value {
 
 /* 2D Capture Loss Map Matrix */
 .loss-map-container {
-  overflow-x: auto;
+  overflow: auto;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
+  margin-top: 0.75rem;
+  height: auto;
+  max-height: min(75vh, 540px);
+  scroll-behavior: smooth;
+}
+
+[data-theme="light"] .loss-map-container,
+body.theme-light .loss-map-container {
+  background: #ffffff;
+}
+
+[data-theme="dark"] .loss-map-container,
+body.theme-dark .loss-map-container {
   background: rgba(10, 14, 23, 0.8);
-  margin-top: 1rem;
-  max-height: 380px;
 }
 
 .loss-map-matrix-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.74rem;
+  font-size: 0.65rem;
   font-family: var(--font-mono);
   text-align: center;
+  table-layout: auto;
 }
 
 .loss-map-matrix-table th {
-  padding: 0.4rem 0.5rem;
+  padding: 0.2rem 0.28rem;
+  font-size: 0.64rem;
   white-space: nowrap;
   position: sticky;
   top: 0;
   z-index: 2;
   font-weight: 600;
+  min-width: 32px;
 }
 
 [data-theme="light"] .loss-map-matrix-table th,
@@ -2332,10 +2346,13 @@ body.theme-dark .loss-map-matrix-table th.corner-th {
 }
 
 .loss-map-matrix-table td {
-  padding: 0.35rem 0.45rem;
+  padding: 0.16rem 0.22rem;
+  font-size: 0.63rem;
   border: 1px solid rgba(255, 255, 255, 0.04);
   white-space: nowrap;
   transition: transform 0.1s ease;
+  min-width: 32px;
+  line-height: 1.25;
 }
 
 [data-theme="light"] .loss-map-matrix-table td,
@@ -2344,8 +2361,8 @@ body.theme-light .loss-map-matrix-table td {
 }
 
 .loss-map-matrix-table td:hover {
-  transform: scale(1.12);
-  z-index: 1;
+  transform: scale(1.15);
+  z-index: 2;
   box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
@@ -2353,7 +2370,10 @@ body.theme-light .loss-map-matrix-table td {
   position: sticky;
   left: 0;
   font-weight: 700;
+  font-size: 0.65rem;
   z-index: 1;
+  padding: 0.16rem 0.35rem;
+  min-width: 36px;
 }
 
 [data-theme="light"] .loss-map-matrix-table .row-header-beta,
@@ -2368,6 +2388,53 @@ body.theme-dark .loss-map-matrix-table .row-header-beta {
   background: rgba(20, 28, 45, 0.95);
   color: #a5f3fc;
   border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Energy Calculation Table Angle Column */
+.opt-energy-table th.th-ener-angle {
+  text-align: center;
+  font-weight: 700;
+  color: var(--accent-cyan, #0284c7);
+  white-space: nowrap;
+  padding: 0.5rem 0.75rem;
+}
+
+.opt-energy-table td.td-ener-angle {
+  text-align: center;
+  white-space: nowrap;
+  padding: 0.45rem 0.75rem;
+}
+
+.energy-angle-badge {
+  display: inline-block;
+  padding: 0.18rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  background: rgba(2, 132, 199, 0.1);
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.25);
+}
+
+[data-theme="dark"] .energy-angle-badge,
+body.theme-dark .energy-angle-badge {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.energy-angle-badge.badge-annual {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="dark"] .energy-angle-badge.badge-annual,
+body.theme-dark .energy-angle-badge.badge-annual {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.35);
 }
 
 /* CTE DB-HE4 Compliance Colors */

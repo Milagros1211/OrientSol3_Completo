@@ -395,6 +395,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                 <thead>
                   <tr>
                     <th class="th-ener-month">${isEn ? 'Month' : 'Mes'}</th>
+                    <th class="th-ener-angle">${isEn ? 'Considered tilt / angle' : 'Ángulo considerado'}</th>
                     <th class="th-ener-horiz">${isEn ? 'Horizontal surface (0°)' : 'Superficie horizontal (0°)'}</th>
                     <th class="th-ener-study">${studyColTitle}</th>
                     <th class="th-ener-gain">${isEn ? 'Gain (kWh)' : 'Ganancia (kWh)'}</th>
@@ -406,21 +407,41 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                     const e = energyData.e_mes[idx];
                     const g = energyData.ganancia_mes[idx];
 
-                    const showAngleTag = studyType === 'monthly' || studyType === 'annual' || studyType === 'seasonal' || studyType === 'azimuthal';
-                    const angleText =
-                      studyType === 'monthly'
-                        ? `${res.monthlyOptimum12?.optimalTiltsDeg ? res.monthlyOptimum12.optimalTiltsDeg[idx] : optTiltAnnual}°`
-                        : isSeasonal && seasonalData
-                        ? `${idx === 0 || idx === 1 || idx === 11 ? seasonalData.winterTiltDeg : idx === 5 || idx === 6 || idx === 7 ? seasonalData.summerTiltDeg : seasonalData.springTiltDeg}°`
-                        : `${optTiltAnnual}°`;
+                    let angleBadgeText = '';
+                    if (studyType === 'monthly') {
+                      const mDeg = res.monthlyOptimum12?.optimalTiltsDeg ? res.monthlyOptimum12.optimalTiltsDeg[idx] : optTiltAnnual;
+                      angleBadgeText = `β = ${mDeg}°`;
+                    } else if (isSeasonal && seasonalData) {
+                      if (idx === 11 || idx === 0 || idx === 1) {
+                        angleBadgeText = `Inv: β = ${seasonalData.winterTiltDeg}°`;
+                      } else if (idx === 2 || idx === 3 || idx === 4) {
+                        angleBadgeText = `Pri: β = ${seasonalData.springTiltDeg}°`;
+                      } else if (idx === 5 || idx === 6 || idx === 7) {
+                        angleBadgeText = `Ver: β = ${seasonalData.summerTiltDeg}°`;
+                      } else {
+                        angleBadgeText = `Oto: β = ${seasonalData.autumnTiltDeg}°`;
+                      }
+                    } else if (studyType === 'polar') {
+                      angleBadgeText = `β = ${latitude.toFixed(1)}° (Polar)`;
+                    } else if (studyType === 'azimuthal') {
+                      angleBadgeText = `β = ${optTiltAnnual}° (Azim)`;
+                    } else if (studyType === 'horizontal') {
+                      angleBadgeText = `β = 0° (Horiz)`;
+                    } else if (studyType === 'dual') {
+                      angleBadgeText = `2 ejes (β, α)`;
+                    } else {
+                      angleBadgeText = `β = ${optTiltAnnual}°`;
+                    }
 
                     return `
                       <tr>
                         <td class="td-ener-month"><strong>${monthName}</strong></td>
+                        <td class="td-ener-angle">
+                          <span class="energy-angle-badge">${angleBadgeText}</span>
+                        </td>
                         <td class="td-num">${e0.toFixed(2)}</td>
                         <td class="td-num td-ener-study-val">
                           <strong>${e.toFixed(2)}</strong>
-                          ${showAngleTag ? `<span class="energy-angle-tag" style="font-size: 0.78rem; opacity: 0.85; margin-left: 5px;">(${angleText})</span>` : ''}
                         </td>
                         <td class="td-num td-ener-gain-val ${g >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
                           ${g.toFixed(2)}
@@ -432,6 +453,25 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                 <tfoot>
                   <tr class="energy-annual-row">
                     <td class="td-ener-annual"><strong>${isEn ? 'ANNUAL' : 'ANUAL'}</strong></td>
+                    <td class="td-ener-angle">
+                      <span class="energy-angle-badge badge-annual">
+                        ${
+                          studyType === 'monthly'
+                            ? (isEn ? 'Variable (12 tilts)' : 'Variable (12 inclinaciones)')
+                            : isSeasonal
+                            ? (isEn ? 'Variable (4 seasons)' : 'Variable (4 estaciones)')
+                            : studyType === 'polar'
+                            ? `β = ${latitude.toFixed(1)}°`
+                            : studyType === 'azimuthal'
+                            ? `β = ${optTiltAnnual}°`
+                            : studyType === 'horizontal'
+                            ? `β = 0°`
+                            : studyType === 'dual'
+                            ? (isEn ? '2-axis tracking' : '2 ejes (Continuo)')
+                            : `β = ${optTiltAnnual}°`
+                        }
+                      </span>
+                    </td>
                     <td class="td-num"><strong>${energyData.e0_anual.toFixed(1)}</strong></td>
                     <td class="td-num td-ener-study-val"><strong>${energyData.e_anual.toFixed(1)}</strong></td>
                     <td class="td-num td-ener-gain-val ${energyData.ganancia_anual >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
