@@ -13,7 +13,7 @@ export function renderArchitectureOverview(): HTMLElement {
         </svg>
       </div>
       <div>
-        <h3 class="panel-title">3. Arquitectura del Proyecto y Estructura OrientSol</h3>
+        <h3 class="panel-title">Arquitectura del Proyecto y Estructura OrientSol</h3>
         <p class="panel-desc">Estructura modular estándar para scripts Python, componentes UI y bases de datos</p>
       </div>
     </div>

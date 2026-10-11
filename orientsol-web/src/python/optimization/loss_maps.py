@@ -29,8 +29,8 @@ def generate_capture_loss_map(
     dh_matriz: np.ndarray,
     gh_matriz: np.ndarray,
     albedo: float = 0.20,
-    beta_step_deg: int = 5,
-    alpha_step_deg: int = 10,
+    beta_step_deg: Union[int, float] = 5,
+    alpha_step_deg: Union[int, float] = 7.5,
     alpha_range_deg: Tuple[int, int] = (-90, 90),
 ) -> Dict[str, Union[np.ndarray, List[float], float, int, Dict]]:
     """
@@ -52,9 +52,9 @@ def generate_capture_loss_map(
     _, ang_salida = angulos_salida(lat_rad, CHARACTERISTIC_DAYS)
     numero_n2, matriz_angulos2 = angulos2(ang_salida)
 
-    # Grid axes
-    betas = np.arange(0, 91, beta_step_deg, dtype=np.float64)
-    alphas = np.arange(alpha_range_deg[0], alpha_range_deg[1] + 1, alpha_step_deg, dtype=np.float64)
+    # Grid axes (half step for finer resolution)
+    betas = np.arange(0, 90.0001, beta_step_deg, dtype=np.float64)
+    alphas = np.arange(alpha_range_deg[0], alpha_range_deg[1] + 0.0001, alpha_step_deg, dtype=np.float64)
 
     n_betas = len(betas)
     n_alphas = len(alphas)    # 2D output matrices (annual mean daily radiation and loss percentage)
@@ -201,8 +201,8 @@ def generate_capture_loss_map(
         })
 
     return {
-        "betas_deg": [int(b) for b in betas],
-        "alphas_deg": [int(a) for a in alphas],
+        "betas_deg": [round(float(b), 1) if abs(b - round(b)) > 0.01 else int(round(b)) for b in betas],
+        "alphas_deg": [round(float(a), 1) if abs(a - round(a)) > 0.01 else int(round(a)) for a in alphas],
         "radiation_matrix_kwh_m2_day": [[round(float(v), 3) for v in row] for row in radiation_annual_daily],
         "loss_percentage_matrix": [[round(float(v), 2) for v in row] for row in loss_pct_matrix],
         "optimal_point": {

@@ -391,8 +391,8 @@ loss_map = generate_capture_loss_map(
     dh_matriz=dh_mat,
     gh_matriz=gh_mat,
     albedo=albedo,
-    beta_step_deg=10,
-    alpha_step_deg=15,
+    beta_step_deg=5,
+    alpha_step_deg=7.5,
     alpha_range_deg=(-90, 90),
 )
 
