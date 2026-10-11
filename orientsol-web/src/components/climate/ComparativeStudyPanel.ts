@@ -8,6 +8,7 @@ import {
 } from '@/components/export/pdfReportGenerator';
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
+import { getNoonAzimuthDeg, getDualAxisNoonTiltDeg } from '@/services/solarGeometryAngles';
 
 export type ComparativeRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
 
@@ -152,62 +153,127 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
             <thead>
               <tr class="tracking-top-th-row">
                 <th class="th-track-month">${isEn ? 'Month' : 'Mes'}</th>
-                <th>
-                  ${compSym} (0°)
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: 0.0° | Ori: 0.0°</div>
-                </th>
-                <th>
-                  ${compSym} (${isEn ? 'Annual Optimum' : 'Inclinación óptima anual'})
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: ${res.optimalAnnual.optimalTiltDeg.toFixed(1)}° | Ori: ${latitude >= 0 ? '0.0°' : '180.0°'}</div>
-                </th>
-                <th>
-                  ${compSym} (${isEn ? 'Seasonal Optimum' : 'Inclinación óptima estacional'})
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: Var (4) | Ori: ${latitude >= 0 ? '0.0°' : '180.0°'}</div>
-                </th>
-                <th>
-                  ${compSym} (${isEn ? 'Polar 1-axis' : 'Seguim. a un eje polar'})
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: ${latitude.toFixed(1)}° | Ori: ${latitude >= 0 ? '0.0°' : '180.0°'}</div>
-                </th>
-                <th>
-                  ${compSym} (${isEn ? 'Azimuthal 1-axis' : 'Seguim. a un eje azimutal'})
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: ${latitude.toFixed(1)}° | Ori: ${latitude >= 0 ? (latitude < 23.45 ? '0.0°/180.0°' : '0.0°') : (latitude > -23.45 ? '180.0°/0.0°' : '180.0°')}</div>
-                </th>
-                <th>
-                  ${compSym} (${isEn ? 'Horizontal 1-axis' : 'Seguim. a un eje horizontal'})
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: 0.0° | Ori: 90.0°</div>
-                </th>
-                <th class="th-track-opt">
-                  ${compSym} (${isEn ? 'Two-axis' : 'Seguim. a dos ejes'})
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: Var | Ori: ${latitude >= 0 ? (latitude < 23.45 ? '0.0°/180.0°' : '0.0°') : (latitude > -23.45 ? '180.0°/0.0°' : '180.0°')}</div>
-                </th>
+                <th>${compSym} (0°)</th>
+                <th>${compSym} (${isEn ? 'Annual Optimum' : 'Inclinación óptima anual'})</th>
+                <th>${compSym} (${isEn ? 'Seasonal Optimum' : 'Inclinación óptima estacional'})</th>
+                <th>${compSym} (${isEn ? 'Polar 1-axis' : 'Seguim. a un eje polar'})</th>
+                <th>${compSym} (${isEn ? 'Azimuthal 1-axis' : 'Seguim. a un eje azimutal'})</th>
+                <th>${compSym} (${isEn ? 'Horizontal 1-axis' : 'Seguim. a un eje horizontal'})</th>
+                <th class="th-track-opt">${compSym} (${isEn ? 'Two-axis' : 'Seguim. a dos ejes'})</th>
                 <th class="th-track-temp">${isEn ? 'Mean temperature' : 'Temperatura media'}</th>
               </tr>
             </thead>
             <tbody>
-              ${months.map((mName, i) => `
+              ${months.map((mName, i) => {
+                let seasonTilt = res.seasonal?.autumnTiltDeg ?? 35;
+                if (i === 11 || i === 0 || i === 1) {
+                  seasonTilt = res.seasonal?.winterTiltDeg ?? 60;
+                } else if (i === 2 || i === 3 || i === 4) {
+                  seasonTilt = res.seasonal?.springTiltDeg ?? 35;
+                } else if (i === 5 || i === 6 || i === 7) {
+                  seasonTilt = res.seasonal?.summerTiltDeg ?? 15;
+                }
+
+                const fixedOri = latitude >= 0 ? 0.0 : 180.0;
+                const noonAzim = getNoonAzimuthDeg(latitude, i);
+                const noonDualTilt = getDualAxisNoonTiltDeg(latitude, i);
+                const optTiltAnn = res.optimalAnnual.optimalTiltDeg;
+
+                return `
                 <tr>
                   <td class="td-track-month"><strong>${mName}</strong></td>
-                  <td>${rad0[i].toFixed(2)}</td>
-                  <td>${radOptAnnual[i].toFixed(2)}</td>
-                  <td>${radOptSeasonal[i].toFixed(2)}</td>
-                  <td>${radPolar[i].toFixed(2)}</td>
-                  <td>${radAzim[i].toFixed(2)}</td>
-                  <td>${radHorizTrack[i].toFixed(2)}</td>
-                  <td class="td-track-dual"><strong>${radDual[i].toFixed(2)}</strong></td>
+                  <td class="td-comp-val-cell">
+                    <div class="comp-cell-flex">
+                      <span class="comp-val-main">${rad0[i].toFixed(2)}</span>
+                      <span class="comp-angle-chip">Inc: 0.0° | Ori: 0.0°</span>
+                    </div>
+                  </td>
+                  <td class="td-comp-val-cell">
+                    <div class="comp-cell-flex">
+                      <span class="comp-val-main">${radOptAnnual[i].toFixed(2)}</span>
+                      <span class="comp-angle-chip">Inc: ${optTiltAnn.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                    </div>
+                  </td>
+                  <td class="td-comp-val-cell">
+                    <div class="comp-cell-flex">
+                      <span class="comp-val-main">${radOptSeasonal[i].toFixed(2)}</span>
+                      <span class="comp-angle-chip">Inc: ${seasonTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                    </div>
+                  </td>
+                  <td class="td-comp-val-cell">
+                    <div class="comp-cell-flex">
+                      <span class="comp-val-main">${radPolar[i].toFixed(2)}</span>
+                      <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                    </div>
+                  </td>
+                  <td class="td-comp-val-cell">
+                    <div class="comp-cell-flex">
+                      <span class="comp-val-main">${radAzim[i].toFixed(2)}</span>
+                      <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${noonAzim.toFixed(1)}°</span>
+                    </div>
+                  </td>
+                  <td class="td-comp-val-cell">
+                    <div class="comp-cell-flex">
+                      <span class="comp-val-main">${radHorizTrack[i].toFixed(2)}</span>
+                      <span class="comp-angle-chip">Inc: 0.0° | Ori: 90.0°</span>
+                    </div>
+                  </td>
+                  <td class="td-track-dual td-comp-val-cell">
+                    <div class="comp-cell-flex">
+                      <span class="comp-val-main"><strong>${radDual[i].toFixed(2)}</strong></span>
+                      <span class="comp-angle-chip chip-dual">Inc: ${noonDualTilt.toFixed(1)}° | Ori: ${noonAzim.toFixed(1)}°</span>
+                    </div>
+                  </td>
                   <td class="td-track-temp-val"><strong>${tempMean[i].toFixed(1)}</strong></td>
                 </tr>
-              `).join('')}
+                `;
+              }).join('')}
             </tbody>
             <tfoot>
               <tr class="tracking-media-row">
                 <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
-                <td><strong>${m0.toFixed(2)}</strong></td>
-                <td><strong>${mOptAnnual.toFixed(2)}</strong></td>
-                <td><strong>${mOptSeasonal.toFixed(2)}</strong></td>
-                <td><strong>${mPolar.toFixed(2)}</strong></td>
-                <td><strong>${mAzim.toFixed(2)}</strong></td>
-                <td><strong>${mHorizTrack.toFixed(2)}</strong></td>
-                <td class="td-track-dual"><strong>${mDual.toFixed(2)}</strong></td>
+                <td class="td-comp-val-cell">
+                  <div class="comp-cell-flex">
+                    <span class="comp-val-main"><strong>${m0.toFixed(2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: 0.0° | Ori: 0.0°</span>
+                  </div>
+                </td>
+                <td class="td-comp-val-cell">
+                  <div class="comp-cell-flex">
+                    <span class="comp-val-main"><strong>${mOptAnnual.toFixed(2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: ${res.optimalAnnual.optimalTiltDeg.toFixed(1)}° | Ori: ${(latitude >= 0 ? 0.0 : 180.0).toFixed(1)}°</span>
+                  </div>
+                </td>
+                <td class="td-comp-val-cell">
+                  <div class="comp-cell-flex">
+                    <span class="comp-val-main"><strong>${mOptSeasonal.toFixed(2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: Var (4) | Ori: ${(latitude >= 0 ? 0.0 : 180.0).toFixed(1)}°</span>
+                  </div>
+                </td>
+                <td class="td-comp-val-cell">
+                  <div class="comp-cell-flex">
+                    <span class="comp-val-main"><strong>${mPolar.toFixed(2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${(latitude >= 0 ? 0.0 : 180.0).toFixed(1)}°</span>
+                  </div>
+                </td>
+                <td class="td-comp-val-cell">
+                  <div class="comp-cell-flex">
+                    <span class="comp-val-main"><strong>${mAzim.toFixed(2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: Var</span>
+                  </div>
+                </td>
+                <td class="td-comp-val-cell">
+                  <div class="comp-cell-flex">
+                    <span class="comp-val-main"><strong>${mHorizTrack.toFixed(2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: 0.0° | Ori: 90.0°</span>
+                  </div>
+                </td>
+                <td class="td-track-dual td-comp-val-cell">
+                  <div class="comp-cell-flex">
+                    <span class="comp-val-main"><strong>${mDual.toFixed(2)}</strong></span>
+                    <span class="comp-angle-chip chip-dual">Inc: Var | Ori: Var</span>
+                  </div>
+                </td>
                 <td class="td-track-temp-val"><strong>${mTemp.toFixed(1)}</strong></td>
               </tr>
             </tfoot>
