@@ -100,39 +100,44 @@ def generate_capture_loss_map(
                 omegas = omega_rad[m, beta_idx, :n_pts]
 
                 # Direct cosine of incidence angle on inclined surface with azimuth alpha:
-                # cos_theta = sin(delta)*sin(phi)*cos(beta)
-                #           - sin(delta)*cos(phi)*sin(beta)*cos(alpha)
-                #           + cos(delta)*cos(phi)*cos(beta)*cos(omega)
-                #           + cos(delta)*sin(phi)*sin(beta)*cos(alpha)*cos(omega)
-                #           + cos(delta)*sin(beta)*sin(alpha)*np.sin(omega)
+                # Symmetrical terms A(omega) - even functions where cos(-omega) = cos(omega):
                 term1 = sin_delta * sin_phi * cos_beta
                 term2 = -sin_delta * cos_phi * sin_beta * cos_alpha
                 term3 = cos_delta * cos_phi * cos_beta * np.cos(omegas)
                 term4 = cos_delta * sin_phi * sin_beta * cos_alpha * np.cos(omegas)
-                term5 = cos_delta * sin_beta * sin_alpha * np.sin(omegas)
+                a_sym = term1 + term2 + term3 + term4
 
-                cos_theta = term1 + term2 + term3 + term4 + term5
+                # Asymmetrical term B(omega) - odd function where sin(-omega) = -sin(omega):
+                b_asym = cos_delta * sin_beta * sin_alpha * np.sin(omegas)
 
-                # Sun zenith cosine on horizontal surface
+                # Afternoon incidence (+omega) and Morning incidence (-omega):
+                cos_theta_pm = a_sym + b_asym
+                cos_theta_am = a_sym - b_asym
+
+                # Sun zenith cosine on horizontal surface (symmetric for morning & afternoon)
                 cos_theta_z = sin_phi * sin_delta + cos_phi * cos_delta * np.cos(omegas)
                 safe_cos_tz = np.where(cos_theta_z > 0.01, cos_theta_z, 0.01)
 
-                # Beam transposition ratio Rb = max(0, cos_theta) / cos_theta_z
-                rb = np.where((cos_theta_z > 0.01) & (cos_theta > 0), cos_theta / safe_cos_tz, 0.0)
+                # Beam transposition ratio Rb:
+                rb_pm = np.where((cos_theta_z > 0.01) & (cos_theta_pm > 0), cos_theta_pm / safe_cos_tz, 0.0)
+                rb_am = np.where((cos_theta_z > 0.01) & (cos_theta_am > 0), cos_theta_am / safe_cos_tz, 0.0)
 
                 # Hourly beam, diffuse, and ground reflected components
                 bh_hourly = bh_matriz[m, :n_pts]
                 dh_hourly = dh_matriz[m, :n_pts]
                 gh_hourly = gh_matriz[m, :n_pts]
 
-                bh_tilted = bh_hourly * rb
+                # Beam radiation for PM and AM:
+                bh_tilted_pm = bh_hourly * rb_pm
+                bh_tilted_am = bh_hourly * rb_am
+
+                # Diffuse and ground reflected components (isotropic models depend only on tilt beta):
                 dh_tilted = dh_hourly * diffuse_factor
                 rh_tilted = gh_hourly * albedo_factor
 
-                gh_tilted = bh_tilted + dh_tilted + rh_tilted
-
-                # Total daily for month m (trapezoidal integration across daylight hours)
-                g_daily_month[m] = float(np.sum(gh_tilted) * 2.0)
+                # Total daily for month m: sum of afternoon direct + morning direct + full-day diffuse & albedo:
+                # (Notice: full-day diffuse = 2 * dh_tilted, full-day albedo = 2 * rh_tilted)
+                g_daily_month[m] = float(np.sum(bh_tilted_pm + bh_tilted_am + 2.0 * dh_tilted + 2.0 * rh_tilted))
 
             # Annual daily mean radiation
             radiation_annual_daily[i_b, i_a] = float(np.mean(g_daily_month))
