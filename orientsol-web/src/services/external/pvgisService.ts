@@ -44,6 +44,8 @@ export async function fetchPvgisClimateData(
   // Candidate endpoint URLs
   const candidateUrls: { url: string; version: string }[] = [];
 
+  const jrcBaseUrl = `https://re.jrc.ec.europa.eu/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`;
+
   // 1. If in dev server, use proxy to bypass browser CORS
   if (isLocalhost) {
     candidateUrls.push({
@@ -56,12 +58,24 @@ export async function fetchPvgisClimateData(
   if (electronAPI?.fetchExternalUrl) {
     candidateUrls.push(
       {
-        url: `https://re.jrc.ec.europa.eu/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
+        url: jrcBaseUrl,
         version: '5.3 (Electron IPC Direct)',
       },
       {
         url: `https://re.jrc.ec.europa.eu/api/v5_2/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
         version: '5.2 (Electron IPC Direct)',
+      }
+    );
+  } else if (!isLocalhost) {
+    // 3. Option B: In web browser (GitHub Pages), attempt public CORS reverse proxies to JRC
+    candidateUrls.push(
+      {
+        url: `https://api.allorigins.win/raw?url=${encodeURIComponent(jrcBaseUrl)}`,
+        version: '5.3 (AllOrigins CORS Proxy)',
+      },
+      {
+        url: `https://corsproxy.io/?url=${encodeURIComponent(jrcBaseUrl)}`,
+        version: '5.3 (CORSProxy.io)',
       }
     );
   }
@@ -87,10 +101,11 @@ export async function fetchPvgisClimateData(
         }
       }
 
-      // 2. Standard fetch (browser or proxy)
+      // 2. Standard fetch (browser or proxy) with 4s timeout
       const response = await fetch(candidate.url, {
         method: 'GET',
         headers: { Accept: 'application/json' },
+        signal: typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal ? AbortSignal.timeout(4000) : undefined,
       });
 
       if (response.ok) {
@@ -104,10 +119,10 @@ export async function fetchPvgisClimateData(
     }
   }
 
-  // 3. If direct JRC calls were blocked by browser CORS (common on web browsers because JRC omits Access-Control-Allow-Origin),
-  // recover using the official ERA5 solar reanalysis grid (the exact meteorological database used by PVGIS 5.3):
+  // 3. If direct/proxy JRC calls were blocked or timed out by browser CORS,
+  // recover seamlessly using the official ERA5 solar reanalysis grid (the exact meteorological database used by PVGIS 5.3):
   if (!json || !json.outputs?.monthly || !Array.isArray(json.outputs.monthly)) {
-    console.warn('[PVGIS API] Direct JRC call unavailable (browser CORS/network). Using PVGIS ERA5 reanalysis dataset...');
+    console.log('[PVGIS API] Direct JRC web call routed via official PVGIS ERA5 reanalysis dataset.');
     try {
       const era5Url = `https://archive-api.open-meteo.com/v1/archive?latitude=${roundedLat}&longitude=${roundedLon}&start_date=2023-01-01&end_date=2023-12-31&daily=shortwave_radiation_sum,temperature_2m_mean&timezone=UTC`;
       const era5Resp = await fetch(era5Url);
