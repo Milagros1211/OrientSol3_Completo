@@ -11,6 +11,7 @@ import {
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { renderEnergyCalculationPanel } from '@/components/energy/EnergyCalculationPanel';
 import { renderOptimalSeasonalGraphsWindow } from '@/components/charts/OptimalSeasonalGraphsWindow';
+import { renderCaptureLossMapSection } from '@/components/climate/CaptureLossMapSection';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import * as XLSX from 'xlsx';
 
@@ -875,6 +876,9 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
           </div>
         </div>
 
+        <!-- Mount point for CTE DB-HE4 Seasonal Capture Loss Map -->
+        <div id="seasonal-loss-map-mount-point"></div>
+
         <!-- Mount point for Dedicated MATLAB Energy Calculation Window (Imagen 1 / Energia_Osterwald.m) -->
         <div id="opt-seasonal-energy-mount-point"></div>
 
@@ -882,6 +886,18 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
         <div id="opt-seasonal-graphs-mount-point"></div>
       </div>
     `;
+
+    // Hook CTE DB-HE4 Seasonal Capture Loss Map
+    const lossMapMountPoint = container.querySelector<HTMLDivElement>('#seasonal-loss-map-mount-point');
+    if (lossMapMountPoint) {
+      lossMapMountPoint.innerHTML = '';
+      const lossMapSection = renderCaptureLossMapSection({
+        mode: 'seasonal',
+        simulationResult: res,
+        isEn,
+      });
+      lossMapMountPoint.appendChild(lossMapSection);
+    }
 
     // Mount Graphs Panel if active
     const graphsMountPoint = container.querySelector<HTMLDivElement>('#opt-seasonal-graphs-mount-point');
