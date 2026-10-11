@@ -109,22 +109,6 @@ export function renderTrackingAzimuthalGraphsWindow(props: TrackingAzimuthalGrap
     const legendBorder = isDark ? 'rgba(255,255,255,0.2)' : '#cbd5e1';
     const legendText = isDark ? '#f8fafc' : '#0f172a';
 
-    const seasonBands = (innerWVal: number, padLeft: number, padTop: number, innerHVal: number) => {
-      const slotW = innerWVal / 12;
-      return `
-        <rect x="${padLeft}" y="${padTop}" width="${slotW * 2}" height="${innerHVal}" fill="rgba(2, 132, 199, 0.10)" />
-        <text x="${padLeft + slotW}" y="${padTop + 12}" fill="rgba(56, 189, 248, 0.7)" font-size="9" text-anchor="middle" font-weight="700">❄️ INV</text>
-        <rect x="${padLeft + slotW * 2}" y="${padTop}" width="${slotW * 3}" height="${innerHVal}" fill="rgba(22, 163, 74, 0.10)" />
-        <text x="${padLeft + slotW * 3.5}" y="${padTop + 12}" fill="rgba(74, 222, 128, 0.7)" font-size="9" text-anchor="middle" font-weight="700">🌸 PRIM</text>
-        <rect x="${padLeft + slotW * 5}" y="${padTop}" width="${slotW * 3}" height="${innerHVal}" fill="rgba(217, 119, 6, 0.10)" />
-        <text x="${padLeft + slotW * 6.5}" y="${padTop + 12}" fill="rgba(250, 204, 21, 0.7)" font-size="9" text-anchor="middle" font-weight="700">☀️ VER</text>
-        <rect x="${padLeft + slotW * 8}" y="${padTop}" width="${slotW * 3}" height="${innerHVal}" fill="rgba(154, 52, 18, 0.10)" />
-        <text x="${padLeft + slotW * 9.5}" y="${padTop + 12}" fill="rgba(251, 146, 60, 0.7)" font-size="9" text-anchor="middle" font-weight="700">🍂 OTO</text>
-        <rect x="${padLeft + slotW * 11}" y="${padTop}" width="${slotW}" height="${innerHVal}" fill="rgba(2, 132, 199, 0.10)" />
-        <text x="${padLeft + slotW * 11.5}" y="${padTop + 12}" fill="rgba(56, 189, 248, 0.7)" font-size="9" text-anchor="middle" font-weight="700">❄️ INV</text>
-      `;
-    };
-
     const plotW = 540;
     const plotH = 200;
     const pad = { top: 32, right: 90, bottom: 35, left: 45 };
@@ -233,7 +217,6 @@ export function renderTrackingAzimuthalGraphsWindow(props: TrackingAzimuthalGrap
         <text x="14" y="${plotH / 2}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle" transform="rotate(-90 14 ${plotH / 2})">${isEn ? 'Radiation' : 'Radiación'}</text>
         <text x="${pad.left + innerW / 2}" y="${plotH - 8}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle">${isEn ? 'Months' : 'Meses'}</text>
 
-        ${seasonBands(innerW, pad.left, pad.top, innerH)}
         ${gridLinesTop}
         ${topSeriesHtml}
 
@@ -254,8 +237,15 @@ export function renderTrackingAzimuthalGraphsWindow(props: TrackingAzimuthalGrap
     const bInnerW = bottomPlotW - bPad.left - bPad.right;
     const bInnerH = bottomPlotH - bPad.top - bPad.bottom;
 
+    const allGainsComps = {
+      global: calcGains(allData.global.rad0, allData.global.radAz),
+      beam: calcGains(allData.beam.rad0, allData.beam.radAz),
+      diffuse: calcGains(allData.diffuse.rad0, allData.diffuse.radAz),
+      albedo: new Array(12).fill(0),
+    };
+
     const allGainsPool = isAll
-      ? [...gainsVs0, ...gainsVsAnn, ...gainsVsSeas, ...gainsVsPolar, ...gainsVsHorTrack]
+      ? [...allGainsComps.global, ...allGainsComps.beam, ...allGainsComps.diffuse]
       : [...gainsVs0, ...gainsVsAnn, ...gainsVsSeas, ...gainsVsPolar, ...gainsVsHorTrack];
 
     const rawMinGain = Math.min(...allGainsPool, 0);
@@ -293,60 +283,91 @@ export function renderTrackingAzimuthalGraphsWindow(props: TrackingAzimuthalGrap
       gridLinesBottom += `<text x="${bPad.left - 6}" y="${y + 4}" fill="${tickColor}" font-size="10" text-anchor="end" font-family="monospace">${v}</text>`;
     }
 
-    // 5 bars per month matching MATLAB Grafica_EjeAzimutal.m:
-    // 1: vs 0°
-    // 2: vs Inclinación óptima anual
-    // 3: vs Inclinación óptima estacional
-    // 4: vs Seg. eje polar
-    // 5: vs Seg. eje horizontal
     const monthSlotW = bInnerW / 12;
-    const barW = Math.max(2.5, monthSlotW * 0.16);
-    const gap = 1;
-
     let bottomBarsHtml = '';
-    for (let i = 0; i < 12; i++) {
-      const slotX = bPad.left + i * monthSlotW + (monthSlotW - (barW * 5 + gap * 4)) / 2;
+    let bottomLegendHtml = '';
 
-      const series = [
-        { val: gainsVs0[i], color: '#0284c7' },
-        { val: gainsVsAnn[i], color: '#10b981' },
-        { val: gainsVsSeas[i], color: '#f59e0b' },
-        { val: gainsVsPolar[i], color: '#38bdf8' },
-        { val: gainsVsHorTrack[i], color: '#ec4899' },
-      ];
+    if (isAll) {
+      const barW = Math.max(2.8, monthSlotW * 0.18);
+      const gap = 1;
 
-      series.forEach((s, sIdx) => {
-        const bx = slotX + sIdx * (barW + gap);
-        const y = yBottom(s.val);
-        const barY = Math.min(y, yZero);
-        const barH = Math.max(0.5, Math.abs(y - yZero));
-        bottomBarsHtml += `<rect x="${bx}" y="${barY}" width="${barW}" height="${barH}" fill="${s.color}" stroke="#0f172a" stroke-width="0.3" rx="1" />`;
-      });
+      for (let i = 0; i < 12; i++) {
+        const slotX = bPad.left + i * monthSlotW + (monthSlotW - (barW * 4 + gap * 3)) / 2;
+        const seriesAll = [
+          { val: allGainsComps.global[i], color: '#0284c7' },
+          { val: allGainsComps.beam[i], color: '#ef4444' },
+          { val: allGainsComps.diffuse[i], color: '#84cc16' },
+          { val: allGainsComps.albedo[i], color: '#f59e0b' },
+        ];
+
+        seriesAll.forEach((s, sIdx) => {
+          const bx = slotX + sIdx * (barW + gap);
+          const y = yBottom(s.val);
+          const barY = Math.min(y, yZero);
+          const barH = Math.max(0.5, Math.abs(y - yZero));
+          bottomBarsHtml += `<rect x="${bx.toFixed(1)}" y="${barY.toFixed(1)}" width="${barW.toFixed(1)}" height="${barH.toFixed(1)}" fill="${s.color}" stroke="#0f172a" stroke-width="0.3" rx="1" />`;
+        });
+      }
+
+      bottomLegendHtml = `
+        <g transform="translate(${bPad.left + bInnerW + 6}, ${bPad.top + 8})">
+          <rect x="0" y="0" width="80" height="80" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+          <rect x="5" y="8" width="9" height="9" fill="#0284c7" />
+          <text x="18" y="16" fill="${legendText}" font-size="8.5" font-weight="600">Gdm (Glob)</text>
+          <rect x="5" y="24" width="9" height="9" fill="#ef4444" />
+          <text x="18" y="32" fill="${legendText}" font-size="8.5" font-weight="600">Bdm (Dir)</text>
+          <rect x="5" y="40" width="9" height="9" fill="#84cc16" />
+          <text x="18" y="48" fill="${legendText}" font-size="8.5" font-weight="600">Ddm (Dif)</text>
+          <rect x="5" y="56" width="9" height="9" fill="#f59e0b" />
+          <text x="18" y="64" fill="${legendText}" font-size="8.5" font-weight="600">Rdm (Alb)</text>
+        </g>
+      `;
+    } else {
+      const barW = Math.max(2.5, monthSlotW * 0.16);
+      const gap = 1;
+
+      for (let i = 0; i < 12; i++) {
+        const slotX = bPad.left + i * monthSlotW + (monthSlotW - (barW * 5 + gap * 4)) / 2;
+
+        const series = [
+          { val: gainsVs0[i], color: '#0284c7' },
+          { val: gainsVsAnn[i], color: '#10b981' },
+          { val: gainsVsSeas[i], color: '#f59e0b' },
+          { val: gainsVsPolar[i], color: '#38bdf8' },
+          { val: gainsVsHorTrack[i], color: '#ec4899' },
+        ];
+
+        series.forEach((s, sIdx) => {
+          const bx = slotX + sIdx * (barW + gap);
+          const y = yBottom(s.val);
+          const barY = Math.min(y, yZero);
+          const barH = Math.max(0.5, Math.abs(y - yZero));
+          bottomBarsHtml += `<rect x="${bx}" y="${barY}" width="${barW}" height="${barH}" fill="${s.color}" stroke="#0f172a" stroke-width="0.3" rx="1" />`;
+        });
+      }
+
+      bottomLegendHtml = `
+        <g transform="translate(${bPad.left + bInnerW + 6}, ${bPad.top + 2})">
+          <rect x="0" y="0" width="80" height="96" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+          <rect x="5" y="8" width="9" height="9" fill="#0284c7" />
+          <text x="18" y="16" fill="${legendText}" font-size="8.5" font-weight="600">0°</text>
+          <rect x="5" y="24" width="9" height="9" fill="#10b981" />
+          <text x="18" y="32" fill="${legendText}" font-size="8.5" font-weight="600">Ópt. anu</text>
+          <rect x="5" y="40" width="9" height="9" fill="#f59e0b" />
+          <text x="18" y="48" fill="${legendText}" font-size="8.5" font-weight="600">Ópt. est</text>
+          <rect x="5" y="56" width="9" height="9" fill="#38bdf8" />
+          <text x="18" y="64" fill="${legendText}" font-size="8.5" font-weight="600">Seg. pol</text>
+          <rect x="5" y="72" width="9" height="9" fill="#ec4899" />
+          <text x="18" y="80" fill="${legendText}" font-size="8.5" font-weight="600">Seg. hor</text>
+        </g>
+      `;
     }
-
-    const bottomLegendHtml = `
-      <g transform="translate(${bPad.left + bInnerW + 6}, ${bPad.top + 2})">
-        <rect x="0" y="0" width="80" height="96" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-        <rect x="5" y="8" width="9" height="9" fill="#0284c7" />
-        <text x="18" y="16" fill="${legendText}" font-size="8.5" font-weight="600">0°</text>
-        <rect x="5" y="24" width="9" height="9" fill="#10b981" />
-        <text x="18" y="32" fill="${legendText}" font-size="8.5" font-weight="600">Ópt. anu</text>
-        <rect x="5" y="40" width="9" height="9" fill="#f59e0b" />
-        <text x="18" y="48" fill="${legendText}" font-size="8.5" font-weight="600">Ópt. est</text>
-        <rect x="5" y="56" width="9" height="9" fill="#38bdf8" />
-        <text x="18" y="64" fill="${legendText}" font-size="8.5" font-weight="600">Seg. pol</text>
-        <rect x="5" y="72" width="9" height="9" fill="#ec4899" />
-        <text x="18" y="80" fill="${legendText}" font-size="8.5" font-weight="600">Seg. hor</text>
-      </g>
-    `;
 
     const svgBottomHtml = `
       <svg viewBox="0 0 ${bottomPlotW} ${bottomPlotH}" style="width: 100%; height: auto; background: ${plotBg}; border: 1px solid ${plotBorder}; border-radius: 4px;">
         <text x="${bottomPlotW / 2 - 20}" y="19" fill="${titleColor}" font-size="12" font-weight="700" text-anchor="middle">${bottomPlotTitle}</text>
         <text x="14" y="${bottomPlotH / 2}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle" transform="rotate(-90 14 ${bottomPlotH / 2})">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</text>
         <text x="${bPad.left + bInnerW / 2}" y="${bottomPlotH - 8}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle">${isEn ? 'Months' : 'Meses'}</text>
-
-        ${seasonBands(bInnerW, bPad.left, bPad.top, bInnerH)}
         ${gridLinesBottom}
 
         <line x1="${bPad.left}" y1="${yZero}" x2="${bPad.left + bInnerW}" y2="${yZero}" stroke="${zeroLineStroke}" stroke-width="1.4" />
