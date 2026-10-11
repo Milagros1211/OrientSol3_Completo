@@ -1,11 +1,7 @@
 import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
-import {
-  showPdfGenerationNoticeModal,
-  generateOrientSolEnergyPDFReport,
-} from '@/components/export/pdfReportGenerator';
-import * as XLSX from 'xlsx';
+
 
 export interface EnergyCalculationProps {
   simulationResult: SolarBridgeSimulationResult;
@@ -456,27 +452,6 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
               <span>${isEn ? 'Exit' : 'Salir'}</span>
             </button>
           </div>
-
-          <div class="footer-btn-right-group">
-            <button id="btn-energy-export-excel" class="btn-study-foot btn-excel" type="button">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              <span>${isEn ? 'Export to Excel' : 'Exportar a Excel'}</span>
-            </button>
-
-            <button id="btn-energy-export-report" class="btn-study-foot btn-report" type="button">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-              </svg>
-              <span>${isEn ? 'Generate report' : 'Generar un informe'}</span>
-            </button>
-          </div>
         </div>
       </div>
     `;
@@ -568,20 +543,6 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
     btnSalir?.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-
-    // 5. Export to Excel
-    const btnExcel = container.querySelector<HTMLButtonElement>('#btn-energy-export-excel');
-    btnExcel?.addEventListener('click', () => {
-      exportEnergyToExcel(res, energyData, statePeakKw, stateCoefTemp, stateTonc, studyTitle, isEn);
-    });
-
-    // 6. Generate PDF Report (Figura 5.2.83)
-    const btnReport = container.querySelector<HTMLButtonElement>('#btn-energy-export-report');
-    btnReport?.addEventListener('click', () => {
-      showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolEnergyPDFReport(res, energyData, statePeakKw, stateCoefTemp, stateTonc, studyTitle, isEn);
-      });
-    });
   }
 
   const handleExternalSync = (e: Event) => {
@@ -607,92 +568,4 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
   return container;
 }
 
-/**
- * Exports Energy Yield Table to Excel (.xlsx) strictly matching:
- * - Figura 5.2.82: Datos exportados de energía generada para la inclinación óptima anual
- */
-async function exportEnergyToExcel(
-  res: SolarBridgeSimulationResult,
-  energyData: ReturnType<typeof calculateOsterwaldEnergy>,
-  _peakKw: number,
-  _coefTemp: number,
-  _tonc: number,
-  studyTitle: string,
-  isEn: boolean
-) {
-  const months = isEn ? MONTH_NAMES_EN : MONTH_NAMES_ES;
-  const data: any[][] = [];
 
-  // Row 1 (Index 0): Jaén | Latitud | 37,7655556 | | Inclinación óptima anual (Figura 5.2.82)
-  data[0] = [res.locationName, isEn ? 'Latitude' : 'Latitud', res.latitude, '', studyTitle];
-  // Row 2 (Index 1): empty
-  data[1] = [];
-  // Row 3 (Index 2): Col B: ENERGÍA MEDIA MENSUAL (kWh/mes)
-  data[2] = ['', isEn ? 'MEAN MONTHLY ENERGY (kWh/month)' : 'ENERGÍA MEDIA MENSUAL (kWh/mes)'];
-  // Row 4 (Index 3): Col B: Plano horizo | Col C: Tipo de estu | Col D: Ganancias (kWh)
-  data[3] = [
-    '',
-    isEn ? 'Horizontal plane' : 'Plano horizo',
-    isEn ? 'Study type' : 'Tipo de estu',
-    isEn ? 'Gains (kWh)' : 'Ganancias (kWh)',
-  ];
-
-  // Rows 5..16 (Index 4..15): Enero..Diciembre
-  for (let i = 0; i < 12; i++) {
-    data[4 + i] = [
-      months[i],
-      energyData.e0_mes[i],
-      energyData.e_mes[i],
-      energyData.ganancia_mes[i],
-    ];
-  }
-
-  // Row 17 (Index 16): ANUAL
-  data[16] = [
-    isEn ? 'ANNUAL' : 'ANUAL',
-    energyData.e0_anual,
-    energyData.e_anual,
-    energyData.ganancia_anual,
-  ];
-
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  XLSX.utils.book_append_sheet(wb, ws, isEn ? 'Energy_Yield' : 'Energia_Osterwald');
-
-  const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `OrientSol3_Calculo_Energia_${cleanLoc}.xlsx`;
-
-  const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  const blob = new Blob([excelBuffer], {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  });
-
-  if ('showSaveFilePicker' in window) {
-    try {
-      const handle = await (window as any).showSaveFilePicker({
-        suggestedName: filename,
-        types: [
-          {
-            description: 'Libro de Excel (*.xlsx)',
-            accept: {
-              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-            },
-          },
-        ],
-      });
-      const writable = await handle.createWritable();
-      await writable.write(blob);
-      await writable.close();
-      return;
-    } catch (err: any) {
-      if (err.name === 'AbortError') return;
-    }
-  }
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}

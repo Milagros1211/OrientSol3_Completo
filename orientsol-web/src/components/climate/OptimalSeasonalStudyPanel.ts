@@ -8,8 +8,10 @@ import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
 } from '@/components/export/pdfReportGenerator';
+import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { renderEnergyCalculationPanel } from '@/components/energy/EnergyCalculationPanel';
 import { renderOptimalSeasonalGraphsWindow } from '@/components/charts/OptimalSeasonalGraphsWindow';
+import { solarSyncState } from '@/services/bridge/solarSyncState';
 import * as XLSX from 'xlsx';
 
 export type SeasonalRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
@@ -976,14 +978,25 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
     // 6. Export to Excel (Figures 5.2.90 & 5.2.91)
     const btnExportExcel = container.querySelector<HTMLButtonElement>('#btn-seasonal-export-excel');
     btnExportExcel?.addEventListener('click', () => {
-      showSeasonalExcelExportModal(res, stateSeasonalComponent, isEn);
+      exportOrientSolMasterExcel(res, {
+        activeStudyOp: 'seasonal',
+        activeComponent: stateSeasonalComponent,
+        isEn,
+        peakPowerKw: solarSyncState.getPeakPowerKw(),
+        performanceRatio: solarSyncState.getPerformanceRatio(),
+        tonc: solarSyncState.getTonc(),
+      });
     });
 
     // 7. Generate PDF Report (Figures 5.2.70, 5.2.71, 5.2.72, 5.2.74, 5.2.75)
     const btnExportReport = container.querySelector<HTMLButtonElement>('#btn-seasonal-export-report');
     btnExportReport?.addEventListener('click', () => {
       showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn, 'seasonal');
+        generateOrientSolPDFReport(res, isEn, 'seasonal', {
+          peakPowerKw: solarSyncState.getPeakPowerKw(),
+          performanceRatio: solarSyncState.getPerformanceRatio(),
+          tonc: solarSyncState.getTonc(),
+        });
       });
     });
   }

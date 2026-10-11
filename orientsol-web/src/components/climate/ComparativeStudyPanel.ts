@@ -6,7 +6,8 @@ import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
 } from '@/components/export/pdfReportGenerator';
-import * as XLSX from 'xlsx';
+import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
+import { solarSyncState } from '@/services/bridge/solarSyncState';
 
 export type ComparativeRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
 
@@ -277,85 +278,25 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
     });
 
     container.querySelector('#btn-comp-excel')?.addEventListener('click', () => {
-      exportToExcel(isEn, months, rad0, radOptAnnual, radOptSeasonal, radPolar, radAzim, radHorizTrack, radDual, tempMean, m0, mOptAnnual, mOptSeasonal, mPolar, mAzim, mHorizTrack, mDual, mTemp, locationName, latitude);
+      exportOrientSolMasterExcel(res, {
+        activeStudyOp: 'comparative',
+        activeComponent: stateCompComponent,
+        isEn,
+        peakPowerKw: solarSyncState.getPeakPowerKw(),
+        performanceRatio: solarSyncState.getPerformanceRatio(),
+        tonc: solarSyncState.getTonc(),
+      });
     });
 
     container.querySelector('#btn-comp-pdf')?.addEventListener('click', () => {
       showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn, 'comparative');
+        generateOrientSolPDFReport(res, isEn, 'comparative', {
+          peakPowerKw: solarSyncState.getPeakPowerKw(),
+          performanceRatio: solarSyncState.getPerformanceRatio(),
+          tonc: solarSyncState.getTonc(),
+        });
       });
     });
-  }
-
-  function exportToExcel(
-    isEn: boolean,
-    months: string[],
-    r0: number[],
-    rAnu: number[],
-    rEst: number[],
-    rPol: number[],
-    rAzi: number[],
-    rHor: number[],
-    r2E: number[],
-    temp: number[],
-    m0: number,
-    mAnu: number,
-    mEst: number,
-    mPol: number,
-    mAzi: number,
-    mHor: number,
-    m2E: number,
-    mTemp: number,
-    loc: string,
-    lat: number
-  ) {
-    const data: any[] = [
-      [isEn ? 'OrientSol 3.0 - Comparative Report of all solar tracking & fixed methods' : 'OrientSol 3.0 - Comparativa de todos los tipos de estudios'],
-      [`${isEn ? 'Location' : 'Localización'}: ${loc}`, `${isEn ? 'Latitude' : 'Latitud'}: ${lat}°`],
-      [],
-      [
-        isEn ? 'Month' : 'Mes',
-        'Gdm (0°)',
-        'Gdm (Inclinación óptima anual)',
-        'Gdm (Inclinación óptima estacional)',
-        'Gdm (Seguim. a un eje polar)',
-        'Gdm (Seguim. a un eje azimutal)',
-        'Gdm (Seguim. a un eje horizontal)',
-        'Gdm (Seguim. a dos ejes)',
-        isEn ? 'Mean Temp (°C)' : 'Temperatura media (°C)'
-      ]
-    ];
-
-    for (let i = 0; i < 12; i++) {
-      data.push([
-        months[i],
-        Number(r0[i].toFixed(2)),
-        Number(rAnu[i].toFixed(2)),
-        Number(rEst[i].toFixed(2)),
-        Number(rPol[i].toFixed(2)),
-        Number(rAzi[i].toFixed(2)),
-        Number(rHor[i].toFixed(2)),
-        Number(r2E[i].toFixed(2)),
-        Number(temp[i].toFixed(1))
-      ]);
-    }
-
-    data.push([
-      isEn ? 'MEAN' : 'MEDIA',
-      Number(m0.toFixed(2)),
-      Number(mAnu.toFixed(2)),
-      Number(mEst.toFixed(2)),
-      Number(mPol.toFixed(2)),
-      Number(mAzi.toFixed(2)),
-      Number(mHor.toFixed(2)),
-      Number(m2E.toFixed(2)),
-      Number(mTemp.toFixed(2))
-    ]);
-
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Comparativa_Estudios');
-    XLSX.writeFile(wb, `OrientSol3_Comparativa_Todos_Estudios_${loc}.xlsx`);
   }
 
   renderInternal();

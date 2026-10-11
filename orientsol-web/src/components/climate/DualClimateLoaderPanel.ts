@@ -19,7 +19,6 @@ import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslati
 import { pyodideService } from '@/services/pyodide';
 import {
   renderOptimalAnnualStudyPanel,
-  showExcelExportModal,
 } from '@/components/climate/OptimalAnnualStudyPanel';
 import { renderOptimalMonthlyStudyPanel } from '@/components/climate/OptimalMonthlyStudyPanel';
 import { renderOptimalSeasonalStudyPanel } from '@/components/climate/OptimalSeasonalStudyPanel';
@@ -28,10 +27,6 @@ import { renderTrackingAzimuthalStudyPanel } from '@/components/climate/Tracking
 import { renderTrackingHorizontalStudyPanel } from '@/components/climate/TrackingHorizontalStudyPanel';
 import { renderTrackingDualAxisStudyPanel } from '@/components/climate/TrackingDualAxisStudyPanel';
 import { renderComparativeStudyPanel } from '@/components/climate/ComparativeStudyPanel';
-import {
-  showPdfGenerationNoticeModal,
-  generateOrientSolPDFReport,
-} from '@/components/export/pdfReportGenerator';
 
 // Module-level caches to preserve state across language toggles (ES <-> EN)
 let cachedLastSimulationResult: SolarBridgeSimulationResult | null = null;
@@ -1177,22 +1172,6 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <h3>${t.results.resultsFor.replace('{location}', res.locationName).replace('{lat}', res.latitude.toFixed(2))}</h3>
         </div>
         <div class="results-export-actions">
-          <button id="btn-export-pdf" class="btn-export btn-export-pdf" type="button" title="${t.results.exportPdfBtn}">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M6 9V2h12v7"></path>
-              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-              <rect x="6" y="14" width="12" height="8"></rect>
-            </svg>
-            <span>${t.results.exportPdfBtn}</span>
-          </button>
-          <button id="btn-export-excel-top" class="btn-export btn-export-excel" type="button" title="${t.results.exportExcelBtn}">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            <span>${t.results.exportExcelBtn}</span>
-          </button>
           <button id="btn-copy-summary" class="btn-export btn-export-copy" type="button" title="${t.results.exportCopyBtn}">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -1573,21 +1552,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       mountStudyOperation(targetOp);
     });
 
-    // Event Listeners for Export & Report Actions
-    const pdfBtn = resultsContainer.querySelector<HTMLButtonElement>('#btn-export-pdf');
-    const excelBtnTop = resultsContainer.querySelector<HTMLButtonElement>('#btn-export-excel-top');
+    // Event Listeners for Summary Copy
     const copyBtn = resultsContainer.querySelector<HTMLButtonElement>('#btn-copy-summary');
     const copyLabel = resultsContainer.querySelector<HTMLSpanElement>('#copy-btn-label');
-
-    pdfBtn?.addEventListener('click', () => {
-      showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn, cachedActiveStudyOp);
-      });
-    });
-
-    excelBtnTop?.addEventListener('click', () => {
-      showExcelExportModal(res, 45, isEn);
-    });
 
     copyBtn?.addEventListener('click', async () => {
       const ok = await copyReportToClipboard(res, {

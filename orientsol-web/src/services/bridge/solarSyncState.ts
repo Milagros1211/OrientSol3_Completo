@@ -8,6 +8,7 @@ class SolarSyncStateService {
   private peakPowerKw: number = 5.0;
   private tonc: number = 47.0;
   private coefTemp: number = -0.0035;
+  private performanceRatio: number = 0.80;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -42,6 +43,16 @@ class SolarSyncStateService {
 
   public getCoefTemp(): number {
     return this.coefTemp;
+  }
+
+  public getPerformanceRatio(): number {
+    return this.performanceRatio;
+  }
+
+  public setPerformanceRatio(val: number, source: string = 'unknown'): void {
+    if (isNaN(val) || val <= 0) return;
+    this.performanceRatio = val;
+    this.dispatchUpdate('performanceRatio', val, source);
   }
 
   public setPeakPowerKw(val: number, source: string = 'unknown'): void {
