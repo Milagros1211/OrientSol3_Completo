@@ -169,15 +169,15 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
 
     const optBadgeText = mode === 'annual'
       ? (isEn
-          ? `Optimal: β = ${currentOptPoint.betaDeg}°, α = ${currentOptPoint.alphaDeg}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/day`
-          : `Óptimo Anual: β = ${currentOptPoint.betaDeg}°, α = ${currentOptPoint.alphaDeg}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día`)
+          ? `Optimal: Inc = ${Number(currentOptPoint.betaDeg).toFixed(1)}°, Ori = ${Number(currentOptPoint.alphaDeg).toFixed(1)}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/day`
+          : `Óptimo Anual: Inc = ${Number(currentOptPoint.betaDeg).toFixed(1)}°, Ori = ${Number(currentOptPoint.alphaDeg).toFixed(1)}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día`)
       : mode === 'monthly'
       ? (isEn
-          ? `Month Optimum (${monthNames[selectedMonthIdx]}): β = ${currentOptPoint.betaDeg}°, α = ${currentOptPoint.alphaDeg}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/day`
-          : `Óptimo del mes (${monthNames[selectedMonthIdx]}): β = ${currentOptPoint.betaDeg}°, α = ${currentOptPoint.alphaDeg}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día`)
+          ? `Month Optimum (${monthNames[selectedMonthIdx]}): Inc = ${Number(currentOptPoint.betaDeg).toFixed(1)}°, Ori = ${Number(currentOptPoint.alphaDeg).toFixed(1)}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/day`
+          : `Óptimo del mes (${monthNames[selectedMonthIdx]}): Inc = ${Number(currentOptPoint.betaDeg).toFixed(1)}°, Ori = ${Number(currentOptPoint.alphaDeg).toFixed(1)}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día`)
       : (isEn
-          ? `Season Optimum (${activeSeasonName}): β = ${currentOptPoint.betaDeg}°, α = ${currentOptPoint.alphaDeg}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/day`
-          : `Óptimo Estacional (${activeSeasonName}): β = ${currentOptPoint.betaDeg}°, α = ${currentOptPoint.alphaDeg}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día`);
+          ? `Season Optimum (${activeSeasonName}): Inc = ${Number(currentOptPoint.betaDeg).toFixed(1)}°, Ori = ${Number(currentOptPoint.alphaDeg).toFixed(1)}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/day`
+          : `Óptimo Estacional (${activeSeasonName}): Inc = ${Number(currentOptPoint.betaDeg).toFixed(1)}°, Ori = ${Number(currentOptPoint.alphaDeg).toFixed(1)}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día`);
 
     let selectorHtml = '';
     if (mode === 'monthly') {
@@ -189,7 +189,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
           <select id="loss-map-month-select" class="form-select form-select-sm loss-map-month-dropdown" style="width: auto; min-width: 170px; font-weight: 600;">
             ${monthNames.map((name: string, i: number) => `
               <option value="${i}" ${i === selectedMonthIdx ? 'selected' : ''}>
-                ${i + 1}. ${name} (β = ${lossMap.monthlyMaps ? lossMap.monthlyMaps[i].optimalPoint.betaDeg : 0}°)
+                ${i + 1}. ${name} (Inc = ${lossMap.monthlyMaps ? Number(lossMap.monthlyMaps[i].optimalPoint.betaDeg).toFixed(1) : '0.0'}°)
               </option>
             `).join('')}
           </select>
@@ -244,7 +244,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
               const sMonths = isEn ? s.monthsEn : s.monthsEs;
               return `
                 <option value="${i}" ${i === selectedSeasonIdx ? 'selected' : ''}>
-                  ${sName} (${sMonths}) — Ópt: β = ${optBeta}°, α = ${optAlpha}°
+                  ${sName} (${sMonths}) — Ópt: Inc = ${Number(optBeta).toFixed(1)}°, Ori = ${Number(optAlpha).toFixed(1)}°
                 </option>
               `;
             }).join('')}
