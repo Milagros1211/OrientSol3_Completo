@@ -3,6 +3,7 @@ import {
   executeSolarSimulationFromClimateData,
   type SolarBridgeSimulationResult,
 } from '@/services/bridge/solarCalculationBridge';
+import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { generateSampleCSV, generateSampleJSON } from '@/services/hybrid/climateFileParser';
 import type { ClimateDataRecord } from '@/types/climate';
 import { climateDatabaseService, formatEmplacementNameWithSuffix } from '@/services/supabase';
@@ -406,6 +407,36 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   const simTonc = container.querySelector('#sim-tonc') as HTMLInputElement;
   const statusBar = container.querySelector('#hybrid-status-bar') as HTMLElement;
   const resultsContainer = container.querySelector('#hybrid-simulation-results') as HTMLElement;
+
+  // Initialize values from synchronized global state
+  if (simPeakKw) simPeakKw.value = solarSyncState.getPeakPowerKw().toString();
+  if (simTonc) simTonc.value = solarSyncState.getTonc().toString();
+
+  // Real-time synchronization when typing into Climate Simulation Bar
+  simPeakKw?.addEventListener('input', () => {
+    const v = parseFloat(simPeakKw.value);
+    if (!isNaN(v) && v > 0) {
+      solarSyncState.setPeakPowerKw(v, 'sim-panel');
+    }
+  });
+
+  simTonc?.addEventListener('input', () => {
+    const v = parseFloat(simTonc.value);
+    if (!isNaN(v) && v > 0) {
+      solarSyncState.setTonc(v, 'sim-panel');
+    }
+  });
+
+  // Listen to parameter updates coming from EnergyCalculationPanel
+  window.addEventListener('orientsol:solar-params-updated', (e: Event) => {
+    const d = (e as CustomEvent).detail;
+    if (!d || d.source === 'sim-panel') return;
+    if (d.field === 'peakPowerKw' && simPeakKw && parseFloat(simPeakKw.value) !== d.value) {
+      simPeakKw.value = d.value.toString();
+    } else if (d.field === 'tonc' && simTonc && parseFloat(simTonc.value) !== d.value) {
+      simTonc.value = d.value.toString();
+    }
+  });
 
   let currentActiveRecord: ClimateDataRecord = currentActiveRecordInit;
 
@@ -1070,10 +1101,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       return;
     }
 
-    const peakKw = parseFloat(simPeakKw.value) || 5.0;
+    const peakKw = parseFloat(simPeakKw.value) || solarSyncState.getPeakPowerKw();
     const pr = parseFloat(simPr.value) || 0.80;
     const albedo = parseFloat(simAlbedo.value) || 0.20;
-    const tonc = parseFloat(simTonc?.value) || 47.0;
+    const tonc = parseFloat(simTonc?.value) || solarSyncState.getTonc();
 
     simBtn.disabled = true;
     simBtn.innerHTML = `
@@ -1469,7 +1500,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       </div>
     `;
 
-    const currentPeakKw = parseFloat(simPeakKw.value) || 5.0;
+    const currentPeakKw = parseFloat(simPeakKw.value) || solarSyncState.getPeakPowerKw();
 
     // Dynamic Study Operation Mount Manager (Prevents Endless HTML)
     const mountStudyOperation = (op: typeof cachedActiveStudyOp) => {

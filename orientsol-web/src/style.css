@@ -6657,6 +6657,33 @@ body.theme-dark .tracking-media-row td {
   color: #38bdf8 !important;
 }
 
+/* Comparative Table Specific Column Highlights */
+[data-theme="light"] .td-track-dual,
+body.theme-light .td-track-dual {
+  color: #0284c7;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .td-track-dual,
+body.theme-dark .td-track-dual {
+  color: #38bdf8 !important;
+  font-weight: 700;
+}
+
+[data-theme="light"] .td-track-temp-val,
+body.theme-light .td-track-temp-val {
+  background: #fffbeb;
+  color: #b45309;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .td-track-temp-val,
+body.theme-dark .td-track-temp-val {
+  background: rgba(245, 158, 11, 0.08) !important;
+  color: #fbbf24 !important;
+  font-weight: 600;
+}
+
 /* Sidebar diagram */
 .opt-tracking-diagram-sidebar {
   display: flex;
