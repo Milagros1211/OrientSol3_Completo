@@ -1,6 +1,7 @@
 import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
+import { getDualAxisNoonTiltDeg, getNoonAzimuthDeg } from '@/services/solarGeometryAngles';
 
 
 export interface EnergyCalculationProps {
@@ -270,9 +271,9 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
       studyBadge = isEn ? '2-Axis Tracking' : '2 Ejes';
     } else {
       studyColTitle = isEn
-        ? `Performed study (β = ${optTiltAnnual}°)`
-        : `Estudio realizado (β = ${optTiltAnnual}°)`;
-      studyBadge = `β = ${optTiltAnnual}°`;
+        ? `Performed study (Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${latitude >= 0 ? '0.0°' : '180.0°'})`
+        : `Estudio realizado (Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${latitude >= 0 ? '0.0°' : '180.0°'})`;
+      studyBadge = `Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${latitude >= 0 ? '0.0°' : '180.0°'}`;
     }
 
     // Run Osterwald calculation
@@ -395,7 +396,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                 <thead>
                   <tr>
                     <th class="th-ener-month">${isEn ? 'Month' : 'Mes'}</th>
-                    <th class="th-ener-angle">${isEn ? 'Considered angles (β | α)' : 'Ángulos considerados (β | α)'}</th>
+                    <th class="th-ener-angle">${isEn ? 'Considered angles (Inc | Ori)' : 'Ángulos considerados (Inc | Ori)'}</th>
                     <th class="th-ener-horiz">${isEn ? 'Horizontal surface (0°)' : 'Superficie horizontal (0°)'}</th>
                     <th class="th-ener-study">${studyColTitle}</th>
                     <th class="th-ener-gain">${isEn ? 'Gain (kWh)' : 'Ganancia (kWh)'}</th>
@@ -408,29 +409,33 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                     const g = energyData.ganancia_mes[idx];
 
                     let angleBadgeText = '';
+                    const noonAzim = getNoonAzimuthDeg(latitude, idx);
+                    const noonDualTilt = getDualAxisNoonTiltDeg(latitude, idx);
+                    const fixedOri = latitude >= 0 ? 0.0 : 180.0;
+
                     if (studyType === 'monthly') {
                       const mDeg = res.monthlyOptimum12?.optimalTiltsDeg ? res.monthlyOptimum12.optimalTiltsDeg[idx] : optTiltAnnual;
-                      angleBadgeText = `β = ${Number(mDeg).toFixed(1)}° | α = 0.0°`;
+                      angleBadgeText = `Inc: ${Number(mDeg).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                     } else if (isSeasonal && seasonalData) {
                       if (idx === 11 || idx === 0 || idx === 1) {
-                        angleBadgeText = `Inv: β = ${seasonalData.winterTiltDeg.toFixed(1)}° | α = 0.0°`;
+                        angleBadgeText = `Inv: Inc: ${seasonalData.winterTiltDeg.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                       } else if (idx === 2 || idx === 3 || idx === 4) {
-                        angleBadgeText = `Pri: β = ${seasonalData.springTiltDeg.toFixed(1)}° | α = 0.0°`;
+                        angleBadgeText = `Pri: Inc: ${seasonalData.springTiltDeg.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                       } else if (idx === 5 || idx === 6 || idx === 7) {
-                        angleBadgeText = `Ver: β = ${seasonalData.summerTiltDeg.toFixed(1)}° | α = 0.0°`;
+                        angleBadgeText = `Ver: Inc: ${seasonalData.summerTiltDeg.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                       } else {
-                        angleBadgeText = `Oto: β = ${seasonalData.autumnTiltDeg.toFixed(1)}° | α = 0.0°`;
+                        angleBadgeText = `Oto: Inc: ${seasonalData.autumnTiltDeg.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                       }
                     } else if (studyType === 'polar') {
-                      angleBadgeText = `β = ${latitude.toFixed(1)}° | α = 0.0°`;
+                      angleBadgeText = `Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                     } else if (studyType === 'azimuthal') {
-                      angleBadgeText = `β = ${latitude.toFixed(1)}° | α = ψs`;
+                      angleBadgeText = `Inc: ${latitude.toFixed(1)}° | Ori: ${noonAzim.toFixed(1)}°`;
                     } else if (studyType === 'horizontal') {
-                      angleBadgeText = `β = Var (0.0°) | α = 90.0°`;
+                      angleBadgeText = `Inc: 0.0° | Ori: 90.0°`;
                     } else if (studyType === 'dual') {
-                      angleBadgeText = `β = 90.0°-γs | α = ψs`;
+                      angleBadgeText = `Inc: ${noonDualTilt.toFixed(1)}° | Ori: ${noonAzim.toFixed(1)}°`;
                     } else {
-                      angleBadgeText = `β = ${Number(optTiltAnnual).toFixed(1)}° | α = 0.0°`;
+                      angleBadgeText = `Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                     }
 
                     return `
@@ -455,21 +460,28 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                     <td class="td-ener-annual"><strong>${isEn ? 'ANNUAL' : 'ANUAL'}</strong></td>
                     <td class="td-ener-angle">
                       <span class="energy-angle-badge badge-annual">
-                        ${
-                          studyType === 'monthly'
-                            ? (isEn ? 'Var (12 tilts) | α = 0.0°' : 'Var (12 incl.) | α = 0.0°')
-                            : isSeasonal
-                            ? (isEn ? 'Var (4 seasons) | α = 0.0°' : 'Var (4 estac.) | α = 0.0°')
-                            : studyType === 'polar'
-                            ? `β = ${latitude.toFixed(1)}° | α = 0.0°`
-                            : studyType === 'azimuthal'
-                            ? `β = ${latitude.toFixed(1)}° | α = ψs`
-                            : studyType === 'horizontal'
-                            ? `β = Var (0.0°) | α = 90.0°`
-                            : studyType === 'dual'
-                            ? `β = 90.0°-γs | α = ψs`
-                            : `β = ${Number(optTiltAnnual).toFixed(1)}° | α = 0.0°`
-                        }
+                        ${(() => {
+                          const fixedOri = latitude >= 0 ? 0.0 : 180.0;
+                          if (studyType === 'monthly') {
+                            return isEn ? `Var (12 tilts) | Ori: ${fixedOri.toFixed(1)}°` : `Var (12 incl.) | Ori: ${fixedOri.toFixed(1)}°`;
+                          }
+                          if (isSeasonal) {
+                            return isEn ? `Var (4 seasons) | Ori: ${fixedOri.toFixed(1)}°` : `Var (4 estac.) | Ori: ${fixedOri.toFixed(1)}°`;
+                          }
+                          if (studyType === 'polar') {
+                            return `Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                          }
+                          if (studyType === 'azimuthal') {
+                            return `Inc: ${latitude.toFixed(1)}° | Ori: Var`;
+                          }
+                          if (studyType === 'horizontal') {
+                            return `Inc: 0.0° | Ori: 90.0°`;
+                          }
+                          if (studyType === 'dual') {
+                            return `Inc: Var | Ori: Var`;
+                          }
+                          return `Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                        })()}
                       </span>
                     </td>
                     <td class="td-num"><strong>${energyData.e0_anual.toFixed(1)}</strong></td>
