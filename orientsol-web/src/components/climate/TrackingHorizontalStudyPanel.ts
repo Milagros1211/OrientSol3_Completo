@@ -6,7 +6,8 @@ import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
 } from '@/components/export/pdfReportGenerator';
-import * as XLSX from 'xlsx';
+import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
+import { solarSyncState } from '@/services/bridge/solarSyncState';
 
 export type TrackingRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -363,85 +364,25 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
     });
 
     container.querySelector('#btn-horiz-excel')?.addEventListener('click', () => {
-      exportToExcel(isEn, months, radHoriz, radHorizTrack, gainsOverHoriz, gainsOverAnnual, gainsOverSeasonal, gainsOverPolar, gainsOverAzim, tempMean, meanHoriz, meanHorizTrack, meanGainHoriz, meanGainAnnual, meanGainSeasonal, meanGainPolar, meanGainAzim, tempAnnualMean, locationName, latitude);
+      exportOrientSolMasterExcel(res, {
+        activeStudyOp: 'horizontal',
+        activeComponent: stateHorizComponent,
+        isEn,
+        peakPowerKw: solarSyncState.getPeakPowerKw(),
+        performanceRatio: solarSyncState.getPerformanceRatio(),
+        tonc: solarSyncState.getTonc(),
+      });
     });
 
     container.querySelector('#btn-horiz-pdf')?.addEventListener('click', () => {
       showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn, 'horizontal');
+        generateOrientSolPDFReport(res, isEn, 'horizontal', {
+          peakPowerKw: solarSyncState.getPeakPowerKw(),
+          performanceRatio: solarSyncState.getPerformanceRatio(),
+          tonc: solarSyncState.getTonc(),
+        });
       });
     });
-  }
-
-  function exportToExcel(
-    isEn: boolean,
-    months: string[],
-    radHoriz: number[],
-    radHorizTrack: number[],
-    gainsHoriz: number[],
-    gainsAnu: number[],
-    gainsEst: number[],
-    gainsPol: number[],
-    gainsAzi: number[],
-    tempMean: number[],
-    meanHoriz: number,
-    meanHorizTrack: number,
-    meanGainHoriz: number,
-    meanGainAnu: number,
-    meanGainEst: number,
-    meanGainPol: number,
-    meanGainAzi: number,
-    tempAnnualMean: number,
-    loc: string,
-    lat: number
-  ) {
-    const data: any[] = [
-      [isEn ? 'OrientSol 3.0 - Single-Axis Horizontal Tracking Report' : 'OrientSol 3.0 - Informe Seguimiento a un Eje Horizontal'],
-      [`${isEn ? 'Location' : 'Localización'}: ${loc}`, `${isEn ? 'Latitude' : 'Latitud'}: ${lat}°`],
-      [],
-      [
-        isEn ? 'Month' : 'Mes',
-        'Gdm (0°)',
-        'Gdm (Seg. Horizontal)',
-        '% Gan. 0°',
-        '% Gan. Ópt. Anual',
-        '% Gan. Ópt. Estac.',
-        '% Gan. Seg. Polar',
-        '% Gan. Seg. Azimutal',
-        isEn ? 'Mean Temp (°C)' : 'Tª Media (°C)'
-      ]
-    ];
-
-    for (let i = 0; i < 12; i++) {
-      data.push([
-        months[i],
-        Number(radHoriz[i].toFixed(2)),
-        Number(radHorizTrack[i].toFixed(2)),
-        Number(gainsHoriz[i].toFixed(1)),
-        Number(gainsAnu[i].toFixed(1)),
-        Number(gainsEst[i].toFixed(1)),
-        Number(gainsPol[i].toFixed(1)),
-        Number(gainsAzi[i].toFixed(1)),
-        Number(tempMean[i].toFixed(1))
-      ]);
-    }
-
-    data.push([
-      isEn ? 'MEAN' : 'MEDIA',
-      Number(meanHoriz.toFixed(2)),
-      Number(meanHorizTrack.toFixed(2)),
-      Number(meanGainHoriz.toFixed(1)),
-      Number(meanGainAnu.toFixed(1)),
-      Number(meanGainEst.toFixed(1)),
-      Number(meanGainPol.toFixed(1)),
-      Number(meanGainAzi.toFixed(1)),
-      Number(tempAnnualMean.toFixed(1))
-    ]);
-
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Seg_Eje_Horizontal');
-    XLSX.writeFile(wb, `OrientSol3_Seguimiento_Eje_Horizontal_${loc}.xlsx`);
   }
 
   renderInternal();

@@ -6,7 +6,8 @@ import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
 } from '@/components/export/pdfReportGenerator';
-import * as XLSX from 'xlsx';
+import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
+import { solarSyncState } from '@/services/bridge/solarSyncState';
 
 export type TrackingRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -366,68 +367,27 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
     });
 
     container.querySelector<HTMLButtonElement>('#btn-polar-export-excel')?.addEventListener('click', () => {
-      exportPolarTrackingToExcel(res, isEn);
+      exportOrientSolMasterExcel(res, {
+        activeStudyOp: 'polar',
+        activeComponent: statePolarComponent,
+        isEn,
+        peakPowerKw: solarSyncState.getPeakPowerKw(),
+        performanceRatio: solarSyncState.getPerformanceRatio(),
+        tonc: solarSyncState.getTonc(),
+      });
     });
 
     container.querySelector<HTMLButtonElement>('#btn-polar-export-report')?.addEventListener('click', () => {
       showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn, 'polar');
+        generateOrientSolPDFReport(res, isEn, 'polar', {
+          peakPowerKw: solarSyncState.getPeakPowerKw(),
+          performanceRatio: solarSyncState.getPerformanceRatio(),
+          tonc: solarSyncState.getTonc(),
+        });
       });
     });
   }
 
   renderInternal();
   return container;
-}
-
-/**
- * Exports Polar Tracking Table to Excel (.xlsx) matching Figura 6.3.18
- */
-function exportPolarTrackingToExcel(res: SolarBridgeSimulationResult, isEn: boolean) {
-  const months = isEn ? MONTH_NAMES_EN : MONTH_NAMES_ES;
-  const tempMean = res.temperatures.ambient.monthlyMeanC;
-  const radHoriz = res.horizontal.gdm0;
-  const radPolar = res.tracking.polarAxis.monthlyDailyKwh;
-
-  const data: any[][] = [];
-  data[0] = [res.locationName, isEn ? 'Latitude' : 'Latitud', res.latitude, '', isEn ? 'Single-axis polar tracking' : 'Seguimiento a un eje polar'];
-  data[1] = [];
-  data[2] = [
-    isEn ? 'Month' : 'Mes',
-    'Gdm (0°)',
-    'Gdm',
-    isEn ? 'Mean Temp (°C)' : 'Tª media (°C)',
-    isEn ? 'Gain Horiz (%)' : 'Plano horizontal (%)',
-    isEn ? 'Gain Annual Opt (%)' : 'Inclinación ópt. anual (%)',
-    isEn ? 'Gain Seasonal Opt (%)' : 'Inclin. ópt. estacional (%)',
-    isEn ? 'Gain Azimuthal 1-Axis (%)' : 'Seg. a un eje azimutal (%)',
-    isEn ? 'Gain Horizontal 1-Axis (%)' : 'Seg. a un eje horizontal (%)',
-  ];
-
-  for (let i = 0; i < 12; i++) {
-    const p = radPolar[i];
-    const g0 = radHoriz[i];
-    const gAnn = res.optimalAnnual.monthlyDailyKwh[i];
-    const gSeas = res.seasonal.monthlyDailyKwh[i];
-    const gAz = res.tracking.azimuthalAxis.monthlyDailyKwh[i];
-    const gHz = res.tracking.horizontalAxis.monthlyDailyKwh[i];
-
-    data[3 + i] = [
-      months[i],
-      g0,
-      p,
-      tempMean[i],
-      g0 > 0 ? ((p - g0) / g0) * 100 : 0,
-      gAnn > 0 ? ((p - gAnn) / gAnn) * 100 : 0,
-      gSeas > 0 ? ((p - gSeas) / gSeas) * 100 : 0,
-      gAz > 0 ? ((p - gAz) / gAz) * 100 : 0,
-      gHz > 0 ? ((p - gHz) / gHz) * 100 : 0,
-    ];
-  }
-
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  XLSX.utils.book_append_sheet(wb, ws, isEn ? 'Polar_Tracking' : 'Seg_Eje_Polar');
-  const filename = `OrientSol3_Seguimiento_Eje_Polar_${res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_')}.xlsx`;
-  XLSX.writeFile(wb, filename);
 }

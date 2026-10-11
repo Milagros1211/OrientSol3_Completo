@@ -11,6 +11,8 @@ import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
 } from '@/components/export/pdfReportGenerator';
+import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
+import { solarSyncState } from '@/services/bridge/solarSyncState';
 
 export type RadiationComponentType = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 export type TableRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
@@ -1271,14 +1273,25 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
     // 7. Export Table to Excel (Figura 5.2.64 & 5.2.65 modal)
     const btnExportExcel = container.querySelector<HTMLButtonElement>('#btn-export-opt-excel');
     btnExportExcel?.addEventListener('click', () => {
-      showExcelExportModal(res, stateAngleX, isEn);
+      exportOrientSolMasterExcel(res, {
+        activeStudyOp: 'annual',
+        activeComponent: stateTableComponent,
+        isEn,
+        peakPowerKw: solarSyncState.getPeakPowerKw(),
+        performanceRatio: solarSyncState.getPerformanceRatio(),
+        tonc: solarSyncState.getTonc(),
+      });
     });
 
     // 8. Generate Report (PDF)
     const btnExportReport = container.querySelector<HTMLButtonElement>('#btn-export-opt-report');
     btnExportReport?.addEventListener('click', () => {
       showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn);
+        generateOrientSolPDFReport(res, isEn, 'annual', {
+          peakPowerKw: solarSyncState.getPeakPowerKw(),
+          performanceRatio: solarSyncState.getPerformanceRatio(),
+          tonc: solarSyncState.getTonc(),
+        });
       });
     });
 

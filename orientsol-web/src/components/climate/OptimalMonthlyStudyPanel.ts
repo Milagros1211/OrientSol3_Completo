@@ -1,11 +1,12 @@
 import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { renderEnergyCalculationPanel } from '@/components/energy/EnergyCalculationPanel';
-import { showExcelExportModal } from '@/components/climate/OptimalAnnualStudyPanel';
 import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
 } from '@/components/export/pdfReportGenerator';
+import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
+import { solarSyncState } from '@/services/bridge/solarSyncState';
 
 export type MonthlyRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
 
@@ -555,13 +556,24 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
 
     const btnExportExcel = container.querySelector<HTMLButtonElement>('#btn-monthly-export-excel');
     btnExportExcel?.addEventListener('click', () => {
-      showExcelExportModal(res, Math.round(meanTilt), isEn);
+      exportOrientSolMasterExcel(res, {
+        activeStudyOp: 'monthly',
+        activeComponent: stateComponent,
+        isEn,
+        peakPowerKw: solarSyncState.getPeakPowerKw(),
+        performanceRatio: solarSyncState.getPerformanceRatio(),
+        tonc: solarSyncState.getTonc(),
+      });
     });
 
     const btnExportReport = container.querySelector<HTMLButtonElement>('#btn-monthly-export-report');
     btnExportReport?.addEventListener('click', () => {
       showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn, 'monthly');
+        generateOrientSolPDFReport(res, isEn, 'monthly', {
+          peakPowerKw: solarSyncState.getPeakPowerKw(),
+          performanceRatio: solarSyncState.getPerformanceRatio(),
+          tonc: solarSyncState.getTonc(),
+        });
       });
     });
   }
