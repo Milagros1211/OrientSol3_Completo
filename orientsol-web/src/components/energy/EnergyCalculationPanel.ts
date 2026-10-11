@@ -457,7 +457,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                 </tbody>
                 <tfoot>
                   <tr class="energy-annual-row">
-                    <td class="td-ener-annual"><strong>${isEn ? 'ANNUAL' : 'ANUAL'}</strong></td>
+                    <td class="td-ener-annual"><strong>${isEn ? 'ANNUAL TOTAL' : 'TOTAL ANUAL'}</strong></td>
                     <td class="td-ener-angle">
                       <span class="energy-angle-badge badge-annual">
                         ${(() => {
@@ -488,6 +488,40 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                     <td class="td-num td-ener-study-val"><strong>${energyData.e_anual.toFixed(1)}</strong></td>
                     <td class="td-num td-ener-gain-val ${energyData.ganancia_anual >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
                       <strong>${energyData.ganancia_anual.toFixed(2)}</strong>
+                    </td>
+                  </tr>
+                  <tr class="table-media-row energy-media-row">
+                    <td class="td-ener-annual"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+                    <td class="td-ener-angle">
+                      <span class="energy-angle-badge badge-annual">
+                        ${(() => {
+                          const fixedOri = latitude >= 0 ? 0.0 : 180.0;
+                          if (studyType === 'monthly') {
+                            return isEn ? `Var (12) | Ori: ${fixedOri.toFixed(1)}°` : `Var (12) | Ori: ${fixedOri.toFixed(1)}°`;
+                          }
+                          if (isSeasonal) {
+                            return isEn ? `Var (4) | Ori: ${fixedOri.toFixed(1)}°` : `Var (4) | Ori: ${fixedOri.toFixed(1)}°`;
+                          }
+                          if (studyType === 'polar') {
+                            return `Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                          }
+                          if (studyType === 'azimuthal') {
+                            return `Inc: ${latitude.toFixed(1)}° | Ori: Var`;
+                          }
+                          if (studyType === 'horizontal') {
+                            return `Inc: 0.0° | Ori: 90.0°`;
+                          }
+                          if (studyType === 'dual') {
+                            return `Inc: Var | Ori: Var`;
+                          }
+                          return `Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                        })()}
+                      </span>
+                    </td>
+                    <td class="td-num"><strong>${(energyData.e0_anual / 12).toFixed(1)}</strong></td>
+                    <td class="td-num td-ener-study-val"><strong>${(energyData.e_anual / 12).toFixed(1)}</strong></td>
+                    <td class="td-num td-ener-gain-val ${energyData.ganancia_anual >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
+                      <strong>${energyData.ganancia_anual >= 0 ? '+' : ''}${energyData.ganancia_anual.toFixed(2)}%</strong>
                     </td>
                   </tr>
                 </tfoot>

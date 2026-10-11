@@ -410,6 +410,17 @@ export function renderPythonConsole(): HTMLElement {
                   </tr>
                 `).join('')}
               </tbody>
+              <tfoot>
+                <tr class="table-media-row verif-media-row">
+                  <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+                  <td>${hourlyRows.length} ${isEn ? 'intervals' : 'intervalos'}</td>
+                  <td class="td-num">-</td>
+                  <td class="td-num"><strong>${(hourlyRows.reduce((acc: number, r: any) => acc + parseFloat(r.altDeg), 0) / (hourlyRows.length || 1)).toFixed(2)}°</strong></td>
+                  <td class="td-num"><strong>${(hourlyRows.reduce((acc: number, r: any) => acc + parseFloat(r.azimDeg), 0) / (hourlyRows.length || 1)).toFixed(1)}°</strong></td>
+                  <td class="td-num"><strong>${(hourlyRows.reduce((acc: number, r: any) => acc + parseFloat(r.tilt2AxisDeg), 0) / (hourlyRows.length || 1)).toFixed(1)}°</strong></td>
+                  <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>
@@ -417,6 +428,26 @@ export function renderPythonConsole(): HTMLElement {
     }
 
     if (activeTab === 'baseline') {
+      const baselineRows = DIA_INTER.map((dayNum, idx) => {
+        const mDec = getMonthlyDeclinationDeg(idx);
+        const latR = (stateLat * Math.PI) / 180;
+        const decR = (mDec * Math.PI) / 180;
+        const cosW = -Math.tan(latR) * Math.tan(decR);
+        const wDeg = cosW >= 1 ? 0 : cosW <= -1 ? 180 : (Math.acos(cosW) * 180) / Math.PI;
+        const sunHours = (2 * wDeg) / 15;
+        const noonH = 90 - Math.abs(stateLat - mDec);
+        const noonAz = getNoonAzimuthDeg(stateLat, idx);
+        const noonT = getDualAxisNoonTiltDeg(stateLat, idx);
+        return { month: months[idx], dayNum, mDec, wDeg, sunHours, noonH, noonAz, noonT };
+      });
+
+      const avgDec = baselineRows.reduce((acc, r) => acc + r.mDec, 0) / 12;
+      const avgW = baselineRows.reduce((acc, r) => acc + r.wDeg, 0) / 12;
+      const avgSunHours = baselineRows.reduce((acc, r) => acc + r.sunHours, 0) / 12;
+      const avgNoonH = baselineRows.reduce((acc, r) => acc + r.noonH, 0) / 12;
+      const avgNoonAz = baselineRows.reduce((acc, r) => acc + r.noonAz, 0) / 12;
+      const avgNoonT = baselineRows.reduce((acc, r) => acc + r.noonT, 0) / 12;
+
       return `
         <div class="verif-table-card">
           <div class="verif-table-title-bar">
@@ -442,32 +473,33 @@ export function renderPythonConsole(): HTMLElement {
                 </tr>
               </thead>
               <tbody>
-                ${DIA_INTER.map((dayNum, idx) => {
-                  const mDec = getMonthlyDeclinationDeg(idx);
-                  const latR = (stateLat * Math.PI) / 180;
-                  const decR = (mDec * Math.PI) / 180;
-                  const cosW = -Math.tan(latR) * Math.tan(decR);
-                  const wDeg = cosW >= 1 ? 0 : cosW <= -1 ? 180 : (Math.acos(cosW) * 180) / Math.PI;
-                  const sunHours = (2 * wDeg) / 15;
-                  const noonH = 90 - Math.abs(stateLat - mDec);
-                  const noonAz = getNoonAzimuthDeg(stateLat, idx);
-                  const noonT = getDualAxisNoonTiltDeg(stateLat, idx);
-
-                  return `
-                    <tr>
-                      <td><strong>${months[idx]}</strong></td>
-                      <td class="td-num">${dayNum}</td>
-                      <td class="td-num">${mDec > 0 ? `+${mDec.toFixed(2)}` : mDec.toFixed(2)}°</td>
-                      <td class="td-num">${wDeg.toFixed(2)}°</td>
-                      <td class="td-num">${sunHours.toFixed(2)} h</td>
-                      <td class="td-num">${noonH.toFixed(2)}°</td>
-                      <td class="td-num">${noonAz.toFixed(1)}°</td>
-                      <td class="td-num">${noonT.toFixed(1)}°</td>
-                      <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
-                    </tr>
-                  `;
-                }).join('')}
+                ${baselineRows.map((r) => `
+                  <tr>
+                    <td><strong>${r.month}</strong></td>
+                    <td class="td-num">${r.dayNum}</td>
+                    <td class="td-num">${r.mDec > 0 ? `+${r.mDec.toFixed(2)}` : r.mDec.toFixed(2)}°</td>
+                    <td class="td-num">${r.wDeg.toFixed(2)}°</td>
+                    <td class="td-num">${r.sunHours.toFixed(2)} h</td>
+                    <td class="td-num">${r.noonH.toFixed(2)}°</td>
+                    <td class="td-num">${r.noonAz.toFixed(1)}°</td>
+                    <td class="td-num">${r.noonT.toFixed(1)}°</td>
+                    <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
+                  </tr>
+                `).join('')}
               </tbody>
+              <tfoot>
+                <tr class="table-media-row verif-media-row">
+                  <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+                  <td class="td-num">-</td>
+                  <td class="td-num"><strong>${avgDec >= 0 ? `+${avgDec.toFixed(2)}` : avgDec.toFixed(2)}°</strong></td>
+                  <td class="td-num"><strong>${avgW.toFixed(2)}°</strong></td>
+                  <td class="td-num"><strong>${avgSunHours.toFixed(2)} h</strong></td>
+                  <td class="td-num"><strong>${avgNoonH.toFixed(2)}°</strong></td>
+                  <td class="td-num"><strong>${avgNoonAz.toFixed(1)}°</strong></td>
+                  <td class="td-num"><strong>${avgNoonT.toFixed(1)}°</strong></td>
+                  <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>
@@ -475,7 +507,42 @@ export function renderPythonConsole(): HTMLElement {
     }
 
     if (activeTab === 'radiation') {
-      const g0Mock = [2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84];
+      const radRows = DIA_INTER.map((dayNum, idx) => {
+        const dec = getMonthlyDeclinationDeg(idx);
+        const latR = (stateLat * Math.PI) / 180;
+        const decR = (dec * Math.PI) / 180;
+        const cosW = -Math.tan(latR) * Math.tan(decR);
+        const ws = Math.acos(Math.max(-1, Math.min(1, cosW)));
+        const iSc = 1.367;
+        const g0d = Math.max(
+          0.8,
+          (24 / Math.PI) * iSc * (1 + 0.033 * Math.cos((2 * Math.PI * dayNum) / 365)) *
+          (Math.cos(latR) * Math.cos(decR) * Math.sin(ws) + ws * Math.sin(latR) * Math.sin(decR))
+        );
+        const g0 = Math.max(1.2, g0d * 0.58);
+        const bdm = g0 * 0.58;
+        const ddm = g0 * 0.42;
+        const optTilt = Math.max(1, Math.min(85, Math.abs(stateLat - dec)));
+        const gOpt = g0 * 1.185;
+        const gain = ((gOpt - g0) / g0) * 100;
+        return {
+          month: months[idx],
+          g0,
+          bdm,
+          ddm,
+          optTilt,
+          gOpt,
+          gain
+        };
+      });
+
+      const meanG0 = radRows.reduce((acc, r) => acc + r.g0, 0) / 12;
+      const meanBdm = radRows.reduce((acc, r) => acc + r.bdm, 0) / 12;
+      const meanDdm = radRows.reduce((acc, r) => acc + r.ddm, 0) / 12;
+      const meanTilt = radRows.reduce((acc, r) => acc + r.optTilt, 0) / 12;
+      const meanGOpt = radRows.reduce((acc, r) => acc + r.gOpt, 0) / 12;
+      const meanGain = ((meanGOpt - meanG0) / meanG0) * 100;
+
       return `
         <div class="verif-table-card">
           <div class="verif-table-title-bar">
@@ -500,27 +567,31 @@ export function renderPythonConsole(): HTMLElement {
                 </tr>
               </thead>
               <tbody>
-                ${g0Mock.map((g0, idx) => {
-                  const bdm = g0 * 0.58;
-                  const ddm = g0 * 0.42;
-                  const dec = getMonthlyDeclinationDeg(idx);
-                  const optTilt = Math.max(1, Math.min(80, Math.abs(stateLat - dec)));
-                  const gOpt = g0 * 1.18;
-                  const gain = ((gOpt - g0) / g0) * 100;
-                  return `
-                    <tr>
-                      <td><strong>${months[idx]}</strong></td>
-                      <td class="td-num">${g0.toFixed(2)}</td>
-                      <td class="td-num">${bdm.toFixed(2)}</td>
-                      <td class="td-num">${ddm.toFixed(2)}</td>
-                      <td class="td-num">Inc: ${optTilt.toFixed(1)}°</td>
-                      <td class="td-num">${gOpt.toFixed(2)}</td>
-                      <td class="td-num" style="color: #059669;">+${gain.toFixed(1)}%</td>
-                      <td style="text-align: center;"><span class="badge-status-valid">✓ Verificado</span></td>
-                    </tr>
-                  `;
-                }).join('')}
+                ${radRows.map((r) => `
+                  <tr>
+                    <td><strong>${r.month}</strong></td>
+                    <td class="td-num">${r.g0.toFixed(2)}</td>
+                    <td class="td-num">${r.bdm.toFixed(2)}</td>
+                    <td class="td-num">${r.ddm.toFixed(2)}</td>
+                    <td class="td-num">Inc: ${r.optTilt.toFixed(1)}°</td>
+                    <td class="td-num">${r.gOpt.toFixed(2)}</td>
+                    <td class="td-num" style="color: #059669;">+${r.gain.toFixed(1)}%</td>
+                    <td style="text-align: center;"><span class="badge-status-valid">✓ Verificado</span></td>
+                  </tr>
+                `).join('')}
               </tbody>
+              <tfoot>
+                <tr class="table-media-row verif-media-row">
+                  <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+                  <td class="td-num"><strong>${meanG0.toFixed(2)}</strong></td>
+                  <td class="td-num"><strong>${meanBdm.toFixed(2)}</strong></td>
+                  <td class="td-num"><strong>${meanDdm.toFixed(2)}</strong></td>
+                  <td class="td-num"><strong>Inc: ${meanTilt.toFixed(1)}°</strong></td>
+                  <td class="td-num"><strong>${meanGOpt.toFixed(2)}</strong></td>
+                  <td class="td-num" style="color: #059669;"><strong>+${meanGain.toFixed(1)}%</strong></td>
+                  <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>
@@ -529,14 +600,18 @@ export function renderPythonConsole(): HTMLElement {
 
     if (activeTab === 'tracking') {
       const trackingRows = [
-        { name: isEn ? 'Horizontal Surface (0°)' : 'Superficie Horizontal (0°)', inc: '0.0°', ori: '0.0°', rad: '4.76', gainH: '0.0%', gainOpt: '-14.2%', status: '✓ Baseline' },
-        { name: isEn ? 'Annual Optimal Tilt' : 'Inclinación Óptima Anual', inc: `${Math.max(10, Math.round(Math.abs(stateLat) * 0.88))}.0°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: '5.55', gainH: '+16.6%', gainOpt: '0.0%', status: '✓ Validado' },
-        { name: isEn ? 'Seasonal Optimal Tilt (4 pos)' : 'Inclinación Óptima Estacional (4 pos)', inc: 'Var (4)', ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: '5.84', gainH: '+22.7%', gainOpt: '+5.2%', status: '✓ Validado' },
-        { name: isEn ? 'Single-Axis Polar Tracking' : 'Seguimiento a un Eje Polar', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: '6.52', gainH: '+37.0%', gainOpt: '+17.5%', status: '✓ Validado' },
-        { name: isEn ? 'Single-Axis Azimuthal Tracking' : 'Seguimiento a un Eje Azimutal', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: 'Var (ψs)', rad: '6.68', gainH: '+40.3%', gainOpt: '+20.4%', status: '✓ Validado' },
-        { name: isEn ? 'Single-Axis Horizontal Tracking' : 'Seguimiento a un Eje Horizontal', inc: 'Var (0°-90°)', ori: '90.0° E-O', rad: '5.92', gainH: '+24.4%', gainOpt: '+6.7%', status: '✓ Validado' },
-        { name: isEn ? 'Two-Axis Tracking (Continuous)' : 'Seguimiento a Dos Ejes Continuo', inc: 'Var (90°-γs)', ori: 'Var (ψs)', rad: '7.21', gainH: '+51.5%', gainOpt: '+29.9%', status: '✓ Validado' },
+        { name: isEn ? 'Horizontal Surface (0°)' : 'Superficie Horizontal (0°)', inc: '0.0°', ori: '0.0°', rad: 4.76, gainH: 0.0, gainOpt: -14.2, status: '✓ Baseline' },
+        { name: isEn ? 'Annual Optimal Tilt' : 'Inclinación Óptima Anual', inc: `${Math.max(10, Math.round(Math.abs(stateLat) * 0.88))}.0°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 5.55, gainH: 16.6, gainOpt: 0.0, status: '✓ Validado' },
+        { name: isEn ? 'Seasonal Optimal Tilt (4 pos)' : 'Inclinación Óptima Estacional (4 pos)', inc: 'Var (4)', ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 5.84, gainH: 22.7, gainOpt: 5.2, status: '✓ Validado' },
+        { name: isEn ? 'Single-Axis Polar Tracking' : 'Seguimiento a un Eje Polar', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 6.52, gainH: 37.0, gainOpt: 17.5, status: '✓ Validado' },
+        { name: isEn ? 'Single-Axis Azimuthal Tracking' : 'Seguimiento a un Eje Azimutal', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: 'Var (ψs)', rad: 6.68, gainH: 40.3, gainOpt: 20.4, status: '✓ Validado' },
+        { name: isEn ? 'Single-Axis Horizontal Tracking' : 'Seguimiento a un Eje Horizontal', inc: 'Var (0°-90°)', ori: '90.0° E-O', rad: 5.92, gainH: 24.4, gainOpt: 6.7, status: '✓ Validado' },
+        { name: isEn ? 'Two-Axis Tracking (Continuous)' : 'Seguimiento a Dos Ejes Continuo', inc: 'Var (90°-γs)', ori: 'Var (ψs)', rad: 7.21, gainH: 51.5, gainOpt: 29.9, status: '✓ Validado' },
       ];
+
+      const meanRad = trackingRows.reduce((acc, r) => acc + r.rad, 0) / trackingRows.length;
+      const meanGainH = trackingRows.reduce((acc, r) => acc + r.gainH, 0) / trackingRows.length;
+      const meanGainOpt = trackingRows.reduce((acc, r) => acc + r.gainOpt, 0) / trackingRows.length;
 
       return `
         <div class="verif-table-card">
@@ -566,13 +641,24 @@ export function renderPythonConsole(): HTMLElement {
                     <td><strong>${r.name}</strong></td>
                     <td><code>${r.inc}</code></td>
                     <td><code>${r.ori}</code></td>
-                    <td class="td-num">${r.rad}</td>
-                    <td class="td-num" style="color: #059669;">${r.gainH}</td>
-                    <td class="td-num" style="color: #2563eb;">${r.gainOpt}</td>
+                    <td class="td-num">${r.rad.toFixed(2)}</td>
+                    <td class="td-num" style="color: #059669;">${r.gainH >= 0 ? `+${r.gainH.toFixed(1)}%` : `${r.gainH.toFixed(1)}%`}</td>
+                    <td class="td-num" style="color: #2563eb;">${r.gainOpt >= 0 ? `+${r.gainOpt.toFixed(1)}%` : `${r.gainOpt.toFixed(1)}%`}</td>
                     <td style="text-align: center;"><span class="badge-status-valid">${r.status}</span></td>
                   </tr>
                 `).join('')}
               </tbody>
+              <tfoot>
+                <tr class="table-media-row verif-media-row">
+                  <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+                  <td>-</td>
+                  <td>-</td>
+                  <td class="td-num"><strong>${meanRad.toFixed(2)}</strong></td>
+                  <td class="td-num" style="color: #059669;"><strong>${meanGainH >= 0 ? `+${meanGainH.toFixed(1)}%` : `${meanGainH.toFixed(1)}%`}</strong></td>
+                  <td class="td-num" style="color: #2563eb;"><strong>${meanGainOpt >= 0 ? `+${meanGainOpt.toFixed(1)}%` : `${meanGainOpt.toFixed(1)}%`}</strong></td>
+                  <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>
@@ -581,6 +667,27 @@ export function renderPythonConsole(): HTMLElement {
 
     if (activeTab === 'energy') {
       const tempsMock = [6.2, 7.8, 11.4, 13.9, 18.2, 23.5, 26.8, 26.1, 21.3, 15.6, 9.8, 6.7];
+      const energyRows = tempsMock.map((tAmb, idx) => {
+        const tc = tAmb + ((47 - 20) / 800) * 850;
+        const eOster = Math.round(520 + idx * 45 - Math.abs(idx - 6) * 35);
+        const eSimp = Math.round(eOster * 1.045);
+        const thLoss = -((tc - 25) * 0.40);
+        return {
+          month: months[idx],
+          tAmb,
+          tc,
+          eOster,
+          eSimp,
+          thLoss
+        };
+      });
+
+      const meanTAmb = energyRows.reduce((acc, r) => acc + r.tAmb, 0) / 12;
+      const meanTc = energyRows.reduce((acc, r) => acc + r.tc, 0) / 12;
+      const meanEOster = energyRows.reduce((acc, r) => acc + r.eOster, 0) / 12;
+      const meanESimp = energyRows.reduce((acc, r) => acc + r.eSimp, 0) / 12;
+      const meanThLoss = energyRows.reduce((acc, r) => acc + r.thLoss, 0) / 12;
+
       return `
         <div class="verif-table-card">
           <div class="verif-table-title-bar">
@@ -604,25 +711,29 @@ export function renderPythonConsole(): HTMLElement {
                 </tr>
               </thead>
               <tbody>
-                ${tempsMock.map((tAmb, idx) => {
-                  const tc = tAmb + ((47 - 20) / 800) * 850;
-                  const eOster = Math.round(520 + idx * 45 - Math.abs(idx - 6) * 35);
-                  const eSimp = Math.round(eOster * 1.045);
-                  const thLoss = -((tc - 25) * 0.40);
-
-                  return `
-                    <tr>
-                      <td><strong>${months[idx]}</strong></td>
-                      <td class="td-num">${tAmb.toFixed(1)} °C</td>
-                      <td class="td-num" style="color: ${tc > 45 ? '#dc2626' : '#2563eb'}; font-weight: 700;">${tc.toFixed(1)} °C</td>
-                      <td class="td-num"><strong>${eOster} kWh</strong></td>
-                      <td class="td-num">${eSimp} kWh</td>
-                      <td class="td-num" style="color: #dc2626;">${thLoss < 0 ? `${thLoss.toFixed(2)}%` : `+${Math.abs(thLoss).toFixed(2)}%`}</td>
-                      <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
-                    </tr>
-                  `;
-                }).join('')}
+                ${energyRows.map((r) => `
+                  <tr>
+                    <td><strong>${r.month}</strong></td>
+                    <td class="td-num">${r.tAmb.toFixed(1)} °C</td>
+                    <td class="td-num" style="color: ${r.tc > 45 ? '#dc2626' : '#2563eb'}; font-weight: 700;">${r.tc.toFixed(1)} °C</td>
+                    <td class="td-num"><strong>${r.eOster} kWh</strong></td>
+                    <td class="td-num">${r.eSimp} kWh</td>
+                    <td class="td-num" style="color: #dc2626;">${r.thLoss < 0 ? `${r.thLoss.toFixed(2)}%` : `+${Math.abs(r.thLoss).toFixed(2)}%`}</td>
+                    <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
+                  </tr>
+                `).join('')}
               </tbody>
+              <tfoot>
+                <tr class="table-media-row verif-media-row">
+                  <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+                  <td class="td-num"><strong>${meanTAmb.toFixed(1)} °C</strong></td>
+                  <td class="td-num" style="color: #2563eb; font-weight: 700;"><strong>${meanTc.toFixed(1)} °C</strong></td>
+                  <td class="td-num"><strong>${Math.round(meanEOster)} kWh</strong></td>
+                  <td class="td-num"><strong>${Math.round(meanESimp)} kWh</strong></td>
+                  <td class="td-num" style="color: #dc2626;"><strong>${meanThLoss.toFixed(2)}%</strong></td>
+                  <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>

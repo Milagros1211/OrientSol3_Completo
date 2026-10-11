@@ -5074,9 +5074,13 @@ body.theme-dark .gain-neg {
 [data-theme="light"] .table-media-row td,
 [data-theme="light"] .tracking-media-row td,
 [data-theme="light"] .seasonal-media-row td,
+[data-theme="light"] .verif-media-row td,
+[data-theme="light"] .energy-media-row td,
 body.theme-light .table-media-row td,
 body.theme-light .tracking-media-row td,
-body.theme-light .seasonal-media-row td {
+body.theme-light .seasonal-media-row td,
+body.theme-light .verif-media-row td,
+body.theme-light .energy-media-row td {
   background: #f1f5f9 !important;
   border-top: 2.5px solid #0f172a !important;
   color: #0f172a !important;
@@ -5087,9 +5091,13 @@ body.theme-light .seasonal-media-row td {
 [data-theme="light"] .table-media-row .td-month-name,
 [data-theme="light"] .tracking-media-row .td-track-month,
 [data-theme="light"] .seasonal-media-row .td-month-badge,
+[data-theme="light"] .verif-media-row td:first-child,
+[data-theme="light"] .energy-media-row .td-ener-annual,
 body.theme-light .table-media-row .td-month-name,
 body.theme-light .tracking-media-row .td-track-month,
-body.theme-light .seasonal-media-row .td-month-badge {
+body.theme-light .seasonal-media-row .td-month-badge,
+body.theme-light .verif-media-row td:first-child,
+body.theme-light .energy-media-row .td-ener-annual {
   color: #0f172a !important;
   background: #e2e8f0 !important;
 }
@@ -5107,9 +5115,13 @@ body.theme-light .seasonal-media-row .highlight-media {
 [data-theme="dark"] .table-media-row td,
 [data-theme="dark"] .tracking-media-row td,
 [data-theme="dark"] .seasonal-media-row td,
+[data-theme="dark"] .verif-media-row td,
+[data-theme="dark"] .energy-media-row td,
 body.theme-dark .table-media-row td,
 body.theme-dark .tracking-media-row td,
-body.theme-dark .seasonal-media-row td {
+body.theme-dark .seasonal-media-row td,
+body.theme-dark .verif-media-row td,
+body.theme-dark .energy-media-row td {
   background: #0b2d40 !important;
   border-top: 2.5px solid #0284c7 !important;
   color: #38bdf8 !important;
@@ -5120,9 +5132,13 @@ body.theme-dark .seasonal-media-row td {
 [data-theme="dark"] .table-media-row .td-month-name,
 [data-theme="dark"] .tracking-media-row .td-track-month,
 [data-theme="dark"] .seasonal-media-row .td-month-badge,
+[data-theme="dark"] .verif-media-row td:first-child,
+[data-theme="dark"] .energy-media-row .td-ener-annual,
 body.theme-dark .table-media-row .td-month-name,
 body.theme-dark .tracking-media-row .td-track-month,
-body.theme-dark .seasonal-media-row .td-month-badge {
+body.theme-dark .seasonal-media-row .td-month-badge,
+body.theme-dark .verif-media-row td:first-child,
+body.theme-dark .energy-media-row .td-ener-annual {
   color: #38bdf8 !important;
   background: #09202c !important;
 }
