@@ -694,16 +694,19 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
         <div class="opt-seasonal-header-bar">
           <div class="opt-seasonal-header-left">
             <div class="opt-seasonal-meta-row">
-              <span class="meta-label"><strong>${isEn ? 'City:' : 'Ciudad:'}</strong> ${locationName}</span>
+              <span class="meta-label">
+                <strong>${isEn ? 'City:' : 'Ciudad:'}</strong>
+                <span class="meta-val meta-city" style="font-weight: 700; margin-left: 0.35rem;">${locationName}</span>
+              </span>
               <span class="meta-label" style="margin-left: 2rem;">
                 <strong>${isEn ? 'Latitude (°):' : 'Latitud (°):'}</strong>
-                <span style="color: #38bdf8; font-weight: 700;">${latitude.toFixed(2)}</span>
+                <span class="meta-val" style="font-weight: 700; margin-left: 0.35rem;">${latitude.toFixed(2)}°</span>
               </span>
             </div>
             <div class="opt-seasonal-study-title-row">
               <span class="meta-label">
                 <strong>${isEn ? 'Study:' : 'Estudio:'}</strong>
-                <span style="color: #60a5fa; font-weight: 600;">${isEn ? 'Seasonal optimal tilt' : 'Inclinación óptima estacional'}</span>
+                <span class="meta-val" style="font-weight: 600; margin-left: 0.35rem;">${isEn ? 'Seasonal optimal tilt' : 'Inclinación óptima estacional'}</span>
               </span>
             </div>
           </div>

@@ -1351,25 +1351,43 @@ body.theme-dark .climate-monthly-table .row-label {
 }
 
 .result-card {
-  background: rgba(10, 14, 23, 0.7);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-sm, 8px);
   padding: 1.25rem;
+  transition: all var(--transition-normal);
+}
+
+[data-theme="light"] .result-card,
+body.theme-light .result-card {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #0f172a;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .result-card,
+body.theme-dark .result-card {
+  background: #06151f !important;
+  border: 1.5px solid #0e3d54 !important;
+  color: #f8fafc !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4) !important;
 }
 
 .highlight-card {
   border-color: rgba(245, 158, 11, 0.4);
-  background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), rgba(10, 14, 23, 0.85));
+}
+
+[data-theme="light"] .highlight-card,
+body.theme-light .highlight-card {
+  background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.08), #ffffff);
+}
+
+[data-theme="dark"] .highlight-card,
+body.theme-dark .highlight-card {
+  background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), rgba(6, 21, 31, 0.95));
 }
 
 .wide-card {
   margin-bottom: 1.25rem;
-}
-
-.wide-card h4 {
-  font-size: 1.05rem;
-  color: #fff;
-  margin-bottom: 1rem;
 }
 
 .result-card-header {
@@ -1379,9 +1397,22 @@ body.theme-dark .climate-monthly-table .row-label {
   margin-bottom: 1rem;
 }
 
-.result-card-header h4 {
-  font-size: 1rem;
-  color: #f3f4f6;
+[data-theme="light"] .wide-card h4,
+[data-theme="light"] .result-card-header h4,
+body.theme-light .wide-card h4,
+body.theme-light .result-card-header h4 {
+  font-size: 1.05rem;
+  color: #0f172a !important;
+  margin-bottom: 0.5rem;
+}
+
+[data-theme="dark"] .wide-card h4,
+[data-theme="dark"] .result-card-header h4,
+body.theme-dark .wide-card h4,
+body.theme-dark .result-card-header h4 {
+  font-size: 1.05rem;
+  color: #f8fafc !important;
+  margin-bottom: 0.5rem;
 }
 
 .tag-optimum {
@@ -1522,61 +1553,137 @@ body.theme-dark .climate-monthly-table .row-label {
 }
 
 .energy-box {
-  background: rgba(10, 14, 23, 0.7);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-sm, 8px);
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
+  transition: all var(--transition-normal);
+}
+
+[data-theme="light"] .energy-box,
+body.theme-light .energy-box {
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-theme="dark"] .energy-box,
+body.theme-dark .energy-box {
+  background: #08161d !important;
+  border: 1.5px solid #0e3d54 !important;
+  color: #f8fafc !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
 }
 
 .energy-title {
   font-size: 0.82rem;
-  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 0.5rem;
+}
+
+[data-theme="light"] .energy-title,
+body.theme-light .energy-title {
+  color: #475569 !important;
+}
+
+[data-theme="dark"] .energy-title,
+body.theme-dark .energy-title {
+  color: #94a3b8 !important;
 }
 
 .energy-val-large {
   font-size: 1.85rem;
   font-weight: 800;
-  color: #38bdf8;
   font-family: var(--font-mono);
   margin-bottom: 0.5rem;
 }
 
+[data-theme="light"] .energy-val-large,
+body.theme-light .energy-val-large {
+  color: #0284c7;
+}
+
+[data-theme="dark"] .energy-val-large,
+body.theme-dark .energy-val-large {
+  color: #38bdf8;
+}
+
 .energy-val-large small {
   font-size: 0.85rem;
-  color: var(--text-dim);
   font-weight: 400;
+}
+
+[data-theme="light"] .energy-val-large small,
+body.theme-light .energy-val-large small {
+  color: #64748b;
+}
+
+[data-theme="dark"] .energy-val-large small,
+body.theme-dark .energy-val-large small {
+  color: #94a3b8;
 }
 
 .energy-details {
   display: flex;
   justify-content: space-between;
   font-size: 0.82rem;
-  color: var(--text-dim);
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   margin-bottom: 0.5rem;
 }
 
-.energy-details strong {
-  color: #fbbf24;
+[data-theme="light"] .energy-details,
+body.theme-light .energy-details {
+  border-bottom: 1px solid #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+[data-theme="dark"] .energy-details,
+body.theme-dark .energy-details {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .energy-details strong,
+body.theme-light .energy-details strong {
+  color: #d97706 !important;
+}
+
+[data-theme="dark"] .energy-details strong,
+body.theme-dark .energy-details strong {
+  color: #fbbf24 !important;
 }
 
 .energy-row-track {
   display: flex;
   justify-content: space-between;
   font-size: 0.84rem;
-  color: var(--text-muted);
+}
+
+[data-theme="light"] .energy-row-track,
+body.theme-light .energy-row-track {
+  color: #475569 !important;
+}
+
+[data-theme="dark"] .energy-row-track,
+body.theme-dark .energy-row-track {
+  color: #cbd5e1 !important;
 }
 
 .energy-row-track strong {
-  color: #34d399;
   font-family: var(--font-mono);
+}
+
+[data-theme="light"] .energy-row-track strong,
+body.theme-light .energy-row-track strong {
+  color: #16a34a !important;
+}
+
+[data-theme="dark"] .energy-row-track strong,
+body.theme-dark .energy-row-track strong {
+  color: #34d399 !important;
 }
 
 .hidden {
@@ -3329,10 +3436,25 @@ body.theme-light .suggestion-meta {
 
 .opt-study-card {
   margin-bottom: 1.5rem;
-  border: 1px solid rgba(59, 130, 246, 0.25);
-  box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.5), 0 0 16px rgba(59, 130, 246, 0.08);
-  background: linear-gradient(180deg, rgba(17, 24, 39, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border-radius: var(--radius-md, 8px);
   padding: 1.5rem;
+  transition: all var(--transition-normal);
+}
+
+[data-theme="light"] .opt-study-card,
+body.theme-light .opt-study-card {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="dark"] .opt-study-card,
+body.theme-dark .opt-study-card {
+  background: #06151f !important;
+  color: #f8fafc !important;
+  border: 1.5px solid #0e3d54 !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5) !important;
 }
 
 .opt-study-header {
@@ -3342,8 +3464,14 @@ body.theme-light .suggestion-meta {
   flex-wrap: wrap;
   gap: 1rem;
   padding-bottom: 1.15rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 2px solid #e2e8f0;
   margin-bottom: 1.25rem;
+  transition: border-color var(--transition-fast);
+}
+
+[data-theme="dark"] .opt-study-header,
+body.theme-dark .opt-study-header {
+  border-bottom-color: #0e3d54 !important;
 }
 
 .opt-study-meta {
@@ -3361,18 +3489,45 @@ body.theme-light .suggestion-meta {
 }
 
 .meta-label {
-  color: var(--text-muted, #94a3b8);
   font-weight: 500;
 }
 
+[data-theme="light"] .meta-label,
+body.theme-light .meta-label {
+  color: #475569;
+}
+
+[data-theme="dark"] .meta-label,
+body.theme-dark .meta-label {
+  color: #94a3b8;
+}
+
 .meta-val {
-  color: var(--text-primary, #f8fafc);
   font-weight: 700;
 }
 
+[data-theme="light"] .meta-val,
+body.theme-light .meta-val {
+  color: #0f172a;
+}
+
+[data-theme="dark"] .meta-val,
+body.theme-dark .meta-val {
+  color: #f8fafc;
+}
+
 .meta-city {
-  color: var(--accent-cyan, #38bdf8);
   font-size: 1.05rem;
+}
+
+[data-theme="light"] .meta-city,
+body.theme-light .meta-city {
+  color: #0284c7 !important;
+}
+
+[data-theme="dark"] .meta-city,
+body.theme-dark .meta-city {
+  color: #38bdf8 !important;
 }
 
 .opt-study-badge-opt {
@@ -3380,7 +3535,7 @@ body.theme-light .suggestion-meta {
   align-items: center;
   gap: 0.6rem;
   background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.35);
+  border: 1.5px solid rgba(245, 158, 11, 0.4);
   padding: 0.4rem 0.85rem;
   border-radius: var(--radius-md, 8px);
 }
@@ -3389,14 +3544,24 @@ body.theme-light .suggestion-meta {
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.05em;
+  color: #d97706;
+}
+
+[data-theme="dark"] .opt-badge-tag,
+body.theme-dark .opt-badge-tag {
   color: #fbbf24;
 }
 
 .opt-badge-angle {
   font-size: 1.1rem;
   font-weight: 800;
-  color: #fef08a;
+  color: #b45309;
   font-family: var(--font-mono, monospace);
+}
+
+[data-theme="dark"] .opt-badge-angle,
+body.theme-dark .opt-badge-angle {
+  color: #fef08a;
 }
 
 /* Control Bar */
@@ -3420,18 +3585,24 @@ body.theme-light .suggestion-meta {
   align-items: center;
   gap: 0.4rem;
   font-size: 0.9rem;
-  color: #cbd5e1;
   font-weight: 600;
 }
 
+[data-theme="light"] .comp-label,
+body.theme-light .comp-label {
+  color: #1e40af;
+}
+
+[data-theme="dark"] .comp-label,
+body.theme-dark .comp-label {
+  color: #38bdf8;
+}
+
 .comp-label svg {
-  color: var(--accent-cyan, #38bdf8);
+  color: currentColor;
 }
 
 .select-comp-dropdown {
-  background: rgba(15, 23, 42, 0.8);
-  color: #f8fafc;
-  border: 1px solid rgba(59, 130, 246, 0.4);
   padding: 0.45rem 1rem;
   border-radius: var(--radius-sm, 6px);
   font-size: 0.9rem;
@@ -3441,9 +3612,29 @@ body.theme-light .suggestion-meta {
   transition: all 0.2s ease;
 }
 
+[data-theme="light"] .select-comp-dropdown,
+body.theme-light .select-comp-dropdown {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1.5px solid #cbd5e1;
+}
+
+[data-theme="dark"] .select-comp-dropdown,
+body.theme-dark .select-comp-dropdown {
+  background: #08161d !important;
+  color: #f8fafc !important;
+  border: 1.5px solid #0284c7 !important;
+}
+
 .select-comp-dropdown:focus {
-  border-color: var(--accent-cyan, #38bdf8);
-  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+  border-color: #0284c7;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.25);
+}
+
+[data-theme="dark"] .select-comp-dropdown:focus,
+body.theme-dark .select-comp-dropdown:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.3);
 }
 
 .control-group-actions {
@@ -3667,54 +3858,108 @@ body.theme-light .suggestion-meta {
   flex-shrink: 0;
 }
 
-/* Table Styling */
-.opt-table-responsive-wrapper {
+/* ==========================================================================
+   HOMOGENIZED STUDY TABLES SYSTEM (ANNUAL, MONTHLY, SEASONAL, TRACKING, COMPARATIVE)
+   ========================================================================== */
+
+.opt-table-responsive-wrapper,
+.opt-seasonal-table-wrap,
+.opt-tracking-table-wrap {
   overflow-x: auto;
   border-radius: var(--radius-md, 8px);
-  border: 1px solid rgba(59, 130, 246, 0.3);
   margin-bottom: 1.25rem;
+  transition: all var(--transition-normal);
 }
 
-.opt-annual-matlab-table {
+[data-theme="light"] .opt-table-responsive-wrapper,
+[data-theme="light"] .opt-seasonal-table-wrap,
+[data-theme="light"] .opt-tracking-table-wrap,
+body.theme-light .opt-table-responsive-wrapper,
+body.theme-light .opt-seasonal-table-wrap,
+body.theme-light .opt-tracking-table-wrap {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .opt-table-responsive-wrapper,
+[data-theme="dark"] .opt-seasonal-table-wrap,
+[data-theme="dark"] .opt-tracking-table-wrap,
+body.theme-dark .opt-table-responsive-wrapper,
+body.theme-dark .opt-seasonal-table-wrap,
+body.theme-dark .opt-tracking-table-wrap {
+  background: #05151f !important;
+  border: 1.5px solid #0e3d54 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+.opt-annual-matlab-table,
+.opt-matrix-table,
+.opt-seasonal-table,
+.opt-tracking-table,
+.matlab-results-table,
+.comparative-results-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.84rem;
+  font-size: 0.86rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  text-align: center;
 }
 
-/* Header Rows */
-.table-top-header-row th {
-  background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%);
-  color: #ffffff;
+/* Unified Table Headers */
+.table-top-header-row th,
+.table-main-header-row th,
+.seasonal-top-th-row th,
+.tracking-top-th-row th,
+.opt-annual-matlab-table thead tr:first-child th,
+.opt-matrix-table thead tr:first-child th,
+.opt-seasonal-table thead tr:first-child th,
+.opt-tracking-table thead tr:first-child th {
+  background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%) !important;
+  color: #ffffff !important;
   padding: 0.55rem 0.65rem;
   font-weight: 700;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  font-size: 0.85rem;
 }
 
-.table-sub-header-row th {
-  background: #1e3a8a;
-  color: #bfdbfe;
+.table-sub-header-row th,
+.seasonal-sub-th-row th,
+.tracking-sub-th-row th,
+.tracking-header-sub th,
+.opt-annual-matlab-table thead tr:nth-child(2) th,
+.opt-matrix-table thead tr:nth-child(2) th,
+.opt-seasonal-table thead tr:nth-child(2) th,
+.opt-tracking-table thead tr:nth-child(2) th {
+  background: #1e3a8a !important;
+  color: #bfdbfe !important;
   padding: 0.45rem 0.55rem;
   font-weight: 600;
   font-size: 0.78rem;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-.th-month {
+/* Month column in headers */
+.th-month,
+.th-season-month,
+.th-track-month {
   width: 110px;
   background: #1e3a8a !important;
-  color: #ffffff;
+  color: #ffffff !important;
   text-align: left !important;
   padding-left: 0.85rem !important;
 }
 
-.th-optimum {
+/* Optimum header columns */
+.th-optimum,
+.th-track-opt {
   background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%) !important;
   border-left: 2px solid #38bdf8 !important;
   border-right: 2px solid #38bdf8 !important;
+  color: #ffffff !important;
   min-width: 100px;
 }
 
@@ -3761,16 +4006,17 @@ body.theme-light .suggestion-meta {
   border: 1px solid rgba(233, 213, 255, 0.4);
 }
 
-.th-temp {
+.th-temp,
+.th-track-temp {
   background: #0f766e !important;
   color: #ccfbf1 !important;
   min-width: 75px;
 }
 
-.th-gain-horiz {
-  background: #0f172a !important;
-  color: #38bdf8 !important;
-  border-bottom: 1px solid rgba(56, 189, 248, 0.3) !important;
+.th-gain-horiz,
+.th-track-gains-super {
+  background: #1e3a8a !important;
+  color: #ffffff !important;
 }
 
 .th-gain-anglex {
@@ -3791,90 +4037,334 @@ body.theme-light .suggestion-meta {
   color: #d8b4fe !important;
 }
 
-/* Table Body Cells */
-.opt-annual-matlab-table tbody tr {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+/* ==========================================================================
+   TABLE BODY ROWS & CELLS (LIGHT & DARK HOMOGENIZED)
+   ========================================================================== */
+
+/* Light Mode Body Rows & Cells */
+[data-theme="light"] .opt-annual-matlab-table tbody tr,
+[data-theme="light"] .opt-matrix-table tbody tr,
+[data-theme="light"] .opt-seasonal-table tbody tr,
+[data-theme="light"] .opt-tracking-table tbody tr,
+[data-theme="light"] .matlab-results-table tbody tr,
+body.theme-light .opt-annual-matlab-table tbody tr,
+body.theme-light .opt-matrix-table tbody tr,
+body.theme-light .opt-seasonal-table tbody tr,
+body.theme-light .opt-tracking-table tbody tr,
+body.theme-light .matlab-results-table tbody tr {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
   transition: background 0.15s ease;
 }
 
-.opt-annual-matlab-table tbody tr:nth-child(even) {
-  background: rgba(15, 23, 42, 0.4);
+[data-theme="light"] .opt-annual-matlab-table tbody tr:nth-child(even),
+[data-theme="light"] .opt-matrix-table tbody tr:nth-child(even),
+[data-theme="light"] .opt-seasonal-table tbody tr:nth-child(even),
+[data-theme="light"] .opt-tracking-table tbody tr:nth-child(even),
+[data-theme="light"] .matlab-results-table tbody tr:nth-child(even),
+body.theme-light .opt-annual-matlab-table tbody tr:nth-child(even),
+body.theme-light .opt-matrix-table tbody tr:nth-child(even),
+body.theme-light .opt-seasonal-table tbody tr:nth-child(even),
+body.theme-light .opt-tracking-table tbody tr:nth-child(even),
+body.theme-light .matlab-results-table tbody tr:nth-child(even) {
+  background: #f8fafc;
 }
 
-.opt-annual-matlab-table tbody tr:hover {
-  background: rgba(59, 130, 246, 0.12);
+[data-theme="light"] .opt-annual-matlab-table tbody tr:hover td,
+[data-theme="light"] .opt-matrix-table tbody tr:hover td,
+[data-theme="light"] .opt-seasonal-table tbody tr:hover td,
+[data-theme="light"] .opt-tracking-table tbody tr:hover td,
+[data-theme="light"] .matlab-results-table tbody tr:hover td,
+body.theme-light .opt-annual-matlab-table tbody tr:hover td,
+body.theme-light .opt-matrix-table tbody tr:hover td,
+body.theme-light .opt-seasonal-table tbody tr:hover td,
+body.theme-light .opt-tracking-table tbody tr:hover td,
+body.theme-light .matlab-results-table tbody tr:hover td {
+  background: #eff6ff !important;
 }
 
-.opt-annual-matlab-table td {
-  padding: 0.45rem 0.55rem;
-  text-align: right;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #e2e8f0;
+[data-theme="light"] .opt-annual-matlab-table td,
+[data-theme="light"] .opt-matrix-table td,
+[data-theme="light"] .opt-seasonal-table td,
+[data-theme="light"] .opt-tracking-table td,
+[data-theme="light"] .matlab-results-table td,
+body.theme-light .opt-annual-matlab-table td,
+body.theme-light .opt-matrix-table td,
+body.theme-light .opt-seasonal-table td,
+body.theme-light .opt-tracking-table td,
+body.theme-light .matlab-results-table td {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
 }
 
-.td-month-name {
+/* Light Mode Month Cell */
+[data-theme="light"] .td-month-name,
+[data-theme="light"] .td-track-month,
+body.theme-light .td-month-name,
+body.theme-light .td-track-month {
   text-align: left !important;
   padding-left: 0.85rem !important;
-  color: #cbd5e1;
-  background: rgba(15, 23, 42, 0.6);
-  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-.td-col-opt {
-  background: rgba(14, 165, 233, 0.1);
-  border-left: 1px solid rgba(56, 189, 248, 0.4) !important;
-  border-right: 1px solid rgba(56, 189, 248, 0.4) !important;
-  color: #fef08a !important;
+  color: #1e40af !important;
+  background: #f1f5f9 !important;
+  border-right: 1.5px solid #cbd5e1 !important;
   font-weight: 700;
 }
 
-.td-col-anglex {
-  background: rgba(168, 85, 247, 0.1);
-  border-left: 1px solid rgba(168, 85, 247, 0.4) !important;
-  border-right: 1px solid rgba(168, 85, 247, 0.4) !important;
+/* Light Mode Highlights */
+[data-theme="light"] .td-col-opt,
+[data-theme="light"] .td-track-opt,
+body.theme-light .td-col-opt,
+body.theme-light .td-track-opt {
+  background: #e0f2fe !important;
+  border-left: 1.5px solid #0284c7 !important;
+  border-right: 1.5px solid #0284c7 !important;
+  color: #0369a1 !important;
+  font-weight: 800;
+}
+
+[data-theme="light"] .td-col-anglex,
+body.theme-light .td-col-anglex {
+  background: #f3e8ff !important;
+  border-left: 1.5px solid #a855f7 !important;
+  border-right: 1.5px solid #a855f7 !important;
+  color: #6b21a8 !important;
+  font-weight: 700;
+}
+
+[data-theme="light"] .td-col-temp,
+[data-theme="light"] .td-track-temp-val,
+body.theme-light .td-col-temp,
+body.theme-light .td-track-temp-val {
+  color: #b45309 !important;
+  background: #fffbeb !important;
+  font-weight: 600;
+}
+
+[data-theme="light"] .td-gain-factor,
+body.theme-light .td-gain-factor {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+[data-theme="light"] .td-gain-factor-x,
+body.theme-light .td-gain-factor-x {
+  color: #7e22ce;
+  font-weight: 600;
+}
+
+[data-theme="light"] .text-gain-pos,
+[data-theme="light"] .gain-pos,
+body.theme-light .text-gain-pos,
+body.theme-light .gain-pos {
+  color: #15803d !important;
+  font-weight: 700;
+}
+
+[data-theme="light"] .text-gain-neg,
+[data-theme="light"] .gain-neg,
+body.theme-light .text-gain-neg,
+body.theme-light .gain-neg {
+  color: #dc2626 !important;
+  font-weight: 700;
+}
+
+/* Dark Mode Body Rows & Cells */
+[data-theme="dark"] .opt-annual-matlab-table tbody tr,
+[data-theme="dark"] .opt-matrix-table tbody tr,
+[data-theme="dark"] .opt-seasonal-table tbody tr,
+[data-theme="dark"] .opt-tracking-table tbody tr,
+[data-theme="dark"] .matlab-results-table tbody tr,
+body.theme-dark .opt-annual-matlab-table tbody tr,
+body.theme-dark .opt-matrix-table tbody tr,
+body.theme-dark .opt-seasonal-table tbody tr,
+body.theme-dark .opt-tracking-table tbody tr,
+body.theme-dark .matlab-results-table tbody tr {
+  background: #06151f !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  transition: background 0.15s ease;
+}
+
+[data-theme="dark"] .opt-annual-matlab-table tbody tr:nth-child(even),
+[data-theme="dark"] .opt-matrix-table tbody tr:nth-child(even),
+[data-theme="dark"] .opt-seasonal-table tbody tr:nth-child(even),
+[data-theme="dark"] .opt-tracking-table tbody tr:nth-child(even),
+[data-theme="dark"] .matlab-results-table tbody tr:nth-child(even),
+body.theme-dark .opt-annual-matlab-table tbody tr:nth-child(even),
+body.theme-dark .opt-matrix-table tbody tr:nth-child(even),
+body.theme-dark .opt-seasonal-table tbody tr:nth-child(even),
+body.theme-dark .opt-tracking-table tbody tr:nth-child(even),
+body.theme-dark .matlab-results-table tbody tr:nth-child(even) {
+  background: #0a1f2c !important;
+}
+
+[data-theme="dark"] .opt-annual-matlab-table tbody tr:hover td,
+[data-theme="dark"] .opt-matrix-table tbody tr:hover td,
+[data-theme="dark"] .opt-seasonal-table tbody tr:hover td,
+[data-theme="dark"] .opt-tracking-table tbody tr:hover td,
+[data-theme="dark"] .matlab-results-table tbody tr:hover td,
+body.theme-dark .opt-annual-matlab-table tbody tr:hover td,
+body.theme-dark .opt-matrix-table tbody tr:hover td,
+body.theme-dark .opt-seasonal-table tbody tr:hover td,
+body.theme-dark .opt-tracking-table tbody tr:hover td,
+body.theme-dark .matlab-results-table tbody tr:hover td {
+  background: rgba(59, 130, 246, 0.15) !important;
+}
+
+[data-theme="dark"] .opt-annual-matlab-table td,
+[data-theme="dark"] .opt-matrix-table td,
+[data-theme="dark"] .opt-seasonal-table td,
+[data-theme="dark"] .opt-tracking-table td,
+[data-theme="dark"] .matlab-results-table td,
+body.theme-dark .opt-annual-matlab-table td,
+body.theme-dark .opt-matrix-table td,
+body.theme-dark .opt-seasonal-table td,
+body.theme-dark .opt-tracking-table td,
+body.theme-dark .matlab-results-table td {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #e2e8f0 !important;
+}
+
+/* Dark Mode Month Cell */
+[data-theme="dark"] .td-month-name,
+[data-theme="dark"] .td-track-month,
+body.theme-dark .td-month-name,
+body.theme-dark .td-track-month {
+  text-align: left !important;
+  padding-left: 0.85rem !important;
+  color: #38bdf8 !important;
+  background: #09202c !important;
+  border-right: 1.5px solid #0e3d54 !important;
+  font-weight: 700;
+}
+
+/* Dark Mode Highlights */
+[data-theme="dark"] .td-col-opt,
+[data-theme="dark"] .td-track-opt,
+body.theme-dark .td-col-opt,
+body.theme-dark .td-track-opt {
+  background: rgba(14, 165, 233, 0.16) !important;
+  border-left: 1.5px solid #38bdf8 !important;
+  border-right: 1.5px solid #38bdf8 !important;
+  color: #fef08a !important;
+  font-weight: 800;
+}
+
+[data-theme="dark"] .td-col-anglex,
+body.theme-dark .td-col-anglex {
+  background: rgba(168, 85, 247, 0.16) !important;
+  border-left: 1.5px solid #c084fc !important;
+  border-right: 1.5px solid #c084fc !important;
   color: #e9d5ff !important;
   font-weight: 700;
 }
 
-.td-col-temp {
-  color: #5eead4 !important;
-  background: rgba(15, 118, 110, 0.08);
-}
-
-.td-gain-factor {
-  color: #93c5fd;
+[data-theme="dark"] .td-col-temp,
+[data-theme="dark"] .td-track-temp-val,
+body.theme-dark .td-col-temp,
+body.theme-dark .td-track-temp-val {
+  color: #fbbf24 !important;
+  background: rgba(245, 158, 11, 0.08) !important;
   font-weight: 600;
 }
 
-.td-gain-factor-x {
-  color: #d8b4fe;
+[data-theme="dark"] .td-gain-factor,
+body.theme-dark .td-gain-factor {
+  color: #93c5fd !important;
   font-weight: 600;
 }
 
-.text-gain-pos {
+[data-theme="dark"] .td-gain-factor-x,
+body.theme-dark .td-gain-factor-x {
+  color: #d8b4fe !important;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .text-gain-pos,
+[data-theme="dark"] .gain-pos,
+body.theme-dark .text-gain-pos,
+body.theme-dark .gain-pos {
   color: #34d399 !important;
   font-weight: 700;
 }
 
-.text-gain-neg {
+[data-theme="dark"] .text-gain-neg,
+[data-theme="dark"] .gain-neg,
+body.theme-dark .text-gain-neg,
+body.theme-dark .gain-neg {
   color: #f87171 !important;
   font-weight: 700;
 }
 
-/* Footer MEDIA Row */
-.table-media-row td {
-  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
-  border-top: 2px solid #3b82f6 !important;
-  padding: 0.6rem 0.55rem !important;
-  color: #ffffff;
+/* ==========================================================================
+   TABLE FOOTER MEDIA ROW (HOMOGENIZED LIGHT & DARK)
+   ========================================================================== */
+
+/* Light Mode Footer */
+[data-theme="light"] .table-media-row td,
+[data-theme="light"] .tracking-media-row td,
+[data-theme="light"] .seasonal-media-row td,
+body.theme-light .table-media-row td,
+body.theme-light .tracking-media-row td,
+body.theme-light .seasonal-media-row td {
+  background: #f1f5f9 !important;
+  border-top: 2.5px solid #0f172a !important;
+  color: #0f172a !important;
   font-weight: 800 !important;
+  padding: 0.6rem 0.55rem !important;
 }
 
-.td-media-label {
-  text-align: left !important;
-  padding-left: 0.85rem !important;
-  color: #fbbf24 !important;
-  letter-spacing: 0.05em;
+[data-theme="light"] .table-media-row .td-month-name,
+[data-theme="light"] .tracking-media-row .td-track-month,
+[data-theme="light"] .seasonal-media-row .td-month-badge,
+body.theme-light .table-media-row .td-month-name,
+body.theme-light .tracking-media-row .td-track-month,
+body.theme-light .seasonal-media-row .td-month-badge {
+  color: #0f172a !important;
+  background: #e2e8f0 !important;
+}
+
+[data-theme="light"] .table-media-row .td-col-opt,
+[data-theme="light"] .tracking-media-row .td-track-opt,
+[data-theme="light"] .seasonal-media-row .highlight-media,
+body.theme-light .table-media-row .td-col-opt,
+body.theme-light .tracking-media-row .td-track-opt,
+body.theme-light .seasonal-media-row .highlight-media {
+  color: #0284c7 !important;
+}
+
+/* Dark Mode Footer */
+[data-theme="dark"] .table-media-row td,
+[data-theme="dark"] .tracking-media-row td,
+[data-theme="dark"] .seasonal-media-row td,
+body.theme-dark .table-media-row td,
+body.theme-dark .tracking-media-row td,
+body.theme-dark .seasonal-media-row td {
+  background: #0b2d40 !important;
+  border-top: 2.5px solid #0284c7 !important;
+  color: #38bdf8 !important;
+  font-weight: 800 !important;
+  padding: 0.6rem 0.55rem !important;
+}
+
+[data-theme="dark"] .table-media-row .td-month-name,
+[data-theme="dark"] .tracking-media-row .td-track-month,
+[data-theme="dark"] .seasonal-media-row .td-month-badge,
+body.theme-dark .table-media-row .td-month-name,
+body.theme-dark .tracking-media-row .td-track-month,
+body.theme-dark .seasonal-media-row .td-month-badge {
+  color: #38bdf8 !important;
+  background: #09202c !important;
+}
+
+[data-theme="dark"] .table-media-row .td-col-opt,
+[data-theme="dark"] .tracking-media-row .td-track-opt,
+[data-theme="dark"] .seasonal-media-row .highlight-media,
+body.theme-dark .table-media-row .td-col-opt,
+body.theme-dark .tracking-media-row .td-track-opt,
+body.theme-dark .seasonal-media-row .highlight-media {
+  color: #fef08a !important;
 }
 
 /* KPI Metric Grid */
@@ -4606,11 +5096,7 @@ body.theme-dark .opt-svg-wrapper {
 .opt-seasonal-study-card {
   margin-top: 2rem;
   margin-bottom: 2.5rem;
-  background: #ffffff;
-  color: #0f172a;
   border-radius: var(--radius-md, 8px);
-  box-shadow: 0 10px 30px rgba(22, 163, 74, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04);
-  border: 1.5px solid #86efac;
   overflow: hidden;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   transition: all var(--transition-normal);
@@ -4618,9 +5104,10 @@ body.theme-dark .opt-svg-wrapper {
 
 [data-theme="light"] .opt-seasonal-study-card,
 body.theme-light .opt-seasonal-study-card {
-  background: #ffffff;
-  color: #0f172a;
-  border-color: #86efac;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
 [data-theme="dark"] .opt-seasonal-study-card,
@@ -4767,63 +5254,11 @@ body.theme-dark .opt-seasonal-table-caption {
   color: #38bdf8 !important;
 }
 
-.opt-seasonal-table-wrap {
-  overflow-x: auto;
-  border: 1.5px solid #86efac;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  background: #ffffff;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-}
+/* ==========================================================================
+   SEASONAL TABLE 4-SEASON ACCENTS (PRESERVING CONTRASTING COLORS ON BADGES & OPTIMA)
+   ========================================================================== */
 
-[data-theme="dark"] .opt-seasonal-table-wrap,
-body.theme-dark .opt-seasonal-table-wrap {
-  border-color: #0e3d54 !important;
-  background: #05151f !important;
-}
-
-.opt-seasonal-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: center;
-  font-size: 0.9rem;
-  font-variant-numeric: tabular-nums;
-  background: #ffffff;
-  color: #0f172a;
-}
-
-.opt-seasonal-table th,
-.opt-seasonal-table td {
-  border: 1px solid #cbd5e1;
-  padding: 0.5rem 0.6rem;
-}
-
-.seasonal-top-th-row th {
-  background: linear-gradient(180deg, #15803d 0%, #166534 100%);
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 0.85rem;
-}
-
-.seasonal-sub-th-row th {
-  background: #14532d;
-  color: #f0fdf4;
-  font-weight: 600;
-  font-size: 0.8rem;
-}
-
-.th-opt-angle-col,
-.th-opt-rad-col {
-  background: linear-gradient(180deg, #ca8a04 0%, #a16207 100%) !important;
-  color: #ffffff !important;
-}
-
-.th-gains-super-col {
-  background: #1e3a8a !important;
-  color: #ffffff !important;
-}
-
-/* Seasonal Month Badges - High Contrast Between Seasons */
+/* Seasonal Month Badges - High Contrast Between Seasons in Both Themes */
 .td-month-badge {
   text-align: left !important;
   padding-left: 0.85rem !important;
@@ -4834,31 +5269,34 @@ body.theme-dark .opt-seasonal-table-wrap {
   box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Invierno (Winter): Azul Hielo / Cian Frío */
+/* Invierno (Winter): Azul Cielo / Cian Intenso */
 .badge-winter {
   background: #0284c7 !important;
   border-right: 2px solid #0369a1 !important;
 }
 
-.row-season-winter {
-  background: #f0f9ff !important;
-}
-
-.row-season-winter:hover {
-  background: #e0f2fe !important;
-}
-
-.row-season-winter td {
-  color: #0c4a6e;
-}
-
-.text-season-winter {
+[data-theme="light"] .text-season-winter,
+body.theme-light .text-season-winter {
   color: #0284c7 !important;
 }
 
-.val-opt-winter {
+[data-theme="dark"] .text-season-winter,
+body.theme-dark .text-season-winter {
+  color: #38bdf8 !important;
+}
+
+[data-theme="light"] .val-opt-winter,
+body.theme-light .val-opt-winter {
   color: #0369a1 !important;
   font-weight: 800;
+  background: rgba(2, 132, 199, 0.08) !important;
+}
+
+[data-theme="dark"] .val-opt-winter,
+body.theme-dark .val-opt-winter {
+  color: #38bdf8 !important;
+  font-weight: 800;
+  background: rgba(56, 189, 248, 0.12) !important;
 }
 
 /* Primavera (Spring): Verde Fresco / Esmeralda Brillante */
@@ -4867,52 +5305,58 @@ body.theme-dark .opt-seasonal-table-wrap {
   border-right: 2px solid #15803d !important;
 }
 
-.row-season-spring {
-  background: #f0fdf4 !important;
-}
-
-.row-season-spring:hover {
-  background: #dcfce7 !important;
-}
-
-.row-season-spring td {
-  color: #14532d;
-}
-
-.text-season-spring {
+[data-theme="light"] .text-season-spring,
+body.theme-light .text-season-spring {
   color: #15803d !important;
 }
 
-.val-opt-spring {
-  color: #166534 !important;
-  font-weight: 800;
+[data-theme="dark"] .text-season-spring,
+body.theme-dark .text-season-spring {
+  color: #4ade80 !important;
 }
 
-/* Verano (Summer): Amarillo Oro Solar Radiante */
+[data-theme="light"] .val-opt-spring,
+body.theme-light .val-opt-spring {
+  color: #15803d !important;
+  font-weight: 800;
+  background: rgba(22, 163, 74, 0.08) !important;
+}
+
+[data-theme="dark"] .val-opt-spring,
+body.theme-dark .val-opt-spring {
+  color: #4ade80 !important;
+  font-weight: 800;
+  background: rgba(74, 222, 128, 0.12) !important;
+}
+
+/* Verano (Summer): Amarillo Oro / Ámbar Solar Radiante */
 .badge-summer {
-  background: #ca8a04 !important;
-  border-right: 2px solid #a16207 !important;
+  background: #d97706 !important;
+  border-right: 2px solid #b45309 !important;
 }
 
-.row-season-summer {
-  background: #fefce8 !important;
+[data-theme="light"] .text-season-summer,
+body.theme-light .text-season-summer {
+  color: #b45309 !important;
 }
 
-.row-season-summer:hover {
-  background: #fef9c3 !important;
+[data-theme="dark"] .text-season-summer,
+body.theme-dark .text-season-summer {
+  color: #fbbf24 !important;
 }
 
-.row-season-summer td {
-  color: #713f12;
-}
-
-.text-season-summer {
-  color: #a16207 !important;
-}
-
-.val-opt-summer {
-  color: #854d0e !important;
+[data-theme="light"] .val-opt-summer,
+body.theme-light .val-opt-summer {
+  color: #b45309 !important;
   font-weight: 800;
+  background: rgba(217, 119, 6, 0.08) !important;
+}
+
+[data-theme="dark"] .val-opt-summer,
+body.theme-dark .val-opt-summer {
+  color: #fbbf24 !important;
+  font-weight: 800;
+  background: rgba(251, 191, 36, 0.12) !important;
 }
 
 /* Otoño (Autumn): Terracota / Naranja Quemado Cálido */
@@ -4921,145 +5365,40 @@ body.theme-dark .opt-seasonal-table-wrap {
   border-right: 2px solid #c2410c !important;
 }
 
-.row-season-autumn {
-  background: #fff7ed !important;
-}
-
-.row-season-autumn:hover {
-  background: #ffedd5 !important;
-}
-
-.row-season-autumn td {
-  color: #7c2d12;
-}
-
-.text-season-autumn {
+[data-theme="light"] .text-season-autumn,
+body.theme-light .text-season-autumn {
   color: #c2410c !important;
 }
 
-.val-opt-autumn {
-  color: #9a3412 !important;
+[data-theme="dark"] .text-season-autumn,
+body.theme-dark .text-season-autumn {
+  color: #fb923c !important;
+}
+
+[data-theme="light"] .val-opt-autumn,
+body.theme-light .val-opt-autumn {
+  color: #c2410c !important;
   font-weight: 800;
-}
-
-/* Media: Neutro Grafito Elegante */
-.badge-media {
-  background: #1e293b !important;
-  color: #ffffff !important;
-}
-
-.seasonal-media-row td {
-  background: #f8fafc !important;
-  font-weight: 800;
-  border-top: 2.5px solid #0f172a !important;
-  color: #0f172a !important;
-}
-
-.highlight-media {
-  color: #15803d !important;
-  font-weight: 800;
-}
-
-/* Seasonal Table Dark Mode Styles */
-[data-theme="dark"] .opt-seasonal-table-wrap,
-body.theme-dark .opt-seasonal-table-wrap {
-  background: #0b1a21;
-  border-color: rgba(52, 211, 153, 0.4);
-}
-
-[data-theme="dark"] .opt-seasonal-table,
-body.theme-dark .opt-seasonal-table {
-  background: #0b1a21;
-  color: #f8fafc;
-}
-
-[data-theme="dark"] .opt-seasonal-table th,
-[data-theme="dark"] .opt-seasonal-table td,
-body.theme-dark .opt-seasonal-table th,
-body.theme-dark .opt-seasonal-table td {
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-[data-theme="dark"] .seasonal-comp-dropdown,
-body.theme-dark .seasonal-comp-dropdown {
-  background: #08161d;
-  color: #f8fafc;
-  border-color: #10b981;
-}
-
-[data-theme="dark"] .opt-seasonal-meta-row,
-body.theme-dark .opt-seasonal-meta-row {
-  color: #f8fafc;
-}
-
-[data-theme="dark"] .opt-seasonal-study-title-row,
-body.theme-dark .opt-seasonal-study-title-row {
-  color: #4ade80;
-}
-
-[data-theme="dark"] .opt-seasonal-table-caption,
-body.theme-dark .opt-seasonal-table-caption {
-  color: #4ade80;
-}
-
-[data-theme="dark"] .row-season-winter,
-body.theme-dark .row-season-winter {
-  background: rgba(2, 132, 199, 0.15) !important;
-}
-
-[data-theme="dark"] .row-season-winter td,
-body.theme-dark .row-season-winter td {
-  color: #bae6fd !important;
-}
-
-[data-theme="dark"] .val-opt-winter,
-body.theme-dark .val-opt-winter {
-  color: #38bdf8 !important;
-}
-
-[data-theme="dark"] .row-season-spring,
-body.theme-dark .row-season-spring {
-  background: rgba(22, 163, 74, 0.15) !important;
-}
-
-[data-theme="dark"] .row-season-spring td,
-body.theme-dark .row-season-spring td {
-  color: #bbf7d0 !important;
-}
-
-[data-theme="dark"] .val-opt-spring,
-body.theme-dark .val-opt-spring {
-  color: #4ade80 !important;
-}
-
-[data-theme="dark"] .row-season-summer,
-body.theme-dark .row-season-summer {
-  background: rgba(202, 138, 4, 0.15) !important;
-}
-
-[data-theme="dark"] .row-season-summer td,
-body.theme-dark .row-season-summer td {
-  color: #fef08a !important;
-}
-
-[data-theme="dark"] .val-opt-summer,
-body.theme-dark .val-opt-summer {
-  color: #facc15 !important;
-}
-
-[data-theme="dark"] .row-season-autumn,
-body.theme-dark .row-season-autumn {
-  background: rgba(234, 88, 12, 0.15) !important;
-}
-
-[data-theme="dark"] .row-season-autumn td,
-body.theme-dark .row-season-autumn td {
-  color: #fed7aa !important;
+  background: rgba(234, 88, 12, 0.08) !important;
 }
 
 [data-theme="dark"] .val-opt-autumn,
 body.theme-dark .val-opt-autumn {
   color: #fb923c !important;
+  font-weight: 800;
+  background: rgba(251, 146, 60, 0.12) !important;
+}
+
+/* Media: Neutro Grafito / Azul Oscuro */
+.badge-media {
+  background: #1e293b !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .badge-media,
+body.theme-dark .badge-media {
+  background: #0b2d40 !important;
+  color: #38bdf8 !important;
 }
 
 .opt-study-footer-actions,
@@ -5965,12 +6304,23 @@ body.theme-dark .opt-energy-footer-buttons {
    ========================================================================== */
 .opt-matlab-graphs-window {
   margin-top: 1.5rem;
-  background: linear-gradient(180deg, #021a14 0%, #010f0c 100%);
-  border: 1px solid rgba(16, 185, 129, 0.35);
   border-radius: 8px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.08);
   overflow: hidden;
   transition: all 0.3s ease;
+}
+
+[data-theme="light"] .opt-matlab-graphs-window,
+body.theme-light .opt-matlab-graphs-window {
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="dark"] .opt-matlab-graphs-window,
+body.theme-dark .opt-matlab-graphs-window {
+  background: #06151f !important;
+  border: 1.5px solid #0e3d54 !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5) !important;
 }
 
 .opt-matlab-graphs-frame {
@@ -6611,9 +6961,10 @@ body.theme-dark .operation-dropdown-select option {
 
 [data-theme="light"] .opt-tracking-study-card,
 body.theme-light .opt-tracking-study-card {
-  background: #ffffff;
-  color: #0f172a;
-  border: 1.5px solid #86efac;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
 }
 
 [data-theme="dark"] .opt-tracking-study-card,
@@ -6771,7 +7122,7 @@ body.theme-dark .opt-tracking-table-caption {
 [data-theme="light"] .opt-tracking-table-wrap,
 body.theme-light .opt-tracking-table-wrap {
   background: #ffffff;
-  border: 1.5px solid #86efac;
+  border: 1.5px solid #cbd5e1;
 }
 
 [data-theme="dark"] .opt-tracking-table-wrap,

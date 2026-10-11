@@ -157,91 +157,95 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
         </div>
       </div>
 
+      <!-- 3. Table Caption -->
+      <div class="opt-tracking-table-caption">
+        ${isEn ? `Mean monthly daily ${compLabel} radiation (kWh/m²/day)` : `Radiación ${compLabel} media mensual (kWh/m²/día)`}
+      </div>
+
       <!-- Main Layout: Table on left, Illustration & Summary on right -->
-      <div style="display: grid; grid-template-columns: 1fr 240px; gap: 1.2rem; align-items: start;">
-        <div style="overflow-x: auto; background: #0f172a; border-radius: 8px; border: 1px solid #1e293b;">
-          <div style="padding: 0.5rem 0.8rem; background: #1e293b; color: #94a3b8; font-size: 0.82rem; font-weight: 600; text-transform: uppercase;">
-            ${isEn ? 'Mean Monthly Radiation' : 'Radiación media mensual'} (${compLabel}) - (kWh/m²/día)
-          </div>
-          <table class="matlab-results-table" style="width: 100%; border-collapse: collapse; font-size: 0.84rem; text-align: center;">
+      <div class="opt-tracking-content-grid">
+        <div class="opt-tracking-table-wrap">
+          <table class="opt-tracking-table">
             <thead>
-              <tr style="background: #1e293b; color: #e2e8f0; border-bottom: 2px solid #334155;">
-                <th style="padding: 0.5rem; text-align: left;">${isEn ? 'Month' : 'Mes'}</th>
-                <th style="padding: 0.5rem;">${compSym} (0°)</th>
-                <th style="padding: 0.5rem; background: rgba(2, 132, 199, 0.2); color: #38bdf8;">${compSym} (Seg. horizontal)</th>
-                <th style="padding: 0.5rem;">% Gan. 0°</th>
-                <th style="padding: 0.5rem;">% Gan. Ópt. Anual</th>
-                <th style="padding: 0.5rem;">% Gan. Ópt. Estac.</th>
-                <th style="padding: 0.5rem;">% Gan. Seg. Polar</th>
-                <th style="padding: 0.5rem;">% Gan. Seg. Azim.</th>
-                <th style="padding: 0.5rem;">Tª Med (°C)</th>
+              <tr class="tracking-top-th-row">
+                <th class="th-track-month">${isEn ? 'Month' : 'Mes'}</th>
+                <th>${compSym} (0°)</th>
+                <th class="th-track-opt">${compSym} (Seg. horizontal)</th>
+                <th>% Gan. 0°</th>
+                <th>% Gan. Ópt. Anual</th>
+                <th>% Gan. Ópt. Estac.</th>
+                <th>% Gan. Seg. Polar</th>
+                <th>% Gan. Seg. Azim.</th>
+                <th class="th-track-temp">Tª Med (°C)</th>
               </tr>
             </thead>
             <tbody>
               ${months.map((mName, i) => `
-                <tr style="border-bottom: 1px solid #1e293b; ${i % 2 === 0 ? 'background: #0b1120;' : 'background: #0f172a;'}">
-                  <td style="padding: 0.45rem 0.6rem; text-align: left; font-weight: 600; color: #cbd5e1;">${mName}</td>
-                  <td style="padding: 0.45rem;">${radHoriz[i].toFixed(2)}</td>
-                  <td style="padding: 0.45rem; font-weight: 700; color: #38bdf8; background: rgba(2, 132, 199, 0.08);">${radHorizTrack[i].toFixed(2)}</td>
-                  <td style="padding: 0.45rem; color: ${gainsOverHoriz[i] >= 0 ? '#10b981' : '#f43f5e'}; font-weight: 600;">
+                <tr>
+                  <td class="td-track-month"><strong>${mName}</strong></td>
+                  <td>${radHoriz[i].toFixed(2)}</td>
+                  <td class="td-track-opt"><strong>${radHorizTrack[i].toFixed(2)}</strong></td>
+                  <td class="${gainsOverHoriz[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
                     ${gainsOverHoriz[i] >= 0 ? '+' : ''}${gainsOverHoriz[i].toFixed(1)}%
                   </td>
-                  <td style="padding: 0.45rem; color: ${gainsOverAnnual[i] >= 0 ? '#10b981' : '#f43f5e'}; font-weight: 600;">
+                  <td class="${gainsOverAnnual[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
                     ${gainsOverAnnual[i] >= 0 ? '+' : ''}${gainsOverAnnual[i].toFixed(1)}%
                   </td>
-                  <td style="padding: 0.45rem; color: ${gainsOverSeasonal[i] >= 0 ? '#10b981' : '#f43f5e'}; font-weight: 600;">
+                  <td class="${gainsOverSeasonal[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
                     ${gainsOverSeasonal[i] >= 0 ? '+' : ''}${gainsOverSeasonal[i].toFixed(1)}%
                   </td>
-                  <td style="padding: 0.45rem; color: ${gainsOverPolar[i] >= 0 ? '#10b981' : '#f43f5e'}; font-weight: 600;">
+                  <td class="${gainsOverPolar[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
                     ${gainsOverPolar[i] >= 0 ? '+' : ''}${gainsOverPolar[i].toFixed(1)}%
                   </td>
-                  <td style="padding: 0.45rem; color: ${gainsOverAzim[i] >= 0 ? '#10b981' : '#f43f5e'}; font-weight: 600;">
+                  <td class="${gainsOverAzim[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
                     ${gainsOverAzim[i] >= 0 ? '+' : ''}${gainsOverAzim[i].toFixed(1)}%
                   </td>
-                  <td style="padding: 0.45rem; color: #f59e0b; font-weight: 600;">${tempMean[i].toFixed(1)}</td>
+                  <td class="td-track-temp-val"><strong>${tempMean[i].toFixed(1)}</strong></td>
                 </tr>
               `).join('')}
-              <tr style="background: #1e293b; font-weight: 800; border-top: 2px solid #0284c7; color: #f8fafc;">
-                <td style="padding: 0.55rem 0.6rem; text-align: left; text-transform: uppercase; color: #38bdf8;">${isEn ? 'Mean' : 'Media'}</td>
-                <td style="padding: 0.55rem;">${meanHoriz.toFixed(2)}</td>
-                <td style="padding: 0.55rem; color: #38bdf8;">${meanHorizTrack.toFixed(2)}</td>
-                <td style="padding: 0.55rem; color: ${meanGainHoriz >= 0 ? '#10b981' : '#f43f5e'};">
-                  ${meanGainHoriz >= 0 ? '+' : ''}${meanGainHoriz.toFixed(1)}%
-                </td>
-                <td style="padding: 0.55rem; color: ${meanGainAnnual >= 0 ? '#10b981' : '#f43f5e'};">
-                  ${meanGainAnnual >= 0 ? '+' : ''}${meanGainAnnual.toFixed(1)}%
-                </td>
-                <td style="padding: 0.55rem; color: ${meanGainSeasonal >= 0 ? '#10b981' : '#f43f5e'};">
-                  ${meanGainSeasonal >= 0 ? '+' : ''}${meanGainSeasonal.toFixed(1)}%
-                </td>
-                <td style="padding: 0.55rem; color: ${meanGainPolar >= 0 ? '#10b981' : '#f43f5e'};">
-                  ${meanGainPolar >= 0 ? '+' : ''}${meanGainPolar.toFixed(1)}%
-                </td>
-                <td style="padding: 0.55rem; color: ${meanGainAzim >= 0 ? '#10b981' : '#f43f5e'};">
-                  ${meanGainAzim >= 0 ? '+' : ''}${meanGainAzim.toFixed(1)}%
-                </td>
-                <td style="padding: 0.55rem; color: #f59e0b;">${tempAnnualMean.toFixed(1)}</td>
-              </tr>
             </tbody>
+            <tfoot>
+              <tr class="tracking-media-row">
+                <td class="td-track-month"><strong>${isEn ? 'Mean' : 'Media'}</strong></td>
+                <td><strong>${meanHoriz.toFixed(2)}</strong></td>
+                <td class="td-track-opt"><strong>${meanHorizTrack.toFixed(2)}</strong></td>
+                <td class="${meanGainHoriz >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
+                  <strong>${meanGainHoriz >= 0 ? '+' : ''}${meanGainHoriz.toFixed(1)}%</strong>
+                </td>
+                <td class="${meanGainAnnual >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
+                  <strong>${meanGainAnnual >= 0 ? '+' : ''}${meanGainAnnual.toFixed(1)}%</strong>
+                </td>
+                <td class="${meanGainSeasonal >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
+                  <strong>${meanGainSeasonal >= 0 ? '+' : ''}${meanGainSeasonal.toFixed(1)}%</strong>
+                </td>
+                <td class="${meanGainPolar >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
+                  <strong>${meanGainPolar >= 0 ? '+' : ''}${meanGainPolar.toFixed(1)}%</strong>
+                </td>
+                <td class="${meanGainAzim >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
+                  <strong>${meanGainAzim >= 0 ? '+' : ''}${meanGainAzim.toFixed(1)}%</strong>
+                </td>
+                <td class="td-track-temp-val"><strong>${tempAnnualMean.toFixed(1)}</strong></td>
+              </tr>
+            </tfoot>
           </table>
         </div>
 
         <!-- Sidebar illustration and tracker configuration info -->
-        <div style="background: #0f172a; border-radius: 8px; border: 1px solid #1e293b; padding: 1rem; text-align: center;">
-          <h4 style="margin: 0 0 0.8rem; font-size: 0.9rem; color: #38bdf8; text-transform: uppercase;">
+        <div class="opt-tracking-diagram-sidebar">
+          <h4 style="margin: 0 0 0.8rem; font-size: 0.9rem; color: var(--accent-cyan); text-transform: uppercase;">
             ${isEn ? 'Horizontal Tracker Setup' : 'Geometría del Seguidor'}
           </h4>
           ${horizDiagramSvg}
-          <div style="margin-top: 1rem; text-align: left; font-size: 0.82rem; color: #94a3b8; line-height: 1.4;">
+          <div class="tracking-diagram-caption" style="margin-top: 1rem; text-align: left; line-height: 1.4;">
             <p style="margin: 0 0 0.4rem;">
-              <strong style="color: #cbd5e1;">${isEn ? 'Axis Elevation:' : 'Elevación de eje:'}</strong> 0° (${isEn ? 'Horizontal' : 'Horizontal'})
+              <strong>${isEn ? 'Axis Elevation:' : 'Elevación de eje:'}</strong> 0° (${isEn ? 'Horizontal' : 'Horizontal'})
             </p>
             <p style="margin: 0 0 0.4rem;">
-              <strong style="color: #cbd5e1;">${isEn ? 'Tracking Range:' : 'Rango de giro:'}</strong> ±45° / ±60° ${isEn ? 'E-W roll' : 'balanceo E-O'}
+              <strong>${isEn ? 'Tracking Range:' : 'Rango de giro:'}</strong> ±45° / ±60° ${isEn ? 'E-W roll' : 'balanceo E-O'}
             </p>
             <p style="margin: 0;">
-              <strong style="color: #cbd5e1;">${isEn ? 'Annual Gain vs 0°:' : 'Ganancia anual vs 0°:'}</strong>
-              <span style="color: #10b981; font-weight: bold;">+${meanGainHoriz.toFixed(1)}%</span>
+              <strong>${isEn ? 'Annual Gain vs 0°:' : 'Ganancia anual vs 0°:'}</strong>
+              <span class="text-gain-pos">+${meanGainHoriz.toFixed(1)}%</span>
             </p>
           </div>
         </div>

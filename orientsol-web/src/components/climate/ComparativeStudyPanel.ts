@@ -94,17 +94,17 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
             <div class="opt-tracking-meta-row">
               <span>
                 <strong>${isEn ? 'City:' : 'Ciudad:'}</strong>
-                <span style="color: #38bdf8; font-weight: 700; margin-left: 0.35rem;">${locationName}</span>
+                <span class="meta-val meta-city" style="font-weight: 700; margin-left: 0.35rem;">${locationName}</span>
               </span>
               <span style="margin-left: 1.5rem;">
                 <strong>${isEn ? 'Latitude (°):' : 'Latitud (°):'}</strong>
-                <span style="color: #38bdf8; font-weight: 700; margin-left: 0.35rem;">${latitude.toFixed(2)}</span>
+                <span class="meta-val" style="font-weight: 700; margin-left: 0.35rem;">${latitude.toFixed(2)}°</span>
               </span>
             </div>
             <div class="opt-tracking-study-title-row">
               <span class="meta-label">
                 <strong>${isEn ? 'Study:' : 'Estudio:'}</strong>
-                <span style="color: #38bdf8; font-weight: 600; margin-left: 0.35rem;">${isEn ? 'Comparative of all study types' : 'Comparativa de todos los tipos de estudios'}</span>
+                <span class="meta-val" style="font-weight: 600; margin-left: 0.35rem;">${isEn ? 'Comparative of all study types' : 'Comparativa de todos los tipos de estudios'}</span>
               </span>
             </div>
           </div>
