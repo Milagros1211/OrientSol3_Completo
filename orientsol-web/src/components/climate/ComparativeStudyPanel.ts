@@ -154,31 +154,31 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
                 <th class="th-track-month">${isEn ? 'Month' : 'Mes'}</th>
                 <th>
                   ${compSym} (0°)
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">β = 0.0° | α = 0.0°</div>
+                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: 0.0° | Ori: 0.0°</div>
                 </th>
                 <th>
                   ${compSym} (${isEn ? 'Annual Optimum' : 'Inclinación óptima anual'})
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">β = ${res.optimalAnnual.optimalTiltDeg.toFixed(1)}° | α = 0.0°</div>
+                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: ${res.optimalAnnual.optimalTiltDeg.toFixed(1)}° | Ori: ${latitude >= 0 ? '0.0°' : '180.0°'}</div>
                 </th>
                 <th>
                   ${compSym} (${isEn ? 'Seasonal Optimum' : 'Inclinación óptima estacional'})
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">β = Var (4) | α = 0.0°</div>
+                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: Var (4) | Ori: ${latitude >= 0 ? '0.0°' : '180.0°'}</div>
                 </th>
                 <th>
                   ${compSym} (${isEn ? 'Polar 1-axis' : 'Seguim. a un eje polar'})
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">β = ${latitude.toFixed(1)}° | α = 0.0°</div>
+                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: ${latitude.toFixed(1)}° | Ori: ${latitude >= 0 ? '0.0°' : '180.0°'}</div>
                 </th>
                 <th>
                   ${compSym} (${isEn ? 'Azimuthal 1-axis' : 'Seguim. a un eje azimutal'})
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">β = ${latitude.toFixed(1)}° | α = ψs</div>
+                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: ${latitude.toFixed(1)}° | Ori: ${latitude >= 0 ? (latitude < 23.45 ? '0.0°/180.0°' : '0.0°') : (latitude > -23.45 ? '180.0°/0.0°' : '180.0°')}</div>
                 </th>
                 <th>
                   ${compSym} (${isEn ? 'Horizontal 1-axis' : 'Seguim. a un eje horizontal'})
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">β = Var (0.0°) | α = 90.0°</div>
+                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: 0.0° | Ori: 90.0°</div>
                 </th>
                 <th class="th-track-opt">
                   ${compSym} (${isEn ? 'Two-axis' : 'Seguim. a dos ejes'})
-                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">β = 90.0°-γs | α = ψs</div>
+                  <div style="font-size: 0.72rem; opacity: 0.85; font-weight: normal; margin-top: 3px;">Inc: Var | Ori: ${latitude >= 0 ? (latitude < 23.45 ? '0.0°/180.0°' : '0.0°') : (latitude > -23.45 ? '180.0°/0.0°' : '180.0°')}</div>
                 </th>
                 <th class="th-track-temp">${isEn ? 'Mean temperature' : 'Temperatura media'}</th>
               </tr>

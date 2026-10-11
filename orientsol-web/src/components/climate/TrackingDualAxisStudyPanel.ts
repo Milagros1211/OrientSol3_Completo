@@ -8,6 +8,7 @@ import {
 } from '@/components/export/pdfReportGenerator';
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
+import { getDualAxisNoonTiltDeg, getNoonAzimuthDeg } from '@/services/solarGeometryAngles';
 
 export type TrackingDualComponent = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -187,7 +188,7 @@ export function renderTrackingDualAxisStudyPanel(props: TrackingDualStudyProps):
                   <th rowspan="2" class="th-track-month">${isEn ? 'Month' : 'Mes'}</th>
                   <th rowspan="2" class="th-track-angles" style="min-width: 145px;">
                     <div>${isEn ? 'Considered Angles' : 'Ángulos considerados'}</div>
-                    <div style="font-size: 0.72rem; font-weight: 600; color: #10b981;">β = 90.0°-γs | α = ψs</div>
+                    <div style="font-size: 0.72rem; font-weight: 600; color: #10b981;">Inc: Variable | Ori: ${res.latitude >= 0 ? (res.latitude < 23.45 ? '0.0°/180.0°' : '0.0°') : (res.latitude > -23.45 ? '180.0°/0.0°' : '180.0°')}</div>
                   </th>
                   <th rowspan="2" class="th-track-h0">${compSym} (0°)</th>
                   <th rowspan="2" class="th-track-opt">${compSym}</th>
@@ -204,11 +205,14 @@ export function renderTrackingDualAxisStudyPanel(props: TrackingDualStudyProps):
                 </tr>
               </thead>
               <tbody>
-                ${months.map((mName, i) => `
+                ${months.map((mName, i) => {
+                  const noonTilt = getDualAxisNoonTiltDeg(res.latitude, i);
+                  const noonAzim = getNoonAzimuthDeg(res.latitude, i);
+                  return `
                   <tr>
                     <td class="td-track-month"><strong>${mName}</strong></td>
                     <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 600; white-space: nowrap; text-align: center;">
-                      <span style="color: #34d399;">β = 90.0°-γs</span> <span style="opacity: 0.4;">|</span> <span style="color: #38bdf8;">α = ψs</span>
+                      <span style="color: #34d399;">Inc: ${noonTilt.toFixed(1)}°</span> <span style="opacity: 0.4;">|</span> <span style="color: #38bdf8;">Ori: ${noonAzim.toFixed(1)}°</span>
                     </td>
                     <td class="td-num">${radHoriz[i].toFixed(2)}</td>
                     <td class="td-num td-track-val"><strong>${radDual[i].toFixed(2)}</strong></td>
@@ -220,13 +224,13 @@ export function renderTrackingDualAxisStudyPanel(props: TrackingDualStudyProps):
                     <td class="td-num">${gainsOverAzim[i].toFixed(2)}</td>
                     <td class="td-num">${gainsOverHorizTrack[i].toFixed(2)}</td>
                   </tr>
-                `).join('')}
+                `;}).join('')}
               </tbody>
               <tfoot>
                 <tr class="tracking-media-row">
                   <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
                   <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 700; white-space: nowrap; text-align: center; color: #34d399;">
-                    β = 90.0°-γs | α = ψs
+                    Inc: ${(months.reduce((acc, _, idx) => acc + getDualAxisNoonTiltDeg(res.latitude, idx), 0) / 12).toFixed(1)}° | Ori: ${(months.reduce((acc, _, idx) => acc + getNoonAzimuthDeg(res.latitude, idx), 0) / 12).toFixed(1)}°
                   </td>
                   <td class="td-num"><strong>${meanHoriz.toFixed(2)}</strong></td>
                   <td class="td-num td-track-val"><strong>${meanDual.toFixed(2)}</strong></td>
