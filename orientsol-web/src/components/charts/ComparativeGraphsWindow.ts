@@ -1,6 +1,10 @@
 import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { getMonthlyRadiationForAngle } from '@/components/climate/OptimalAnnualStudyPanel';
+import { themeManager } from '@/services/theme/themeManager';
+
+export type RadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
+export type GraphType = 'lines' | 'bars';
 
 interface ComparativeGraphsProps {
   simulationResult: SolarBridgeSimulationResult;
@@ -10,28 +14,17 @@ interface ComparativeGraphsProps {
   onExit?: () => void;
 }
 
-export type RadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
-export type GraphType = 'lines' | 'bars';
-
 /**
  * Replicates OrientSol 3.0 - Gráficas para comparativa de todos los tipos de estudios
- * Following strictly Figura 5.2.109 (Líneas) and Figura 5.2.111 (Barras)
+ * Matching strictly Figura 5.2.109 (Líneas) & Figura 5.2.111 (Barras)
+ * With full Light & Dark mode support.
  */
 export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HTMLElement {
   const { simulationResult: res, locationName, latitude, onBack, onExit } = props;
 
   const container = document.createElement('div');
-  container.className = 'matlab-window-container comparative-graphs-window';
-  container.style.cssText = `
-    background: #f8fafc;
-    color: #1e293b;
-    border: 2px solid #94a3b8;
-    border-radius: 8px;
-    padding: 1rem 1.25rem;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-top: 1rem;
-  `;
+  container.className = 'opt-matlab-graphs-window comparative-graphs-window';
+  container.id = 'comparative-graphs-window';
 
   let selectedComponent: RadiationComponent = 'global';
   let graphType: GraphType = 'lines';
@@ -39,6 +32,7 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
 
   function render() {
     const isEn = i18n.getLocale() === 'en';
+    const isDark = themeManager.isDark();
 
     // Retrieve the 7 series for the selected component
     const getCompValues = (
@@ -84,92 +78,101 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
       : selectedComponent === 'diffuse' ? (isEn ? 'Diffuse radiation' : 'Radiación difusa')
       : (isEn ? 'Albedo radiation' : 'Radiación de albedo');
 
+    const cardBg = isDark ? '#06151f' : '#ffffff';
+    const cardBorder = isDark ? 'rgba(56, 189, 248, 0.25)' : '#cbd5e1';
+    const subCardBg = isDark ? '#09202c' : '#f8fafc';
+    const subCardBorder = isDark ? 'rgba(255, 255, 255, 0.12)' : '#cbd5e1';
+    const textMain = isDark ? '#f8fafc' : '#0f172a';
+    const textMuted = isDark ? '#94a3b8' : '#475569';
+
     container.innerHTML = `
-      <!-- Title Bar -->
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #cbd5e1; padding-bottom: 0.6rem; margin-bottom: 1rem;">
-        <div>
-          <div style="font-size: 0.82rem; color: #64748b; font-weight: bold;">
-            ${isEn ? 'Study:' : 'Estudio:'} <span style="color: #0284c7; font-size: 0.95rem;">${isEn ? 'Comparative of all study types' : 'Comparativa de todos los tipos de estudios'}</span>
+      <div style="background: ${cardBg}; border: 1.5px solid ${cardBorder}; border-radius: 8px; padding: 1.25rem; box-shadow: 0 10px 30px rgba(0,0,0,${isDark ? '0.5' : '0.08'}); transition: all 0.3s ease;">
+        <!-- Title Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid ${isDark ? '#0e3d54' : '#e2e8f0'}; padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
+          <div>
+            <div style="font-size: 0.85rem; color: ${textMuted}; font-weight: bold;">
+              ${isEn ? 'Study:' : 'Estudio:'} <span style="color: #38bdf8; font-size: 0.95rem;">${isEn ? 'Comparative of all study types' : 'Comparativa de todos los tipos de estudios'}</span>
+            </div>
+            <div style="font-size: 0.88rem; color: ${textMuted}; margin-top: 0.25rem;">
+              <span>${isEn ? 'City:' : 'Ciudad:'} <strong style="color: #38bdf8;">${locationName}</strong></span>
+              <span style="margin-left: 1.5rem;">${isEn ? 'Latitude (°):' : 'Latitud (°):'} <strong style="color: #38bdf8;">${latitude.toFixed(2)}</strong></span>
+            </div>
           </div>
-          <div style="font-size: 0.85rem; color: #475569; margin-top: 0.2rem;">
-            <span>${isEn ? 'City:' : 'Ciudad:'} <strong style="color: #0284c7;">${locationName}</strong></span>
-            <span style="margin-left: 1.5rem;">${isEn ? 'Latitude (°):' : 'Latitud (°):'} <strong style="color: #0284c7;">${latitude.toFixed(2)}</strong></span>
-          </div>
-        </div>
-        <div style="font-size: 1.3rem; font-weight: 900; letter-spacing: 0.5px; color: #0284c7;">
-          ORIENT<span style="color: #f59e0b;">SOL</span> 3.0
-        </div>
-      </div>
-
-      <!-- Main Body: Canvas Chart on Left, Controls & Stat Cards on Right -->
-      <div style="display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; align-items: start;">
-        
-        <!-- Left: Canvas Graph -->
-        <div style="background: #ffffff; border: 1px solid #94a3b8; border-radius: 4px; padding: 1rem; position: relative;">
-          <div style="text-align: center; font-weight: bold; font-size: 1rem; color: #1e293b; margin-bottom: 0.5rem;">
-            ${compLabel} (kWh/m²/día)
-          </div>
-          <div style="position: relative; width: 100%; height: 380px;">
-            <canvas id="comparative-canvas" width="620" height="380" style="width: 100%; height: 100%; display: block;"></canvas>
-          </div>
-          <div style="margin-top: 0.6rem; display: flex; justify-content: flex-end; align-items: center;">
-            <label style="font-size: 0.84rem; color: #334155; display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
-              <input type="checkbox" id="chk-grid" ${showGrid ? 'checked' : ''} />
-              ${isEn ? 'Enable grid' : 'Activar rejilla'}
-            </label>
+          <div style="font-size: 1.35rem; font-weight: 900; letter-spacing: 0.5px; color: #0284c7;">
+            ORIENT<span style="color: #f59e0b;">SOL</span> <strong>3.0</strong>
           </div>
         </div>
 
-        <!-- Right: Control Panel & MATLAB Blue Stat Cards -->
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-          <!-- Component & Graph Type Selector Box -->
-          <div style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0.8rem 1rem;">
-            <label for="comp-select" style="display: block; font-size: 0.86rem; color: #0284c7; font-weight: 700; margin-bottom: 0.35rem;">
-              ${isEn ? 'Select a component:' : 'Seleccione una componente:'}
-            </label>
-            <select id="comp-select" style="width: 100%; padding: 0.4rem; border: 1px solid #94a3b8; border-radius: 4px; font-weight: 600; color: #1e293b; background: white;">
-              <option value="global" ${selectedComponent === 'global' ? 'selected' : ''}>${isEn ? 'Global' : 'Global'}</option>
-              <option value="beam" ${selectedComponent === 'beam' ? 'selected' : ''}>${isEn ? 'Direct' : 'Directa'}</option>
-              <option value="diffuse" ${selectedComponent === 'diffuse' ? 'selected' : ''}>${isEn ? 'Diffuse' : 'Difusa'}</option>
-              <option value="albedo" ${selectedComponent === 'albedo' ? 'selected' : ''}>${isEn ? 'Albedo' : 'Albedo'}</option>
-            </select>
-
-            <div style="margin-top: 0.8rem; display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-size: 0.84rem; color: #334155; font-weight: 600;">
-                ${isEn ? 'Chart type' : 'Tipo de gráfico'}
-              </span>
-              <div style="display: flex; gap: 0.8rem;">
-                <label style="font-size: 0.84rem; display: flex; align-items: center; gap: 0.25rem; cursor: pointer; color: #1e293b;">
-                  <input type="radio" name="chart-type" value="lines" ${graphType === 'lines' ? 'checked' : ''} />
-                  ${isEn ? 'Lines' : 'Líneas'}
-                </label>
-                <label style="font-size: 0.84rem; display: flex; align-items: center; gap: 0.25rem; cursor: pointer; color: #1e293b;">
-                  <input type="radio" name="chart-type" value="bars" ${graphType === 'bars' ? 'checked' : ''} />
-                  ${isEn ? 'Bars' : 'Barras'}
-                </label>
-              </div>
+        <!-- Main Body: Canvas Chart on Left, Controls & Stat Cards on Right -->
+        <div style="display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; align-items: start;">
+          
+          <!-- Left: Canvas Graph -->
+          <div style="background: ${subCardBg}; border: 1px solid ${subCardBorder}; border-radius: 6px; padding: 1rem; position: relative;">
+            <div style="text-align: center; font-weight: bold; font-size: 1rem; color: ${textMain}; margin-bottom: 0.6rem;">
+              ${compLabel} (kWh/m²/día)
+            </div>
+            <div style="position: relative; width: 100%; height: 380px;">
+              <canvas id="comparative-canvas" width="620" height="380" style="width: 100%; height: 100%; display: block; border-radius: 4px;"></canvas>
+            </div>
+            <div style="margin-top: 0.75rem; display: flex; justify-content: flex-end; align-items: center;">
+              <label style="font-size: 0.86rem; color: ${textMuted}; display: flex; align-items: center; gap: 0.4rem; cursor: pointer;">
+                <input type="checkbox" id="chk-grid" ${showGrid ? 'checked' : ''} />
+                ${isEn ? 'Enable grid' : 'Activar rejilla'}
+              </label>
             </div>
           </div>
 
-          <!-- 7 Blue Stat Cards Grid (Replicating Figura 5.2.109 exactly) -->
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.4rem; font-size: 0.76rem;">
-            ${renderStatCard(isEn ? 'Horiz. Plane' : 'Plano Horiz', statHoriz)}
-            ${renderStatCard(isEn ? 'Opt. Annual' : 'Ópt. anual', statOptAnual)}
-            ${renderStatCard(isEn ? 'Opt. Seasonal' : 'Ópt estacio.', statOptEstac)}
-            ${renderStatCard(isEn ? 'Polar Axis' : 'Eje polar', statPolar)}
-            ${renderStatCard(isEn ? 'Azimuthal' : 'Eje azimutal', statAzim)}
-            ${renderStatCard(isEn ? 'Horiz. Axis' : 'Eje horizonta', statEjeHoriz)}
-            ${renderStatCard(isEn ? 'Dual-Axis' : 'A dos ejes', statDual, 'grid-column: span 2;')}
-          </div>
+          <!-- Right: Control Panel & Stat Cards -->
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Component & Graph Type Selector Box -->
+            <div style="background: ${subCardBg}; border: 1px solid ${subCardBorder}; border-radius: 6px; padding: 0.85rem 1rem;">
+              <label for="comp-select" style="display: block; font-size: 0.88rem; color: #38bdf8; font-weight: 700; margin-bottom: 0.4rem;">
+                ${isEn ? 'Select a component:' : 'Seleccione una componente:'}
+              </label>
+              <select id="comp-select" class="form-select" style="width: 100%; padding: 0.45rem 0.75rem; border: 1px solid ${isDark ? '#0e3d54' : '#94a3b8'}; border-radius: 4px; font-weight: 600; color: ${textMain}; background: ${isDark ? '#08161d' : '#ffffff'};">
+                <option value="global" ${selectedComponent === 'global' ? 'selected' : ''}>${isEn ? 'Global' : 'Global'}</option>
+                <option value="beam" ${selectedComponent === 'beam' ? 'selected' : ''}>${isEn ? 'Direct' : 'Directa'}</option>
+                <option value="diffuse" ${selectedComponent === 'diffuse' ? 'selected' : ''}>${isEn ? 'Diffuse' : 'Difusa'}</option>
+                <option value="albedo" ${selectedComponent === 'albedo' ? 'selected' : ''}>${isEn ? 'Albedo' : 'Albedo'}</option>
+              </select>
 
-          <!-- Bottom Action Buttons -->
-          <div style="display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 0.5rem;">
-            <button type="button" id="btn-comp-graphs-back" style="padding: 0.45rem 1.4rem; background: #e2e8f0; color: #1e293b; border: 1px solid #94a3b8; border-radius: 4px; font-weight: 600; cursor: pointer;">
-              ${isEn ? 'Back' : 'Volver'}
-            </button>
-            <button type="button" id="btn-comp-graphs-exit" style="padding: 0.45rem 1.4rem; background: #e2e8f0; color: #1e293b; border: 1px solid #94a3b8; border-radius: 4px; font-weight: 600; cursor: pointer;">
-              ${isEn ? 'Exit' : 'Salir'}
-            </button>
+              <div style="margin-top: 0.85rem; display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 0.86rem; color: ${textMuted}; font-weight: 600;">
+                  ${isEn ? 'Chart type' : 'Tipo de gráfico'}
+                </span>
+                <div style="display: flex; gap: 0.85rem;">
+                  <label style="font-size: 0.86rem; display: flex; align-items: center; gap: 0.3rem; cursor: pointer; color: ${textMain};">
+                    <input type="radio" name="chart-type" value="lines" ${graphType === 'lines' ? 'checked' : ''} />
+                    ${isEn ? 'Lines' : 'Líneas'}
+                  </label>
+                  <label style="font-size: 0.86rem; display: flex; align-items: center; gap: 0.3rem; cursor: pointer; color: ${textMain};">
+                    <input type="radio" name="chart-type" value="bars" ${graphType === 'bars' ? 'checked' : ''} />
+                    ${isEn ? 'Bars' : 'Barras'}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 7 Blue Stat Cards Grid (Replicating Figura 5.2.109 exactly) -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.45rem; font-size: 0.78rem;">
+              ${renderStatCard(isEn ? 'Horiz. Plane' : 'Plano Horiz', statHoriz, isDark)}
+              ${renderStatCard(isEn ? 'Opt. Annual' : 'Ópt. anual', statOptAnual, isDark)}
+              ${renderStatCard(isEn ? 'Opt. Seasonal' : 'Ópt estacio.', statOptEstac, isDark)}
+              ${renderStatCard(isEn ? 'Polar Axis' : 'Eje polar', statPolar, isDark)}
+              ${renderStatCard(isEn ? 'Azimuthal' : 'Eje azimutal', statAzim, isDark)}
+              ${renderStatCard(isEn ? 'Horiz. Axis' : 'Eje horizonta', statEjeHoriz, isDark)}
+              ${renderStatCard(isEn ? 'Dual-Axis' : 'A dos ejes', statDual, isDark, 'grid-column: span 2;')}
+            </div>
+
+            <!-- Bottom Action Buttons -->
+            <div class="opt-tracking-footer-buttons" style="border: none; padding-top: 0.5rem; justify-content: flex-end;">
+              <button type="button" id="btn-comp-graphs-volver" class="btn-study-foot btn-volver">
+                <span>${isEn ? 'Back' : 'Volver'}</span>
+              </button>
+              <button type="button" id="btn-comp-graphs-salir" class="btn-study-foot btn-salir">
+                <span>${isEn ? 'Exit' : 'Salir'}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -198,11 +201,11 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
       drawCanvasChart();
     });
 
-    container.querySelector('#btn-comp-graphs-back')?.addEventListener('click', () => {
+    container.querySelector('#btn-comp-graphs-volver')?.addEventListener('click', () => {
       if (onBack) onBack();
     });
 
-    container.querySelector('#btn-comp-graphs-exit')?.addEventListener('click', () => {
+    container.querySelector('#btn-comp-graphs-salir')?.addEventListener('click', () => {
       if (onExit) onExit();
     });
 
@@ -210,19 +213,24 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
     drawCanvasChart();
   }
 
-  function renderStatCard(title: string, s: { min: number; med: number; max: number }, customStyle = ''): string {
+  function renderStatCard(title: string, s: { min: number; med: number; max: number }, isDark: boolean, customStyle = ''): string {
+    const headBg = isDark ? '#0369a1' : '#1e40af';
+    const row1Bg = isDark ? '#0284c7' : '#3b82f6';
+    const row2Bg = isDark ? '#0369a1' : '#2563eb';
+    const row3Bg = isDark ? '#075985' : '#1d4ed8';
+
     return `
-      <div style="background: #2563eb; color: #ffffff; border-radius: 4px; overflow: hidden; border: 1px solid #1d4ed8; ${customStyle}">
-        <div style="background: #1e40af; padding: 0.25rem 0.4rem; font-weight: 700; text-align: center; border-bottom: 1px solid #1d4ed8; letter-spacing: 0.2px;">
+      <div style="background: ${row2Bg}; color: #ffffff; border-radius: 4px; overflow: hidden; border: 1px solid ${row3Bg}; ${customStyle}">
+        <div style="background: ${headBg}; padding: 0.28rem 0.4rem; font-weight: 700; text-align: center; border-bottom: 1px solid ${row3Bg}; letter-spacing: 0.2px;">
           ${title}
         </div>
-        <div style="padding: 0.35rem 0.5rem; display: flex; justify-content: space-between; background: #3b82f6; font-family: monospace;">
+        <div style="padding: 0.3rem 0.5rem; display: flex; justify-content: space-between; background: ${row1Bg}; font-family: monospace;">
           <span>mín</span><strong>${s.min.toFixed(2)}</strong>
         </div>
-        <div style="padding: 0.35rem 0.5rem; display: flex; justify-content: space-between; background: #2563eb; font-family: monospace;">
+        <div style="padding: 0.3rem 0.5rem; display: flex; justify-content: space-between; background: ${row2Bg}; font-family: monospace;">
           <span>med</span><strong>${s.med.toFixed(2)}</strong>
         </div>
-        <div style="padding: 0.35rem 0.5rem; display: flex; justify-content: space-between; background: #1d4ed8; font-family: monospace;">
+        <div style="padding: 0.3rem 0.5rem; display: flex; justify-content: space-between; background: ${row3Bg}; font-family: monospace;">
           <span>máx</span><strong>${s.max.toFixed(2)}</strong>
         </div>
       </div>
@@ -235,9 +243,14 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const isDark = themeManager.isDark();
     const w = canvas.width;
     const h = canvas.height;
     ctx.clearRect(0, 0, w, h);
+
+    // Canvas background
+    ctx.fillStyle = isDark ? '#06151f' : '#ffffff';
+    ctx.fillRect(0, 0, w, h);
 
     // Padding
     const pL = 50;
@@ -273,11 +286,11 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
     const seriesData = [
       { name: '0°', color: '#06b6d4', data: s1_horiz },             // Cyan
       { name: 'Ópt.anual', color: '#84cc16', data: s2_optAnnual },      // Lime
-      { name: 'Ópt.estacional', color: '#16a34a', data: s3_optSeasonal },// Forest Green
+      { name: 'Ópt.estacional', color: '#10b981', data: s3_optSeasonal },// Emerald
       { name: 'Seg.polar', color: '#fb923c', data: s4_polar },          // Coral
       { name: 'Seg.azimutal', color: '#eab308', data: s5_azimuthal },   // Golden
-      { name: 'Seg.horizontal', color: '#dc2626', data: s6_horizontal },// Red
-      { name: 'Seg.2ejes', color: '#1e3a8a', data: s7_dual }            // Navy
+      { name: 'Seg.horizontal', color: '#f43f5e', data: s6_horizontal },// Rose
+      { name: 'Seg.2ejes', color: isDark ? '#38bdf8' : '#1e3a8a', data: s7_dual } // Sky/Navy
     ];
 
     // Determine max Y value
@@ -292,13 +305,13 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
     const yCoord = (val: number) => pT + chartH - (val / maxVal) * chartH;
 
     // Background axes box
-    ctx.strokeStyle = '#000000';
+    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.3)' : '#0f172a';
     ctx.lineWidth = 1;
     ctx.strokeRect(pL, pT, chartW, chartH);
 
     // Optional Grid
     if (showGrid) {
-      ctx.strokeStyle = '#cbd5e1';
+      ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.1)' : '#cbd5e1';
       ctx.setLineDash([3, 3]);
 
       // Horizontal grid lines
@@ -322,7 +335,7 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
     }
 
     // Y Axis labels & ticks
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = isDark ? '#cbd5e1' : '#0f172a';
     ctx.font = '11px sans-serif';
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
@@ -337,17 +350,20 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
     ctx.rotate(-Math.PI / 2);
     ctx.textAlign = 'center';
     ctx.font = 'bold 12px sans-serif';
+    ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
     ctx.fillText('Radiación', 0, 0);
     ctx.restore();
 
     // X Axis labels
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
+    ctx.fillStyle = isDark ? '#cbd5e1' : '#0f172a';
     for (let m = 0; m < 12; m++) {
       const x = graphType === 'lines' ? xCoord(m) : pL + (m + 0.5) * (chartW / 12);
       ctx.fillText((m + 1).toString(), x, pT + chartH + 6);
     }
     ctx.font = 'bold 12px sans-serif';
+    ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
     ctx.fillText('Meses', pL + chartW / 2, pT + chartH + 22);
 
     // Plotting lines or bars
@@ -379,7 +395,7 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
 
           ctx.fillStyle = s.color;
           ctx.fillRect(barX, barY, barW, barH);
-          ctx.strokeStyle = '#0f172a';
+          ctx.strokeStyle = isDark ? '#06151f' : '#0f172a';
           ctx.lineWidth = 0.5;
           ctx.strokeRect(barX, barY, barW, barH);
         });
@@ -391,7 +407,7 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
     let legY = pT + 10;
     const legItemH = 22;
 
-    ctx.strokeStyle = '#94a3b8';
+    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.2)' : '#94a3b8';
     ctx.lineWidth = 1;
     ctx.strokeRect(legX - 4, legY - 6, 102, seriesData.length * legItemH + 8);
 
@@ -407,13 +423,13 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
       } else {
         ctx.fillStyle = s.color;
         ctx.fillRect(legX, legY, 16, 10);
-        ctx.strokeStyle = '#000000';
+        ctx.strokeStyle = isDark ? '#06151f' : '#000000';
         ctx.lineWidth = 0.5;
         ctx.strokeRect(legX, legY, 16, 10);
       }
 
       // Draw label
-      ctx.fillStyle = '#000000';
+      ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
       ctx.font = '10.5px sans-serif';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';

@@ -1,5 +1,6 @@
 import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
+import { solarSyncState } from '@/services/bridge/solarSyncState';
 import {
   showPdfGenerationNoticeModal,
   generateOrientSolEnergyPDFReport,
@@ -12,6 +13,7 @@ export interface EnergyCalculationProps {
   latitude: number;
   studyType?: 'annual' | 'seasonal' | 'polar' | 'azimuthal' | 'horizontal' | 'dual';
   initialPeakKw?: number;
+  initialTonc?: number;
   onClose?: () => void;
 }
 
@@ -192,10 +194,10 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
   container.className = 'opt-energy-study-card';
   container.id = 'energy-calculation-window';
 
-  // Default parameters matching MATLAB Energia_Osterwald.fig, initialized with peakPowerKw from above
-  let statePeakKw: number = props.initialPeakKw ?? 5.0;
-  let stateCoefTemp: number = -0.0035;
-  let stateTonc: number = 47;
+  // Default parameters matching MATLAB Energia_Osterwald.fig, synchronized with global state & climate loader
+  let statePeakKw: number = props.initialPeakKw ?? solarSyncState.getPeakPowerKw();
+  let stateCoefTemp: number = solarSyncState.getCoefTemp();
+  let stateTonc: number = props.initialTonc ?? solarSyncState.getTonc();
 
   // Radiation vectors
   const radHoriz = res.horizontal.gdm0;
@@ -471,13 +473,38 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
     `;
 
     // Attach Event Listeners
+    const potInput = container.querySelector<HTMLInputElement>('#input-energy-potencia');
+    const gammaInput = container.querySelector<HTMLInputElement>('#input-energy-gamma');
+    const toncInput = container.querySelector<HTMLInputElement>('#input-energy-tonc');
+
+    // Real-time synchronization when typing into Energy Calculation inputs
+    potInput?.addEventListener('input', () => {
+      const v = parseFloat(potInput.value);
+      if (!isNaN(v) && v > 0) {
+        statePeakKw = v;
+        solarSyncState.setPeakPowerKw(v, 'energy-panel');
+      }
+    });
+
+    toncInput?.addEventListener('input', () => {
+      const v = parseFloat(toncInput.value);
+      if (!isNaN(v) && v > 0) {
+        stateTonc = v;
+        solarSyncState.setTonc(v, 'energy-panel');
+      }
+    });
+
+    gammaInput?.addEventListener('input', () => {
+      const v = parseFloat(gammaInput.value);
+      if (!isNaN(v)) {
+        stateCoefTemp = v;
+        solarSyncState.setCoefTemp(v, 'energy-panel');
+      }
+    });
+
     // 1. Calculate Button
     const btnCalc = container.querySelector<HTMLButtonElement>('#btn-energy-calc-run');
     btnCalc?.addEventListener('click', () => {
-      const potInput = container.querySelector<HTMLInputElement>('#input-energy-potencia');
-      const gammaInput = container.querySelector<HTMLInputElement>('#input-energy-gamma');
-      const toncInput = container.querySelector<HTMLInputElement>('#input-energy-tonc');
-
       const potVal = parseFloat(potInput?.value || '');
       const gammaVal = parseFloat(gammaInput?.value || '');
       const toncVal = parseFloat(toncInput?.value || '');
@@ -495,14 +522,17 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
         alert(isEn ? 'Temperature coefficient must be between -0.005 and -0.003 (1/°C).' : 'El coeficiente de temperatura debe estar comprendido entre -0.005 y -0.003.');
         return;
       }
-      if (toncVal < 40 || toncVal > 55) {
-        alert(isEn ? 'NOCT must be between 40 and 55 °C.' : 'La TONC debe estar comprendida entre 40 y 55 °C.');
+      if (toncVal < 30 || toncVal > 65) {
+        alert(isEn ? 'NOCT must be between 30 and 65 °C.' : 'La TONC debe estar comprendida entre 30 y 65 °C.');
         return;
       }
 
       statePeakKw = potVal;
       stateCoefTemp = gammaVal;
       stateTonc = toncVal;
+      solarSyncState.setPeakPowerKw(potVal, 'energy-panel');
+      solarSyncState.setTonc(toncVal, 'energy-panel');
+      solarSyncState.setCoefTemp(gammaVal, 'energy-panel');
 
       renderInternal();
     });
@@ -544,6 +574,25 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
       });
     });
   }
+
+  const handleExternalSync = (e: Event) => {
+    const d = (e as CustomEvent).detail;
+    if (!d || d.source === 'energy-panel') return;
+    if (d.field === 'peakPowerKw') {
+      statePeakKw = d.value;
+      const pInp = container.querySelector<HTMLInputElement>('#input-energy-potencia');
+      if (pInp && parseFloat(pInp.value) !== d.value) {
+        pInp.value = d.value.toString();
+      }
+    } else if (d.field === 'tonc') {
+      stateTonc = d.value;
+      const tInp = container.querySelector<HTMLInputElement>('#input-energy-tonc');
+      if (tInp && parseFloat(tInp.value) !== d.value) {
+        tInp.value = d.value.toString();
+      }
+    }
+  };
+  window.addEventListener('orientsol:solar-params-updated', handleExternalSync);
 
   renderInternal();
   return container;

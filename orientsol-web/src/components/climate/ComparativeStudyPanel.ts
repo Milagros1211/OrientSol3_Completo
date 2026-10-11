@@ -87,121 +87,145 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
     const mTemp = res.temperatures.ambient.annualMeanC;
 
     container.innerHTML = `
-      <!-- MATLAB Window Header matching Figura 5.2.98 -->
-      <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 1rem 1.25rem; margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
-        <div>
-          <div style="font-size: 0.95rem; color: #1e293b; margin-bottom: 0.35rem;">
-            <span style="color: #64748b; font-weight: 600;">${isEn ? 'City:' : 'Ciudad:'}</span>
-            <strong style="color: #0284c7; margin-left: 0.4rem;">${locationName}</strong>
-            <span style="color: #64748b; font-weight: 600; margin-left: 2rem;">${isEn ? 'Latitude (°):' : 'Latitud (°):'}</span>
-            <strong style="color: #0284c7; margin-left: 0.4rem;">${latitude.toFixed(2)}</strong>
+      <div class="opt-tracking-window-frame">
+        <!-- 1. Header matching OrientSol 3.0 MATLAB Window -->
+        <div class="opt-tracking-header-bar">
+          <div class="opt-tracking-header-left">
+            <div class="opt-tracking-meta-row">
+              <span>
+                <strong>${isEn ? 'City:' : 'Ciudad:'}</strong>
+                <span style="color: #38bdf8; font-weight: 700; margin-left: 0.35rem;">${locationName}</span>
+              </span>
+              <span style="margin-left: 1.5rem;">
+                <strong>${isEn ? 'Latitude (°):' : 'Latitud (°):'}</strong>
+                <span style="color: #38bdf8; font-weight: 700; margin-left: 0.35rem;">${latitude.toFixed(2)}</span>
+              </span>
+            </div>
+            <div class="opt-tracking-study-title-row">
+              <span class="meta-label">
+                <strong>${isEn ? 'Study:' : 'Estudio:'}</strong>
+                <span style="color: #38bdf8; font-weight: 600; margin-left: 0.35rem;">${isEn ? 'Comparative of all study types' : 'Comparativa de todos los tipos de estudios'}</span>
+              </span>
+            </div>
           </div>
-          <div style="font-size: 0.95rem; color: #1e293b;">
-            <span style="color: #64748b; font-weight: 600;">${isEn ? 'Study:' : 'Estudio:'}</span>
-            <strong style="color: #0284c7; margin-left: 0.4rem;">${isEn ? 'Comparative of all study types' : 'Comparativa de todos los tipos de estudios'}</strong>
+          <div class="opt-tracking-header-right">
+            <div class="opt-matlab-brand-title">
+              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>3.0</strong>
+            </div>
           </div>
         </div>
-        <div style="font-size: 1.5rem; font-weight: 900; letter-spacing: 0.5px; color: #0284c7;">
-          ORIENT<span style="color: #f59e0b;">SOL</span> 3.0
+
+        <!-- 2. Controls Toolbar -->
+        <div class="opt-tracking-toolbar">
+          <div class="tracking-comp-select-group">
+            <label for="sel-comp-study" class="tracking-comp-label">
+              ${isEn ? 'Select a component' : 'Seleccione una componente'}
+            </label>
+            <select id="sel-comp-study" class="form-select tracking-comp-dropdown">
+              <option value="global" ${compActual === 'global' ? 'selected' : ''}>${isEn ? 'Global' : 'Global'}</option>
+              <option value="beam" ${compActual === 'beam' ? 'selected' : ''}>${isEn ? 'Direct' : 'Directa'}</option>
+              <option value="diffuse" ${compActual === 'diffuse' ? 'selected' : ''}>${isEn ? 'Diffuse' : 'Difusa'}</option>
+              <option value="albedo" ${compActual === 'albedo' ? 'selected' : ''}>${isEn ? 'Albedo' : 'Albedo'}</option>
+            </select>
+          </div>
+
+          <div class="tracking-toolbar-actions">
+            <button type="button" id="btn-comp-view-graphs" class="btn btn-sm btn-outline-cyan">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v18h18"></path>
+                <path d="m19 9-5 5-4-4-3 3"></path>
+              </svg>
+              <span>${stateCompShowGraphs ? (isEn ? 'Hide Graphs' : 'Ocultar gráficas') : (isEn ? 'View Graphs' : 'Ver gráficas')}</span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Controls Row: Component Selector & View Graphs button -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.8rem;">
-        <div style="display: flex; align-items: center; gap: 0.6rem;">
-          <span style="color: #0284c7; font-size: 0.95rem; font-weight: 700;">
-            ${isEn ? 'Select a component' : 'Seleccione una componente'}
-          </span>
-          <select id="sel-comp-study" style="padding: 0.35rem 0.6rem; border: 1px solid #94a3b8; border-radius: 4px; font-weight: 600; background: #ffffff; color: #1e293b; min-width: 140px;">
-            <option value="global" ${compActual === 'global' ? 'selected' : ''}>${isEn ? 'Global' : 'Global'}</option>
-            <option value="beam" ${compActual === 'beam' ? 'selected' : ''}>${isEn ? 'Direct' : 'Directa'}</option>
-            <option value="diffuse" ${compActual === 'diffuse' ? 'selected' : ''}>${isEn ? 'Diffuse' : 'Difusa'}</option>
-            <option value="albedo" ${compActual === 'albedo' ? 'selected' : ''}>${isEn ? 'Albedo' : 'Albedo'}</option>
-          </select>
+        <!-- 3. Subtitle / Table Caption -->
+        <div class="opt-tracking-table-caption">
+          ${compTitle} (kWh/m²/día)
         </div>
 
-        <button type="button" id="btn-comp-view-graphs" style="padding: 0.45rem 1.6rem; background: #f1f5f9; color: #1e293b; border: 1px solid #94a3b8; border-radius: 4px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-          ${stateCompShowGraphs ? (isEn ? 'Hide Graphs' : 'Ocultar gráficas') : (isEn ? 'View Graphs' : 'Ver gráficas')}
-        </button>
-      </div>
-
-      <!-- Subtitle -->
-      <div style="color: #334155; font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem;">
-        ${compTitle} (kWh/m²/día)
-      </div>
-
-      <!-- 9-Column Comparative Table Matching Figura 5.2.98 -->
-      <div style="overflow-x: auto; background: #ffffff; border: 1px solid #93c5fd; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.06);">
-        <table class="comparative-results-table" style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.88rem;">
-          <thead>
-            <tr style="background: #2563eb; color: #ffffff; border-bottom: 2px solid #1d4ed8;">
-              <th style="padding: 0.65rem 0.8rem; background: #1e40af; border-right: 1px solid #3b82f6; text-align: left;">${isEn ? 'Month' : 'Mes'}</th>
-              <th style="padding: 0.65rem 0.5rem; border-right: 1px solid #3b82f6;">${compSym} (0°)</th>
-              <th style="padding: 0.65rem 0.5rem; border-right: 1px solid #3b82f6;">${compSym} (Inclinación óptima anual)</th>
-              <th style="padding: 0.65rem 0.5rem; border-right: 1px solid #3b82f6;">${compSym} (Inclinación óptima estacional)</th>
-              <th style="padding: 0.65rem 0.5rem; border-right: 1px solid #3b82f6;">${compSym} (Seguim. a un eje polar)</th>
-              <th style="padding: 0.65rem 0.5rem; border-right: 1px solid #3b82f6;">${compSym} (Seguim. a un eje azimutal)</th>
-              <th style="padding: 0.65rem 0.5rem; border-right: 1px solid #3b82f6;">${compSym} (Seguim. a un eje horizontal)</th>
-              <th style="padding: 0.65rem 0.5rem; border-right: 1px solid #3b82f6;">${compSym} (Seguim. a dos ejes)</th>
-              <th style="padding: 0.65rem 0.5rem; background: #1d4ed8;">${isEn ? 'Mean temperature' : 'Temperatura media'}</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${months.map((mName, i) => `
-              <tr style="border-bottom: 1px solid #e2e8f0; ${i % 2 === 0 ? 'background: #ffffff;' : 'background: #f8fafc;'} color: #1e293b;">
-                <td style="padding: 0.45rem 0.8rem; text-align: left; font-weight: 700; background: #eff6ff; color: #1e40af; border-right: 1px solid #bfdbfe;">
-                  ${mName}
-                </td>
-                <td style="padding: 0.45rem; border-right: 1px solid #e2e8f0;">${rad0[i].toFixed(2)}</td>
-                <td style="padding: 0.45rem; border-right: 1px solid #e2e8f0; font-weight: 600;">${radOptAnnual[i].toFixed(2)}</td>
-                <td style="padding: 0.45rem; border-right: 1px solid #e2e8f0; font-weight: 600;">${radOptSeasonal[i].toFixed(2)}</td>
-                <td style="padding: 0.45rem; border-right: 1px solid #e2e8f0; font-weight: 600;">${radPolar[i].toFixed(2)}</td>
-                <td style="padding: 0.45rem; border-right: 1px solid #e2e8f0; font-weight: 600;">${radAzim[i].toFixed(2)}</td>
-                <td style="padding: 0.45rem; border-right: 1px solid #e2e8f0; font-weight: 600;">${radHorizTrack[i].toFixed(2)}</td>
-                <td style="padding: 0.45rem; border-right: 1px solid #e2e8f0; font-weight: 700; color: #0284c7;">${radDual[i].toFixed(2)}</td>
-                <td style="padding: 0.45rem; color: #b45309; font-weight: 600; background: #fffbeb;">${tempMean[i].toFixed(1)}</td>
+        <!-- 4. 9-Column Comparative Table Matching Figura 5.2.98 -->
+        <div class="opt-tracking-table-wrap">
+          <table class="opt-tracking-table comparative-results-table">
+            <thead>
+              <tr class="tracking-top-th-row">
+                <th class="th-track-month">${isEn ? 'Month' : 'Mes'}</th>
+                <th>${compSym} (0°)</th>
+                <th>${compSym} (${isEn ? 'Annual Optimum' : 'Inclinación óptima anual'})</th>
+                <th>${compSym} (${isEn ? 'Seasonal Optimum' : 'Inclinación óptima estacional'})</th>
+                <th>${compSym} (${isEn ? 'Polar 1-axis' : 'Seguim. a un eje polar'})</th>
+                <th>${compSym} (${isEn ? 'Azimuthal 1-axis' : 'Seguim. a un eje azimutal'})</th>
+                <th>${compSym} (${isEn ? 'Horizontal 1-axis' : 'Seguim. a un eje horizontal'})</th>
+                <th class="th-track-opt">${compSym} (${isEn ? 'Two-axis' : 'Seguim. a dos ejes'})</th>
+                <th class="th-track-temp">${isEn ? 'Mean temperature' : 'Temperatura media'}</th>
               </tr>
-            `).join('')}
-            <!-- MEDIA Row (Matching Figura 5.2.98 black/dark background) -->
-            <tr style="background: #0f172a; color: #ffffff; font-weight: 800; border-top: 2px solid #0284c7;">
-              <td style="padding: 0.55rem 0.8rem; text-align: left; text-transform: uppercase; color: #38bdf8; background: #0284c7;">
-                ${isEn ? 'Mean' : 'MEDIA'}
-              </td>
-              <td style="padding: 0.55rem;">${m0.toFixed(2)}</td>
-              <td style="padding: 0.55rem;">${mOptAnnual.toFixed(2)}</td>
-              <td style="padding: 0.55rem;">${mOptSeasonal.toFixed(2)}</td>
-              <td style="padding: 0.55rem;">${mPolar.toFixed(2)}</td>
-              <td style="padding: 0.55rem;">${mAzim.toFixed(2)}</td>
-              <td style="padding: 0.55rem;">${mHorizTrack.toFixed(2)}</td>
-              <td style="padding: 0.55rem; color: #38bdf8;">${mDual.toFixed(2)}</td>
-              <td style="padding: 0.55rem; color: #fbbf24;">${mTemp.toFixed(2)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Action Buttons Matching Figura 5.2.98 -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; flex-wrap: wrap; gap: 0.8rem;">
-        <div style="display: flex; gap: 0.6rem;">
-          <button type="button" id="btn-comp-exit" style="padding: 0.45rem 1.4rem; background: #e2e8f0; color: #1e293b; border: 1px solid #94a3b8; border-radius: 4px; font-weight: 600; cursor: pointer;">
-            ${isEn ? 'Exit' : 'Salir'}
-          </button>
-          <button type="button" id="btn-comp-back" style="padding: 0.45rem 1.4rem; background: #e2e8f0; color: #1e293b; border: 1px solid #94a3b8; border-radius: 4px; font-weight: 600; cursor: pointer;">
-            ${isEn ? 'Back' : 'Volver'}
-          </button>
+            </thead>
+            <tbody>
+              ${months.map((mName, i) => `
+                <tr>
+                  <td class="td-track-month"><strong>${mName}</strong></td>
+                  <td>${rad0[i].toFixed(2)}</td>
+                  <td>${radOptAnnual[i].toFixed(2)}</td>
+                  <td>${radOptSeasonal[i].toFixed(2)}</td>
+                  <td>${radPolar[i].toFixed(2)}</td>
+                  <td>${radAzim[i].toFixed(2)}</td>
+                  <td>${radHorizTrack[i].toFixed(2)}</td>
+                  <td class="td-track-dual"><strong>${radDual[i].toFixed(2)}</strong></td>
+                  <td class="td-track-temp-val"><strong>${tempMean[i].toFixed(1)}</strong></td>
+                </tr>
+              `).join('')}
+            </tbody>
+            <tfoot>
+              <tr class="tracking-media-row">
+                <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+                <td><strong>${m0.toFixed(2)}</strong></td>
+                <td><strong>${mOptAnnual.toFixed(2)}</strong></td>
+                <td><strong>${mOptSeasonal.toFixed(2)}</strong></td>
+                <td><strong>${mPolar.toFixed(2)}</strong></td>
+                <td><strong>${mAzim.toFixed(2)}</strong></td>
+                <td><strong>${mHorizTrack.toFixed(2)}</strong></td>
+                <td class="td-track-dual"><strong>${mDual.toFixed(2)}</strong></td>
+                <td class="td-track-temp-val"><strong>${mTemp.toFixed(1)}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
-        <div style="display: flex; gap: 0.6rem;">
-          <button type="button" id="btn-comp-excel" style="padding: 0.45rem 1.4rem; background: #e2e8f0; color: #1e293b; border: 1px solid #94a3b8; border-radius: 4px; font-weight: 600; cursor: pointer;">
-            ${isEn ? 'Export to Excel' : 'Exportar a Excel'}
-          </button>
-          <button type="button" id="btn-comp-pdf" style="padding: 0.45rem 1.4rem; background: #e2e8f0; color: #1e293b; border: 1px solid #94a3b8; border-radius: 4px; font-weight: 600; cursor: pointer;">
-            ${isEn ? 'Generate Report' : 'Generar un informe'}
-          </button>
-        </div>
-      </div>
 
-      <!-- Graphs container when toggled -->
-      <div id="comparative-graphs-slot" style="margin-top: 1.5rem;"></div>
+        <!-- 5. Footer Buttons Matching OrientSol Design System -->
+        <div class="opt-tracking-footer-buttons" style="margin-top: 1.5rem;">
+          <div class="footer-btn-left-group">
+            <button type="button" id="btn-comp-volver" class="btn-study-foot btn-volver">
+              <span>${isEn ? 'Back' : 'Volver'}</span>
+            </button>
+            <button type="button" id="btn-comp-salir" class="btn-study-foot btn-salir">
+              <span>${isEn ? 'Exit' : 'Salir'}</span>
+            </button>
+          </div>
+          <div class="footer-btn-right-group">
+            <button type="button" id="btn-comp-excel" class="btn-study-foot btn-excel">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>${isEn ? 'Export to Excel' : 'Exportar a Excel'}</span>
+            </button>
+            <button type="button" id="btn-comp-pdf" class="btn-study-foot btn-report">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>${isEn ? 'Generate Report' : 'Generar un informe'}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Graphs container when toggled -->
+        <div id="comparative-graphs-slot" style="margin-top: 1.5rem;"></div>
+      </div>
     `;
 
     // Hook listeners
@@ -236,11 +260,11 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
       graphsSlot.appendChild(graphsWindow);
     }
 
-    container.querySelector('#btn-comp-back')?.addEventListener('click', () => {
+    container.querySelector('#btn-comp-volver')?.addEventListener('click', () => {
       if (onBack) onBack();
     });
 
-    container.querySelector('#btn-comp-exit')?.addEventListener('click', () => {
+    container.querySelector('#btn-comp-salir')?.addEventListener('click', () => {
       if (onExit) onExit();
     });
 
