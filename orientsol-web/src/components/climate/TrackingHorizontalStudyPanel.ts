@@ -146,12 +146,13 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
             <option value="albedo" ${stateHorizComponent === 'albedo' ? 'selected' : ''}>${isEn ? 'Albedo' : 'Albedo'}</option>
           </select>
         </div>
-        <div style="display: flex; gap: 0.6rem;">
-          <button type="button" id="btn-horiz-energy" class="matlab-btn-default ${stateHorizShowEnergy ? 'active' : ''}" style="background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: 700; border: none;">
-            ⚡ ${stateHorizShowEnergy ? (isEn ? 'Hide Energy' : 'Ocultar energía') : (isEn ? 'Calculate Energy' : 'Calcular energía')}
-          </button>
-          <button type="button" id="btn-horiz-graphs" class="matlab-btn-default ${stateHorizShowGraphs ? 'active' : ''}" style="background: linear-gradient(135deg, #0284c7, #0369a1); color: white; font-weight: 700; border: none;">
-            📈 ${stateHorizShowGraphs ? (isEn ? 'Hide Graphs' : 'Ocultar gráficas') : (isEn ? 'View Graphs' : 'Ver gráficas')}
+        <div>
+          <button type="button" id="btn-horiz-graphs" class="btn-study-view-charts ${stateHorizShowGraphs ? 'active' : ''}">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 3v18h18"></path>
+              <path d="m19 9-5 5-4-4-3 3"></path>
+            </svg>
+            <span>${stateHorizShowGraphs ? (isEn ? 'Hide Charts' : 'Ocultar gráficas') : (isEn ? 'View Charts' : 'Ver gráficas')}</span>
           </button>
         </div>
       </div>
@@ -247,21 +248,46 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
       </div>
 
       <!-- Action Buttons Bar -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #334155; flex-wrap: wrap; gap: 0.8rem;">
-        <div style="display: flex; gap: 0.8rem;">
-          <button type="button" id="btn-horiz-back" class="matlab-btn-default" style="min-width: 90px;">
-            ${isEn ? 'Back' : 'Volver'}
+      <div class="opt-study-footer-actions">
+        <div class="footer-btn-left-group">
+          <button type="button" id="btn-horiz-back" class="btn-study-foot btn-volver">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            <span>${isEn ? 'Back' : 'Volver'}</span>
           </button>
-          <button type="button" id="btn-horiz-exit" class="matlab-btn-default" style="min-width: 90px;">
-            ${isEn ? 'Exit' : 'Salir'}
+          <button type="button" id="btn-horiz-exit" class="btn-study-foot btn-salir">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            <span>${isEn ? 'Exit' : 'Salir'}</span>
           </button>
         </div>
-        <div style="display: flex; gap: 0.8rem;">
-          <button type="button" id="btn-horiz-excel" class="matlab-btn-default" style="background: #1e3a8a; color: #93c5fd; border-color: #3b82f6;">
-            📊 ${isEn ? 'Export to Excel' : 'Exportar a Excel'}
+        <div class="footer-btn-right-group">
+          <button type="button" id="btn-horiz-energy" class="btn-study-foot btn-energy ${stateHorizShowEnergy ? 'active' : ''}">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>${stateHorizShowEnergy ? (isEn ? 'Hide Energy Calculation' : 'Ocultar cálculo de energía') : (isEn ? 'Energy Calculation' : 'Cálculo de energía')}</span>
           </button>
-          <button type="button" id="btn-horiz-pdf" class="matlab-btn-default" style="background: #831843; color: #fbcfe8; border-color: #db2777;">
-            📄 ${isEn ? 'Generate Report' : 'Generar un informe'}
+          <button type="button" id="btn-horiz-excel" class="btn-study-foot btn-excel">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>${isEn ? 'Export to Excel' : 'Exportar a Excel'}</span>
+          </button>
+          <button type="button" id="btn-horiz-pdf" class="btn-study-foot btn-report">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>${isEn ? 'Generate Report' : 'Generar un informe'}</span>
           </button>
         </div>
       </div>

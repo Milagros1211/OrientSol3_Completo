@@ -11,7 +11,7 @@ export interface EnergyCalculationProps {
   simulationResult: SolarBridgeSimulationResult;
   locationName: string;
   latitude: number;
-  studyType?: 'annual' | 'seasonal' | 'polar' | 'azimuthal' | 'horizontal' | 'dual';
+  studyType?: 'annual' | 'monthly' | 'seasonal' | 'polar' | 'azimuthal' | 'horizontal' | 'dual';
   initialPeakKw?: number;
   initialTonc?: number;
   onClose?: () => void;
@@ -202,7 +202,9 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
   // Radiation vectors
   const radHoriz = res.horizontal.gdm0;
   const radStudy =
-    studyType === 'seasonal'
+    studyType === 'monthly'
+      ? res.monthlyOptimum12.monthlyDailyKwh
+      : studyType === 'seasonal'
       ? res.seasonal.monthlyDailyKwh
       : studyType === 'polar'
       ? res.tracking.polarAxis.monthlyDailyKwh
@@ -220,7 +222,9 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
     const isEn = i18n.getLocale() === 'en';
     const months = isEn ? MONTH_NAMES_EN : MONTH_NAMES_ES;
     const studyTitle =
-      studyType === 'seasonal'
+      studyType === 'monthly'
+        ? (isEn ? 'Monthly optimization (12 independent angles)' : 'Optimización mensual (12 inclinaciones independientes)')
+        : studyType === 'seasonal'
         ? (isEn ? 'Seasonal optimal tilt' : 'Inclinación óptima estacional')
         : studyType === 'polar'
         ? (isEn ? 'Polar single-axis tracking' : 'Seguimiento a un eje polar')
@@ -238,7 +242,12 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
 
     let studyColTitle = '';
     let studyBadge = '';
-    if (isSeasonal && seasonalData) {
+    if (studyType === 'monthly') {
+      studyColTitle = isEn
+        ? `Performed study (12 Monthly Angles)`
+        : `Estudio realizado (12 Inclinaciones Mensuales)`;
+      studyBadge = isEn ? '12 Monthly Angles' : '12 Inclinaciones';
+    } else if (isSeasonal && seasonalData) {
       studyColTitle = isEn
         ? `Performed study (Inv: ${seasonalData.winterTiltDeg}° / P-O: ${seasonalData.springTiltDeg}° / Ver: ${seasonalData.summerTiltDeg}°)`
         : `Estudio realizado (Inv: ${seasonalData.winterTiltDeg}° / P-O: ${seasonalData.springTiltDeg}° / Ver: ${seasonalData.summerTiltDeg}°)`;

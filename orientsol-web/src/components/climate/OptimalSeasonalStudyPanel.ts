@@ -730,12 +730,12 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
           </div>
 
           <div class="seasonal-toolbar-actions">
-            <button id="btn-seasonal-view-charts" class="btn btn-sm btn-outline-cyan" type="button">
+            <button id="btn-seasonal-view-charts" class="btn-study-view-charts ${stateSeasonalShowGraphs ? 'active' : ''}" type="button">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 3v18h18"></path>
                 <path d="m19 9-5 5-4-4-3 3"></path>
               </svg>
-              <span>${t.results.viewChartsBtn}</span>
+              <span>${stateSeasonalShowGraphs ? (isEn ? 'Hide Charts' : 'Ocultar gráficas') : (isEn ? 'View Charts' : 'Ver gráficas')}</span>
             </button>
           </div>
         </div>
@@ -823,20 +823,28 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
         </div>
 
         <!-- 5. Bottom Action Buttons matching MATLAB Figura 5.2.89 -->
-        <div class="opt-seasonal-footer-buttons">
+        <div class="opt-study-footer-actions">
           <div class="footer-btn-left-group">
-            <button id="btn-seasonal-salir" class="btn-study-foot btn-salir" type="button">
-              <span>${isEn ? 'Exit' : 'Salir'}</span>
-            </button>
             <button id="btn-seasonal-volver" class="btn-study-foot btn-volver" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
               <span>${isEn ? 'Back' : 'Volver'}</span>
+            </button>
+            <button id="btn-seasonal-salir" class="btn-study-foot btn-salir" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              <span>${isEn ? 'Exit' : 'Salir'}</span>
             </button>
           </div>
 
           <div class="footer-btn-right-group">
-            <button id="btn-seasonal-goto-energy" class="btn-study-foot ${stateSeasonalShowEnergy ? 'active' : ''}" type="button">
+            <button id="btn-seasonal-goto-energy" class="btn-study-foot btn-energy ${stateSeasonalShowEnergy ? 'active' : ''}" type="button">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
               </svg>
               <span>${stateSeasonalShowEnergy ? (isEn ? 'Hide Energy Calculation' : 'Ocultar cálculo de energía') : t.results.energyCalcBtn}</span>
             </button>

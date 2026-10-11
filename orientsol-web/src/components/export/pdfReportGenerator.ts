@@ -110,6 +110,7 @@ export function showPdfGeneratedSuccessModal(
 
 export type OrientSolStudyType =
   | 'annual'
+  | 'monthly'
   | 'seasonal'
   | 'polar'
   | 'azimuthal'
@@ -143,6 +144,7 @@ export async function generateOrientSolPDFReport(
 
   const studyNames: Record<OrientSolStudyType, { es: string; en: string }> = {
     annual: { es: 'Inclinación Óptima Anual', en: 'Annual Optimal Tilt' },
+    monthly: { es: 'Optimización Mensual (12 Posiciones)', en: 'Monthly Optimization (12 Positions)' },
     seasonal: { es: 'Inclinación Óptima Estacional', en: 'Seasonal Optimal Tilt' },
     polar: { es: 'Seguimiento a un Eje Polar', en: 'Single-Axis Polar Tracking' },
     azimuthal: { es: 'Seguimiento a un Eje Azimutal', en: 'Single-Axis Azimuthal Tracking' },
@@ -269,6 +271,10 @@ export async function generateOrientSolPDFReport(
     infoIntroText = isEn
       ? 'Information: In this study the receiving surface has a fixed optimal tilt throughout the year oriented towards the equator, maximizing total annual solar irradiation capture.'
       : 'Información: En este estudio la superficie receptora posee una inclinación fija óptima calculada a lo largo de todo el año orientada hacia el ecuador, maximizando la captación solar anual total.';
+  } else if (studyType === 'monthly') {
+    infoIntroText = isEn
+      ? 'Information: In this study the solar panel tilt is optimized month-by-month across 12 independent positions, adjusting to the precise solar declination each month to maximize total annual energy.'
+      : 'Información: En este estudio la inclinación se optimiza mes a mes en 12 posiciones independientes, adaptándose a la declinación solar específica de cada mes para maximizar la captación de energía anual.';
   } else if (studyType === 'seasonal') {
     infoIntroText = isEn
       ? `Information: In this study the module tilt is adjusted 4 times per year (winter: ${res.seasonal.winterTiltDeg}°, spring: ${res.seasonal.springTiltDeg}°, summer: ${res.seasonal.summerTiltDeg}°, autumn: ${res.seasonal.autumnTiltDeg}°) to track seasonal solar elevation variations.`
@@ -368,7 +374,14 @@ export async function generateOrientSolPDFReport(
   ];
 
   const getStudyRadiation = (code: 'global' | 'beam' | 'diffuse' | 'albedo'): number[] => {
-    if (studyType === 'seasonal') {
+    if (studyType === 'monthly') {
+      return code === 'global'
+        ? res.monthlyOptimum12.monthlyDailyKwh
+        : res.monthlyOptimum12.optimalTiltsDeg.map((deg, m) => {
+            const radM = getMonthlyRadiationForAngle(res, code, deg);
+            return radM[m];
+          });
+    } else if (studyType === 'seasonal') {
       return code === 'global'
         ? res.seasonal.monthlyDailyKwh
         : getMonthlyRadiationForAngle(res, code, Math.round((res.seasonal.winterTiltDeg + res.seasonal.summerTiltDeg) / 2));
