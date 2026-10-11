@@ -187,8 +187,8 @@ def generate_capture_loss_map(
             "monthIndex": m,
             "monthName": MONTH_NAMES_ES[m],
             "optimalPoint": {
-                "betaDeg": opt_beta_m,
-                "alphaDeg": opt_alpha_m,
+                "betaDeg": round(float(opt_beta_m), 1) if abs(opt_beta_m - round(opt_beta_m)) > 0.01 else int(round(opt_beta_m)),
+                "alphaDeg": round(float(opt_alpha_m), 1) if abs(opt_alpha_m - round(opt_alpha_m)) > 0.01 else int(round(opt_alpha_m)),
                 "maxDailyRadiationKwh": round(max_rad_m, 3),
             },
             "radiationMatrixKwhM2Day": [[round(float(v), 3) for v in row] for row in m_rad],
@@ -197,6 +197,81 @@ def generate_capture_loss_map(
                 "generalPctCompliant": gen_pct_m,
                 "superpositionPctCompliant": sup_pct_m,
                 "integrationPctCompliant": int_pct_m,
+            },
+        })
+
+    # Generate 4 independent seasonal capture loss maps (CTE DB-HE4)
+    SEASON_DEFS = [
+        {
+            "key": "winter",
+            "name_es": "Invierno",
+            "name_en": "Winter",
+            "months": [11, 0, 1],
+            "label_es": "Dic - Ene - Feb",
+            "label_en": "Dec - Jan - Feb",
+        },
+        {
+            "key": "spring",
+            "name_es": "Primavera",
+            "name_en": "Spring",
+            "months": [2, 3, 4],
+            "label_es": "Mar - Abr - May",
+            "label_en": "Mar - Apr - May",
+        },
+        {
+            "key": "summer",
+            "name_es": "Verano",
+            "name_en": "Summer",
+            "months": [5, 6, 7],
+            "label_es": "Jun - Jul - Ago",
+            "label_en": "Jun - Jul - Aug",
+        },
+        {
+            "key": "autumn",
+            "name_es": "Otoño",
+            "name_en": "Autumn",
+            "months": [8, 9, 10],
+            "label_es": "Sep - Oct - Nov",
+            "label_en": "Sep - Oct - Nov",
+        },
+    ]
+
+    seasonal_maps = []
+    for s_idx, s_def in enumerate(SEASON_DEFS):
+        s_months = s_def["months"]
+        s_rad = np.mean(radiation_monthly[s_months, :, :], axis=0)
+        max_rad_s = float(np.max(s_rad))
+        opt_indices_s = np.unravel_index(np.argmax(s_rad), s_rad.shape)
+        opt_beta_s = float(betas[opt_indices_s[0]])
+        opt_alpha_s = float(alphas[opt_indices_s[1]])
+
+        loss_pct_s = np.where(
+            max_rad_s > 0,
+            ((max_rad_s - s_rad) / max_rad_s) * 100.0,
+            0.0
+        )
+        gen_pct_s = round(float(np.sum(loss_pct_s <= 10.0) / total_cells * 100.0), 1)
+        sup_pct_s = round(float(np.sum(loss_pct_s <= 20.0) / total_cells * 100.0), 1)
+        int_pct_s = round(float(np.sum(loss_pct_s <= 40.0) / total_cells * 100.0), 1)
+
+        seasonal_maps.append({
+            "seasonIndex": s_idx,
+            "seasonKey": s_def["key"],
+            "seasonName": s_def["name_es"],
+            "seasonNameEn": s_def["name_en"],
+            "monthsIncluded": s_def["label_es"],
+            "monthsIncludedEn": s_def["label_en"],
+            "optimalPoint": {
+                "betaDeg": round(float(opt_beta_s), 1) if abs(opt_beta_s - round(opt_beta_s)) > 0.01 else int(round(opt_beta_s)),
+                "alphaDeg": round(float(opt_alpha_s), 1) if abs(opt_alpha_s - round(opt_alpha_s)) > 0.01 else int(round(opt_alpha_s)),
+                "maxDailyRadiationKwh": round(max_rad_s, 3),
+            },
+            "radiationMatrixKwhM2Day": [[round(float(v), 3) for v in row] for row in s_rad],
+            "lossPercentageMatrix": [[round(float(v), 2) for v in row] for row in loss_pct_s],
+            "cteZones": {
+                "generalPctCompliant": gen_pct_s,
+                "superpositionPctCompliant": sup_pct_s,
+                "integrationPctCompliant": int_pct_s,
             },
         })
 
@@ -231,4 +306,6 @@ def generate_capture_loss_map(
         },
         "monthly_maps": monthly_maps,
         "monthlyMaps": monthly_maps,
+        "seasonal_maps": seasonal_maps,
+        "seasonalMaps": seasonal_maps,
     }

@@ -27,6 +27,27 @@ export interface MonthlyCaptureLossMap {
   };
 }
 
+export interface SeasonalCaptureLossMap {
+  seasonIndex: number;
+  seasonKey: 'winter' | 'spring' | 'summer' | 'autumn';
+  seasonName: string;
+  seasonNameEn: string;
+  monthsIncluded: string;
+  monthsIncludedEn?: string;
+  optimalPoint: {
+    betaDeg: number;
+    alphaDeg: number;
+    maxDailyRadiationKwh: number;
+  };
+  radiationMatrixKwhM2Day: number[][];
+  lossPercentageMatrix: number[][];
+  cteZones: {
+    generalPctCompliant: number;
+    superpositionPctCompliant: number;
+    integrationPctCompliant: number;
+  };
+}
+
 export interface CaptureLossMapResult {
   betasDeg: number[];
   alphasDeg: number[];
@@ -44,6 +65,7 @@ export interface CaptureLossMapResult {
     integrationPctCompliant: number;
   };
   monthlyMaps?: MonthlyCaptureLossMap[];
+  seasonalMaps?: SeasonalCaptureLossMap[];
 }
 
 export interface SolarBridgeSimulationResult {
@@ -594,6 +616,7 @@ output_data = {
             "integrationPctCompliant": round(float(loss_map.get("cte_zones", {}).get("integrationPctCompliant", loss_map.get("cte_zones", {}).get("integration_pct_compliant", 0.0))), 1),
         },
         "monthlyMaps": loss_map.get("monthly_maps", []),
+        "seasonalMaps": loss_map.get("seasonal_maps", []),
     },
     "surfaceComparison": [
         {

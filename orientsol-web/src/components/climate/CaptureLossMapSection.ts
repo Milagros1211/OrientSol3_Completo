@@ -1,4 +1,8 @@
-import type { SolarBridgeSimulationResult, MonthlyCaptureLossMap } from '../../services/bridge/solarCalculationBridge';
+import type {
+  SolarBridgeSimulationResult,
+  MonthlyCaptureLossMap,
+  SeasonalCaptureLossMap,
+} from '../../services/bridge/solarCalculationBridge';
 
 const MONTH_NAMES_ES: string[] = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -11,21 +15,24 @@ const MONTH_NAMES_EN: string[] = [
 ];
 
 export interface CaptureLossMapSectionProps {
-  mode: 'annual' | 'monthly';
+  mode: 'annual' | 'monthly' | 'seasonal';
   simulationResult: SolarBridgeSimulationResult;
   isEn?: boolean;
   initialMonth?: number;
+  initialSeason?: number;
   onMonthChange?: (monthIndex: number, optimalBeta: number) => void;
+  onSeasonChange?: (seasonIndex: number, optimalBeta: number) => void;
 }
 
 export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): HTMLElement {
-  const { mode, simulationResult: res, isEn = false, onMonthChange } = props;
+  const { mode, simulationResult: res, isEn = false, onMonthChange, onSeasonChange } = props;
   const container = document.createElement('div');
   container.className = 'capture-loss-map-section result-card wide-card';
   container.style.marginTop = '1.25rem';
   container.style.marginBottom = '1.25rem';
 
   let selectedMonthIdx = props.initialMonth ?? 0;
+  let selectedSeasonIdx = props.initialSeason ?? 0;
 
   const getCteClass = (loss: number) => {
     if (loss <= 10.0) return 'loss-cell-green';
@@ -59,23 +66,122 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
         maxAnnualRadiationKwhM2: mMap.optimalPoint.maxDailyRadiationKwh * 365,
       };
       currentCteZones = mMap.cteZones;
+    } else if (mode === 'seasonal') {
+      let sMap: SeasonalCaptureLossMap | undefined = lossMap.seasonalMaps?.[selectedSeasonIdx];
+
+      // Defensive fallback if seasonalMaps is not yet built from Python backend: calculate from monthlyMaps
+      if (!sMap && lossMap.monthlyMaps && lossMap.monthlyMaps.length === 12) {
+        const seasonMonthIndices = [
+          [11, 0, 1], // winter
+          [2, 3, 4],  // spring
+          [5, 6, 7],  // summer
+          [8, 9, 10], // autumn
+        ][selectedSeasonIdx] || [11, 0, 1];
+
+        const seasonNamesEs = ['Invierno', 'Primavera', 'Verano', 'Otoño'];
+        const seasonNamesEn = ['Winter', 'Spring', 'Summer', 'Autumn'];
+        const seasonMonthsLabelEs = ['Dic - Ene - Feb', 'Mar - Abr - May', 'Jun - Jul - Ago', 'Sep - Oct - Nov'];
+        const seasonMonthsLabelEn = ['Dec - Jan - Feb', 'Mar - Apr - May', 'Jun - Jul - Aug', 'Sep - Oct - Nov'];
+
+        const nRows = currentBetas.length;
+        const nCols = currentAlphas.length;
+        const sRad: number[][] = Array.from({ length: nRows }, () => new Array(nCols).fill(0));
+        let maxRad = 0;
+        let bestB = 0;
+        let bestA = 0;
+
+        for (let r = 0; r < nRows; r++) {
+          for (let c = 0; c < nCols; c++) {
+            let sum = 0;
+            for (const mIdx of seasonMonthIndices) {
+              sum += lossMap.monthlyMaps[mIdx].radiationMatrixKwhM2Day[r][c];
+            }
+            const avg = sum / seasonMonthIndices.length;
+            sRad[r][c] = avg;
+            if (avg > maxRad) {
+              maxRad = avg;
+              bestB = currentBetas[r];
+              bestA = currentAlphas[c];
+            }
+          }
+        }
+
+        const totalCells = nRows * nCols;
+        let count10 = 0;
+        let count20 = 0;
+        let count40 = 0;
+        const sLoss: number[][] = Array.from({ length: nRows }, () => new Array(nCols).fill(0));
+        for (let r = 0; r < nRows; r++) {
+          for (let c = 0; c < nCols; c++) {
+            const loss = maxRad > 0 ? ((maxRad - sRad[r][c]) / maxRad) * 100 : 0;
+            sLoss[r][c] = loss;
+            if (loss <= 10.0) count10++;
+            if (loss <= 20.0) count20++;
+            if (loss <= 40.0) count40++;
+          }
+        }
+
+        sMap = {
+          seasonIndex: selectedSeasonIdx,
+          seasonKey: (['winter', 'spring', 'summer', 'autumn'][selectedSeasonIdx] || 'winter') as any,
+          seasonName: seasonNamesEs[selectedSeasonIdx],
+          seasonNameEn: seasonNamesEn[selectedSeasonIdx],
+          monthsIncluded: seasonMonthsLabelEs[selectedSeasonIdx],
+          monthsIncludedEn: seasonMonthsLabelEn[selectedSeasonIdx],
+          optimalPoint: {
+            betaDeg: bestB,
+            alphaDeg: bestA,
+            maxDailyRadiationKwh: Math.round(maxRad * 1000) / 1000,
+          },
+          radiationMatrixKwhM2Day: sRad,
+          lossPercentageMatrix: sLoss,
+          cteZones: {
+            generalPctCompliant: Math.round((count10 / totalCells) * 1000) / 10,
+            superpositionPctCompliant: Math.round((count20 / totalCells) * 1000) / 10,
+            integrationPctCompliant: Math.round((count40 / totalCells) * 1000) / 10,
+          },
+        };
+      }
+
+      if (sMap) {
+        currentLossMatrix = sMap.lossPercentageMatrix;
+        currentRadMatrix = sMap.radiationMatrixKwhM2Day;
+        currentOptPoint = {
+          betaDeg: sMap.optimalPoint.betaDeg,
+          alphaDeg: sMap.optimalPoint.alphaDeg,
+          maxDailyRadiationKwh: sMap.optimalPoint.maxDailyRadiationKwh,
+          maxAnnualRadiationKwhM2: sMap.optimalPoint.maxDailyRadiationKwh * 365,
+        };
+        currentCteZones = sMap.cteZones;
+      }
     }
 
     const monthNames: string[] = isEn ? MONTH_NAMES_EN : MONTH_NAMES_ES;
+    const seasonNamesEs = ['Invierno', 'Primavera', 'Verano', 'Otoño'];
+    const seasonNamesEn = ['Winter', 'Spring', 'Summer', 'Autumn'];
+    const activeSeasonName = isEn ? seasonNamesEn[selectedSeasonIdx] : seasonNamesEs[selectedSeasonIdx];
+
     const titleText = mode === 'annual'
       ? (isEn ? 'Capture Loss Map (CTE DB-HE4) — Annual Global Radiation' : 'Mapa de Pérdidas de Captación (CTE DB-HE4) — Inclinación Óptima Anual')
-      : (isEn ? 'Capture Loss Map (CTE DB-HE4) — Monthly Optimization' : 'Mapa de Pérdidas de Captación (CTE DB-HE4) — Optimizaciones Mensuales');
+      : mode === 'monthly'
+      ? (isEn ? 'Capture Loss Map (CTE DB-HE4) — Monthly Optimization' : 'Mapa de Pérdidas de Captación (CTE DB-HE4) — Optimizaciones Mensuales')
+      : (isEn ? 'Capture Loss Map (CTE DB-HE4) — Seasonal Optimal Tilt' : 'Mapa de Pérdidas de Captación (CTE DB-HE4) — Inclinación Óptima Estacional');
 
     const optBadgeText = mode === 'annual'
       ? (isEn
           ? `Optimal: β = ${currentOptPoint.betaDeg}°, α = ${currentOptPoint.alphaDeg}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/day`
           : `Óptimo Anual: β = ${currentOptPoint.betaDeg}°, α = ${currentOptPoint.alphaDeg}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día`)
-      : (isEn
+      : mode === 'monthly'
+      ? (isEn
           ? `Month Optimum (${monthNames[selectedMonthIdx]}): β = ${currentOptPoint.betaDeg}°, α = ${currentOptPoint.alphaDeg}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/day`
-          : `Óptimo del mes (${monthNames[selectedMonthIdx]}): β = ${currentOptPoint.betaDeg}°, α = ${currentOptPoint.alphaDeg}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día`);
+          : `Óptimo del mes (${monthNames[selectedMonthIdx]}): β = ${currentOptPoint.betaDeg}°, α = ${currentOptPoint.alphaDeg}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día`)
+      : (isEn
+          ? `Season Optimum (${activeSeasonName}): β = ${currentOptPoint.betaDeg}°, α = ${currentOptPoint.alphaDeg}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/day`
+          : `Óptimo Estacional (${activeSeasonName}): β = ${currentOptPoint.betaDeg}°, α = ${currentOptPoint.alphaDeg}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día`);
 
-    const monthSelectorHtml = mode === 'monthly'
-      ? `
+    let selectorHtml = '';
+    if (mode === 'monthly') {
+      selectorHtml = `
         <div style="display: flex; align-items: center; gap: 0.6rem; margin-top: 0.5rem; flex-wrap: wrap;">
           <label for="loss-map-month-select" style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">
             ${isEn ? 'Select Month for Capture Map:' : 'Seleccionar mes para el mapa de captación:'}
@@ -91,8 +197,64 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
             ${isEn ? 'Displays CTE losses and highlights optimum for the selected month' : 'Muestra pérdidas CTE y ángulo óptimo del mes seleccionado'}
           </span>
         </div>
-      `
-      : '';
+      `;
+    } else if (mode === 'seasonal') {
+      const seasonDefs = [
+        {
+          nameEs: 'Invierno',
+          nameEn: 'Winter',
+          monthsEs: 'Dic - Ene - Feb',
+          monthsEn: 'Dec - Jan - Feb',
+          fallbackBeta: res.seasonal?.winterTiltDeg ?? currentOptPoint.betaDeg,
+        },
+        {
+          nameEs: 'Primavera',
+          nameEn: 'Spring',
+          monthsEs: 'Mar - Abr - May',
+          monthsEn: 'Mar - Apr - May',
+          fallbackBeta: res.seasonal?.springTiltDeg ?? currentOptPoint.betaDeg,
+        },
+        {
+          nameEs: 'Verano',
+          nameEn: 'Summer',
+          monthsEs: 'Jun - Jul - Ago',
+          monthsEn: 'Jun - Jul - Aug',
+          fallbackBeta: res.seasonal?.summerTiltDeg ?? currentOptPoint.betaDeg,
+        },
+        {
+          nameEs: 'Otoño',
+          nameEn: 'Autumn',
+          monthsEs: 'Sep - Oct - Nov',
+          monthsEn: 'Sep - Oct - Nov',
+          fallbackBeta: res.seasonal?.autumnTiltDeg ?? currentOptPoint.betaDeg,
+        },
+      ];
+
+      selectorHtml = `
+        <div style="display: flex; align-items: center; gap: 0.6rem; margin-top: 0.5rem; flex-wrap: wrap;">
+          <label for="loss-map-season-select" style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">
+            ${isEn ? 'Select Season for Capture Map:' : 'Seleccionar estación para el mapa de captación:'}
+          </label>
+          <select id="loss-map-season-select" class="form-select form-select-sm loss-map-month-dropdown" style="width: auto; min-width: 260px; font-weight: 600;">
+            ${seasonDefs.map((s, i) => {
+              const sMap = lossMap.seasonalMaps?.[i];
+              const optBeta = sMap ? sMap.optimalPoint.betaDeg : s.fallbackBeta;
+              const optAlpha = sMap ? sMap.optimalPoint.alphaDeg : 0;
+              const sName = isEn ? s.nameEn : s.nameEs;
+              const sMonths = isEn ? s.monthsEn : s.monthsEs;
+              return `
+                <option value="${i}" ${i === selectedSeasonIdx ? 'selected' : ''}>
+                  ${sName} (${sMonths}) — Ópt: β = ${optBeta}°, α = ${optAlpha}°
+                </option>
+              `;
+            }).join('')}
+          </select>
+          <span style="font-size: 0.76rem; color: var(--text-dim);">
+            ${isEn ? 'Displays CTE losses and highlights optimum for the selected season' : 'Muestra pérdidas CTE y ángulos óptimos de la estación seleccionada'}
+          </span>
+        </div>
+      `;
+    }
 
     container.innerHTML = `
       <div class="result-card-header" style="flex-wrap: wrap; gap: 0.5rem; align-items: center;">
@@ -114,7 +276,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
         <span class="badge badge-success" style="font-size: 0.82rem; padding: 0.4rem 0.75rem;">${optBadgeText}</span>
       </div>
 
-      ${monthSelectorHtml}
+      ${selectorHtml}
 
       <div class="cte-legend-bar" style="margin-top: 0.75rem;">
         <div class="cte-legend-item">
@@ -175,6 +337,21 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
         const newOptBeta = lossMap.monthlyMaps ? lossMap.monthlyMaps[selectedMonthIdx].optimalPoint.betaDeg : 0;
         if (onMonthChange) {
           onMonthChange(selectedMonthIdx, newOptBeta);
+        }
+        renderContent();
+      });
+    }
+
+    // Attach Season Selector listener if present
+    if (mode === 'seasonal') {
+      const seasonSelect = container.querySelector<HTMLSelectElement>('#loss-map-season-select');
+      seasonSelect?.addEventListener('change', () => {
+        selectedSeasonIdx = parseInt(seasonSelect.value, 10) || 0;
+        const newOptBeta = lossMap.seasonalMaps
+          ? lossMap.seasonalMaps[selectedSeasonIdx].optimalPoint.betaDeg
+          : 0;
+        if (onSeasonChange) {
+          onSeasonChange(selectedSeasonIdx, newOptBeta);
         }
         renderContent();
       });
