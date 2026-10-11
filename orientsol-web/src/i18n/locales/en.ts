@@ -55,7 +55,7 @@ export const en: Translations = {
     previewTitle: 'Retrieved Meteorological Data',
   },
   hybridLoader: {
-    title: '3. Hybrid Architecture & Dual Climate Ingestion',
+    title: 'Hybrid Architecture & Dual Climate Ingestion',
     subtitle: 'Query OrientSol 3.0 Historical Database, enter monthly data manually, or upload digital documents (CSV / JSON) to feed the Python calculation engine.',
     tabHistorical: '1. OrientSol Historical Database',
     tabManual: '2. Manual Entry (Form)',

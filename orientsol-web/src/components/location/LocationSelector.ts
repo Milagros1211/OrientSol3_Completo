@@ -74,7 +74,6 @@ export function renderLocationSelector(
     detailsBox.innerHTML = `
       <div class="meta-pills">
         <span class="meta-pill"><strong>${currT.location.latitude}:</strong> ${selectedLoc.latitude.toFixed(4)}° N</span>
-        <span class="meta-pill"><strong>${currT.location.elevation}:</strong> ${selectedLoc.elevationM ?? 'N/D'} m</span>
         <span class="meta-pill"><strong>${currT.externalClimate.annualGdm0}:</strong> ${annualGdm0.toFixed(2)} kWh/m²/d</span>
         <span class="meta-pill"><strong>${currT.location.albedoLabel}:</strong> ${albedoVal.toFixed(2)}</span>
       </div>
