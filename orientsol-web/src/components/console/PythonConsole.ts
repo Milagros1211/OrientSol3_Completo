@@ -503,7 +503,8 @@ export function renderPythonConsole(): HTMLElement {
                 ${g0Mock.map((g0, idx) => {
                   const bdm = g0 * 0.58;
                   const ddm = g0 * 0.42;
-                  const optTilt = Math.max(0, Math.min(65, stateLat - getMonthlyDeclinationDeg(idx)));
+                  const dec = getMonthlyDeclinationDeg(idx);
+                  const optTilt = Math.max(1, Math.min(80, Math.abs(stateLat - dec)));
                   const gOpt = g0 * 1.18;
                   const gain = ((gOpt - g0) / g0) * 100;
                   return `
@@ -529,7 +530,7 @@ export function renderPythonConsole(): HTMLElement {
     if (activeTab === 'tracking') {
       const trackingRows = [
         { name: isEn ? 'Horizontal Surface (0°)' : 'Superficie Horizontal (0°)', inc: '0.0°', ori: '0.0°', rad: '4.76', gainH: '0.0%', gainOpt: '-14.2%', status: '✓ Baseline' },
-        { name: isEn ? 'Annual Optimal Tilt' : 'Inclinación Óptima Anual', inc: `${Math.max(10, Math.round(stateLat - 5))}.0°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: '5.55', gainH: '+16.6%', gainOpt: '0.0%', status: '✓ Validado' },
+        { name: isEn ? 'Annual Optimal Tilt' : 'Inclinación Óptima Anual', inc: `${Math.max(10, Math.round(Math.abs(stateLat) * 0.88))}.0°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: '5.55', gainH: '+16.6%', gainOpt: '0.0%', status: '✓ Validado' },
         { name: isEn ? 'Seasonal Optimal Tilt (4 pos)' : 'Inclinación Óptima Estacional (4 pos)', inc: 'Var (4)', ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: '5.84', gainH: '+22.7%', gainOpt: '+5.2%', status: '✓ Validado' },
         { name: isEn ? 'Single-Axis Polar Tracking' : 'Seguimiento a un Eje Polar', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: '6.52', gainH: '+37.0%', gainOpt: '+17.5%', status: '✓ Validado' },
         { name: isEn ? 'Single-Axis Azimuthal Tracking' : 'Seguimiento a un Eje Azimutal', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: 'Var (ψs)', rad: '6.68', gainH: '+40.3%', gainOpt: '+20.4%', status: '✓ Validado' },
