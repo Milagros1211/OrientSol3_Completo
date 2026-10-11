@@ -177,6 +177,10 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
               <thead>
                 <tr class="tracking-top-th-row">
                   <th rowspan="2" class="th-track-month">${isEn ? 'Month' : 'Mes'}</th>
+                  <th rowspan="2" class="th-track-angles" style="min-width: 140px;">
+                    <div>${isEn ? 'Considered Angles' : 'Ángulos considerados'}</div>
+                    <div style="font-size: 0.72rem; font-weight: 600; color: #f59e0b;">β = Var (0.0°) | α = 90.0°</div>
+                  </th>
                   <th rowspan="2" class="th-track-h0">${compSym} (0°)</th>
                   <th rowspan="2" class="th-track-opt">${compSym}</th>
                   <th rowspan="2" class="th-track-temp">${isEn ? 'Mean Temp' : 'Tª media'}</th>
@@ -194,9 +198,12 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
                 ${months.map((mName, i) => `
                   <tr>
                     <td class="td-track-month"><strong>${mName}</strong></td>
+                    <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 600; white-space: nowrap; text-align: center;">
+                      <span style="color: #fbbf24;">β = Var (0.0°)</span> <span style="opacity: 0.4;">|</span> <span style="color: var(--text-muted);">α = 90.0°</span>
+                    </td>
                     <td class="td-num">${radHoriz[i].toFixed(2)}</td>
                     <td class="td-num td-track-val"><strong>${radHorizTrack[i].toFixed(2)}</strong></td>
-                    <td class="td-num td-track-temp">${tempMean[i].toFixed(1)}</td>
+                    <td class="td-num">${tempMean[i].toFixed(1)}</td>
                     <td class="td-num">${gainsOverHoriz[i].toFixed(2)}</td>
                     <td class="td-num">${gainsOverAnnual[i].toFixed(2)}</td>
                     <td class="td-num">${gainsOverSeasonal[i].toFixed(2)}</td>
@@ -208,9 +215,12 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
               <tfoot>
                 <tr class="tracking-media-row">
                   <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+                  <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 700; white-space: nowrap; text-align: center; color: #fbbf24;">
+                    β = Var (0.0°) | α = 90.0°
+                  </td>
                   <td class="td-num"><strong>${meanHoriz.toFixed(2)}</strong></td>
                   <td class="td-num td-track-val"><strong>${meanHorizTrack.toFixed(2)}</strong></td>
-                  <td class="td-num td-track-temp"><strong>${tempAnnualMean.toFixed(1)}</strong></td>
+                  <td class="td-num"><strong>${tempAnnualMean.toFixed(1)}</strong></td>
                   <td class="td-num"><strong>${meanGainHoriz.toFixed(2)}</strong></td>
                   <td class="td-num"><strong>${meanGainAnnual.toFixed(2)}</strong></td>
                   <td class="td-num"><strong>${meanGainSeasonal.toFixed(2)}</strong></td>

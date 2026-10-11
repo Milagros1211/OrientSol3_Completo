@@ -185,6 +185,10 @@ export function renderTrackingDualAxisStudyPanel(props: TrackingDualStudyProps):
               <thead>
                 <tr class="tracking-top-th-row">
                   <th rowspan="2" class="th-track-month">${isEn ? 'Month' : 'Mes'}</th>
+                  <th rowspan="2" class="th-track-angles" style="min-width: 145px;">
+                    <div>${isEn ? 'Considered Angles' : 'Ángulos considerados'}</div>
+                    <div style="font-size: 0.72rem; font-weight: 600; color: #10b981;">β = 90.0°-γs | α = ψs</div>
+                  </th>
                   <th rowspan="2" class="th-track-h0">${compSym} (0°)</th>
                   <th rowspan="2" class="th-track-opt">${compSym}</th>
                   <th rowspan="2" class="th-track-temp">${isEn ? 'Mean Temp' : 'Tª media'}</th>
@@ -203,6 +207,9 @@ export function renderTrackingDualAxisStudyPanel(props: TrackingDualStudyProps):
                 ${months.map((mName, i) => `
                   <tr>
                     <td class="td-track-month"><strong>${mName}</strong></td>
+                    <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 600; white-space: nowrap; text-align: center;">
+                      <span style="color: #34d399;">β = 90.0°-γs</span> <span style="opacity: 0.4;">|</span> <span style="color: #38bdf8;">α = ψs</span>
+                    </td>
                     <td class="td-num">${radHoriz[i].toFixed(2)}</td>
                     <td class="td-num td-track-val"><strong>${radDual[i].toFixed(2)}</strong></td>
                     <td class="td-num td-track-temp">${tempMean[i].toFixed(1)}</td>
@@ -218,6 +225,9 @@ export function renderTrackingDualAxisStudyPanel(props: TrackingDualStudyProps):
               <tfoot>
                 <tr class="tracking-media-row">
                   <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+                  <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 700; white-space: nowrap; text-align: center; color: #34d399;">
+                    β = 90.0°-γs | α = ψs
+                  </td>
                   <td class="td-num"><strong>${meanHoriz.toFixed(2)}</strong></td>
                   <td class="td-num td-track-val"><strong>${meanDual.toFixed(2)}</strong></td>
                   <td class="td-num td-track-temp"><strong>${tempAnnualMean.toFixed(1)}</strong></td>

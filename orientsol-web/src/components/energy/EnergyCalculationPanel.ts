@@ -395,7 +395,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                 <thead>
                   <tr>
                     <th class="th-ener-month">${isEn ? 'Month' : 'Mes'}</th>
-                    <th class="th-ener-angle">${isEn ? 'Considered tilt / angle' : 'Ángulo considerado'}</th>
+                    <th class="th-ener-angle">${isEn ? 'Considered angles (β | α)' : 'Ángulos considerados (β | α)'}</th>
                     <th class="th-ener-horiz">${isEn ? 'Horizontal surface (0°)' : 'Superficie horizontal (0°)'}</th>
                     <th class="th-ener-study">${studyColTitle}</th>
                     <th class="th-ener-gain">${isEn ? 'Gain (kWh)' : 'Ganancia (kWh)'}</th>
@@ -410,27 +410,27 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                     let angleBadgeText = '';
                     if (studyType === 'monthly') {
                       const mDeg = res.monthlyOptimum12?.optimalTiltsDeg ? res.monthlyOptimum12.optimalTiltsDeg[idx] : optTiltAnnual;
-                      angleBadgeText = `β = ${mDeg}°`;
+                      angleBadgeText = `β = ${Number(mDeg).toFixed(1)}° | α = 0.0°`;
                     } else if (isSeasonal && seasonalData) {
                       if (idx === 11 || idx === 0 || idx === 1) {
-                        angleBadgeText = `Inv: β = ${seasonalData.winterTiltDeg}°`;
+                        angleBadgeText = `Inv: β = ${seasonalData.winterTiltDeg.toFixed(1)}° | α = 0.0°`;
                       } else if (idx === 2 || idx === 3 || idx === 4) {
-                        angleBadgeText = `Pri: β = ${seasonalData.springTiltDeg}°`;
+                        angleBadgeText = `Pri: β = ${seasonalData.springTiltDeg.toFixed(1)}° | α = 0.0°`;
                       } else if (idx === 5 || idx === 6 || idx === 7) {
-                        angleBadgeText = `Ver: β = ${seasonalData.summerTiltDeg}°`;
+                        angleBadgeText = `Ver: β = ${seasonalData.summerTiltDeg.toFixed(1)}° | α = 0.0°`;
                       } else {
-                        angleBadgeText = `Oto: β = ${seasonalData.autumnTiltDeg}°`;
+                        angleBadgeText = `Oto: β = ${seasonalData.autumnTiltDeg.toFixed(1)}° | α = 0.0°`;
                       }
                     } else if (studyType === 'polar') {
-                      angleBadgeText = `β = ${latitude.toFixed(1)}° (Polar)`;
+                      angleBadgeText = `β = ${latitude.toFixed(1)}° | α = 0.0°`;
                     } else if (studyType === 'azimuthal') {
-                      angleBadgeText = `β = ${optTiltAnnual}° (Azim)`;
+                      angleBadgeText = `β = ${latitude.toFixed(1)}° | α = ψs`;
                     } else if (studyType === 'horizontal') {
-                      angleBadgeText = `β = 0° (Horiz)`;
+                      angleBadgeText = `β = Var (0.0°) | α = 90.0°`;
                     } else if (studyType === 'dual') {
-                      angleBadgeText = `2 ejes (β, α)`;
+                      angleBadgeText = `β = 90.0°-γs | α = ψs`;
                     } else {
-                      angleBadgeText = `β = ${optTiltAnnual}°`;
+                      angleBadgeText = `β = ${Number(optTiltAnnual).toFixed(1)}° | α = 0.0°`;
                     }
 
                     return `
@@ -457,18 +457,18 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                       <span class="energy-angle-badge badge-annual">
                         ${
                           studyType === 'monthly'
-                            ? (isEn ? 'Variable (12 tilts)' : 'Variable (12 inclinaciones)')
+                            ? (isEn ? 'Var (12 tilts) | α = 0.0°' : 'Var (12 incl.) | α = 0.0°')
                             : isSeasonal
-                            ? (isEn ? 'Variable (4 seasons)' : 'Variable (4 estaciones)')
+                            ? (isEn ? 'Var (4 seasons) | α = 0.0°' : 'Var (4 estac.) | α = 0.0°')
                             : studyType === 'polar'
-                            ? `β = ${latitude.toFixed(1)}°`
+                            ? `β = ${latitude.toFixed(1)}° | α = 0.0°`
                             : studyType === 'azimuthal'
-                            ? `β = ${optTiltAnnual}°`
+                            ? `β = ${latitude.toFixed(1)}° | α = ψs`
                             : studyType === 'horizontal'
-                            ? `β = 0°`
+                            ? `β = Var (0.0°) | α = 90.0°`
                             : studyType === 'dual'
-                            ? (isEn ? '2-axis tracking' : '2 ejes (Continuo)')
-                            : `β = ${optTiltAnnual}°`
+                            ? `β = 90.0°-γs | α = ψs`
+                            : `β = ${Number(optTiltAnnual).toFixed(1)}° | α = 0.0°`
                         }
                       </span>
                     </td>
