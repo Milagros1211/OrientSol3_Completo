@@ -7104,9 +7104,9 @@ body.theme-dark .opt-tracking-table-caption {
 
 .opt-tracking-content-grid {
   display: grid;
-  grid-template-columns: 1fr 220px;
+  grid-template-columns: minmax(0, 1fr) 200px;
   gap: 1.25rem;
-  align-items: start;
+  align-items: stretch;
   margin-bottom: 1.25rem;
 }
 
@@ -7138,13 +7138,13 @@ body.theme-dark .opt-tracking-table-wrap {
   width: 100%;
   border-collapse: collapse;
   text-align: center;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
 }
 
 .opt-tracking-table th,
 .opt-tracking-table td {
-  padding: 0.45rem 0.6rem;
+  padding: 0.42rem 0.45rem;
   border: 1px solid #cbd5e1;
 }
 
@@ -7152,27 +7152,30 @@ body.theme-dark .opt-tracking-table-wrap {
 [data-theme="dark"] .opt-tracking-table td,
 body.theme-dark .opt-tracking-table th,
 body.theme-dark .opt-tracking-table td {
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(56, 189, 248, 0.12) !important;
 }
 
 .tracking-top-th-row th {
   background: #1d4ed8;
   color: #ffffff;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.84rem;
+  padding: 0.5rem 0.4rem;
 }
 
 .tracking-sub-th-row th {
   background: #1e3a8a;
   color: #bfdbfe;
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  padding: 0.38rem 0.35rem;
 }
 
 .th-track-month {
   background: #2563eb !important;
   color: #ffffff !important;
-  min-width: 100px;
+  min-width: 82px;
 }
 
 .th-track-opt {

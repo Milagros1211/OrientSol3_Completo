@@ -112,7 +112,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
     `;
 
     container.innerHTML = `
-      <div class="opt-tracking-study-frame">
+      <div class="opt-tracking-window-frame">
         <div class="opt-tracking-header-bar">
           <div class="opt-tracking-header-left">
             <div class="opt-tracking-meta-row">
@@ -122,10 +122,10 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
                 <span style="color: #38bdf8; font-weight: 700;">${latitude.toFixed(2)}</span>
               </span>
             </div>
-            <div class="opt-tracking-study-row">
+            <div class="opt-tracking-study-title-row">
               <span class="meta-label">
                 <strong>${isEn ? 'Study:' : 'Estudio:'}</strong>
-                <span style="color: #f97316; font-weight: 600;">${isEn ? 'Single-axis azimuthal tracking' : 'Seguimiento a un eje azimutal'}</span>
+                <span style="color: #38bdf8; font-weight: 600;">${isEn ? 'Single-axis azimuthal tracking' : 'Seguimiento a un eje azimutal'}</span>
               </span>
             </div>
           </div>
@@ -137,11 +137,11 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
         </div>
 
         <div class="opt-tracking-toolbar">
-          <div class="opt-tracking-comp-selector">
+          <div class="tracking-comp-select-group">
             <label for="tracking-azim-comp-select" class="tracking-comp-label">
               ${isEn ? 'Select a component' : 'Seleccione una componente'}
             </label>
-            <select id="tracking-azim-comp-select" class="tracking-comp-dropdown">
+            <select id="tracking-azim-comp-select" class="form-select tracking-comp-dropdown">
               <option value="global" ${stateAzimComponent === 'global' ? 'selected' : ''}>${isEn ? 'Global' : 'Global'}</option>
               <option value="beam" ${stateAzimComponent === 'beam' ? 'selected' : ''}>${isEn ? 'Direct' : 'Directa'}</option>
               <option value="diffuse" ${stateAzimComponent === 'diffuse' ? 'selected' : ''}>${isEn ? 'Diffuse' : 'Difusa'}</option>
@@ -149,36 +149,38 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
             </select>
           </div>
 
-          <button id="btn-azim-view-charts" class="btn-study-view-charts ${stateAzimShowGraphs ? 'active' : ''}" type="button">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 3v18h18"></path>
-              <path d="m19 9-5 5-4-4-3 3"></path>
-            </svg>
-            <span>${stateAzimShowGraphs ? (isEn ? 'Hide charts' : 'Ocultar gráficas') : (isEn ? 'View charts' : 'Ver gráficas')}</span>
-          </button>
+          <div class="tracking-toolbar-actions">
+            <button id="btn-azim-view-charts" class="btn-study-view-charts ${stateAzimShowGraphs ? 'active' : ''}" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v18h18"></path>
+                <path d="m19 9-5 5-4-4-3 3"></path>
+              </svg>
+              <span>${stateAzimShowGraphs ? (isEn ? 'Hide charts' : 'Ocultar gráficas') : (isEn ? 'View charts' : 'Ver gráficas')}</span>
+            </button>
+          </div>
         </div>
 
-        <div class="opt-tracking-caption">
-          ${isEn ? `Monthly average daily ${compLabel} radiation (kWh/m²/day)` : `Radiación ${compLabel} media mensual (kWh/m²/día)`}
+        <div class="opt-tracking-table-caption">
+          ${isEn ? `Mean monthly daily ${compLabel} radiation (kWh/m²/day)` : `Radiación ${compLabel} media mensual (kWh/m²/día)`}
         </div>
 
         <div class="opt-tracking-content-grid">
           <div class="opt-tracking-table-wrap">
             <table class="opt-tracking-table">
               <thead>
-                <tr class="tracking-header-super">
-                  <th rowspan="2" class="th-month">${isEn ? 'Month' : 'Mes'}</th>
-                  <th rowspan="2" class="th-rad-0">${compSym} (0°)</th>
-                  <th rowspan="2" class="th-rad-track">${compSym}</th>
-                  <th rowspan="2" class="th-temp">${isEn ? 'Mean Tª' : 'Tª media'}</th>
-                  <th colspan="5" class="th-gains-super">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</th>
+                <tr class="tracking-top-th-row">
+                  <th rowspan="2" class="th-track-month">${isEn ? 'Month' : 'Mes'}</th>
+                  <th rowspan="2" class="th-track-h0">${compSym} (0°)</th>
+                  <th rowspan="2" class="th-track-opt">${compSym}</th>
+                  <th rowspan="2" class="th-track-temp">${isEn ? 'Mean Temp' : 'Tª media'}</th>
+                  <th colspan="5" class="th-track-gains-super">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</th>
                 </tr>
-                <tr class="tracking-header-sub">
-                  <th class="th-gain-sub">${isEn ? 'Horizontal' : 'Plano horizontal'}</th>
-                  <th class="th-gain-sub">${isEn ? 'Annual opt.' : 'Inclinación ópt. anual'}</th>
-                  <th class="th-gain-sub">${isEn ? 'Seasonal opt.' : 'Inclin. ópt. estacional'}</th>
+                <tr class="tracking-sub-th-row">
+                  <th class="th-gain-sub">${isEn ? 'Horizontal plane' : 'Plano horizontal'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Annual opt. tilt' : 'Inclinación ópt. anual'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Seasonal opt. tilt' : 'Inclin. ópt. estacional'}</th>
                   <th class="th-gain-sub">${isEn ? 'Polar 1-axis' : 'Seg. a un eje polar'}</th>
-                  <th class="th-gain-sub">${isEn ? 'Horiz. 1-axis' : 'Seg. a un eje horizontal'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Horizontal 1-axis' : 'Seg. a un eje horizontal'}</th>
                 </tr>
               </thead>
               <tbody>
@@ -193,42 +195,40 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
                   const gHz = gainsOverHorizTrack[i];
 
                   return `
-                    <tr class="tracking-row-month">
-                      <td class="td-month-name">${mName}</td>
-                      <td class="td-val-horiz">${g0.toFixed(2)}</td>
-                      <td class="td-val-track">${pVal.toFixed(2)}</td>
-                      <td class="td-val-temp">${tVal !== undefined ? tVal.toFixed(1) : '-'}</td>
-                      <td class="td-gain-val ${gHor >= 0 ? 'gain-pos' : 'gain-neg'}">${gHor.toFixed(2)}</td>
-                      <td class="td-gain-val ${gAnn >= 0 ? 'gain-pos' : 'gain-neg'}">${gAnn.toFixed(2)}</td>
-                      <td class="td-gain-val ${gSeas >= 0 ? 'gain-pos' : 'gain-neg'}">${gSeas.toFixed(2)}</td>
-                      <td class="td-gain-val ${gPol >= 0 ? 'gain-pos' : 'gain-neg'}">${gPol.toFixed(2)}</td>
-                      <td class="td-gain-val ${gHz >= 0 ? 'gain-pos' : 'gain-neg'}">${gHz.toFixed(2)}</td>
+                    <tr>
+                      <td class="td-track-month"><strong>${mName}</strong></td>
+                      <td class="td-num">${g0.toFixed(2)}</td>
+                      <td class="td-num td-track-val"><strong>${pVal.toFixed(2)}</strong></td>
+                      <td class="td-num td-track-temp">${tVal !== undefined ? tVal.toFixed(1) : '-'}</td>
+                      <td class="td-num">${gHor.toFixed(2)}</td>
+                      <td class="td-num">${gAnn.toFixed(2)}</td>
+                      <td class="td-num">${gSeas.toFixed(2)}</td>
+                      <td class="td-num">${gPol.toFixed(2)}</td>
+                      <td class="td-num">${gHz.toFixed(2)}</td>
                     </tr>
                   `;
                 }).join('')}
-
-                <tr class="tracking-row-media">
-                  <td class="td-media-label">${isEn ? 'MEAN' : 'MEDIA'}</td>
-                  <td class="td-media-val">${meanHoriz.toFixed(2)}</td>
-                  <td class="td-media-val">${meanAzim.toFixed(2)}</td>
-                  <td class="td-media-val">${tempAnnualMean !== undefined ? tempAnnualMean.toFixed(2) : '-'}</td>
-                  <td class="td-media-val ${meanGainHoriz >= 0 ? 'gain-pos' : 'gain-neg'}">${meanGainHoriz.toFixed(2)}</td>
-                  <td class="td-media-val ${meanGainAnnual >= 0 ? 'gain-pos' : 'gain-neg'}">${meanGainAnnual.toFixed(2)}</td>
-                  <td class="td-media-val ${meanGainSeasonal >= 0 ? 'gain-pos' : 'gain-neg'}">${meanGainSeasonal.toFixed(2)}</td>
-                  <td class="td-media-val ${meanGainPolar >= 0 ? 'gain-pos' : 'gain-neg'}">${meanGainPolar.toFixed(2)}</td>
-                  <td class="td-media-val ${meanGainHorizTrack >= 0 ? 'gain-pos' : 'gain-neg'}">${meanGainHorizTrack.toFixed(2)}</td>
-                </tr>
               </tbody>
+              <tfoot>
+                <tr class="tracking-media-row">
+                  <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+                  <td class="td-num"><strong>${meanHoriz.toFixed(2)}</strong></td>
+                  <td class="td-num td-track-val"><strong>${meanAzim.toFixed(2)}</strong></td>
+                  <td class="td-num td-track-temp"><strong>${tempAnnualMean !== undefined ? tempAnnualMean.toFixed(1) : '-'}</strong></td>
+                  <td class="td-num"><strong>${meanGainHoriz.toFixed(2)}</strong></td>
+                  <td class="td-num"><strong>${meanGainAnnual.toFixed(2)}</strong></td>
+                  <td class="td-num"><strong>${meanGainSeasonal.toFixed(2)}</strong></td>
+                  <td class="td-num"><strong>${meanGainPolar.toFixed(2)}</strong></td>
+                  <td class="td-num"><strong>${meanGainHorizTrack.toFixed(2)}</strong></td>
+                </tr>
+              </tfoot>
             </table>
           </div>
 
           <div class="opt-tracking-diagram-sidebar">
-            <div class="tracking-diagram-card">
-              ${azimDiagramSvg}
-              <div class="tracking-diagram-caption">
-                <strong>${isEn ? 'Azimuthal 1-Axis' : 'Eje Azimutal'}</strong><br/>
-                <span style="font-size: 0.8rem; opacity: 0.85;">${isEn ? 'Vertical axis tracking' : 'Giro continuo azimutal'}</span>
-              </div>
+            ${azimDiagramSvg}
+            <div class="tracking-diagram-caption">
+              ${isEn ? 'Single-axis azimuthal tracking with continuous vertical axis rotation' : 'Seguimiento a un eje azimutal con giro continuo alrededor del eje vertical'}
             </div>
           </div>
         </div>

@@ -204,11 +204,11 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
                     <td class="td-num">${radHoriz[i].toFixed(2)}</td>
                     <td class="td-num td-track-val"><strong>${radPolar[i].toFixed(2)}</strong></td>
                     <td class="td-num td-track-temp">${tempMean[i].toFixed(1)}</td>
-                    <td class="td-num ${gainsOverHoriz[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${gainsOverHoriz[i].toFixed(2)}</td>
-                    <td class="td-num ${gainsOverAnnual[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${gainsOverAnnual[i].toFixed(2)}</td>
-                    <td class="td-num ${gainsOverSeasonal[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${gainsOverSeasonal[i].toFixed(2)}</td>
-                    <td class="td-num ${gainsOverAzim[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${gainsOverAzim[i].toFixed(2)}</td>
-                    <td class="td-num ${gainsOverHorizTrack[i] >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${gainsOverHorizTrack[i].toFixed(2)}</td>
+                    <td class="td-num">${gainsOverHoriz[i].toFixed(2)}</td>
+                    <td class="td-num">${gainsOverAnnual[i].toFixed(2)}</td>
+                    <td class="td-num">${gainsOverSeasonal[i].toFixed(2)}</td>
+                    <td class="td-num">${gainsOverAzim[i].toFixed(2)}</td>
+                    <td class="td-num">${gainsOverHorizTrack[i].toFixed(2)}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -217,7 +217,7 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
                   <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
                   <td class="td-num"><strong>${meanHoriz.toFixed(2)}</strong></td>
                   <td class="td-num td-track-val"><strong>${meanPolar.toFixed(2)}</strong></td>
-                  <td class="td-num td-track-temp"><strong>${tempAnnualMean.toFixed(2)}</strong></td>
+                  <td class="td-num td-track-temp"><strong>${tempAnnualMean.toFixed(1)}</strong></td>
                   <td class="td-num"><strong>${meanGainHoriz.toFixed(2)}</strong></td>
                   <td class="td-num"><strong>${meanGainAnnual.toFixed(2)}</strong></td>
                   <td class="td-num"><strong>${meanGainSeasonal.toFixed(2)}</strong></td>
