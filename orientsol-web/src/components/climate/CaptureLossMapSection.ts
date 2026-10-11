@@ -297,8 +297,8 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
         </div>
       </div>
 
-      <div class="loss-map-container" style="margin-top: 0.75rem; max-height: 480px; overflow: auto; border: 1px solid var(--border-subtle); border-radius: 6px;">
-        <table class="loss-map-matrix-table" style="font-size: 0.76rem;">
+      <div class="loss-map-container">
+        <table class="loss-map-matrix-table">
           <thead>
             <tr>
               <th class="corner-th">β \\ α</th>
@@ -318,7 +318,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
                       ? 'border: 2px solid var(--accent-cyan, #0284c7) !important; box-shadow: inset 0 0 8px rgba(2, 132, 199, 0.4); font-weight: 800; transform: scale(1.08);'
                       : '';
                     const starText = isOptimalCell ? ' ★' : '';
-                    return `<td class="${cls}" style="${optStyle}" title="β=${b}°, α=${a}°: Pérdida ${loss.toFixed(1)}% (${rad.toFixed(2)} kWh/m²/d)">${loss.toFixed(0)}%${starText}</td>`;
+                    return `<td class="${cls}" style="${optStyle}" title="β=${b}°, α=${a}°: Pérdida ${loss.toFixed(1)}% (${rad.toFixed(2)} kWh/m²/d)">${loss.toFixed(1)}%${starText}</td>`;
                   })
                   .join('');
                 return `<tr><td class="row-header-beta">${b}°</td>${cells}</tr>`;
