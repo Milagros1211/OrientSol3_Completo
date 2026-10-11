@@ -826,11 +826,87 @@ body.theme-dark .lang-btn:hover {
   color: #e5e7eb;
 }
 
+[data-theme="light"] .btn-secondary,
+body.theme-light .btn-secondary {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #1e293b;
+  font-weight: 600;
+}
+
 .btn-secondary:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
   border-color: var(--solar-amber);
   transform: translateY(-1px);
+}
+
+[data-theme="light"] .btn-secondary:hover:not(:disabled),
+body.theme-light .btn-secondary:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #0284c7;
+  color: #0284c7;
+}
+
+[data-theme="light"] .btn-secondary:disabled,
+body.theme-light .btn-secondary:disabled {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #64748b;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+/* Specific High Contrast Rules for Climate Action Buttons */
+#btn-save-api-to-supabase {
+  transition: all var(--transition-fast);
+}
+
+#btn-save-api-to-supabase:not(:disabled) {
+  background: #059669 !important;
+  border: 1.5px solid #047857 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35) !important;
+}
+
+#btn-save-api-to-supabase:not(:disabled):hover {
+  background: #047857 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.45) !important;
+}
+
+[data-theme="light"] #btn-save-api-to-supabase:disabled,
+body.theme-light #btn-save-api-to-supabase:disabled {
+  background: #f1f5f9 !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #475569 !important;
+  opacity: 1 !important;
+  cursor: not-allowed;
+}
+
+[data-theme="dark"] #btn-save-api-to-supabase:disabled,
+body.theme-dark #btn-save-api-to-supabase:disabled {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+  cursor: not-allowed;
+}
+
+#btn-fetch-satellite-api {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #111827;
+  font-weight: 700;
+  border: 1px solid #b45309;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+}
+
+#btn-fetch-satellite-api:hover:not(:disabled) {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #000000;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.5);
 }
 
 .verification-controls-bar {
@@ -1311,22 +1387,26 @@ body.theme-dark .climate-status-bar.status-warning {
 /* Light theme table colors */
 [data-theme="light"] .climate-monthly-table th,
 body.theme-light .climate-monthly-table th {
-  background: #f8fafc;
-  color: #1e293b;
-  border-bottom: 1px solid #cbd5e1;
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  font-weight: 700;
 }
 
 [data-theme="light"] .climate-monthly-table td,
 body.theme-light .climate-monthly-table td {
   color: #0f172a;
-  border-bottom: 1px solid #f1f5f9;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  font-weight: 600;
 }
 
 [data-theme="light"] .climate-monthly-table .row-label,
 body.theme-light .climate-monthly-table .row-label {
-  background: #f1f5f9;
+  background: #f8fafc;
   color: #0f172a;
-  border-right: 1px solid #e2e8f0;
+  border: 1px solid #cbd5e1;
+  font-weight: 700;
 }
 
 /* Dark theme table colors */
@@ -1837,21 +1917,26 @@ body.theme-dark .dual-tabs-bar {
 
 [data-theme="light"] .dual-tab-btn,
 body.theme-light .dual-tab-btn {
-  color: #334155;
+  color: #475569;
+  font-weight: 600;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
 }
 
 [data-theme="light"] .dual-tab-btn:hover,
 body.theme-light .dual-tab-btn:hover {
   color: #0f172a;
-  background: rgba(255, 255, 255, 0.8);
+  background: #ffffff;
+  border-color: #94a3b8;
 }
 
 [data-theme="light"] .dual-tab-btn.active,
 body.theme-light .dual-tab-btn.active {
-  background: #ffffff;
-  color: #0284c7;
-  border: 1px solid #7dd3fc;
-  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.16);
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1.5px solid #0284c7;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.2);
 }
 
 [data-theme="dark"] .dual-tab-btn,
@@ -2051,15 +2136,42 @@ body.theme-dark .dual-tab-btn.active {
 [data-theme="light"] .active-dataset-card,
 body.theme-light .active-dataset-card {
   background: #ffffff;
-  border: 1.5px solid #86efac;
-  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.08);
+  border: 1.5px solid #cbd5e1;
+  border-left: 5px solid #0284c7;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
 }
 
 [data-theme="dark"] .active-dataset-card,
 body.theme-dark .active-dataset-card {
-  background: rgba(17, 24, 39, 0.7);
-  border: 1px solid var(--border-highlight);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: rgba(17, 24, 39, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-left: 5px solid var(--accent-cyan);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Badges inside Active Record Box with High Contrast */
+[data-theme="light"] .record-title-box .badge-source,
+body.theme-light .record-title-box .badge-source {
+  background: #ede9fe;
+  color: #4338ca;
+  border: 1.5px solid #a5b4fc;
+  font-weight: 800;
+}
+
+[data-theme="light"] .record-title-box .badge-warning,
+body.theme-light .record-title-box .badge-warning {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1.5px solid #f59e0b;
+  font-weight: 800;
+}
+
+[data-theme="light"] .record-title-box .badge-neutral,
+body.theme-light .record-title-box .badge-neutral {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1.5px solid #94a3b8;
+  font-weight: 800;
 }
 
 .active-record-badge-bar {
