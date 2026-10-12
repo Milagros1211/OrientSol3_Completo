@@ -83,13 +83,13 @@ def run_full_energy_test(
     Simulates and validates OrientSol simplified and Osterwald PV energy production models.
     """
     if gdm0 is None:
-        gdm0 = np.array([2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84])
+        gdm0 = np.array([2.00, 2.73, 4.48, 5.17, 6.58, 7.24, 7.32, 6.41, 4.97, 3.36, 2.15, 1.64])
     else:
         gdm0 = np.asarray(gdm0, dtype=np.float64)
 
     if ambient_temp is None:
-        # Default Madrid ambient temperatures [°C] from BBDD.xlsx
-        ambient_temp = np.array([5.5, 7.3, 10.4, 12.6, 16.5, 21.6, 25.2, 24.7, 20.8, 15.1, 9.6, 6.4])
+        # Default Madrid ambient temperatures [°C] from OrientSol BBDD.xlsx
+        ambient_temp = np.array([4.1, 5.5, 9.1, 11.6, 16.3, 22.5, 25.3, 24.8, 20.4, 14.1, 8.2, 4.7])
     else:
         ambient_temp = np.asarray(ambient_temp, dtype=np.float64)
 

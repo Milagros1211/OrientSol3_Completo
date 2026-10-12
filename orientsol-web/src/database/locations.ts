@@ -30,9 +30,9 @@ export const LOCATIONS_DATABASE: LocationData[] = [
     latitude: 40.4168,
     longitude: -3.7038,
     elevationM: 667,
-    // [Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dic] in kWh/m2/dia
-    monthlyGdm0: [2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84],
-    monthlyTempC: [6.1, 7.9, 11.2, 13.5, 17.8, 23.3, 27.0, 26.7, 22.0, 15.9, 10.1, 6.9],
+    // OrientSol MATLAB BBDD.xlsx canonical values:
+    monthlyGdm0: [2.00, 2.73, 4.48, 5.17, 6.58, 7.24, 7.32, 6.41, 4.97, 3.36, 2.15, 1.64],
+    monthlyTempC: [4.1, 5.5, 9.1, 11.6, 16.3, 22.5, 25.3, 24.8, 20.4, 14.1, 8.2, 4.7],
   },
   {
     id: 'es-albacete',

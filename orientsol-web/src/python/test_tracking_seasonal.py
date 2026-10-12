@@ -86,8 +86,8 @@ def run_full_tracking_seasonal_test(
     Simulates and validates all OrientSol tracking and seasonal optimization models.
     """
     if gdm0 is None:
-        # Default Madrid global horizontal radiation [kWh/m2/day] from OrientSol BBDD.xlsx
-        gdm0 = np.array([2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84])
+        # Default Madrid global horizontal radiation [kWh/m2/day] from OrientSol BBDD.xlsx (Mean = 4.50 kWh/m2/day)
+        gdm0 = np.array([2.00, 2.73, 4.48, 5.17, 6.58, 7.24, 7.32, 6.41, 4.97, 3.36, 2.15, 1.64])
     else:
         gdm0 = np.asarray(gdm0, dtype=np.float64)
 
