@@ -1,3 +1,5 @@
+import type { SolarBridgeSimulationResult } from './solarCalculationBridge';
+
 /**
  * Shared Reactive State for Solar System Technical Parameters.
  * Synchronizes installed peak power (Potencia Pico kWp) and NOCT/TONC (°C)
@@ -9,6 +11,7 @@ class SolarSyncStateService {
   private tonc: number = 47.0;
   private coefTemp: number = -0.0035;
   private performanceRatio: number = 0.80;
+  private lastSimulationResult: SolarBridgeSimulationResult | null = null;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -30,6 +33,19 @@ class SolarSyncStateService {
     if (simTonc && simTonc.value) {
       const v = parseFloat(simTonc.value);
       if (!isNaN(v) && v > 0) this.tonc = v;
+    }
+  }
+
+  public getLastSimulationResult(): SolarBridgeSimulationResult | null {
+    return this.lastSimulationResult;
+  }
+
+  public setLastSimulationResult(res: SolarBridgeSimulationResult): void {
+    this.lastSimulationResult = res;
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('orientsol:simulation-updated', { detail: { simulationResult: res } })
+      );
     }
   }
 

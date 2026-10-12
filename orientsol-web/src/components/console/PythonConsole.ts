@@ -6,6 +6,7 @@ import {
   getNoonAzimuthDeg,
   getDualAxisNoonTiltDeg,
 } from '@/services/solarGeometryAngles';
+import { solarSyncState } from '@/services/bridge/solarSyncState';
 
 const MONTH_NAMES_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -710,6 +711,7 @@ export function renderPythonConsole(): HTMLElement {
     }
 
     if (activeTab === 'radiation') {
+      const simRes = solarSyncState.getLastSimulationResult();
       const radRows = DIA_INTER.map((dayNum, idx) => {
         const dec = getMonthlyDeclinationDeg(idx);
         const latR = (stateLat * Math.PI) / 180;
@@ -722,12 +724,12 @@ export function renderPythonConsole(): HTMLElement {
           (24 / Math.PI) * iSc * (1 + 0.033 * Math.cos((2 * Math.PI * dayNum) / 365)) *
           (Math.cos(latR) * Math.cos(decR) * Math.sin(ws) + ws * Math.sin(latR) * Math.sin(decR))
         );
-        const g0 = Math.max(1.2, g0d * 0.58);
-        const bdm = g0 * 0.58;
-        const ddm = g0 * 0.42;
-        const optTilt = Math.max(1, Math.min(85, Math.abs(stateLat - dec)));
-        const gOpt = g0 * 1.185;
-        const gain = ((gOpt - g0) / g0) * 100;
+        const g0 = simRes?.horizontal?.gdm0 ? simRes.horizontal.gdm0[idx] : Math.max(1.2, g0d * 0.58);
+        const bdm = simRes?.horizontal?.bdm0 ? simRes.horizontal.bdm0[idx] : g0 * 0.58;
+        const ddm = simRes?.horizontal?.ddm0 ? simRes.horizontal.ddm0[idx] : g0 * 0.42;
+        const optTilt = simRes?.monthlyOptimum12?.optimalTiltsDeg ? simRes.monthlyOptimum12.optimalTiltsDeg[idx] : Math.max(1, Math.min(85, Math.abs(stateLat - dec)));
+        const gOpt = simRes?.optimalAnnual?.monthlyDailyKwh ? simRes.optimalAnnual.monthlyDailyKwh[idx] : g0 * 1.185;
+        const gain = g0 > 0 ? ((gOpt - g0) / g0) * 100 : 0;
         return {
           month: months[idx],
           g0,
@@ -744,7 +746,7 @@ export function renderPythonConsole(): HTMLElement {
       const meanDdm = radRows.reduce((acc, r) => acc + r.ddm, 0) / 12;
       const meanTilt = radRows.reduce((acc, r) => acc + r.optTilt, 0) / 12;
       const meanGOpt = radRows.reduce((acc, r) => acc + r.gOpt, 0) / 12;
-      const meanGain = ((meanGOpt - meanG0) / meanG0) * 100;
+      const meanGain = meanG0 > 0 ? ((meanGOpt - meanG0) / meanG0) * 100 : 0;
 
       return `
         <div class="verif-table-card">
@@ -802,14 +804,29 @@ export function renderPythonConsole(): HTMLElement {
     }
 
     if (activeTab === 'tracking') {
+      const simRes = solarSyncState.getLastSimulationResult();
+      const rHoriz = simRes ? simRes.horizontal.annualMeanDailyKwh : 4.76;
+      const rOpt = simRes ? simRes.optimalAnnual.annualMeanDailyKwh : 5.55;
+      const rSeas = simRes ? simRes.seasonal.annualMeanDailyKwh : 5.84;
+      const rPol = simRes ? simRes.tracking.polarAxis.annualMeanDailyKwh : 6.52;
+      const rAzim = simRes ? simRes.tracking.azimuthalAxis.annualMeanDailyKwh : 6.68;
+      const rHTrk = simRes ? simRes.tracking.horizontalAxis.annualMeanDailyKwh : 6.48;
+      const rDual = simRes ? simRes.tracking.dualAxis.annualMeanDailyKwh : 7.21;
+
+      const calcGH = (val: number) => rHoriz > 0 ? ((val - rHoriz) / rHoriz) * 100 : 0;
+      const calcGO = (val: number) => rOpt > 0 ? ((val - rOpt) / rOpt) * 100 : 0;
+
+      const optTiltStr = simRes ? `${simRes.optimalAnnual.optimalTiltDeg.toFixed(1)}°` : `${Math.max(10, Math.round(Math.abs(stateLat) * 0.88))}.0°`;
+      const hMeanTiltStr = '50.4° (media)';
+
       const trackingRows = [
-        { name: isEn ? 'Horizontal Surface (0°)' : 'Superficie Horizontal (0°)', inc: '0.0°', ori: '0.0°', rad: 4.76, gainH: 0.0, gainOpt: -14.2, status: '✓ Baseline' },
-        { name: isEn ? 'Annual Optimal Tilt' : 'Inclinación Óptima Anual', inc: `${Math.max(10, Math.round(Math.abs(stateLat) * 0.88))}.0°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 5.55, gainH: 16.6, gainOpt: 0.0, status: '✓ Validado' },
-        { name: isEn ? 'Seasonal Optimal Tilt (4 pos)' : 'Inclinación Óptima Estacional (4 pos)', inc: `${Math.max(10, Math.round(Math.abs(stateLat) * 0.88))}.0° (media)`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 5.84, gainH: 22.7, gainOpt: 5.2, status: '✓ Validado' },
-        { name: isEn ? 'Single-Axis Polar Tracking' : 'Seguimiento a un Eje Polar', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 6.52, gainH: 37.0, gainOpt: 17.5, status: '✓ Validado' },
-        { name: isEn ? 'Single-Axis Azimuthal Tracking' : 'Seguimiento a un Eje Azimutal', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 6.68, gainH: 40.3, gainOpt: 20.4, status: '✓ Validado' },
-        { name: isEn ? 'Single-Axis Horizontal Tracking' : 'Seguimiento a un Eje Horizontal', inc: '50.4° (media)', ori: '90.0°', rad: 5.92, gainH: 24.4, gainOpt: 6.7, status: '✓ Validado' },
-        { name: isEn ? 'Two-Axis Tracking (Continuous)' : 'Seguimiento a Dos Ejes Continuo', inc: `${Math.max(10, Math.round(Math.abs(stateLat) * 0.88))}.0° (media)`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 7.21, gainH: 51.5, gainOpt: 29.9, status: '✓ Validado' },
+        { name: isEn ? 'Horizontal Surface (0°)' : 'Superficie Horizontal (0°)', inc: '0.0°', ori: '0.0°', rad: rHoriz, gainH: 0.0, gainOpt: calcGO(rHoriz), status: '✓ Baseline' },
+        { name: isEn ? 'Annual Optimal Tilt' : 'Inclinación Óptima Anual', inc: optTiltStr, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: rOpt, gainH: calcGH(rOpt), gainOpt: 0.0, status: '✓ Validado' },
+        { name: isEn ? 'Seasonal Optimal Tilt (4 pos)' : 'Inclinación Óptima Estacional (4 pos)', inc: `${optTiltStr} (media)`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: rSeas, gainH: calcGH(rSeas), gainOpt: calcGO(rSeas), status: '✓ Validado' },
+        { name: isEn ? 'Single-Axis Polar Tracking' : 'Seguimiento a un Eje Polar', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: rPol, gainH: calcGH(rPol), gainOpt: calcGO(rPol), status: '✓ Validado' },
+        { name: isEn ? 'Single-Axis Azimuthal Tracking' : 'Seguimiento a un Eje Azimutal', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: rAzim, gainH: calcGH(rAzim), gainOpt: calcGO(rAzim), status: '✓ Validado' },
+        { name: isEn ? 'Single-Axis Horizontal Tracking' : 'Seguimiento a un Eje Horizontal', inc: hMeanTiltStr, ori: '90.0°', rad: rHTrk, gainH: calcGH(rHTrk), gainOpt: calcGO(rHTrk), status: '✓ Validado' },
+        { name: isEn ? 'Two-Axis Tracking (Continuous)' : 'Seguimiento a Dos Ejes Continuo', inc: `${optTiltStr} (media)`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: rDual, gainH: calcGH(rDual), gainOpt: calcGO(rDual), status: '✓ Validado' },
       ];
 
       const meanRad = trackingRows.reduce((acc, r) => acc + r.rad, 0) / trackingRows.length;
@@ -984,6 +1001,11 @@ export function renderPythonConsole(): HTMLElement {
         stateDay = Math.max(1, Math.min(DAYS_IN_MONTH[stateMonth - 1], val));
         renderView();
       }
+    });
+
+    // Listen to simulation updates to refresh tables
+    window.addEventListener('orientsol:simulation-updated', () => {
+      renderView();
     });
 
     // OrientSol characteristic day button
