@@ -1,5 +1,5 @@
 """
-Global Surface Optimization and Comparative Engine for OrientSol 3.0.
+Global Surface Optimization and Comparative Engine for OrientSol 4.0.
 Calculates and compares all solar collector topologies:
 1. Fixed Surfaces:
    - Máxima Anual (single optimal annual tilt)

@@ -26,10 +26,10 @@ export interface ValidationReport {
 }
 
 /**
- * Hybrid Climate Manager for OrientSol 3.0.
+ * Hybrid Climate Manager for OrientSol 4.0.
  * Unifies:
  * 1. International APIs (NASA POWER, PVGIS, Meteonorm).
- * 2. Historical OrientSol 3.0 database (52 provinces & European cities).
+ * 2. Historical OrientSol 4.0 database (52 provinces & European cities).
  * 3. Dual Input: Manual Entry Form & Digital Document Upload (CSV/JSON).
  * 4. Data structures prepared for the Pyodide Python execution engine.
  */
@@ -44,7 +44,7 @@ export class HybridClimateManager {
   }
 
   // --------------------------------------------------------------------------
-  // 1. HISTORICAL ORIENTSOL 3.0 DATABASE
+  // 1. HISTORICAL ORIENTSOL 4.0 DATABASE
   // --------------------------------------------------------------------------
 
   /**

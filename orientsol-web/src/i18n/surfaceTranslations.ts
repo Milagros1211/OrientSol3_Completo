@@ -1,5 +1,5 @@
 /**
- * Surface and Category translation utilities for OrientSol 3.0.
+ * Surface and Category translation utilities for OrientSol 4.0.
  * Ensures consistent multi-language presentation across tables, charts, and exported reports.
  */
 

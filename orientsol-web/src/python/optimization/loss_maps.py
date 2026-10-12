@@ -1,5 +1,5 @@
 """
-Solar Capture Loss Map Module (Mapas de Pérdidas de Captación) for OrientSol 3.0.
+Solar Capture Loss Map Module (Mapas de Pérdidas de Captación) for OrientSol 4.0.
 Calculates irradiation and capture losses as a function of panel tilt (beta)
 and orientation/azimuth (alpha), categorized according to CTE DB-HE4 limits.
 

@@ -1,5 +1,5 @@
 """
-Comprehensive Solar Energy Yield Module for OrientSol 3.0.
+Comprehensive Solar Energy Yield Module for OrientSol 4.0.
 Calculates:
 1. Energía Recibida (Incident Solar Resource on Collector Aperture)
 2. Energía Producida (Photovoltaic Electricity Yield via Simplified and Osterwald Models)

@@ -29,7 +29,7 @@ export function exportToCSV(
 
   // 1. Header Metadata
   lines.push('======================================================================');
-  lines.push(`ORIENTSOL 3.0 - ${isEn ? 'SOLAR ENERGY SIMULATION REPORT' : 'INFORME DE SIMULACIÓN ENERGÉTICA SOLAR'}`);
+  lines.push(`ORIENTSOL 4.0 - ${isEn ? 'SOLAR ENERGY SIMULATION REPORT' : 'INFORME DE SIMULACIÓN ENERGÉTICA SOLAR'}`);
   lines.push('======================================================================');
   lines.push(`${isEn ? 'Download Date & Time' : 'Fecha y Hora de Descarga'};${downloadDateFormatted}`);
   lines.push(`${isEn ? 'ISO Timestamp' : 'Marca Temporal ISO'};${now.toISOString()}`);
@@ -170,7 +170,7 @@ export async function copyReportToClipboard(
 
   const text = `
 ======================================================================
-ORIENTSOL 3.0 - ${isEn ? 'TECHNICAL SOLAR SIMULATION SUMMARY' : 'RESUMEN TÉCNICO DE SIMULACIÓN SOLAR'}
+ORIENTSOL 4.0 - ${isEn ? 'TECHNICAL SOLAR SIMULATION SUMMARY' : 'RESUMEN TÉCNICO DE SIMULACIÓN SOLAR'}
 ======================================================================
 ${isEn ? 'Location' : 'Localidad'}: ${res.locationName} (${res.latitude.toFixed(2)}°, ${res.longitude.toFixed(2)}°)
 ${isEn ? 'Data Source' : 'Fuente'}: ${res.source.toUpperCase()}
@@ -191,7 +191,7 @@ ${isEn ? 'PV Peak Power' : 'Potencia Pico'}: ${peakKw.toFixed(2)} kWp | PR: ${(p
 ${res.surfaceComparison.map((s, idx) => `   ${idx + 1}. ${getSurfaceDisplayName(s, isEn)}: ${s.meanDailyKwhM2.toFixed(3)} kWh/m²/d (${Math.round(s.annualRadiationKwhM2)} kWh/m²) | +${s.gainOverHorizontalPct.toFixed(1)}% | Prod: ${Math.round(s.energyProducedOsterwaldKwhYear).toLocaleString()} kWh/${isEn ? 'yr' : 'año'}`).join('\n')}
 
 ======================================================================
-OrientSol 3.0 Web • ${new Date().toLocaleDateString()}
+OrientSol 4.0 Web • ${new Date().toLocaleDateString()}
 `.trim();
 
   try {

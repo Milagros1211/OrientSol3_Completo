@@ -1,7 +1,7 @@
 import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
-import { getDualAxisNoonTiltDeg, getNoonAzimuthDeg } from '@/services/solarGeometryAngles';
+import { getDualAxisNoonTiltDeg, getNoonAzimuthDeg, getHorizontalTrackerDailyMeanTiltDeg } from '@/services/solarGeometryAngles';
 
 
 export interface EnergyCalculationProps {
@@ -28,7 +28,7 @@ const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 /**
  * Shows Osterwald Formula and Nomenclature help dialog
- * matching EXACTLY Figura 5.2.80 (Ayuda_Energia.m) in OrientSol 3.0
+ * matching EXACTLY Figura 5.2.80 (Ayuda_Energia.m) in OrientSol 4.0
  */
 export function showOsterwaldInfoModal(isEn: boolean): void {
   const existing = document.getElementById('matlab-ayuda-energia-modal');
@@ -183,7 +183,7 @@ export function calculateOsterwaldEnergy(
 }
 
 /**
- * Renders the OrientSol 3.0 - Cálculo de la energía component matching Imagen 1
+ * Renders the OrientSol 4.0 - Cálculo de la energía component matching Imagen 1
  */
 export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTMLElement {
   const { simulationResult: res, locationName, latitude, studyType = 'annual', onClose } = props;
@@ -288,7 +288,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
 
     container.innerHTML = `
       <div class="opt-energy-window-frame">
-        <!-- 1. Header Bar matching OrientSol 3.0 Imagen 1 -->
+        <!-- 1. Header Bar matching OrientSol 4.0 Imagen 1 -->
         <div class="opt-energy-header-bar">
           <div class="opt-energy-header-left">
             <div class="opt-energy-meta-row">
@@ -308,7 +308,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
           </div>
           <div class="opt-energy-header-right">
             <div class="opt-matlab-brand-title">
-              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>3.0</strong>
+              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>4.0</strong>
             </div>
           </div>
         </div>
@@ -431,7 +431,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                     } else if (studyType === 'azimuthal') {
                       angleBadgeText = `Inc: ${latitude.toFixed(1)}° | Ori: ${noonAzim.toFixed(1)}°`;
                     } else if (studyType === 'horizontal') {
-                      angleBadgeText = `Inc: 0.0° | Ori: 90.0°`;
+                      angleBadgeText = `Inc: ${getHorizontalTrackerDailyMeanTiltDeg(latitude, idx).toFixed(1)}° | Ori: 90.0°`;
                     } else if (studyType === 'dual') {
                       angleBadgeText = `Inc: ${noonDualTilt.toFixed(1)}° | Ori: ${noonAzim.toFixed(1)}°`;
                     } else {
@@ -476,7 +476,8 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                             return `Inc: ${latitude.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`;
                           }
                           if (studyType === 'horizontal') {
-                            return `Inc: 0.0° | Ori: 90.0°`;
+                            const avgHorizTilt = months.reduce((acc, _, idx) => acc + getHorizontalTrackerDailyMeanTiltDeg(latitude, idx), 0) / 12;
+                            return `Inc: ${avgHorizTilt.toFixed(1)}° | Ori: 90.0°`;
                           }
                           if (studyType === 'dual') {
                             const avgDualTilt = months.reduce((acc, _, idx) => acc + getDualAxisNoonTiltDeg(latitude, idx), 0) / 12;
@@ -512,7 +513,8 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                             return `Inc: ${latitude.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`;
                           }
                           if (studyType === 'horizontal') {
-                            return `Inc: 0.0° | Ori: 90.0°`;
+                            const avgHorizTilt = months.reduce((acc, _, idx) => acc + getHorizontalTrackerDailyMeanTiltDeg(latitude, idx), 0) / 12;
+                            return `Inc: ${avgHorizTilt.toFixed(1)}° | Ori: 90.0°`;
                           }
                           if (studyType === 'dual') {
                             const avgDualTilt = months.reduce((acc, _, idx) => acc + getDualAxisNoonTiltDeg(latitude, idx), 0) / 12;

@@ -1,5 +1,5 @@
 """
-Temperature Modeling Module for OrientSol 3.0.
+Temperature Modeling Module for OrientSol 4.0.
 Calculates ambient temperature metrics (Maximum, Minimum, Mean) and
 photovoltaic cell operating temperatures (NOCT / TONC model) across all surfaces.
 

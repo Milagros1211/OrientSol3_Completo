@@ -36,7 +36,7 @@ let stateDualShowEnergy: boolean = false;
 let stateDualShowGraphs: boolean = false;
 
 /**
- * Renders OrientSol 3.0 - Seguimiento a dos ejes (Figura 6.3.19)
+ * Renders OrientSol 4.0 - Seguimiento a dos ejes (Figura 6.3.19)
  */
 export function renderTrackingDualAxisStudyPanel(props: TrackingDualStudyProps): HTMLElement {
   const { simulationResult: res, locationName, latitude, onBack, onExit } = props;
@@ -143,7 +143,7 @@ export function renderTrackingDualAxisStudyPanel(props: TrackingDualStudyProps):
           </div>
           <div class="opt-tracking-header-right">
             <div class="opt-matlab-brand-title">
-              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>3.0</strong>
+              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>4.0</strong>
             </div>
           </div>
         </div>

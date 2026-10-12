@@ -35,7 +35,7 @@ let statePolarShowEnergy: boolean = false;
 let statePolarShowGraphs: boolean = false;
 
 /**
- * Renders OrientSol 3.0 - Seguimiento a un eje polar (Figura 6.3.18)
+ * Renders OrientSol 4.0 - Seguimiento a un eje polar (Figura 6.3.18)
  */
 export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLElement {
   const { simulationResult: res, locationName, latitude, onBack, onExit } = props;
@@ -141,7 +141,7 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
           </div>
           <div class="opt-tracking-header-right">
             <div class="opt-matlab-brand-title">
-              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>3.0</strong>
+              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>4.0</strong>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 """
-Monthly Optimal Tilt Optimization (12 Monthly Positions) for OrientSol 3.0.
+Monthly Optimal Tilt Optimization (12 Monthly Positions) for OrientSol 4.0.
 Calculates independent optimal tilt angle for each of the 12 calendar months.
 
 Original mathematical reference:

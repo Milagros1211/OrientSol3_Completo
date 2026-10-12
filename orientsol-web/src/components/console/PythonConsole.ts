@@ -114,7 +114,7 @@ export function renderPythonConsole(): HTMLElement {
           <h3 class="panel-title">${isEn ? 'Scientific Verification & Engine Validation' : 'Verificación de Algoritmos y Motores de Cálculo'}</h3>
           <p class="panel-desc">
             ${isEn
-              ? 'Interactive verification suite for OrientSol 3.0 algorithms: solar geometry, radiation transposition, tracking systems, and Osterwald cell thermal models.'
+              ? 'Interactive verification suite for OrientSol 4.0 algorithms: solar geometry, radiation transposition, tracking systems, and Osterwald cell thermal models.'
               : 'Módulos verificados: <code>matriz_declinacion</code>, <code>AngulosSalida</code>, <code>Angulos</code>, <code>Altura_Solar</code>, <code>Azimut_Solar</code>, <code>Calculo_Beta_2Ejes</code>, <code>Osterwald</code>.'}
           </p>
         </div>

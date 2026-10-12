@@ -58,7 +58,7 @@ export function exportOrientSolMasterExcel(
   // HOJA 1: RESUMEN GENERAL & BALANCE ENERGÉTICO
   // =========================================================================
   const summaryData: (string | number)[][] = [
-    ['ORIENTSOL 3.0 - ' + (isEn ? 'SIMULATION REPORT & ENERGY BALANCE' : 'INFORME DE SIMULACIÓN Y BALANCE ENERGÉTICO')],
+    ['ORIENTSOL 4.0 - ' + (isEn ? 'SIMULATION REPORT & ENERGY BALANCE' : 'INFORME DE SIMULACIÓN Y BALANCE ENERGÉTICO')],
     [isEn ? 'DOWNLOAD TIMESTAMP' : 'REGISTRO DE DESCARGA'],
     [isEn ? 'Download Date & Time' : 'Fecha y Hora de Descarga', formattedDateTime],
     [isEn ? 'ISO Timestamp' : 'Marca Temporal ISO', isoTimestamp],

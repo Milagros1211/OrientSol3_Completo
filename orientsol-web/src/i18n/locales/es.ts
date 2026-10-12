@@ -3,7 +3,7 @@ import type { Translations } from '../types';
 export const es: Translations = {
   common: {
     appName: 'OrientSol',
-    versionBadge: 'v3.0 Web',
+    versionBadge: 'v4.0 Web',
     subtitle: 'Simulación Solar y Fotovoltaica • Migración MATLAB a Web & Desktop',
     docs: 'Documentación',
     loading: 'Cargando...',
@@ -56,11 +56,11 @@ export const es: Translations = {
   },
   hybridLoader: {
     title: 'Arquitectura Híbrida & Carga Dual de Climatología',
-    subtitle: 'Consulta la Base Histórica OrientSol 3.0, introduce datos manualmente mes a mes, o sube documentos digitales (CSV / JSON) para alimentar el motor de cálculo Python.',
+    subtitle: 'Consulta la Base Histórica OrientSol 4.0, introduce datos manualmente mes a mes, o sube documentos digitales (CSV / JSON) para alimentar el motor de cálculo Python.',
     tabHistorical: '1. Base Histórica OrientSol',
     tabManual: '2. Introducción Manual (Formulario)',
     tabUpload: '3. Subida Digital (CSV / JSON)',
-    historicalLabel: 'Estación Histórica OrientSol 3.0',
+    historicalLabel: 'Estación Histórica OrientSol 4.0',
     selectStation: 'Seleccionar Estación',
     manualPresetLabel: 'Prellenar con estación histórica:',
     manualPresetPlaceholder: '-- Seleccionar plantilla --',
@@ -69,7 +69,7 @@ export const es: Translations = {
     country: 'País',
     applyManualBtn: 'Aplicar Datos Manuales',
     dropzoneTitle: 'Arrastra tu archivo CSV o JSON aquí',
-    dropzoneHint: 'Archivos compatibles con OrientSol 3.0 (radiación mensual Gdm0 y temperaturas Tamb)',
+    dropzoneHint: 'Archivos compatibles con OrientSol 4.0 (radiación mensual Gdm0 y temperaturas Tamb)',
     selectFileBtn: 'Seleccionar Archivo',
     sampleCsvBtn: 'Descargar Plantilla CSV',
     sampleJsonBtn: 'Descargar Plantilla JSON',
@@ -82,7 +82,7 @@ export const es: Translations = {
   },
   results: {
     pythonSuccess: '✓ Motor Matemático Python (NumPy)',
-    resultsFor: 'Resultados OrientSol 3.0: {location} (Lat: {lat}°)',
+    resultsFor: 'Resultados OrientSol 4.0: {location} (Lat: {lat}°)',
     // Temperatures
     tempMeanAnnual: 'Temp. Media Anual',
     tempMeanAnnualDesc: 'Media ambiente mensual',
@@ -96,7 +96,7 @@ export const es: Translations = {
     optAnnualTitle: 'Inclinación Óptima Anual (βopt)',
     gainOverHoriz: 'Ganancia s/ Horizontal:',
     annualTotalRad: 'Radiación Total Anual:',
-    optAnnualStudyTitle: 'OrientSol 3.0 — Inclinación Óptima Anual',
+    optAnnualStudyTitle: 'OrientSol 4.0 — Inclinación Óptima Anual',
     optAnnualStudyDesc: 'Estudio de radiación mensual sobre superficie inclinada (0° a 90°) y comparativa entre la inclinación óptima hallada y un ángulo seleccionado.',
     selectComponent: 'Seleccione una componente:',
     compGlobal: 'Global (Gdm)',
@@ -235,11 +235,11 @@ export const es: Translations = {
     statusReady: 'Listo para ejecutar comandos Python.',
   },
   architecture: {
-    title: '5. Arquitectura del Sistema OrientSol 3.0 Web',
+    title: '5. Arquitectura del Sistema OrientSol 4.0 Web',
     subtitle: 'Diagrama de capas, tecnologías y flujo de datos',
   },
   statusBar: {
-    ready: 'Sistema OrientSol 3.0 Web listo para cálculos.',
+    ready: 'Sistema OrientSol 4.0 Web listo para cálculos.',
     offlineMode: 'Modo Offline: Disponible',
     crossPlatform: 'Multiplataforma: Web, Desktop y Móvil',
   },

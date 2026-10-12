@@ -1,8 +1,8 @@
 {
   "name": "orientsol-web",
   "private": true,
-  "version": "3.0.0",
-  "description": "OrientSol 3.0 - Software Avanzado de Cálculo Solar Fotovoltaico y Térmico",
+  "version": "4.0.0",
+  "description": "OrientSol 4.0 - Software Avanzado de Cálculo Solar Fotovoltaico y Térmico",
   "author": "OrientSol Team",
   "type": "module",
   "main": "electron/main.js",
@@ -42,7 +42,7 @@
   },
   "build": {
     "appId": "com.orientsol.app",
-    "productName": "OrientSol 3.0",
+    "productName": "OrientSol 4.0",
     "copyright": "Copyright © 2026 OrientSol",
     "directories": {
       "output": "release"
