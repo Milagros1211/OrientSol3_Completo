@@ -206,7 +206,7 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
                   <tr>
                     <td class="td-track-month"><strong>${mName}</strong></td>
                     <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 600; white-space: nowrap; text-align: center;">
-                      <span style="color: #38bdf8;">Inc: ${res.latitude.toFixed(1)}°</span> <span style="opacity: 0.4;">|</span> <span style="color: var(--text-muted);">Ori: Rot. 15°/h (${res.latitude >= 0 ? '0°' : '180°'} a 12h)</span>
+                      <span style="color: #38bdf8;">Inc: ${res.latitude.toFixed(1)}°</span> <span style="opacity: 0.4;">|</span> <span style="color: var(--text-muted);">Ori: ${res.latitude >= 0 ? '0.0°' : '180.0°'}</span>
                     </td>
                     <td class="td-num">${radHoriz[i].toFixed(2)}</td>
                     <td class="td-num td-track-val"><strong>${radPolar[i].toFixed(2)}</strong></td>
@@ -223,7 +223,7 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
                 <tr class="tracking-media-row">
                   <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
                   <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 700; white-space: nowrap; text-align: center; color: #38bdf8;">
-                    Inc: ${res.latitude.toFixed(1)}° | Ori: Rot. 15°/h (${res.latitude >= 0 ? '0°' : '180°'} a 12h)
+                    Inc: ${res.latitude.toFixed(1)}° | Ori: ${res.latitude >= 0 ? '0.0°' : '180.0°'}
                   </td>
                   <td class="td-num"><strong>${meanHoriz.toFixed(2)}</strong></td>
                   <td class="td-num td-track-val"><strong>${meanPolar.toFixed(2)}</strong></td>
