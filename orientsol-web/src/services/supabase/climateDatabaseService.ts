@@ -14,6 +14,7 @@ const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 export interface SimilarityResult {
   isDuplicate: boolean;
+  duplicateReason?: 'coordinates' | 'name' | 'data' | 'validation';
   similarityPct: number;
   matchedRecord?: ClimateDataRecord;
   message?: string;
@@ -23,6 +24,7 @@ export interface RegisterEmplacementResult {
   success: boolean;
   isDuplicate: boolean;
   isOffline: boolean;
+  duplicateReason?: 'coordinates' | 'name' | 'data' | 'validation';
   similarityPct?: number;
   matchedRecord?: ClimateDataRecord;
   message: string;
@@ -43,6 +45,180 @@ export interface SyncSummary {
 }
 
 type DatabaseStateListener = () => void;
+
+/**
+ * Calculates string similarity percentage (0 to 100%) between two emplacement names
+ * using normalized Levenshtein edit distance.
+ */
+export function calculateStringSimilarity(str1: string, str2: string): number {
+  if (!str1 || !str2) return 0;
+  const s1 = str1.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const s2 = str2.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (s1 === s2) return 100;
+
+  const track = Array(s2.length + 1)
+    .fill(null)
+    .map(() => Array(s1.length + 1).fill(null));
+
+  for (let i = 0; i <= s1.length; i += 1) track[0][i] = i;
+  for (let j = 0; j <= s2.length; j += 1) track[j][0] = j;
+
+  for (let j = 1; j <= s2.length; j += 1) {
+    for (let i = 1; i <= s1.length; i += 1) {
+      const indicator = s1[i - 1] === s2[j - 1] ? 0 : 1;
+      track[j][i] = Math.min(
+        track[j][i - 1] + 1,
+        track[j - 1][i] + 1,
+        track[j - 1][i - 1] + indicator
+      );
+    }
+  }
+
+  const distance = track[s2.length][s1.length];
+  const maxLen = Math.max(s1.length, s2.length);
+  if (maxLen === 0) return 100;
+  const sim = Math.max(0, (1 - distance / maxLen) * 100);
+  return Math.round(sim * 10) / 10;
+}
+
+/**
+ * Validates that all fields of a climate record are non-empty, physically valid,
+ * and complete before attempting upload to Supabase.
+ */
+export function validateClimateRecordForSaving(
+  record: Partial<ClimateDataRecord> | null | undefined,
+  isEn: boolean = false
+): { valid: boolean; error?: string } {
+  if (!record) {
+    return {
+      valid: false,
+      error: isEn ? 'No climate record provided.' : 'No se han proporcionado datos del emplazamiento.',
+    };
+  }
+
+  // 1. Emplacement name
+  const name = (record.locationName || '').trim();
+  if (!name) {
+    return {
+      valid: false,
+      error: isEn
+        ? 'The emplacement name is empty. Please enter a valid name.'
+        : 'El nombre del emplazamiento está vacío. Por favor, introduce un nombre válido.',
+    };
+  }
+
+  // 2. Latitude
+  if (record.latitude === undefined || record.latitude === null || isNaN(Number(record.latitude))) {
+    return {
+      valid: false,
+      error: isEn
+        ? 'Latitude is empty or not a valid number.'
+        : 'La latitud está vacía o no es un número válido.',
+    };
+  }
+  const lat = Number(record.latitude);
+  if (lat < -90 || lat > 90) {
+    return {
+      valid: false,
+      error: isEn
+        ? `Latitude (${lat}°) is out of range [-90°, +90°].`
+        : `La latitud (${lat}°) está fuera del rango permitido [-90°, +90°].`,
+    };
+  }
+
+  // 3. Longitude
+  if (record.longitude === undefined || record.longitude === null || isNaN(Number(record.longitude))) {
+    return {
+      valid: false,
+      error: isEn
+        ? 'Longitude is empty or not a valid number.'
+        : 'La longitud está vacía o no es un número válido.',
+    };
+  }
+  const lon = Number(record.longitude);
+  if (lon < -180 || lon > 180) {
+    return {
+      valid: false,
+      error: isEn
+        ? `Longitude (${lon}°) is out of range [-180°, +180°].`
+        : `La longitud (${lon}°) está fuera del rango permitido [-180°, +180°].`,
+    };
+  }
+
+  // 4. Monthly Gdm0 (12 months)
+  if (!Array.isArray(record.monthlyGdm0) || record.monthlyGdm0.length < 12) {
+    return {
+      valid: false,
+      error: isEn
+        ? `Solar radiation Gdm(0) data is incomplete. Exactly 12 monthly values are required (received ${record.monthlyGdm0?.length ?? 0}).`
+        : `Los datos de radiación Gdm(0) están incompletos. Se requieren exactamente 12 valores mensuales (se recibieron ${record.monthlyGdm0?.length ?? 0}).`,
+    };
+  }
+
+  let totalRad = 0;
+  for (let m = 0; m < 12; m++) {
+    const val = record.monthlyGdm0[m];
+    if (val === undefined || val === null || isNaN(Number(val))) {
+      return {
+        valid: false,
+        error: isEn
+          ? `Gdm(0) radiation value is empty or not a number in month ${m + 1}.`
+          : `El valor de radiación Gdm(0) está vacío o no es un número válido en el mes ${m + 1}.`,
+      };
+    }
+    const num = Number(val);
+    if (num < 0) {
+      return {
+        valid: false,
+        error: isEn
+          ? `Gdm(0) radiation cannot be negative in month ${m + 1} (${num}).`
+          : `La radiación Gdm(0) no puede ser negativa en el mes ${m + 1} (${num}).`,
+      };
+    }
+    totalRad += num;
+  }
+  if (totalRad === 0) {
+    return {
+      valid: false,
+      error: isEn
+        ? 'Gdm(0) solar radiation values cannot be all zero across the year.'
+        : 'La radiación solar Gdm(0) no puede ser cero en todos los meses del año.',
+    };
+  }
+
+  // 5. Monthly Temperature (12 months)
+  if (!Array.isArray(record.monthlyTemperature) || record.monthlyTemperature.length < 12) {
+    return {
+      valid: false,
+      error: isEn
+        ? `Temperature Tamb data is incomplete. Exactly 12 monthly values are required (received ${record.monthlyTemperature?.length ?? 0}).`
+        : `Los datos de temperatura Tamb están incompletos. Se requieren exactamente 12 valores mensuales (se recibieron ${record.monthlyTemperature?.length ?? 0}).`,
+    };
+  }
+
+  for (let m = 0; m < 12; m++) {
+    const val = record.monthlyTemperature[m];
+    if (val === undefined || val === null || isNaN(Number(val))) {
+      return {
+        valid: false,
+        error: isEn
+          ? `Tamb temperature value is empty or not a number in month ${m + 1}.`
+          : `El valor de temperatura Tamb está vacío o no es un número válido en el mes ${m + 1}.`,
+      };
+    }
+    const num = Number(val);
+    if (num < -60 || num > 65) {
+      return {
+        valid: false,
+        error: isEn
+          ? `Tamb temperature (${num}°C) in month ${m + 1} is unrealistic.`
+          : `La temperatura Tamb (${num}°C) en el mes ${m + 1} está fuera del rango físico razonable (-60°C a +65°C).`,
+      };
+    }
+  }
+
+  return { valid: true };
+}
 
 /**
  * Calculates similarity percentage (0 to 100%) between two climate data records
@@ -296,7 +472,10 @@ export class ClimateDatabaseService {
   }
 
   /**
-   * Checks whether an emplacement already exists with >= 90% data similarity.
+   * Checks whether an emplacement already exists:
+   * 1. Same coordinates (regardless of name): REJECT with warning.
+   * 2. Name similarity >= 90%: REJECT with warning.
+   * 3. Numerical data similarity >= 90%: REJECT with warning.
    */
   public async findSimilarEmplacement(
     target: ClimateDataRecord,
@@ -307,6 +486,32 @@ export class ClimateDatabaseService {
     let bestMatch: ClimateDataRecord | undefined = undefined;
 
     for (const existing of allRecords) {
+      // 1. Same geographic coordinates check (tolerance ~0.005° ≈ 500m)
+      const latDiff = Math.abs(target.latitude - existing.latitude);
+      const lonDiff = Math.abs(target.longitude - existing.longitude);
+      if (latDiff < 0.005 && lonDiff < 0.005) {
+        return {
+          isDuplicate: true,
+          duplicateReason: 'coordinates',
+          similarityPct: 100,
+          matchedRecord: existing,
+          message: `⚠️ No se puede registrar: Ya existe un emplazamiento registrado ("${existing.locationName}") con las mismas coordenadas geográficas (Lat: ${existing.latitude.toFixed(3)}°, Lon: ${existing.longitude.toFixed(3)}°), aunque el nombre sea diferente.`,
+        };
+      }
+
+      // 2. Name similarity >= 90% check
+      const nameSim = calculateStringSimilarity(target.locationName, existing.locationName);
+      if (nameSim >= thresholdPct) {
+        return {
+          isDuplicate: true,
+          duplicateReason: 'name',
+          similarityPct: nameSim,
+          matchedRecord: existing,
+          message: `⚠️ No se puede registrar: El nombre "${target.locationName}" presenta una similitud del ${nameSim}% (≥ 90%) con el emplazamiento existente "${existing.locationName}".`,
+        };
+      }
+
+      // 3. Numerical data similarity
       const sim = calculateDataSimilarity(target, existing);
       if (sim > highestSim) {
         highestSim = sim;
@@ -317,9 +522,10 @@ export class ClimateDatabaseService {
     if (highestSim >= thresholdPct && bestMatch) {
       return {
         isDuplicate: true,
+        duplicateReason: 'data',
         similarityPct: highestSim,
         matchedRecord: bestMatch,
-        message: `El emplazamiento ya ha sido registrado previamente con ${highestSim}% de coincidencia en datos numéricos con "${bestMatch.locationName}".`,
+        message: `⚠️ El emplazamiento ya ha sido registrado previamente con ${highestSim}% de coincidencia en datos numéricos con "${bestMatch.locationName}".`,
       };
     }
 
@@ -332,19 +538,32 @@ export class ClimateDatabaseService {
 
   /**
    * Registers a new emplacement:
-   * 1. Checks for data similarity >= 90% against existing records.
-   * 2. If >= 90%, marks as duplicate and halts insertion.
-   * 3. If < 90% and online, immediately inserts into Supabase.
-   * 4. If < 90% and offline (or Supabase unconfigured), stores in offline sync queue.
+   * 1. Validates that all fields are non-empty and physically valid.
+   * 2. Checks for coordinate duplicates, name similarity >= 90%, and data similarity >= 90%.
+   * 3. If valid and not duplicate, inserts into Supabase (or offline sync queue).
    */
   public async registerEmplacement(record: ClimateDataRecord): Promise<RegisterEmplacementResult> {
-    // 1. Duplicate check (>= 90% similarity in numerical data)
+    // 1. Pre-validation of empty / invalid data
+    const val = validateClimateRecordForSaving(record);
+    if (!val.valid) {
+      return {
+        success: false,
+        isDuplicate: false,
+        duplicateReason: 'validation',
+        isOffline: !this.isOnline() || !this.isConfigured(),
+        message: val.error || 'Error de validación en los datos ingresados.',
+        record,
+      };
+    }
+
+    // 2. Duplicate check (Coordinates, Name >= 90%, Data >= 90%)
     const check = await this.findSimilarEmplacement(record, 90.0);
     if (check.isDuplicate) {
       return {
         success: false,
         isDuplicate: true,
         isOffline: !this.isOnline() || !this.isConfigured(),
+        duplicateReason: check.duplicateReason,
         similarityPct: check.similarityPct,
         matchedRecord: check.matchedRecord,
         message: check.message!,

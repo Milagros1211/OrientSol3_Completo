@@ -1,5 +1,5 @@
 import { fetchUnifiedClimateData } from '@/services/external';
-import { climateDatabaseService, formatEmplacementNameWithSuffix } from '@/services/supabase';
+import { climateDatabaseService, validateClimateRecordForSaving } from '@/services/supabase';
 import {
   executeSolarSimulationFromClimateData,
   type SolarBridgeSimulationResult,
@@ -56,7 +56,6 @@ export function renderClimateIntegrationPanel(): HTMLElement {
         <select id="climate-source-select" class="form-select">
           <option value="nasa">${isEn ? 'NASA POWER API (Global Satellite Climatology)' : 'NASA POWER API (Climatología Satelital Global)'}</option>
           <option value="pvgis">${isEn ? 'PVGIS 5.3 API (European Commission JRC)' : 'PVGIS 5.3 API (Comisión Europea JRC)'}</option>
-          <option value="meteonorm">${isEn ? 'Meteonorm / Open-Meteo Reanalysis' : 'Meteonorm / Open-Meteo Reanalysis'}</option>
           <option value="supabase">${isEn ? 'Supabase (Saved Cloud Datasets)' : 'Supabase (Datasets Guardados / Nube)'}</option>
         </select>
       </div>
@@ -208,26 +207,27 @@ export function renderClimateIntegrationPanel(): HTMLElement {
     saveBtn.disabled = true;
 
     try {
-      const formattedName = formatEmplacementNameWithSuffix(activeClimateData.locationName, activeClimateData.source);
       const recordToSave: ClimateDataRecord = {
         ...activeClimateData,
-        locationName: formattedName,
+        locationName: activeClimateData.locationName,
       };
+
+      const val = validateClimateRecordForSaving(recordToSave, isEn);
+      if (!val.valid) {
+        setStatus(`Error: ${val.error}`, 'error');
+        saveBtn.disabled = false;
+        return;
+      }
 
       const reg = await climateDatabaseService.registerEmplacement(recordToSave);
       if (reg.isDuplicate) {
-        setStatus(
-          isEn
-            ? `⚠️ Emplacement already registered (${reg.similarityPct}% data match with "${reg.matchedRecord?.locationName}").`
-            : `⚠️ El emplazamiento ya ha sido registrado previamente (${reg.similarityPct}% de coincidencia en datos ingresados con "${reg.matchedRecord?.locationName}").`,
-          'warning'
-        );
+        setStatus(reg.message, 'warning');
       } else {
         renderClimateDataPreview(recordToSave);
         setStatus(
           isEn
-            ? `✓ Emplacement "${formattedName}" registered successfully in Supabase (12 monthly records).`
-            : `✓ Emplazamiento "${formattedName}" guardado con éxito en Supabase (12 registros mensuales).`,
+            ? `✓ Emplacement "${recordToSave.locationName}" registered successfully in Supabase (12 monthly records).`
+            : `✓ Emplazamiento "${recordToSave.locationName}" guardado con éxito en Supabase (12 registros mensuales).`,
           'success'
         );
       }

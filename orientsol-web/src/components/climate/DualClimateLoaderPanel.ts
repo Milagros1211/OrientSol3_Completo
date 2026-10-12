@@ -1,4 +1,4 @@
-import { hybridClimateManager } from '@/services/hybrid';
+import { hybridClimateManager, type ManualClimateInput } from '@/services/hybrid';
 import {
   executeSolarSimulationFromClimateData,
   type SolarBridgeSimulationResult,
@@ -6,7 +6,10 @@ import {
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { generateSampleCSV, generateSampleJSON } from '@/services/hybrid/climateFileParser';
 import type { ClimateDataRecord } from '@/types/climate';
-import { climateDatabaseService, formatEmplacementNameWithSuffix } from '@/services/supabase';
+import {
+  climateDatabaseService,
+  validateClimateRecordForSaving,
+} from '@/services/supabase';
 import { fetchUnifiedClimateData } from '@/services/external';
 import { i18n } from '@/i18n';
 import {
@@ -224,12 +227,20 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         </div>
       </div>
 
-      <div class="manual-actions-row">
+      <div class="manual-actions-row" style="display: flex; gap: 0.75rem; justify-content: flex-end;">
         <button id="btn-validate-manual" class="btn btn-primary">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
           <span>${t.hybridLoader.applyManualBtn}</span>
+        </button>
+        <button id="btn-save-manual-to-supabase" class="btn btn-secondary">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+          <span>${isEn ? 'Save to Supabase' : 'Guardar en Supabase'}</span>
         </button>
       </div>
     </div>
@@ -259,6 +270,16 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <button id="btn-download-json-multi-template" class="btn btn-secondary">${isEn ? 'Sample Batch JSON (Multi)' : 'Plantilla JSON (Lote Multi)'}</button>
         </div>
       </div>
+      <div class="upload-actions-row" style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button id="btn-save-upload-to-supabase" class="btn btn-secondary" disabled>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+          <span>${isEn ? 'Save to Supabase' : 'Guardar en Supabase'}</span>
+        </button>
+      </div>
     </div>
 
     <!-- TAB 4: SATELLITE CLIMATE APIS -->
@@ -269,7 +290,6 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <select id="api-source-select" class="form-select">
             <option value="pvgis">${isEn ? 'PVGIS 5.3 API (European Commission JRC)' : 'PVGIS 5.3 API (Comisión Europea JRC)'}</option>
             <option value="nasa">${isEn ? 'NASA POWER API (Global Satellite Climatology)' : 'NASA POWER API (Climatología Satelital Global)'}</option>
-            <option value="meteonorm">${isEn ? 'Meteonorm / Open-Meteo Reanalysis (ERA5)' : 'Meteonorm / Open-Meteo Reanalysis (ERA5)'}</option>
           </select>
         </div>
 
@@ -287,6 +307,11 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             <option value="8">Atenas (Grecia)</option>
             <option value="custom">${isEn ? 'Custom Coordinates...' : 'Coordenadas Personalizadas...'}</option>
           </select>
+        </div>
+
+        <div class="form-group">
+          <label for="api-input-name" class="form-label">${isEn ? 'Emplacement Name' : 'Nombre del Emplazamiento'}</label>
+          <input type="text" id="api-input-name" class="form-input" value="Madrid (España)" />
         </div>
 
         <div class="form-group">
@@ -376,6 +401,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   const manualTemplateSelect = container.querySelector('#manual-template-select') as HTMLSelectElement;
   const applyTemplateBtn = container.querySelector('#btn-apply-manual-template') as HTMLButtonElement;
   const validateManualBtn = container.querySelector('#btn-validate-manual') as HTMLButtonElement;
+  const saveManualBtn = container.querySelector('#btn-save-manual-to-supabase') as HTMLButtonElement;
 
   const dropzone = container.querySelector('#file-dropzone') as HTMLElement;
   const fileInput = container.querySelector('#climate-file-input') as HTMLInputElement;
@@ -383,14 +409,18 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   const downloadCsvMultiBtn = container.querySelector('#btn-download-csv-multi-template') as HTMLButtonElement;
   const downloadJsonBtn = container.querySelector('#btn-download-json-template') as HTMLButtonElement;
   const downloadJsonMultiBtn = container.querySelector('#btn-download-json-multi-template') as HTMLButtonElement;
+  const saveUploadBtn = container.querySelector('#btn-save-upload-to-supabase') as HTMLButtonElement;
 
   // Tab 4: Satellite Climate APIs Queries
   const apiSourceSelect = container.querySelector('#api-source-select') as HTMLSelectElement;
   const apiCitySelect = container.querySelector('#api-city-preset-select') as HTMLSelectElement;
+  const apiNameInput = container.querySelector('#api-input-name') as HTMLInputElement;
   const apiLatInput = container.querySelector('#api-input-lat') as HTMLInputElement;
   const apiLonInput = container.querySelector('#api-input-lon') as HTMLInputElement;
   const apiFetchBtn = container.querySelector('#btn-fetch-satellite-api') as HTMLButtonElement;
   const apiSaveBtn = container.querySelector('#btn-save-api-to-supabase') as HTMLButtonElement;
+
+  let pendingUploadedRecords: ClimateDataRecord[] = [];
 
   const activeCard = container.querySelector('#active-dataset-card') as HTMLElement;
   const simBtn = container.querySelector('#btn-run-hybrid-simulation') as HTMLButtonElement;
@@ -479,6 +509,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       const idx = parseInt(val, 10);
       const preset = API_CITY_PRESETS[idx];
       if (preset) {
+        if (apiNameInput) apiNameInput.value = preset.name;
         apiLatInput.value = preset.lat.toFixed(4);
         apiLonInput.value = preset.lon.toFixed(4);
       }
@@ -492,8 +523,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     const lat = parseFloat(apiLatInput.value);
     const lon = parseFloat(apiLonInput.value);
 
-    let locationName = 'Coordenadas Personalizadas';
-    if (apiCitySelect.value !== 'custom') {
+    const chosenName = apiNameInput ? apiNameInput.value.trim() : '';
+    let locationName = chosenName || 'Coordenadas Personalizadas';
+    if (!chosenName && apiCitySelect.value !== 'custom') {
       const idx = parseInt(apiCitySelect.value, 10);
       locationName = API_CITY_PRESETS[idx]?.name || locationName;
     }
@@ -535,37 +567,39 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     }
   });
 
-  // Save Satellite API Record to Supabase with Required [DB + Timestamp] Suffix
+  // Save Satellite API Record to Supabase with Desired Name
   apiSaveBtn?.addEventListener('click', async () => {
     if (!currentActiveRecord) return;
+
+    const chosenName = apiNameInput ? apiNameInput.value.trim() : '';
+    const targetName = chosenName || currentActiveRecord.locationName;
+
+    const recordToSave: ClimateDataRecord = {
+      ...currentActiveRecord,
+      locationName: targetName,
+    };
+
+    // Pre-validation: Stop upload and show error if empty or invalid
+    const val = validateClimateRecordForSaving(recordToSave, isEn);
+    if (!val.valid) {
+      setStatus(`Error: ${val.error}`, 'error');
+      return;
+    }
 
     apiSaveBtn.disabled = true;
     setStatus(isEn ? 'Registering dataset in Supabase...' : 'Registrando emplazamiento en Supabase...', 'info');
 
     try {
-      const formattedName = formatEmplacementNameWithSuffix(currentActiveRecord.locationName, currentActiveRecord.source);
-      const recordToSave: ClimateDataRecord = {
-        ...currentActiveRecord,
-        locationName: formattedName,
-      };
-
       const reg = await climateDatabaseService.registerEmplacement(recordToSave);
       if (reg.isDuplicate) {
-        setStatus(
-          isEn
-            ? `⚠️ Emplacement already registered (${reg.similarityPct}% match with "${reg.matchedRecord?.locationName}").`
-            : `⚠️ El emplazamiento ya ha sido registrado previamente (${reg.similarityPct}% de coincidencia con "${reg.matchedRecord?.locationName}").`,
-          'warning'
-        );
+        setStatus(reg.message, 'warning');
       } else {
         renderActiveRecord(recordToSave);
         await updateSearchableStations();
-        setStatus(
-          isEn
-            ? `✓ Emplacement "${formattedName}" successfully saved to Supabase (12 monthly records in datos_mensuales).`
-            : `✓ Emplazamiento "${formattedName}" guardado con éxito en Supabase (12 registros mensuales en datos_mensuales).`,
-          'success'
-        );
+        const uploadPermissionStatus = reg.isOffline
+          ? (isEn ? '🔴 Online upload NOT permitted (Offline Mode) → Stored in local cache.' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Guardado en caché local para sincronizar después.')
+          : (isEn ? '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.');
+        setStatus(`${uploadPermissionStatus} ${reg.message}`, 'success');
       }
     } catch (err: any) {
       setStatus(`Error al guardar en Supabase: ${err.message || String(err)}`, 'error');
@@ -920,47 +954,97 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     setStatus(isEn ? `Template "${rec.locationName}" applied to form.` : `Plantilla "${rec.locationName}" aplicada al formulario.`, 'info');
   });
 
-  validateManualBtn.addEventListener('click', async () => {
+  validateManualBtn.addEventListener('click', () => {
     const gInputs = container.querySelectorAll<HTMLInputElement>('.manual-g-input');
     const tInputs = container.querySelectorAll<HTMLInputElement>('.manual-t-input');
 
     const gdm0: number[] = [];
     const temp: number[] = [];
 
-    gInputs.forEach((inp) => gdm0.push(parseFloat(inp.value) || 0));
-    tInputs.forEach((inp) => temp.push(parseFloat(inp.value) || 0));
+    gInputs.forEach((inp) => gdm0.push(parseFloat(inp.value)));
+    tInputs.forEach((inp) => temp.push(parseFloat(inp.value)));
+
+    const rawRecord: ManualClimateInput = {
+      locationName: manualName.value.trim(),
+      latitude: parseFloat(manualLat.value),
+      longitude: parseFloat(manualLon.value),
+      elevationM: parseFloat(manualElev.value) || 0,
+      country: 'Personalizado',
+      albedo: parseFloat(manualAlbedo.value) || 0.20,
+      monthlyGdm0: gdm0,
+      monthlyTemperature: temp,
+    };
+
+    // Pre-validation: Stop and show error if empty or invalid
+    const val = validateClimateRecordForSaving(rawRecord, isEn);
+    if (!val.valid) {
+      setStatus(`Error: ${val.error}`, 'error');
+      return;
+    }
 
     try {
-      const rec = hybridClimateManager.setManualData({
-        locationName: manualName.value.trim() || 'Estación Manual',
-        latitude: parseFloat(manualLat.value) || 0,
-        longitude: parseFloat(manualLon.value) || 0,
-        elevationM: parseFloat(manualElev.value) || 0,
-        country: 'Personalizado',
-        albedo: parseFloat(manualAlbedo.value) || 0.20,
-        monthlyGdm0: gdm0,
-        monthlyTemperature: temp,
-      });
+      const rec = hybridClimateManager.setManualData(rawRecord);
+      renderActiveRecord(rec);
+      setStatus(
+        isEn
+          ? `✓ Manual dataset applied for "${rec.locationName}". You can simulate or click "Save to Supabase".`
+          : `✓ Datos manuales aplicados para "${rec.locationName}". Puedes simular o hacer clic en "Guardar en Supabase".`,
+        'success'
+      );
+    } catch (err: any) {
+      setStatus(`Error: ${err.message}`, 'error');
+    }
+  });
 
+  saveManualBtn?.addEventListener('click', async () => {
+    const gInputs = container.querySelectorAll<HTMLInputElement>('.manual-g-input');
+    const tInputs = container.querySelectorAll<HTMLInputElement>('.manual-t-input');
+
+    const gdm0: number[] = [];
+    const temp: number[] = [];
+
+    gInputs.forEach((inp) => gdm0.push(parseFloat(inp.value)));
+    tInputs.forEach((inp) => temp.push(parseFloat(inp.value)));
+
+    const rawRecord: ManualClimateInput = {
+      locationName: manualName.value.trim(),
+      latitude: parseFloat(manualLat.value),
+      longitude: parseFloat(manualLon.value),
+      elevationM: parseFloat(manualElev.value) || 0,
+      country: 'Personalizado',
+      albedo: parseFloat(manualAlbedo.value) || 0.20,
+      monthlyGdm0: gdm0,
+      monthlyTemperature: temp,
+    };
+
+    // Pre-validation: Stop upload and show error if empty or invalid
+    const val = validateClimateRecordForSaving(rawRecord, isEn);
+    if (!val.valid) {
+      setStatus(`Error: ${val.error}`, 'error');
+      return;
+    }
+
+    saveManualBtn.disabled = true;
+    setStatus(isEn ? 'Saving manual emplacement to Supabase...' : 'Guardando emplazamiento manual en Supabase...', 'info');
+
+    try {
+      const rec = hybridClimateManager.setManualData(rawRecord);
       renderActiveRecord(rec);
 
-      // Register in Supabase (Online auto-insert or Offline queue with >=90% duplicate detection)
       const reg = await climateDatabaseService.registerEmplacement(rec);
       if (reg.isDuplicate) {
-        setStatus(
-          isEn
-            ? `⚠️ Emplacement already registered (${reg.similarityPct}% data match with "${reg.matchedRecord?.locationName}").`
-            : `⚠️ El emplazamiento ya ha sido registrado previamente (${reg.similarityPct}% de coincidencia en datos ingresados con "${reg.matchedRecord?.locationName}").`,
-          'warning'
-        );
+        setStatus(reg.message, 'warning');
       } else {
+        await updateSearchableStations();
         const uploadPermissionStatus = reg.isOffline
-          ? (isEn ? '🔴 Online upload NOT permitted (Offline Mode) → Emplacement safely stored in local cache.' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Emplazamiento guardado en caché local para sincronizarlo después.')
-          : (isEn ? '🟢 Online upload PERMITTED → Emplacement successfully inserted into datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en la tabla datos_mensuales.');
+          ? (isEn ? '🔴 Online upload NOT permitted (Offline Mode) → Stored in local cache.' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Guardado en caché local para sincronizar después.')
+          : (isEn ? '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.');
         setStatus(`${uploadPermissionStatus} ${reg.message}`, 'success');
       }
     } catch (err: any) {
       setStatus(`Error: ${err.message}`, 'error');
+    } finally {
+      saveManualBtn.disabled = false;
     }
   });
 
@@ -973,50 +1057,98 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     hybridClimateManager
       .parseUploadedClimateFile(file)
       .then(async ({ record, records }) => {
+        const listToRegister = records && records.length > 0 ? records : [record];
+        pendingUploadedRecords = listToRegister;
         renderActiveRecord(record);
 
-        const listToRegister = records && records.length > 0 ? records : [record];
-        let dupsCount = 0;
-        let newCount = 0;
-
-        for (const item of listToRegister) {
-          const reg = await climateDatabaseService.registerEmplacement(item);
-          if (reg.isDuplicate) dupsCount++;
-          else newCount++;
+        if (saveUploadBtn) {
+          saveUploadBtn.disabled = false;
         }
 
-        // Refresh searchable stations so imported locations are immediately searchable
-        updateSearchableStations();
-
-        if (listToRegister.length > 1) {
-          setStatus(
-            isEn
-              ? `Batch file loaded: ${listToRegister.length} locations imported (${newCount} new, ${dupsCount} already registered).`
-              : `Archivo de lote cargado: ${listToRegister.length} emplazamientos importados (${newCount} nuevos, ${dupsCount} ya registrados).`,
-            newCount > 0 ? 'success' : 'warning'
-          );
-        } else {
-          const reg = await climateDatabaseService.registerEmplacement(record);
-          if (reg.isDuplicate) {
-            setStatus(
-              isEn
-                ? `⚠️ File loaded, but emplacement was already registered (${reg.similarityPct}% data match with "${reg.matchedRecord?.locationName}").`
-                : `⚠️ Archivo cargado, pero el emplazamiento ya estaba registrado (${reg.similarityPct}% de coincidencia con "${reg.matchedRecord?.locationName}").`,
-              'warning'
-            );
-          } else {
-            const uploadPermissionStatus = reg.isOffline
-              ? (isEn ? '🔴 Online upload NOT permitted (Offline Mode) → Saved in local cache.' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Guardado en caché local.')
-              : (isEn ? '🟢 Online upload PERMITTED → Emplacement inserted into datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado en datos_mensuales.');
-            setStatus(`${uploadPermissionStatus} ${reg.message}`, 'success');
-          }
-        }
+        setStatus(
+          isEn
+            ? `✓ File "${file.name}" read successfully (${listToRegister.length} emplacement${listToRegister.length > 1 ? 's' : ''}). Click "Save to Supabase" to register.`
+            : `✓ Archivo "${file.name}" leído con éxito (${listToRegister.length} emplazamiento${listToRegister.length > 1 ? 's' : ''}). Pulsa "Guardar en Supabase" para registrarlos.`,
+          'info'
+        );
       })
       .catch((err: any) => {
         console.error('[Upload Error]', err);
         setStatus(`Error de lectura: ${err.message}`, 'error');
       });
   }
+
+  saveUploadBtn?.addEventListener('click', async () => {
+    if (!pendingUploadedRecords || pendingUploadedRecords.length === 0) {
+      setStatus(isEn ? 'No uploaded climate records to save.' : 'No hay registros cargados para guardar.', 'error');
+      return;
+    }
+
+    // Validate all records before saving
+    for (const item of pendingUploadedRecords) {
+      const val = validateClimateRecordForSaving(item, isEn);
+      if (!val.valid) {
+        setStatus(`Error en "${item.locationName || 'Sin Nombre'}": ${val.error}`, 'error');
+        return;
+      }
+    }
+
+    saveUploadBtn.disabled = true;
+    setStatus(isEn ? 'Registering uploaded dataset in Supabase...' : 'Registrando dataset en Supabase...', 'info');
+
+    try {
+      let dupsCount = 0;
+      let newCount = 0;
+      let warningMsg = '';
+
+      for (const item of pendingUploadedRecords) {
+        const reg = await climateDatabaseService.registerEmplacement(item);
+        if (reg.isDuplicate) {
+          dupsCount++;
+          warningMsg = reg.message;
+        } else {
+          newCount++;
+        }
+      }
+
+      await updateSearchableStations();
+
+      if (pendingUploadedRecords.length === 1) {
+        if (dupsCount > 0) {
+          setStatus(warningMsg, 'warning');
+        } else {
+          setStatus(
+            isEn
+              ? `✓ Emplacement "${pendingUploadedRecords[0].locationName}" saved to Supabase (12 monthly records).`
+              : `✓ Emplazamiento "${pendingUploadedRecords[0].locationName}" guardado en Supabase (12 registros mensuales).`,
+            'success'
+          );
+        }
+      } else {
+        if (newCount > 0 && dupsCount === 0) {
+          setStatus(
+            isEn
+              ? `✓ All ${newCount} emplacements saved successfully to Supabase.`
+              : `✓ Los ${newCount} emplazamientos se guardaron exitosamente en Supabase.`,
+            'success'
+          );
+        } else if (newCount > 0 && dupsCount > 0) {
+          setStatus(
+            isEn
+              ? `✓ ${newCount} new emplacements saved to Supabase (${dupsCount} already registered / duplicates).`
+              : `✓ ${newCount} nuevos emplazamientos guardados en Supabase (${dupsCount} ya registrados / advertencia de duplicado).`,
+            'warning'
+          );
+        } else {
+          setStatus(warningMsg || (isEn ? 'All emplacements were already registered.' : 'Todos los emplazamientos ya estaban registrados.'), 'warning');
+        }
+      }
+    } catch (err: any) {
+      setStatus(`Error: ${err.message}`, 'error');
+    } finally {
+      saveUploadBtn.disabled = false;
+    }
+  });
 
   // Subscribe to Supabase connection state changes to keep online upload banners updated
   climateDatabaseService.subscribe(() => {

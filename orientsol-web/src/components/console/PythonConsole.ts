@@ -336,7 +336,7 @@ export function renderPythonConsole(): HTMLElement {
       <div class="verif-kpi-grid">
         <div class="verif-kpi-card">
           <div class="verif-kpi-title">${isEn ? 'Verified Engine' : 'Motor Científico Validado'}</div>
-          <div class="verif-kpi-value" style="font-size: 1.05rem; color: #059669;">Python 3.14 (WASM)</div>
+          <div class="verif-kpi-value" style="font-size: 1.05rem; color: #059669;">Python 3.14</div>
           <div class="verif-kpi-sub">✓ Pyodide + NumPy 2.4.6</div>
         </div>
 
@@ -349,11 +349,11 @@ export function renderPythonConsole(): HTMLElement {
         <div class="verif-kpi-card">
           <div class="verif-kpi-title">${isEn ? 'MATLAB Baseline Match' : 'Concordancia MATLAB OrientSol'}</div>
           <div class="verif-kpi-value" style="color: #059669;">100.0%</div>
-          <div class="verif-kpi-sub">✓ Error Δ < 0.0001% (PFC pág. 220)</div>
+          <div class="verif-kpi-sub">✓ Error Δ &lt; 0.0001%</div>
         </div>
 
         <div class="verif-kpi-card">
-          <div class="verif-kpi-title">${isEn ? 'Day of Year / Declination' : 'Día del Año (n) / Declinación'}</div>
+          <div class="verif-kpi-title">${isEn ? 'Day of Year / Declination' : 'Día del Año / Declinación'}</div>
           <div class="verif-kpi-value">n = ${doy} | ${decDeg > 0 ? `+${decDeg.toFixed(2)}°` : `${decDeg.toFixed(2)}°`}</div>
           <div class="verif-kpi-sub">${isEn ? 'Solar Noon Cenit' : 'Cenit al mediodía'}: ${noonAltDeg.toFixed(1)}°</div>
         </div>
