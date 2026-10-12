@@ -5,6 +5,7 @@ import {
   type TableRadiationComponent,
 } from '@/components/climate/OptimalAnnualStudyPanel';
 import { themeManager } from '@/services/theme/themeManager';
+import { renderWrappedSvgTitle } from './chartSvgUtils';
 
 export type GraphComponentChoice = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -239,10 +240,15 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
 
     const topSvgHtml = `
       <svg viewBox="0 0 ${plotW} ${plotH}" class="matlab-plot-svg" id="svg-matlab-rad-top">
-        <!-- Title -->
-        <text x="${pad.left + innerW / 2}" y="18" fill="${titleColor}" font-size="12" font-weight="700" text-anchor="middle">
-          ${topPlotTitle}
-        </text>
+        <!-- Title with dynamic text wrapping -->
+        ${renderWrappedSvgTitle({
+          text: topPlotTitle,
+          centerX: pad.left + innerW / 2,
+          startY: 18,
+          fill: titleColor,
+          fontSize: 12,
+          maxCharsPerLine: 48,
+        })}
 
         <!-- Plot Area Box -->
         <rect x="${pad.left}" y="${pad.top}" width="${innerW}" height="${innerH}" fill="${plotBg}" stroke="${plotBorder}" stroke-width="1" />
@@ -275,8 +281,8 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
     // SVG 2: Bottom Plot (Bar Chart of Gains %)
     // -------------------------------------------------------------
     const bPlotW = 540;
-    const bPlotH = 190;
-    const bPad = { top: 28, right: 90, bottom: 35, left: 45 };
+    const bPlotH = 205;
+    const bPad = { top: 34, right: 90, bottom: 35, left: 45 };
     const bInnerW = bPlotW - bPad.left - bPad.right;
     const bInnerH = bPlotH - bPad.top - bPad.bottom;
 
@@ -331,10 +337,11 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
       }).join('');
 
       bottomLegendHtml = `
-        <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 8})">
-          <rect x="0" y="0" width="84" height="28" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-          <rect x="6" y="8" width="12" height="12" fill="#0f766e" stroke="#14b8a6" stroke-width="0.8" />
-          <text x="22" y="17" fill="${legendText}" font-size="8.5" font-weight="600">${isEn ? 'vs 0° (Horiz)' : 'vs 0° (Plano hor.)'}</text>
+        <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 4})">
+          <rect x="0" y="0" width="86" height="34" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+          <rect x="6" y="11" width="12" height="12" fill="#0f766e" stroke="#14b8a6" stroke-width="0.8" />
+          <text x="22" y="15" fill="${legendText}" font-size="8.5" font-weight="700">vs 0°</text>
+          <text x="22" y="25" fill="${legendText}" font-size="7.5" font-weight="500">${isEn ? '(Horiz)' : '(Plano hor.)'}</text>
         </g>
       `;
     } else {
@@ -358,26 +365,32 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
 
       bottomLegendHtml = `
         <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 4})">
-          <rect x="0" y="0" width="84" height="96" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-          <text x="42" y="11" fill="${legendText}" font-size="8" font-weight="700" text-anchor="middle">${isEn ? 'vs 0° (Horiz)' : 'vs 0° (Plano hor.)'}</text>
-          <rect x="6" y="18" width="12" height="10" fill="#0f766e" />
-          <text x="22" y="26" fill="${legendText}" font-size="8.5" font-weight="600">Gdm (Glob)</text>
-          <rect x="6" y="36" width="12" height="10" fill="#15803d" />
-          <text x="22" y="44" fill="${legendText}" font-size="8.5" font-weight="600">Bdm (Dir)</text>
-          <rect x="6" y="54" width="12" height="10" fill="#a3e635" />
-          <text x="22" y="62" fill="${legendText}" font-size="8.5" font-weight="600">Ddm (Dif)</text>
-          <rect x="6" y="72" width="12" height="10" fill="#fef08a" />
-          <text x="22" y="80" fill="${legendText}" font-size="8.5" font-weight="600">Rdm (Alb)</text>
+          <rect x="0" y="0" width="86" height="98" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+          <text x="43" y="11" fill="${legendText}" font-size="8" font-weight="700" text-anchor="middle">vs 0°</text>
+          <text x="43" y="20" fill="${legendText}" font-size="7" font-weight="500" text-anchor="middle">${isEn ? '(Horiz)' : '(Plano hor.)'}</text>
+          <rect x="6" y="26" width="11" height="9" fill="#0f766e" />
+          <text x="21" y="34" fill="${legendText}" font-size="8.5" font-weight="600">Gdm (Glob)</text>
+          <rect x="6" y="42" width="11" height="9" fill="#15803d" />
+          <text x="21" y="50" fill="${legendText}" font-size="8.5" font-weight="600">Bdm (Dir)</text>
+          <rect x="6" y="58" width="11" height="9" fill="#a3e635" />
+          <text x="21" y="66" fill="${legendText}" font-size="8.5" font-weight="600">Ddm (Dif)</text>
+          <rect x="6" y="74" width="11" height="9" fill="#fef08a" />
+          <text x="21" y="82" fill="${legendText}" font-size="8.5" font-weight="600">Rdm (Alb)</text>
         </g>
       `;
     }
 
     const bottomSvgHtml = `
       <svg viewBox="0 0 ${bPlotW} ${bPlotH}" class="matlab-plot-svg" id="svg-matlab-gain-bottom">
-        <!-- Title -->
-        <text x="${bPad.left + bInnerW / 2}" y="16" fill="${titleColor}" font-size="11.5" font-weight="700" text-anchor="middle">
-          ${bottomPlotTitle}
-        </text>
+        <!-- Title with dynamic text wrapping -->
+        ${renderWrappedSvgTitle({
+          text: bottomPlotTitle,
+          centerX: bPad.left + bInnerW / 2,
+          startY: 18,
+          fill: titleColor,
+          fontSize: 11.5,
+          maxCharsPerLine: 46,
+        })}
 
         <!-- Plot Area Box -->
         <rect x="${bPad.left}" y="${bPad.top}" width="${bInnerW}" height="${bInnerH}" fill="${plotBg}" stroke="${plotBorder}" stroke-width="1" />

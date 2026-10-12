@@ -1,6 +1,7 @@
 import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { themeManager } from '@/services/theme/themeManager';
+import { renderWrappedSvgTitle } from './chartSvgUtils';
 
 export type TrackingGraphComponentChoice = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -223,7 +224,14 @@ export function renderTrackingDualAxisGraphsWindow(props: TrackingDualAxisGraphs
 
     const svgTopHtml = `
       <svg viewBox="0 0 ${plotW} ${plotH}" style="width: 100%; height: auto; background: ${plotBg}; border: 1px solid ${plotBorder}; border-radius: 4px;">
-        <text x="${plotW / 2 - 20}" y="19" fill="${titleColor}" font-size="12" font-weight="700" text-anchor="middle">${topPlotTitle}</text>
+        ${renderWrappedSvgTitle({
+          text: topPlotTitle,
+          centerX: plotW / 2 - 20,
+          startY: 19,
+          fill: titleColor,
+          fontSize: 12,
+          maxCharsPerLine: 48,
+        })}
         <text x="14" y="${plotH / 2}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle" transform="rotate(-90 14 ${plotH / 2})">${isEn ? 'Radiation' : 'Radiación'}</text>
         <text x="${pad.left + innerW / 2}" y="${plotH - 8}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle">${isEn ? 'Months' : 'Meses'}</text>
 
@@ -324,17 +332,18 @@ export function renderTrackingDualAxisGraphsWindow(props: TrackingDualAxisGraphs
       }
 
       bottomLegendHtml = `
-        <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 4})">
-          <rect x="0" y="0" width="86" height="88" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-          <text x="5" y="11" fill="${legendText}" font-size="7.5" font-weight="700">vs 0° (Plano hor.):</text>
-          <rect x="5" y="16" width="9" height="9" fill="#0284c7" />
-          <text x="18" y="24" fill="${legendText}" font-size="8.5" font-weight="600">Gdm (Glob)</text>
-          <rect x="5" y="32" width="9" height="9" fill="#ef4444" />
-          <text x="18" y="40" fill="${legendText}" font-size="8.5" font-weight="600">Bdm (Dir)</text>
-          <rect x="5" y="48" width="9" height="9" fill="#84cc16" />
-          <text x="18" y="56" fill="${legendText}" font-size="8.5" font-weight="600">Ddm (Dif)</text>
-          <rect x="5" y="64" width="9" height="9" fill="#f59e0b" />
-          <text x="18" y="72" fill="${legendText}" font-size="8.5" font-weight="600">Rdm (Alb)</text>
+        <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 2})">
+          <rect x="0" y="0" width="88" height="96" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+          <text x="44" y="11" fill="${legendText}" font-size="8" font-weight="700" text-anchor="middle">vs 0°</text>
+          <text x="44" y="20" fill="${legendText}" font-size="7" font-weight="500" text-anchor="middle">${isEn ? '(Horiz)' : '(Plano hor.)'}</text>
+          <rect x="5" y="26" width="9" height="9" fill="#0284c7" />
+          <text x="18" y="34" fill="${legendText}" font-size="8.5" font-weight="600">Gdm (Glob)</text>
+          <rect x="5" y="42" width="9" height="9" fill="#ef4444" />
+          <text x="18" y="50" fill="${legendText}" font-size="8.5" font-weight="600">Bdm (Dir)</text>
+          <rect x="5" y="58" width="9" height="9" fill="#84cc16" />
+          <text x="18" y="66" fill="${legendText}" font-size="8.5" font-weight="600">Ddm (Dif)</text>
+          <rect x="5" y="74" width="9" height="9" fill="#f59e0b" />
+          <text x="18" y="82" fill="${legendText}" font-size="8.5" font-weight="600">Rdm (Alb)</text>
         </g>
       `;
     } else {
@@ -390,7 +399,14 @@ export function renderTrackingDualAxisGraphsWindow(props: TrackingDualAxisGraphs
 
     const svgBottomHtml = `
       <svg viewBox="0 0 ${bottomPlotW} ${bottomPlotH}" style="width: 100%; height: auto; background: ${plotBg}; border: 1px solid ${plotBorder}; border-radius: 4px;">
-        <text x="${bottomPlotW / 2 - 20}" y="19" fill="${titleColor}" font-size="12" font-weight="700" text-anchor="middle">${bottomPlotTitle}</text>
+        ${renderWrappedSvgTitle({
+          text: bottomPlotTitle,
+          centerX: bottomPlotW / 2 - 20,
+          startY: 19,
+          fill: titleColor,
+          fontSize: 11.5,
+          maxCharsPerLine: 46,
+        })}
         <text x="14" y="${bottomPlotH / 2}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle" transform="rotate(-90 14 ${bottomPlotH / 2})">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</text>
         <text x="${bPad.left + bInnerW / 2}" y="${bottomPlotH - 8}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle">${isEn ? 'Months' : 'Meses'}</text>
 
