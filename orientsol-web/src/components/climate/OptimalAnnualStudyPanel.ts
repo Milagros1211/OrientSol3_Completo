@@ -11,7 +11,6 @@ import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
 } from '@/components/export/pdfReportGenerator';
-import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { renderCaptureLossMapSection } from '@/components/climate/CaptureLossMapSection';
 
@@ -181,17 +180,27 @@ function showAlbedoWarningModal(isEn: boolean) {
 export function showExcelExportModal(
   res: SolarBridgeSimulationResult,
   angleX: number,
-  isEn: boolean
+  isEn: boolean,
+  activeComponent: TableRadiationComponent = stateTableComponent
 ) {
   const existing = document.getElementById('matlab-excel-export-modal');
   if (existing) existing.remove();
+
+  const compLabelName =
+    activeComponent === 'global'
+      ? (isEn ? 'Global' : 'Global')
+      : activeComponent === 'beam'
+      ? (isEn ? 'Direct' : 'Directa')
+      : activeComponent === 'diffuse'
+      ? (isEn ? 'Diffuse' : 'Difusa')
+      : (isEn ? 'Albedo' : 'Albedo');
 
   const backdrop = document.createElement('div');
   backdrop.id = 'matlab-excel-export-modal';
   backdrop.className = 'matlab-modal-backdrop';
 
   backdrop.innerHTML = `
-    <div class="matlab-dialog-box" role="dialog" aria-modal="true" style="max-width: 520px;">
+    <div class="matlab-dialog-box" role="dialog" aria-modal="true" style="max-width: 530px;">
       <div class="matlab-dialog-titlebar">
         <span class="matlab-title-text">${isEn ? 'Select the desired option' : 'Seleccione la opción deseada'}</span>
         <button type="button" class="matlab-close-btn" aria-label="Cerrar">&times;</button>
@@ -203,15 +212,15 @@ export function showExcelExportModal(
             <path d="M19 18a5 5 0 0 1 10 0c0 3-4 4.5-4 7m0 5.5h.01" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
           </svg>
         </div>
-        <p class="matlab-dialog-msg" style="font-weight: 600;">
+        <p class="matlab-dialog-msg" style="font-weight: 600; font-size: 1rem;">
           ${isEn ? 'What would you like to export to an Excel file?' : '¿Qué desea exportar a un fichero Excel?'}
         </p>
       </div>
       <div class="matlab-dialog-actions" style="justify-content: center; gap: 1rem; padding-bottom: 1.25rem;">
-        <button type="button" id="btn-excel-export-single" class="matlab-btn-default">
-          ${isEn ? 'Only displayed component' : 'Sólo la componente visualizada'}
+        <button type="button" id="btn-excel-export-single" class="matlab-btn-default" style="font-weight: 600; padding: 0.6rem 1.25rem;">
+          ${isEn ? `Only analyzed component (${compLabelName})` : `Sólo la componente analizada (${compLabelName})`}
         </button>
-        <button type="button" id="btn-excel-export-all" class="matlab-btn-primary">
+        <button type="button" id="btn-excel-export-all" class="matlab-btn-primary" style="font-weight: 600; padding: 0.6rem 1.25rem;">
           ${isEn ? 'All components' : 'Todas las componentes'}
         </button>
       </div>
@@ -226,25 +235,26 @@ export function showExcelExportModal(
 
   backdrop.querySelector('#btn-excel-export-single')?.addEventListener('click', () => {
     close();
-    exportOptimalAnnualToExcel(res, 'single', stateTableComponent, angleX, isEn);
+    exportOptimalAnnualToExcel(res, 'single', activeComponent, angleX, isEn);
   });
 
   backdrop.querySelector('#btn-excel-export-all')?.addEventListener('click', () => {
     close();
-    exportOptimalAnnualToExcel(res, 'all', stateTableComponent, angleX, isEn);
+    exportOptimalAnnualToExcel(res, 'all', activeComponent, angleX, isEn);
   });
 
   document.body.appendChild(backdrop);
 }
 
 /**
- * Generates and saves the Excel file (.xlsx) with 1 or 4 sheets, waiting for a save directory.
+ * Generates and saves the Excel file (.xlsx) with 1 or 4 sheets strictly following
+ * Figura 5.2.68 and MATLAB Tabla_OptAnual.m.
  */
 async function exportOptimalAnnualToExcel(
   res: SolarBridgeSimulationResult,
   mode: 'single' | 'all',
   activeComponent: TableRadiationComponent,
-  angleX: number,
+  _angleX: number,
   isEn: boolean
 ) {
   const wb = XLSX.utils.book_new();
@@ -281,27 +291,23 @@ async function exportOptimalAnnualToExcel(
 
     const rad0 = angles91Data[0];
     const radOpt = getMonthlyRadiationForAngle(res, comp, optAngle);
-    const radX = getMonthlyRadiationForAngle(res, comp, angleX);
 
     const gainsHoriz = calculateGains(radOpt, rad0);
-    const gainsX = calculateGains(radOpt, radX);
 
     const meanOf = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / (arr.length || 1);
     const meanOpt = meanOf(radOpt);
     const meanTemp = meanOf(tempVals);
     const meanFactorHoriz = meanOf(gainsHoriz.factors);
     const meanPctHoriz = meanOf(gainsHoriz.pcts);
-    const meanFactorX = meanOf(gainsX.factors);
-    const meanPctX = meanOf(gainsX.pcts);
 
     // Build Sheet Data strictly matching Figura 5.2.68 & MATLAB Tabla_OptAnual.m
     const sheetData: (string | number | null)[][] = [];
 
-    // Fila 1 (Cabecera)
+    // Fila 1 (Cabecera): A1: City, B1: 'Latitud', C1: lat, E1: 'Inclinación óptima anual', G1: optAngle
     sheetData.push([
       res.locationName,
       isEn ? 'Latitude' : 'Latitud',
-      Number(res.latitude.toFixed(6)),
+      Number(res.latitude.toFixed(7)),
       '',
       isEn ? 'Annual optimal tilt' : 'Inclinación óptima anual',
       '',
@@ -311,10 +317,10 @@ async function exportOptimalAnnualToExcel(
     // Fila 2 (Vacía)
     sheetData.push([]);
 
-    // Fila 3 (Título del bloque de radiación)
+    // Fila 3 (Título del bloque de radiación en Col B)
     sheetData.push(['', compTitle]);
 
-    // Fila 4 (Cabecera de columnas: ángulos de 0º a 90º)
+    // Fila 4 (Cabecera de columnas: ángulos de 0º a 90º en columnas B a CP)
     const angleHeaders: string[] = [''];
     for (let deg = 0; deg <= 90; deg++) {
       angleHeaders.push(`${compLabel}(${deg}º)`);
@@ -342,32 +348,35 @@ async function exportOptimalAnnualToExcel(
     // Fila 18 (Vacía)
     sheetData.push([]);
 
-    // Fila 19 (Cabecera bloque inferior de ganancias)
-    sheetData.push(['', '', '', '', isEn ? 'GAINS' : 'GANANCIAS', isEn ? 'Respect to:' : 'Respecto a:']);
-
-    // Fila 20 (Referencia de ganancia)
+    // Fila 19 (Cabecera bloque inferior de ganancias: E19: 'GANANCIAS', F19: 'Respecto a:')
     sheetData.push([
       '',
       '',
       '',
       '',
-      '',
-      isEn ? 'Horizontal plane' : 'Plano horizontal',
-      '',
-      isEn ? `Angle X (${angleX}º)` : `Ángulo X (${angleX}º)`,
+      isEn ? 'GAINS' : 'GANANCIAS',
+      isEn ? 'Respect to:' : 'Respecto a:'
     ]);
 
-    // Fila 21 (Subcabeceras tabla inferior: Óptimo, Temp, Ganancias)
+    // Fila 20 (Referencia de ganancia: F20: 'Plano horizontal')
     sheetData.push([
       '',
-      `${compLabel}(${isEn ? 'Opt.' : 'Ópt.'})`,
+      '',
+      '',
+      '',
+      '',
+      isEn ? 'Horizontal plane' : 'Plano horizontal'
+    ]);
+
+    // Fila 21 (Subcabeceras: B21: Gdm(Ópt.), C21: Temp.(ºC), F21: Fc.Ganancia, G21: Ganancia(%))
+    sheetData.push([
+      '',
+      isEn ? `${compLabel}(Opt.)` : `${compLabel}(Ópt.)`,
       isEn ? 'Temp.(°C)' : 'Temp.(ºC)',
       '',
       '',
       isEn ? 'Gain Factor' : 'Fc.Ganancia',
-      isEn ? 'Gain(%)' : 'Ganancia(%)',
-      isEn ? 'Gain Factor (X)' : 'Fc.Ganancia (X)',
-      isEn ? 'Gain(%) (X)' : 'Ganancia(%) (X)',
+      isEn ? 'Gain(%)' : 'Ganancia(%)'
     ]);
 
     // Filas 22 a 33 (12 Meses en tabla de ganancias)
@@ -380,8 +389,6 @@ async function exportOptimalAnnualToExcel(
         '',
         isAlbedo ? '-' : Number(gainsHoriz.factors[m].toFixed(8)),
         isAlbedo ? '-' : Number(gainsHoriz.pcts[m].toFixed(7)),
-        Number(gainsX.factors[m].toFixed(8)),
-        Number(gainsX.pcts[m].toFixed(7)),
       ]);
     }
 
@@ -394,11 +401,16 @@ async function exportOptimalAnnualToExcel(
       '',
       isAlbedo ? '-' : Number(meanFactorHoriz.toFixed(8)),
       isAlbedo ? '-' : Number(meanPctHoriz.toFixed(7)),
-      Number(meanFactorX.toFixed(8)),
-      Number(meanPctX.toFixed(7)),
     ]);
 
     const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+    // Configurar anchos de columna para legibilidad óptima
+    const colWidths = [{ wch: 15 }, { wch: 16 }, { wch: 14 }];
+    for (let c = 3; c <= 92; c++) {
+      colWidths.push({ wch: 14 });
+    }
+    ws['!cols'] = colWidths;
 
     // Sheet Name matching MATLAB Tabla_OptAnual.m (Hoja1..Hoja4)
     let sheetName =
@@ -418,7 +430,18 @@ async function exportOptimalAnnualToExcel(
 
   const excelBuf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
   const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `OrientSol3_Inclinacion_Optima_${cleanLoc}_${mode === 'all' ? 'Todas' : activeComponent}.xlsx`;
+  const compSuffix =
+    mode === 'all'
+      ? (isEn ? 'All_Components' : 'Todas_las_componentes')
+      : (activeComponent === 'global'
+          ? 'Global'
+          : activeComponent === 'beam'
+          ? 'Directa'
+          : activeComponent === 'diffuse'
+          ? 'Difusa'
+          : 'Albedo');
+  const filename = `OrientSol3_Inclinacion_Optima_${cleanLoc}_${compSuffix}.xlsx`;
+
 
   // Native File System Access API waiting for save location
   if ('showSaveFilePicker' in window) {
@@ -1286,17 +1309,10 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
       }
     });
 
-    // 7. Export Table to Excel (Figura 5.2.64 & 5.2.65 modal)
+    // 7. Export Table to Excel (Figura 5.2.65 modal -> Figura 5.2.68 layout)
     const btnExportExcel = container.querySelector<HTMLButtonElement>('#btn-export-opt-excel');
     btnExportExcel?.addEventListener('click', () => {
-      exportOrientSolMasterExcel(res, {
-        activeStudyOp: 'annual',
-        activeComponent: stateTableComponent,
-        isEn,
-        peakPowerKw: solarSyncState.getPeakPowerKw(),
-        performanceRatio: solarSyncState.getPerformanceRatio(),
-        tonc: solarSyncState.getTonc(),
-      });
+      showExcelExportModal(res, stateAngleX, isEn, stateTableComponent);
     });
 
     // 8. Generate Report (PDF)
