@@ -36,7 +36,7 @@ let stateAzimShowEnergy: boolean = false;
 let stateAzimShowGraphs: boolean = false;
 
 /**
- * Renders OrientSol 3.0 - Seguimiento a un eje azimutal (Tabla_EjeAzimutal.m)
+ * Renders OrientSol 4.0 - Seguimiento a un eje azimutal (Tabla_EjeAzimutal.m)
  */
 export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HTMLElement {
   const { simulationResult: res, locationName, latitude, onBack, onExit } = props;
@@ -132,7 +132,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
           </div>
           <div class="opt-tracking-header-right">
             <div class="opt-matlab-brand-title">
-              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>3.0</strong>
+              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>4.0</strong>
             </div>
           </div>
         </div>

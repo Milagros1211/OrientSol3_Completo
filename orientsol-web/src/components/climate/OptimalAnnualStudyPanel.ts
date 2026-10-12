@@ -457,7 +457,7 @@ async function exportOptimalAnnualToExcel(
 }
 
 /**
- * Renders the full interactive OrientSol 3.0 "Inclinación Óptima Anual" study component.
+ * Renders the full interactive OrientSol 4.0 "Inclinación Óptima Anual" study component.
  */
 export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): HTMLElement {
   const { simulationResult: res, locationName, latitude } = props;
@@ -591,7 +591,7 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
 
     container.innerHTML = `
       <div class="result-card opt-study-card">
-        <!-- 1. Header matching OrientSol 3.0 MATLAB Window -->
+        <!-- 1. Header matching OrientSol 4.0 MATLAB Window -->
         <div class="opt-study-header">
           <div class="opt-study-meta">
             <div class="meta-item">
@@ -862,7 +862,7 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
           </div>
         </div>
 
-        <!-- 6.1 Graphical Visualization Section matching MATLAB OrientSol 3.0 (Grafica_Inclinaciones.fig & Grafica_OptAnual.fig) -->
+        <!-- 6.1 Graphical Visualization Section matching MATLAB OrientSol 4.0 (Grafica_Inclinaciones.fig & Grafica_OptAnual.fig) -->
         ${stateShowCharts ? `
           <div id="opt-charts-panel" class="opt-charts-panel">
             <div class="opt-charts-header">
@@ -907,7 +907,7 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
                 <div class="opt-chart-view-intro">
                   <div class="opt-chart-title-block">
                     <h4 class="opt-chart-question">${t.results.chartHowVariesQuestion}</h4>
-                    <span class="opt-chart-matlab-brand">ORIENT<strong>SOL 3.0</strong></span>
+                    <span class="opt-chart-matlab-brand">ORIENT<strong>SOL 4.0</strong></span>
                   </div>
 
                   <!-- Component Selector with 'Todas' included -->
@@ -988,7 +988,7 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
                 </div>
               </div>
             ` : `
-              <!-- Sub-view 2: Dedicated MATLAB OrientSol 3.0 Gráficas Inclinación Óptima Anual (Figuras 5.2.99, 5.2.107, 5.2.108, 5.2.109, 5.2.110) -->
+              <!-- Sub-view 2: Dedicated MATLAB OrientSol 4.0 Gráficas Inclinación Óptima Anual (Figuras 5.2.99, 5.2.107, 5.2.108, 5.2.109, 5.2.110) -->
               <div id="matlab-opt-graphs-mount-point"></div>
             `}
           </div>

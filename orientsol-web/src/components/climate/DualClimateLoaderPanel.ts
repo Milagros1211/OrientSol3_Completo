@@ -645,7 +645,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     const historicalList = hybridClimateManager.getHistoricalLocations();
 
     if (!isOnline) {
-      // OFFLINE: Solo mostrar estaciones de la memoria caché local (OrientSol 3.0)
+      // OFFLINE: Solo mostrar estaciones de la memoria caché local (OrientSol 4.0)
       allSearchableStations = historicalList.map((h) => ({
         ...h,
         source: 'local_database' as const,
@@ -754,7 +754,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     histSuggestionsDropdown.classList.add('hidden');
     hideNotFoundBanner();
     renderActiveRecord(loc);
-    const sourceTag = loc.source === 'supabase' || (Boolean(loc.id) && loc.id!.startsWith('supabase-')) ? 'SUPABASE' : 'ORIENTSOL 3.0';
+    const sourceTag = loc.source === 'supabase' || (Boolean(loc.id) && loc.id!.startsWith('supabase-')) ? 'SUPABASE' : 'ORIENTSOL 4.0';
     setStatus(
       isEn
         ? `Loaded station: ${loc.locationName} (${loc.country}) [${sourceTag}].`
@@ -801,7 +801,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             .map((m) => {
               const isSupabase = m.source === 'supabase' || (Boolean(m.id) && m.id!.startsWith('supabase-'));
               const badgeClass = isSupabase ? 'badge-supabase' : 'badge-historical';
-              const badgeText = isSupabase ? 'SUPABASE' : 'ORIENTSOL 3.0';
+              const badgeText = isSupabase ? 'SUPABASE' : 'ORIENTSOL 4.0';
               const annualG = m.monthlyGdm0.reduce((a, b) => a + b, 0) / 12;
               return `
                 <div class="suggestion-item" data-id="${m.id || m.locationName}" role="option">
@@ -1220,7 +1220,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         </div>
       </div>
 
-      <!-- 2. SELECTOR DE OPERACIÓN / ESTUDIO (ORIENTSOL 3.0) -->
+      <!-- 2. SELECTOR DE OPERACIÓN / ESTUDIO (ORIENTSOL 4.0) -->
       <div class="operation-selector-container">
         <div class="operation-selector-header">
           <label for="study-operation-select" class="operation-selector-label">

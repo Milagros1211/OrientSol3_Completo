@@ -8,7 +8,7 @@ import {
 } from '@/components/export/pdfReportGenerator';
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
-import { getNoonAzimuthDeg, getDualAxisNoonTiltDeg } from '@/services/solarGeometryAngles';
+import { getNoonAzimuthDeg, getDualAxisNoonTiltDeg, getHorizontalTrackerDailyMeanTiltDeg } from '@/services/solarGeometryAngles';
 
 export type ComparativeRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
 
@@ -34,7 +34,7 @@ let stateCompComponent: ComparativeRadiationComponent = 'global';
 let stateCompShowGraphs: boolean = false;
 
 /**
- * Replicates OrientSol 3.0 - Comparativa de todos los tipos de estudios (Tabla_Comparativa.m)
+ * Replicates OrientSol 4.0 - Comparativa de todos los tipos de estudios (Tabla_Comparativa.m)
  * Matching strictly Figura 5.2.98
  */
 export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLElement {
@@ -118,13 +118,15 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
     const avgMonthlyTilt = monthlyOptTilts.length ? avg(monthlyOptTilts) : 0;
     const noonDualTilts = months.map((_, i) => getDualAxisNoonTiltDeg(latitude, i));
     const noonAzims = months.map((_, i) => getNoonAzimuthDeg(latitude, i));
+    const horizTilts = months.map((_, i) => getHorizontalTrackerDailyMeanTiltDeg(latitude, i));
     const avgDualTilt = avg(noonDualTilts);
     const avgDualAzim = avg(noonAzims);
+    const avgHorizTilt = avg(horizTilts);
     const fixedOri = latitude >= 0 ? 0.0 : 180.0;
 
     container.innerHTML = `
       <div class="opt-tracking-window-frame">
-        <!-- 1. Header matching OrientSol 3.0 MATLAB Window -->
+        <!-- 1. Header matching OrientSol 4.0 MATLAB Window -->
         <div class="opt-tracking-header-bar">
           <div class="opt-tracking-header-left">
             <div class="opt-tracking-meta-row">
@@ -146,7 +148,7 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
           </div>
           <div class="opt-tracking-header-right">
             <div class="opt-matlab-brand-title">
-              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>3.0</strong>
+              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>4.0</strong>
             </div>
           </div>
         </div>
@@ -243,7 +245,7 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
                   <td class="td-comp-val-cell">
                     <div class="comp-cell-flex">
                       <span class="comp-val-main">${radHorizTrack[i].toFixed(2)}</span>
-                      <span class="comp-angle-chip">Inc: 0.0° | Ori: 90.0°</span>
+                      <span class="comp-angle-chip">Inc: ${horizTilts[i].toFixed(1)}° | Ori: 90.0°</span>
                     </div>
                   </td>
                   <td class="td-track-dual td-comp-val-cell">
@@ -299,7 +301,7 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
                     <span class="comp-val-main"><strong>${mHorizTrack.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: 0.0° | Ori: 90.0°</span>
+                    <span class="comp-angle-chip">Inc: ${avgHorizTilt.toFixed(1)}° | Ori: 90.0°</span>
                   </div>
                 </td>
                 <td class="td-track-dual td-comp-val-cell">

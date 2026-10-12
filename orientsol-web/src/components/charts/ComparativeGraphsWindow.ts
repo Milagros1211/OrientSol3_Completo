@@ -15,7 +15,7 @@ interface ComparativeGraphsProps {
 }
 
 /**
- * Replicates OrientSol 3.0 - Gráficas para comparativa de todos los tipos de estudios
+ * Replicates OrientSol 4.0 - Gráficas para comparativa de todos los tipos de estudios
  * Matching strictly Figura 5.2.109 (Líneas) & Figura 5.2.111 (Barras)
  * With full Light & Dark mode support.
  */
@@ -99,7 +99,7 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
             </div>
           </div>
           <div style="font-size: 1.35rem; font-weight: 900; letter-spacing: 0.5px; color: #0284c7;">
-            ORIENT<span style="color: #f59e0b;">SOL</span> <strong>3.0</strong>
+            ORIENT<span style="color: #f59e0b;">SOL</span> <strong>4.0</strong>
           </div>
         </div>
 

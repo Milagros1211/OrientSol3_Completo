@@ -9,7 +9,7 @@ const rootDir = path.resolve(__dirname, '..');
 const androidDir = path.join(rootDir, 'android');
 
 console.log('======================================================================');
-console.log('ORIENTSOL 3.0 - ANDROID APK BUILDER (CAPACITOR)');
+console.log('ORIENTSOL 4.0 - ANDROID APK BUILDER (CAPACITOR)');
 console.log('======================================================================');
 
 if (!fs.existsSync(androidDir)) {

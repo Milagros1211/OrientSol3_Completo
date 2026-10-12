@@ -40,7 +40,7 @@ function parseJSON(jsonText) {
 async function run() {
   console.log('--- 1. Probando Parsers de Carga Dual (CSV / JSON) ---');
   const sampleCSV = `
-# OrientSol 3.0 Dataset
+# OrientSol 4.0 Dataset
 # Localidad: Carmona Solar
 # Latitud: 37.47
 # Longitud: -5.64

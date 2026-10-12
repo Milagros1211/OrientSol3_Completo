@@ -1,5 +1,5 @@
 -- =============================================================================
--- Esquema SQL oficial para la tabla "datos_mensuales" en Supabase (OrientSol 3.0)
+-- Esquema SQL oficial para la tabla "datos_mensuales" en Supabase (OrientSol 4.0)
 -- Estructura normalizada por mes (12 filas por cada emplazamiento)
 -- =============================================================================
 

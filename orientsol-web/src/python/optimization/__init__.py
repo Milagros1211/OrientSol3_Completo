@@ -1,4 +1,4 @@
-"""Solar Tilt and Surface Optimization Module for OrientSol 3.0.
+"""Solar Tilt and Surface Optimization Module for OrientSol 4.0.
 
 Covers:
 - seasonal_optimum.py: 4 seasonal tilt adjustments

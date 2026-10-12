@@ -5,7 +5,7 @@ const jsonPath = path.resolve('../transformed_import_file_rows.json');
 const rows = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
 
 let sql = `-- =========================================================================\n`;
-sql += `-- OrientSol 3.0: Script de sustitución completa de datos_mensuales\n`;
+sql += `-- OrientSol 4.0: Script de sustitución completa de datos_mensuales\n`;
 sql += `-- Generado automáticamente desde 'BBDD import file.xlsx'\n`;
 sql += `-- Total ciudades: 114 | Total registros mensuales: ${rows.length}\n`;
 sql += `-- =========================================================================\n\n`;

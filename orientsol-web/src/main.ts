@@ -23,7 +23,7 @@ function renderAboutView(isEn: boolean): HTMLElement {
         </svg>
       </div>
       <div>
-        <h3 class="panel-title">${isEn ? 'About OrientSol 3.0 & Academic Project' : 'Acerca de OrientSol 3.0 & Proyecto Académico'}</h3>
+        <h3 class="panel-title">${isEn ? 'About OrientSol 4.0 & Academic Project' : 'Acerca de OrientSol 4.0 & Proyecto Académico'}</h3>
         <p class="panel-desc">${isEn ? 'Master Thesis in Renewable Energies — University of Jaén' : 'Trabajo Fin de Máster en Energías Renovables — Universidad de Jaén'}</p>
       </div>
     </div>
@@ -45,8 +45,8 @@ function renderAboutView(isEn: boolean): HTMLElement {
         <h4 style="margin-bottom: 0.75rem; color: var(--accent-cyan);">${isEn ? 'Scientific Modernization from MATLAB (.m)' : 'Modernización Científica desde MATLAB (.m)'}</h4>
         <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 0.75rem;">
           ${isEn 
-            ? 'OrientSol 3.0 is the complete web reimagining of the original desktop software developed in MATLAB/GUIDE (.m and .fig). All core solar geometry equations, radiation transposition, single and dual-axis tracking, and Osterwald cell thermal models now run client-side via WebAssembly (Pyodide + NumPy).'
-            : 'OrientSol 3.0 es la evolución moderna en entorno web del software original desarrollado en MATLAB/GUIDE (.m y .fig). Toda la geometría solar, transposición de radiación difusa y directa, seguimiento a 1 y 2 ejes y el modelo energético de Osterwald se ejecutan en el cliente mediante WebAssembly (Pyodide + NumPy).'}
+            ? 'OrientSol 4.0 is the complete web reimagining of the original desktop software developed in MATLAB/GUIDE (.m and .fig). All core solar geometry equations, radiation transposition, single and dual-axis tracking, and Osterwald cell thermal models now run client-side via WebAssembly (Pyodide + NumPy).'
+            : 'OrientSol 4.0 es la evolución moderna en entorno web del software original desarrollado en MATLAB/GUIDE (.m y .fig). Toda la geometría solar, transposición de radiación difusa y directa, seguimiento a 1 y 2 ejes y el modelo energético de Osterwald se ejecutan en el cliente mediante WebAssembly (Pyodide + NumPy).'}
         </p>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <span class="badge badge-success">Vite + TypeScript</span>

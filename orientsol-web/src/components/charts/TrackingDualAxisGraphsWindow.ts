@@ -433,7 +433,7 @@ export function renderTrackingDualAxisGraphsWindow(props: TrackingDualAxisGraphs
           </div>
           <div class="opt-graphs-header-right">
             <div class="opt-matlab-brand-title">
-              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>3.0</strong>
+              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>4.0</strong>
             </div>
           </div>
         </div>

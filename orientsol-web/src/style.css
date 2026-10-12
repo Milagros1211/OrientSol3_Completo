@@ -4199,7 +4199,7 @@ body.theme-light .suggestion-meta {
 }
 
 /* ==========================================================================
-   ORIENTSOL 3.0 — INCLINACIÓN ÓPTIMA ANUAL & ESTUDIO COMPARATIVO (MATLAB FIG)
+   ORIENTSOL 4.0 — INCLINACIÓN ÓPTIMA ANUAL & ESTUDIO COMPARATIVO (MATLAB FIG)
    ========================================================================== */
 
 .opt-study-card {
@@ -5499,7 +5499,7 @@ body.theme-dark .btn-study-foot.btn-report:hover {
 }
 
 /* ==========================================================================
-   MATLAB ORIENTSOL 3.0 GRAPHICS PANEL (Grafica_Inclinaciones & Grafica_OptAnual)
+   MATLAB ORIENTSOL 4.0 GRAPHICS PANEL (Grafica_Inclinaciones & Grafica_OptAnual)
    ========================================================================== */
 .opt-charts-panel {
   margin-top: 1.5rem;
@@ -5971,7 +5971,7 @@ body.theme-dark .opt-svg-wrapper {
 }
 
 /* ==========================================================================
-   MATLAB OrientSol 3.0 Dialog Boxes (Figures 5.2.48 & 5.2.65)
+   MATLAB OrientSol 4.0 Dialog Boxes (Figures 5.2.48 & 5.2.65)
    ========================================================================== */
 .matlab-modal-backdrop {
   position: fixed;
@@ -6109,7 +6109,7 @@ body.theme-dark .opt-svg-wrapper {
 }
 
 /* ==========================================================================
-   OrientSol 3.0 - Inclinación Óptima Estacional (Figura 5.2.89)
+   OrientSol 4.0 - Inclinación Óptima Estacional (Figura 5.2.89)
    Tema sofisticado en tonalidades verdes (Verde esmeralda, jade, bosque y teal)
    ========================================================================== */
 .opt-seasonal-study-card {
@@ -7813,7 +7813,7 @@ body.theme-dark #tab-content-api .form-input {
 }
 
 /* =========================================================================
-   ORIENTSOL 3.0: OPERATION SELECTOR DROPDOWN (PREVENTS ENDLESS HTML)
+   ORIENTSOL 4.0: OPERATION SELECTOR DROPDOWN (PREVENTS ENDLESS HTML)
    ========================================================================= */
 .operation-selector-container {
   margin: 1.5rem 0 1.25rem 0;

@@ -616,7 +616,7 @@ function showSuccessExportNotice(isEn: boolean) {
 }
 
 /**
- * Main component renderer for OrientSol 3.0 Inclinación Óptima Estacional
+ * Main component renderer for OrientSol 4.0 Inclinación Óptima Estacional
  * matching Figura 5.2.89 (Image 4)
  */
 export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps): HTMLElement {
@@ -693,7 +693,7 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
 
     container.innerHTML = `
       <div class="opt-seasonal-window-frame">
-        <!-- 1. Top Window Header matching OrientSol 3.0 Figura 5.2.89 -->
+        <!-- 1. Top Window Header matching OrientSol 4.0 Figura 5.2.89 -->
         <div class="opt-seasonal-header-bar">
           <div class="opt-seasonal-header-left">
             <div class="opt-seasonal-meta-row">
@@ -715,7 +715,7 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
           </div>
           <div class="opt-seasonal-header-right">
             <div class="opt-matlab-brand-title">
-              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>3.0</strong>
+              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>4.0</strong>
             </div>
           </div>
         </div>

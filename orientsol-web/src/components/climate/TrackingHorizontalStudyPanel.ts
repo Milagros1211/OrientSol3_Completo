@@ -8,6 +8,7 @@ import {
 } from '@/components/export/pdfReportGenerator';
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
+import { getHorizontalTrackerDailyMeanTiltDeg } from '@/services/solarGeometryAngles';
 
 export type TrackingRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -35,7 +36,7 @@ let stateHorizShowEnergy: boolean = false;
 let stateHorizShowGraphs: boolean = false;
 
 /**
- * Renders OrientSol 3.0 - Seguimiento a un eje horizontal (Tabla_EjeHorizontal.m)
+ * Renders OrientSol 4.0 - Seguimiento a un eje horizontal (Tabla_EjeHorizontal.m)
  */
 export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): HTMLElement {
   const { simulationResult: res, locationName, latitude, onBack, onExit } = props;
@@ -135,7 +136,7 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
           </div>
           <div class="opt-tracking-header-right">
             <div class="opt-matlab-brand-title">
-              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>3.0</strong>
+              ORIENT<span style="color: #f59e0b;">SOL</span> <strong>4.0</strong>
             </div>
           </div>
         </div>
@@ -199,7 +200,7 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
                   <tr>
                     <td class="td-track-month"><strong>${mName}</strong></td>
                     <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 600; white-space: nowrap; text-align: center;">
-                      <span style="color: #fbbf24;">Inc: 0.0°</span> <span style="opacity: 0.4;">|</span> <span style="color: var(--text-muted);">Ori: 90.0°</span>
+                      <span style="color: #fbbf24;">Inc: ${getHorizontalTrackerDailyMeanTiltDeg(res.latitude, i).toFixed(1)}°</span> <span style="opacity: 0.4;">|</span> <span style="color: var(--text-muted);">Ori: 90.0°</span>
                     </td>
                     <td class="td-num">${radHoriz[i].toFixed(2)}</td>
                     <td class="td-num td-track-val"><strong>${radHorizTrack[i].toFixed(2)}</strong></td>
@@ -216,7 +217,7 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
                 <tr class="tracking-media-row">
                   <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
                   <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 700; white-space: nowrap; text-align: center; color: #fbbf24;">
-                    Inc: 0.0° | Ori: 90.0°
+                    Inc: ${(months.reduce((acc, _, idx) => acc + getHorizontalTrackerDailyMeanTiltDeg(res.latitude, idx), 0) / 12).toFixed(1)}° | Ori: 90.0°
                   </td>
                   <td class="td-num"><strong>${meanHoriz.toFixed(2)}</strong></td>
                   <td class="td-num td-track-val"><strong>${meanHorizTrack.toFixed(2)}</strong></td>

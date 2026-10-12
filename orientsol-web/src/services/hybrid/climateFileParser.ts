@@ -454,7 +454,7 @@ export function parseClimateCSV(csvString: string, fileName = 'documento.csv'): 
  */
 export function generateSampleCSV(isMulti = false): string {
   if (isMulti) {
-    return `# OrientSol 3.0 - Plantilla de Lote Multi-Emplazamiento (Batch)
+    return `# OrientSol 4.0 - Plantilla de Lote Multi-Emplazamiento (Batch)
 # Formato: emplazamiento;pais;latitud;longitud;mes;radiacion_media;temp_media
 # Radiación: en kWh/m²/día (ej: 2.58) o mensual en kWh/m²/mes (se convierte automáticamente)
 emplazamiento;pais;latitud;longitud;mes;radiacion_media;temp_media
@@ -485,7 +485,7 @@ Madrid;España;40.41;-3.70;12;1.84;6.9
 `;
   }
 
-  return `# OrientSol 3.0 - Plantilla de Climatología Individual
+  return `# OrientSol 4.0 - Plantilla de Climatología Individual
 # Localidad: Jaén
 # Pais: España
 # Latitud: 37.7796

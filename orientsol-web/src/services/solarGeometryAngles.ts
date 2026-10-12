@@ -1,6 +1,6 @@
 /**
  * Solar Geometry Angles Calculation
- * Based on OrientSol 3.0 (Ec. 4.30, Ec. 4.31 and Page 220 of PFC Thesis)
+ * Based on OrientSol 4.0 (Ec. 4.30, Ec. 4.31 and Page 220 of PFC Thesis)
  * Provides monthly computed tilt and orientation angles in degrees without Greek symbols.
  */
 
@@ -59,4 +59,30 @@ export function getDualAxisNoonTiltDeg(latDeg: number, monthIdx: number): number
  */
 export function getFixedOrientationDeg(latDeg: number): number {
   return latDeg >= 0 ? 0.0 : 180.0;
+}
+
+/**
+ * Daytime mean tilt angle for single-axis horizontal tracker with N-S axis (Ec. 4.31 / Bh_EjeHorizontal.m):
+ * In each hour t, beta(t) = arctan(|sin(psi_s(t))| / tan(gamma_s(t))).
+ * Over the sunlight hours from sunrise to sunset, this calculates the characteristic
+ * daytime mean tilt of the rolling collector for monthIdx.
+ */
+export function getHorizontalTrackerDailyMeanTiltDeg(latDeg: number, monthIdx: number): number {
+  const latRad = (latDeg * Math.PI) / 180;
+  const decliDeg = getMonthlyDeclinationDeg(monthIdx);
+  const decliRad = (decliDeg * Math.PI) / 180;
+  const cosW0 = -Math.tan(latRad) * Math.tan(decliRad);
+  const w0 = Math.acos(Math.max(-1, Math.min(1, cosW0)));
+  const steps = 40;
+  let sumBeta = 0;
+  for (let k = 0; k <= steps; k++) {
+    const w = -w0 + (2 * w0 * k) / steps;
+    const sinGamma = Math.sin(latRad) * Math.sin(decliRad) + Math.cos(latRad) * Math.cos(decliRad) * Math.cos(w);
+    const gamma = Math.asin(Math.max(0.001, Math.min(1, sinGamma)));
+    const cosPsi = (sinGamma * Math.sin(latRad) - Math.sin(decliRad)) / (Math.cos(gamma) * Math.cos(latRad));
+    const psi = Math.acos(Math.max(-1, Math.min(1, cosPsi)));
+    const betaDeg = (Math.atan(Math.abs(Math.sin(psi)) / Math.tan(gamma)) * 180) / Math.PI;
+    sumBeta += betaDeg;
+  }
+  return sumBeta / (steps + 1);
 }
