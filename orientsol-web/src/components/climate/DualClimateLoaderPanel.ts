@@ -182,20 +182,20 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       <div class="form-grid manual-meta-grid">
         <div class="form-group">
           <label class="form-label">${t.hybridLoader.locName}</label>
-          <input type="text" id="manual-name" class="form-input" value="${isEn ? 'Custom Solar Facility' : 'Instalación Solar Personalizada'}" />
+          <input type="text" id="manual-name" class="form-input" value="${isEn ? 'Custom Solar Facility' : 'Instalación Solar Personalizada'}" autocomplete="off" spellcheck="false" required />
         </div>
         <div class="form-group">
           <label class="form-label">${t.location.latitude} [°]</label>
-          <input type="number" id="manual-lat" class="form-input" step="0.001" value="37.389" />
+          <input type="text" inputmode="decimal" id="manual-lat" class="form-input" value="37.389" autocomplete="off" required />
         </div>
         <div class="form-group">
           <label class="form-label">${t.location.longitude} [°]</label>
-          <input type="number" id="manual-lon" class="form-input" step="0.001" value="-5.984" />
+          <input type="text" inputmode="decimal" id="manual-lon" class="form-input" value="-5.984" autocomplete="off" required />
         </div>
         <input type="hidden" id="manual-elev" value="0" />
         <div class="form-group">
           <label class="form-label">${t.location.albedoLabel} (&rho;<sub>g</sub>)</label>
-          <input type="number" id="manual-albedo" class="form-input" step="0.01" min="0" max="1" value="0.20" />
+          <input type="text" inputmode="decimal" id="manual-albedo" class="form-input" value="0.20" autocomplete="off" required />
         </div>
       </div>
 
@@ -213,13 +213,13 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
               <tr>
                 <td class="row-label">G<sub>dm</sub>(0)</td>
                 ${MONTH_NAMES.map(
-                  (_, i) => `<td><input type="number" step="0.01" class="manual-g-input" data-month="${i}" value="${(2.5 + i * 0.4).toFixed(2)}" /></td>`
+                  (_, i) => `<td><input type="text" inputmode="decimal" class="manual-g-input" data-month="${i}" value="${(2.5 + i * 0.4).toFixed(2)}" autocomplete="off" required /></td>`
                 ).join('')}
               </tr>
               <tr>
                 <td class="row-label">T<sub>amb</sub> [°C]</td>
                 ${MONTH_NAMES.map(
-                  (_, i) => `<td><input type="number" step="0.1" class="manual-t-input" data-month="${i}" value="${(10 + i * 1.5).toFixed(1)}" /></td>`
+                  (_, i) => `<td><input type="text" inputmode="decimal" class="manual-t-input" data-month="${i}" value="${(10 + i * 1.5).toFixed(1)}" autocomplete="off" required /></td>`
                 ).join('')}
               </tr>
             </tbody>
@@ -290,6 +290,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <select id="api-source-select" class="form-select">
             <option value="pvgis">${isEn ? 'PVGIS 5.3 API (European Commission JRC)' : 'PVGIS 5.3 API (Comisión Europea JRC)'}</option>
             <option value="nasa">${isEn ? 'NASA POWER API (Global Satellite Climatology)' : 'NASA POWER API (Climatología Satelital Global)'}</option>
+            <option value="meteonorm">${isEn ? 'Open-Meteo API (ECMWF ERA5 Reanálisis)' : 'Open-Meteo API (ECMWF ERA5 Reanálisis)'}</option>
           </select>
         </div>
 
@@ -954,33 +955,272 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     setStatus(isEn ? `Template "${rec.locationName}" applied to form.` : `Plantilla "${rec.locationName}" aplicada al formulario.`, 'info');
   });
 
-  validateManualBtn.addEventListener('click', () => {
-    const gInputs = container.querySelectorAll<HTMLInputElement>('.manual-g-input');
-    const tInputs = container.querySelectorAll<HTMLInputElement>('.manual-t-input');
+  function highlightErrorInput(input: HTMLElement) {
+    input.classList.remove('input-error-shake');
+    void input.offsetWidth;
+    input.classList.add('input-error-shake');
+    input.focus();
+    setTimeout(() => input.classList.remove('input-error-shake'), 1200);
+  }
+
+  function setupNumericLock(
+    input: HTMLInputElement,
+    options: {
+      allowNegative?: boolean;
+      min?: number;
+      max?: number;
+      labelName: string;
+    }
+  ) {
+    const { allowNegative = false, min, max, labelName } = options;
+
+    input.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (
+        ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(
+          e.key
+        )
+      ) {
+        return;
+      }
+      if (e.ctrlKey || e.metaKey) {
+        return;
+      }
+
+      if (/^[0-9]$/.test(e.key)) {
+        return;
+      }
+
+      if (allowNegative && (e.key === '-' || e.key === 'Subtract')) {
+        const selStart = input.selectionStart ?? 0;
+        if (selStart === 0 && !input.value.includes('-')) {
+          return;
+        }
+      }
+
+      if (e.key === '.' || e.key === ',') {
+        const val = input.value.replace(',', '.');
+        if (!val.includes('.')) {
+          return;
+        }
+      }
+
+      e.preventDefault();
+    });
+
+    input.addEventListener('input', () => {
+      const raw = input.value.replace(/,/g, '.');
+      let sanitized = '';
+      let hasDot = false;
+      let hasMinus = false;
+
+      for (let i = 0; i < raw.length; i++) {
+        const ch = raw[i];
+        if (ch >= '0' && ch <= '9') {
+          sanitized += ch;
+        } else if (allowNegative && ch === '-' && i === 0 && !hasMinus) {
+          sanitized += ch;
+          hasMinus = true;
+        } else if (ch === '.' && !hasDot) {
+          sanitized += ch;
+          hasDot = true;
+        }
+      }
+
+      if (input.value !== sanitized) {
+        input.value = sanitized;
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      const v = input.value.trim();
+      if (!v) {
+        highlightErrorInput(input);
+        setStatus(
+          isEn
+            ? `⚠️ "${labelName}" cannot be empty. Please enter a valid number.`
+            : `⚠️ "${labelName}" no puede estar vacío. Introduce un valor numérico.`,
+          'warning'
+        );
+      } else {
+        const num = parseFloat(v);
+        if (isNaN(num)) {
+          highlightErrorInput(input);
+          setStatus(
+            isEn
+              ? `⚠️ "${labelName}" contains invalid characters.`
+              : `⚠️ "${labelName}" contiene caracteres no válidos.`,
+            'warning'
+          );
+        } else if (min !== undefined && num < min) {
+          highlightErrorInput(input);
+          setStatus(
+            isEn
+              ? `⚠️ "${labelName}" cannot be lower than ${min}.`
+              : `⚠️ "${labelName}" no puede ser menor que ${min}.`,
+            'warning'
+          );
+        } else if (max !== undefined && num > max) {
+          highlightErrorInput(input);
+          setStatus(
+            isEn
+              ? `⚠️ "${labelName}" cannot exceed ${max}.`
+              : `⚠️ "${labelName}" no puede ser mayor que ${max}.`,
+            'warning'
+          );
+        }
+      }
+    });
+  }
+
+  // Attach locks to all manual numeric inputs
+  setupNumericLock(manualLat, { allowNegative: true, min: -90, max: 90, labelName: isEn ? 'Latitude' : 'Latitud' });
+  setupNumericLock(manualLon, { allowNegative: true, min: -180, max: 180, labelName: isEn ? 'Longitude' : 'Longitud' });
+  setupNumericLock(manualAlbedo, { allowNegative: false, min: 0.0, max: 1.0, labelName: isEn ? 'Ground Albedo' : 'Albedo del Suelo' });
+
+  // Attach lock to location name
+  manualName.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (['<', '>', '{', '}', '$', ';', '"', '\\', '`'].includes(e.key)) {
+      e.preventDefault();
+    }
+  });
+  manualName.addEventListener('input', () => {
+    const raw = manualName.value;
+    const sanitized = raw.replace(/[<>{}\$;"\\`]/g, '');
+    if (raw !== sanitized) {
+      manualName.value = sanitized;
+    }
+  });
+  manualName.addEventListener('blur', () => {
+    if (!manualName.value.trim()) {
+      highlightErrorInput(manualName);
+      setStatus(
+        isEn
+          ? '⚠️ Location name cannot be empty.'
+          : '⚠️ El nombre de localización no puede estar vacío.',
+        'warning'
+      );
+    }
+  });
+
+  const manualGInputs = container.querySelectorAll<HTMLInputElement>('.manual-g-input');
+  const manualTInputs = container.querySelectorAll<HTMLInputElement>('.manual-t-input');
+
+  manualGInputs.forEach((inp, idx) => {
+    setupNumericLock(inp, {
+      allowNegative: false,
+      min: 0.01,
+      max: 25.0,
+      labelName: `Gdm(0) [${MONTH_NAMES[idx]}]`,
+    });
+  });
+
+  manualTInputs.forEach((inp, idx) => {
+    setupNumericLock(inp, {
+      allowNegative: true,
+      min: -50.0,
+      max: 65.0,
+      labelName: `Tamb [${MONTH_NAMES[idx]}]`,
+    });
+  });
+
+  function validateManualFormInputs(): ManualClimateInput | null {
+    const name = manualName.value.trim();
+    if (!name) {
+      highlightErrorInput(manualName);
+      setStatus(
+        isEn ? 'Error: Location Name cannot be empty or invalid.' : 'Error: El Nombre de Localización no puede estar vacío.',
+        'error'
+      );
+      return null;
+    }
+
+    const latRaw = manualLat.value.trim();
+    const lat = parseFloat(latRaw);
+    if (!latRaw || isNaN(lat) || lat < -90 || lat > 90) {
+      highlightErrorInput(manualLat);
+      setStatus(
+        isEn
+          ? 'Error: Latitude is empty or invalid (must be between -90° and +90°).'
+          : 'Error: La Latitud está vacía o es inválida (debe ser un número entre -90° y +90°).',
+        'error'
+      );
+      return null;
+    }
+
+    const lonRaw = manualLon.value.trim();
+    const lon = parseFloat(lonRaw);
+    if (!lonRaw || isNaN(lon) || lon < -180 || lon > 180) {
+      highlightErrorInput(manualLon);
+      setStatus(
+        isEn
+          ? 'Error: Longitude is empty or invalid (must be between -180° and +180°).'
+          : 'Error: La Longitud está vacía o es inválida (debe ser un número entre -180° y +180°).',
+        'error'
+      );
+      return null;
+    }
+
+    const albedoRaw = manualAlbedo.value.trim();
+    const albedo = parseFloat(albedoRaw);
+    if (!albedoRaw || isNaN(albedo) || albedo < 0 || albedo > 1) {
+      highlightErrorInput(manualAlbedo);
+      setStatus(
+        isEn
+          ? 'Error: Ground Albedo is empty or invalid (must be between 0.00 and 1.00).'
+          : 'Error: El Albedo del suelo está vacío o es inválido (debe ser un número entre 0.00 y 1.00).',
+        'error'
+      );
+      return null;
+    }
 
     const gdm0: number[] = [];
     const temp: number[] = [];
 
-    gInputs.forEach((inp) => gdm0.push(parseFloat(inp.value)));
-    tInputs.forEach((inp) => temp.push(parseFloat(inp.value)));
+    for (let i = 0; i < 12; i++) {
+      const gRaw = manualGInputs[i]?.value.trim() ?? '';
+      const gVal = parseFloat(gRaw);
+      if (!gRaw || isNaN(gVal) || gVal <= 0 || gVal > 30) {
+        if (manualGInputs[i]) highlightErrorInput(manualGInputs[i]);
+        setStatus(
+          isEn
+            ? `Error: Radiation Gdm(0) for ${MONTH_NAMES[i]} cannot be empty, negative or zero.`
+            : `Error: La radiación Gdm(0) para ${MONTH_NAMES[i]} no puede estar vacía, contener letras ni ser ≤ 0.`,
+          'error'
+        );
+        return null;
+      }
+      gdm0.push(gVal);
 
-    const rawRecord: ManualClimateInput = {
-      locationName: manualName.value.trim(),
-      latitude: parseFloat(manualLat.value),
-      longitude: parseFloat(manualLon.value),
+      const tRaw = manualTInputs[i]?.value.trim() ?? '';
+      const tVal = parseFloat(tRaw);
+      if (!tRaw || isNaN(tVal) || tVal < -50 || tVal > 65) {
+        if (manualTInputs[i]) highlightErrorInput(manualTInputs[i]);
+        setStatus(
+          isEn
+            ? `Error: Temperature Tamb for ${MONTH_NAMES[i]} cannot be empty or outside [-50°C, 65°C].`
+            : `Error: La temperatura Tamb para ${MONTH_NAMES[i]} no puede estar vacía, contener letras ni estar fuera de rango [-50°C, 65°C].`,
+          'error'
+        );
+        return null;
+      }
+      temp.push(tVal);
+    }
+
+    return {
+      locationName: name,
+      latitude: lat,
+      longitude: lon,
       elevationM: parseFloat(manualElev.value) || 0,
       country: 'Personalizado',
-      albedo: parseFloat(manualAlbedo.value) || 0.20,
+      albedo,
       monthlyGdm0: gdm0,
       monthlyTemperature: temp,
     };
+  }
 
-    // Pre-validation: Stop and show error if empty or invalid
-    const val = validateClimateRecordForSaving(rawRecord, isEn);
-    if (!val.valid) {
-      setStatus(`Error: ${val.error}`, 'error');
-      return;
-    }
+  validateManualBtn.addEventListener('click', () => {
+    const rawRecord = validateManualFormInputs();
+    if (!rawRecord) return;
 
     try {
       const rec = hybridClimateManager.setManualData(rawRecord);
@@ -997,32 +1237,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   });
 
   saveManualBtn?.addEventListener('click', async () => {
-    const gInputs = container.querySelectorAll<HTMLInputElement>('.manual-g-input');
-    const tInputs = container.querySelectorAll<HTMLInputElement>('.manual-t-input');
-
-    const gdm0: number[] = [];
-    const temp: number[] = [];
-
-    gInputs.forEach((inp) => gdm0.push(parseFloat(inp.value)));
-    tInputs.forEach((inp) => temp.push(parseFloat(inp.value)));
-
-    const rawRecord: ManualClimateInput = {
-      locationName: manualName.value.trim(),
-      latitude: parseFloat(manualLat.value),
-      longitude: parseFloat(manualLon.value),
-      elevationM: parseFloat(manualElev.value) || 0,
-      country: 'Personalizado',
-      albedo: parseFloat(manualAlbedo.value) || 0.20,
-      monthlyGdm0: gdm0,
-      monthlyTemperature: temp,
-    };
-
-    // Pre-validation: Stop upload and show error if empty or invalid
-    const val = validateClimateRecordForSaving(rawRecord, isEn);
-    if (!val.valid) {
-      setStatus(`Error: ${val.error}`, 'error');
-      return;
-    }
+    const rawRecord = validateManualFormInputs();
+    if (!rawRecord) return;
 
     saveManualBtn.disabled = true;
     setStatus(isEn ? 'Saving manual emplacement to Supabase...' : 'Guardando emplazamiento manual en Supabase...', 'info');

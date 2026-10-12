@@ -54,8 +54,9 @@ export function renderClimateIntegrationPanel(): HTMLElement {
       <div class="form-group">
         <label for="climate-source-select" class="form-label">${t.externalClimate.sourceLabel}</label>
         <select id="climate-source-select" class="form-select">
-          <option value="nasa">${isEn ? 'NASA POWER API (Global Satellite Climatology)' : 'NASA POWER API (Climatología Satelital Global)'}</option>
           <option value="pvgis">${isEn ? 'PVGIS 5.3 API (European Commission JRC)' : 'PVGIS 5.3 API (Comisión Europea JRC)'}</option>
+          <option value="nasa">${isEn ? 'NASA POWER API (Global Satellite Climatology)' : 'NASA POWER API (Climatología Satelital Global)'}</option>
+          <option value="meteonorm">${isEn ? 'Open-Meteo API (ECMWF ERA5 Reanálisis)' : 'Open-Meteo API (ECMWF ERA5 Reanálisis)'}</option>
           <option value="supabase">${isEn ? 'Supabase (Saved Cloud Datasets)' : 'Supabase (Datasets Guardados / Nube)'}</option>
         </select>
       </div>
