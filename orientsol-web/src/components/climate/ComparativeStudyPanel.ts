@@ -231,25 +231,25 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
                   <td class="td-comp-val-cell">
                     <div class="comp-cell-flex">
                       <span class="comp-val-main">${radPolar[i].toFixed(2)}</span>
-                      <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: Rot. 15°/h (${fixedOri.toFixed(0)}° a 12h)</span>
+                      <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
                     </div>
                   </td>
                   <td class="td-comp-val-cell">
                     <div class="comp-cell-flex">
                       <span class="comp-val-main">${radAzim[i].toFixed(2)}</span>
-                      <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: Seg. ψs (${noonAzims[i].toFixed(0)}° a 12h)</span>
+                      <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${noonAzims[i].toFixed(1)}°</span>
                     </div>
                   </td>
                   <td class="td-comp-val-cell">
                     <div class="comp-cell-flex">
                       <span class="comp-val-main">${radHorizTrack[i].toFixed(2)}</span>
-                      <span class="comp-angle-chip">Inc: 0.0° (mín 12h) | Ori: 90.0°</span>
+                      <span class="comp-angle-chip">Inc: 0.0° | Ori: 90.0°</span>
                     </div>
                   </td>
                   <td class="td-track-dual td-comp-val-cell">
                     <div class="comp-cell-flex">
                       <span class="comp-val-main"><strong>${radDual[i].toFixed(2)}</strong></span>
-                      <span class="comp-angle-chip chip-dual">Inc: ${noonDualTilts[i].toFixed(1)}° (mín) | Ori: Seg. ψs</span>
+                      <span class="comp-angle-chip chip-dual">Inc: ${noonDualTilts[i].toFixed(1)}° | Ori: ${noonAzims[i].toFixed(1)}°</span>
                     </div>
                   </td>
                   <td class="td-track-temp-val"><strong>${tempMean[i].toFixed(1)}</strong></td>
@@ -287,25 +287,25 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
                     <span class="comp-val-main"><strong>${mPolar.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: Rot. 15°/h (${fixedOri.toFixed(0)}° a 12h)</span>
+                    <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
                   </div>
                 </td>
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
                     <span class="comp-val-main"><strong>${mAzim.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: Seg. ψs (${avgDualAzim.toFixed(0)}° a 12h)</span>
+                    <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°</span>
                   </div>
                 </td>
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
                     <span class="comp-val-main"><strong>${mHorizTrack.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: 0.0° (mín 12h) | Ori: 90.0°</span>
+                    <span class="comp-angle-chip">Inc: 0.0° | Ori: 90.0°</span>
                   </div>
                 </td>
                 <td class="td-track-dual td-comp-val-cell">
                   <div class="comp-cell-flex">
                     <span class="comp-val-main"><strong>${mDual.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip chip-dual">Inc: ${avgDualTilt.toFixed(1)}° (mín) | Ori: Seg. ψs</span>
+                    <span class="comp-angle-chip chip-dual">Inc: ${avgDualTilt.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°</span>
                   </div>
                 </td>
                 <td class="td-track-temp-val"><strong>${mTemp.toFixed(1)}</strong></td>

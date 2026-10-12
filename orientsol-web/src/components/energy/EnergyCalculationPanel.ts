@@ -427,13 +427,13 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                         angleBadgeText = `Oto: Inc: ${seasonalData.autumnTiltDeg.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                       }
                     } else if (studyType === 'polar') {
-                      angleBadgeText = `Inc: ${latitude.toFixed(1)}° | Ori: Rot. 15°/h (${fixedOri.toFixed(0)}° a 12h)`;
+                      angleBadgeText = `Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                     } else if (studyType === 'azimuthal') {
-                      angleBadgeText = `Inc: ${latitude.toFixed(1)}° | Ori: Seg. ψs (${noonAzim.toFixed(0)}° a 12h)`;
+                      angleBadgeText = `Inc: ${latitude.toFixed(1)}° | Ori: ${noonAzim.toFixed(1)}°`;
                     } else if (studyType === 'horizontal') {
-                      angleBadgeText = `Inc: 0.0° (mín 12h) | Ori: 90.0°`;
+                      angleBadgeText = `Inc: 0.0° | Ori: 90.0°`;
                     } else if (studyType === 'dual') {
-                      angleBadgeText = `Inc: ${noonDualTilt.toFixed(1)}° (mín) | Ori: Seg. ψs`;
+                      angleBadgeText = `Inc: ${noonDualTilt.toFixed(1)}° | Ori: ${noonAzim.toFixed(1)}°`;
                     } else {
                       angleBadgeText = `Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                     }
@@ -462,6 +462,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                       <span class="energy-angle-badge badge-annual">
                         ${(() => {
                           const fixedOri = latitude >= 0 ? 0.0 : 180.0;
+                          const avgDualAzim = months.reduce((acc, _, idx) => acc + getNoonAzimuthDeg(latitude, idx), 0) / 12;
                           if (studyType === 'monthly') {
                             return isEn ? `Var (12 tilts) | Ori: ${fixedOri.toFixed(1)}°` : `Var (12 incl.) | Ori: ${fixedOri.toFixed(1)}°`;
                           }
@@ -469,17 +470,17 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                             return isEn ? `Var (4 seasons) | Ori: ${fixedOri.toFixed(1)}°` : `Var (4 estac.) | Ori: ${fixedOri.toFixed(1)}°`;
                           }
                           if (studyType === 'polar') {
-                            return `Inc: ${latitude.toFixed(1)}° | Ori: Rot. 15°/h (${fixedOri.toFixed(0)}° a 12h)`;
+                            return `Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                           }
                           if (studyType === 'azimuthal') {
-                            return `Inc: ${latitude.toFixed(1)}° | Ori: Seg. ψs (0° a 12h)`;
+                            return `Inc: ${latitude.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`;
                           }
                           if (studyType === 'horizontal') {
-                            return `Inc: 0.0° (mín 12h) | Ori: 90.0°`;
+                            return `Inc: 0.0° | Ori: 90.0°`;
                           }
                           if (studyType === 'dual') {
                             const avgDualTilt = months.reduce((acc, _, idx) => acc + getDualAxisNoonTiltDeg(latitude, idx), 0) / 12;
-                            return `Inc: ${avgDualTilt.toFixed(1)}° (mín) | Ori: Seg. ψs`;
+                            return `Inc: ${avgDualTilt.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`;
                           }
                           return `Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                         })()}
@@ -497,6 +498,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                       <span class="energy-angle-badge badge-annual">
                         ${(() => {
                           const fixedOri = latitude >= 0 ? 0.0 : 180.0;
+                          const avgDualAzim = months.reduce((acc, _, idx) => acc + getNoonAzimuthDeg(latitude, idx), 0) / 12;
                           if (studyType === 'monthly') {
                             return isEn ? `Var (12) | Ori: ${fixedOri.toFixed(1)}°` : `Var (12) | Ori: ${fixedOri.toFixed(1)}°`;
                           }
@@ -504,17 +506,17 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                             return isEn ? `Var (4) | Ori: ${fixedOri.toFixed(1)}°` : `Var (4) | Ori: ${fixedOri.toFixed(1)}°`;
                           }
                           if (studyType === 'polar') {
-                            return `Inc: ${latitude.toFixed(1)}° | Ori: Rot. 15°/h (${fixedOri.toFixed(0)}° a 12h)`;
+                            return `Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                           }
                           if (studyType === 'azimuthal') {
-                            return `Inc: ${latitude.toFixed(1)}° | Ori: Seg. ψs (0° a 12h)`;
+                            return `Inc: ${latitude.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`;
                           }
                           if (studyType === 'horizontal') {
-                            return `Inc: 0.0° (mín 12h) | Ori: 90.0°`;
+                            return `Inc: 0.0° | Ori: 90.0°`;
                           }
                           if (studyType === 'dual') {
                             const avgDualTilt = months.reduce((acc, _, idx) => acc + getDualAxisNoonTiltDeg(latitude, idx), 0) / 12;
-                            return `Inc: ${avgDualTilt.toFixed(1)}° (mín) | Ori: Seg. ψs`;
+                            return `Inc: ${avgDualTilt.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`;
                           }
                           return `Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                         })()}

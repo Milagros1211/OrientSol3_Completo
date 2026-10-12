@@ -358,14 +358,14 @@ export function renderPythonConsole(): HTMLElement {
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                 </tr>
                 <tr>
-                  <td><strong>${isEn ? 'Solar Azimuth at Noon' : 'Azimut Solar al Mediodía (12:00h)'} (ψs)</strong></td>
-                  <td>Ec. 4.31 y Pág. 220 (${stateLat >= 0 ? (isEn ? 'North = 0° South' : 'Norte = 0.0° Sur') : (isEn ? 'South = 180° North' : 'Sur = 180.0° Norte')})</td>
+                  <td><strong>${isEn ? 'Solar Azimuth / Orientation at Noon' : 'Orientación / Azimut Solar al Mediodía (12:00h)'}</strong></td>
+                  <td>Ec. 4.31 y Pág. 220 (${stateLat >= 0 ? (isEn ? 'North = 0.0° South' : 'Norte = 0.0° Sur') : (isEn ? 'South = 180.0° North' : 'Sur = 180.0° Norte')})</td>
                   <td class="td-num">${noonAzimDeg.toFixed(1)}°</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                 </tr>
                 <tr>
-                  <td><strong>${isEn ? 'Dual-Axis Tracker Tilt at Noon' : 'Inclinación Colector 2-Ejes al Mediodía'} (β)</strong></td>
+                  <td><strong>${isEn ? 'Dual-Axis Tracker Tilt at Noon' : 'Inclinación Colector 2-Ejes al Mediodía'}</strong></td>
                   <td>Ec. Cenital: <code>90° - γs = |φ - δ|</code></td>
                   <td class="td-num">${noonDualTiltDeg.toFixed(1)}°</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
@@ -604,9 +604,9 @@ export function renderPythonConsole(): HTMLElement {
         { name: isEn ? 'Annual Optimal Tilt' : 'Inclinación Óptima Anual', inc: `${Math.max(10, Math.round(Math.abs(stateLat) * 0.88))}.0°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 5.55, gainH: 16.6, gainOpt: 0.0, status: '✓ Validado' },
         { name: isEn ? 'Seasonal Optimal Tilt (4 pos)' : 'Inclinación Óptima Estacional (4 pos)', inc: 'Var (4)', ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 5.84, gainH: 22.7, gainOpt: 5.2, status: '✓ Validado' },
         { name: isEn ? 'Single-Axis Polar Tracking' : 'Seguimiento a un Eje Polar', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 6.52, gainH: 37.0, gainOpt: 17.5, status: '✓ Validado' },
-        { name: isEn ? 'Single-Axis Azimuthal Tracking' : 'Seguimiento a un Eje Azimutal', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: 'Var (ψs)', rad: 6.68, gainH: 40.3, gainOpt: 20.4, status: '✓ Validado' },
-        { name: isEn ? 'Single-Axis Horizontal Tracking' : 'Seguimiento a un Eje Horizontal', inc: 'Var (0°-90°)', ori: '90.0° E-O', rad: 5.92, gainH: 24.4, gainOpt: 6.7, status: '✓ Validado' },
-        { name: isEn ? 'Two-Axis Tracking (Continuous)' : 'Seguimiento a Dos Ejes Continuo', inc: 'Var (90°-γs)', ori: 'Var (ψs)', rad: 7.21, gainH: 51.5, gainOpt: 29.9, status: '✓ Validado' },
+        { name: isEn ? 'Single-Axis Azimuthal Tracking' : 'Seguimiento a un Eje Azimutal', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 6.68, gainH: 40.3, gainOpt: 20.4, status: '✓ Validado' },
+        { name: isEn ? 'Single-Axis Horizontal Tracking' : 'Seguimiento a un Eje Horizontal', inc: '0.0° (12h)', ori: '90.0°', rad: 5.92, gainH: 24.4, gainOpt: 6.7, status: '✓ Validado' },
+        { name: isEn ? 'Two-Axis Tracking (Continuous)' : 'Seguimiento a Dos Ejes Continuo', inc: 'Var (12h mín)', ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 7.21, gainH: 51.5, gainOpt: 29.9, status: '✓ Validado' },
       ];
 
       const meanRad = trackingRows.reduce((acc, r) => acc + r.rad, 0) / trackingRows.length;
