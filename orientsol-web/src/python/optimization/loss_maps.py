@@ -20,6 +20,34 @@ from core.hour_angles import angulos2
 DAYS_PER_MONTH = np.array([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], dtype=np.int32)
 
 
+def _find_optimal_beta_alpha(rad_mat: np.ndarray, betas: np.ndarray, alphas: np.ndarray) -> Tuple[float, float, float]:
+    """
+    Finds maximum radiation in rad_mat and the corresponding optimal tilt (beta)
+    and orientation (alpha).
+    - If optimal beta is 0° (horizontal plane), orientation alpha has no physical/geometric
+      effect, so alpha is strictly set to 0.0° (South) by international solar convention.
+    - If multiple orientations tie for the maximum (within 1e-4 kWh/m²/day), chooses the
+      candidate closest to alpha = 0° (South), breaking further ties by lowest beta.
+    """
+    max_val = float(np.max(rad_mat))
+    max_mask = np.isclose(rad_mat, max_val, atol=1e-4)
+    candidates = np.argwhere(max_mask)
+    if len(candidates) == 0:
+        opt_indices = np.unravel_index(np.argmax(rad_mat), rad_mat.shape)
+        b = float(betas[opt_indices[0]])
+        a = float(alphas[opt_indices[1]])
+        if abs(b) < 0.01:
+            a = 0.0
+        return b, a, max_val
+
+    best = min(candidates, key=lambda idx: (abs(float(alphas[idx[1]])), float(betas[idx[0]])))
+    opt_b = float(betas[best[0]])
+    opt_a = float(alphas[best[1]])
+    if abs(opt_b) < 0.01:
+        opt_a = 0.0
+    return opt_b, opt_a, max_val
+
+
 def generate_capture_loss_map(
     lat_deg: float,
     gdm0: Union[np.ndarray, List[float]],
@@ -143,34 +171,6 @@ def generate_capture_loss_map(
             radiation_annual_daily[i_b, i_a] = float(np.mean(g_daily_month))
             for m in range(12):
                 radiation_monthly[m, i_b, i_a] = g_daily_month[m]
-
-def _find_optimal_beta_alpha(rad_mat: np.ndarray, betas: np.ndarray, alphas: np.ndarray) -> Tuple[float, float, float]:
-    """
-    Finds maximum radiation in rad_mat and the corresponding optimal tilt (beta)
-    and orientation (alpha).
-    - If optimal beta is 0° (horizontal plane), orientation alpha has no physical/geometric
-      effect, so alpha is strictly set to 0.0° (South) by international solar convention.
-    - If multiple orientations tie for the maximum (within 1e-4 kWh/m²/day), chooses the
-      candidate closest to alpha = 0° (South), breaking further ties by lowest beta.
-    """
-    max_val = float(np.max(rad_mat))
-    max_mask = np.isclose(rad_mat, max_val, atol=1e-4)
-    candidates = np.argwhere(max_mask)
-    if len(candidates) == 0:
-        opt_indices = np.unravel_index(np.argmax(rad_mat), rad_mat.shape)
-        b = float(betas[opt_indices[0]])
-        a = float(alphas[opt_indices[1]])
-        if abs(b) < 0.01:
-            a = 0.0
-        return b, a, max_val
-
-    best = min(candidates, key=lambda idx: (abs(float(alphas[idx[1]])), float(betas[idx[0]])))
-    opt_b = float(betas[best[0]])
-    opt_a = float(alphas[best[1]])
-    if abs(opt_b) < 0.01:
-        opt_a = 0.0
-    return opt_b, opt_a, max_val
-
 
     # Reference maximum (South-facing optimal tilt)
     opt_beta_deg, opt_alpha_deg, max_radiation = _find_optimal_beta_alpha(radiation_annual_daily, betas, alphas)
