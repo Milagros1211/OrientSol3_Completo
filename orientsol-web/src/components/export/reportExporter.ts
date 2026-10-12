@@ -48,12 +48,12 @@ export function exportToCSV(
   lines.push(isEn ? 'ANNUAL ENERGY BALANCE & THERMAL DERATING' : 'BALANCE ENERGÉTICO ANUAL Y COMPORTAMIENTO TÉRMICO');
   lines.push('----------------------------------------------------------------------');
   lines.push(`${isEn ? 'Estimated Collector Area' : 'Superficie Captadora Estimada'};${res.energyYield.collectorAreaM2.toFixed(1)} m²`);
-  lines.push(`${isEn ? 'Total Solar Radiation Received' : 'Energía Solar Recibida Total'};${Math.round(res.energyYield.recibida.annualTotalKwh)} kWh/año (${res.energyYield.recibida.annualKwhM2.toFixed(1)} kWh/m²·año)`);
-  lines.push(`${isEn ? 'PV Energy Yield (Osterwald)' : 'Energía FV Producida (Osterwald)'};${Math.round(res.energyYield.producida.osterwald.annualKwh)} kWh/año`);
-  lines.push(`${isEn ? 'PV Energy Yield (Simplified PR)' : 'Energía FV Producida (Simplificado)'};${Math.round(res.energyYield.producida.simplified.annualKwh)} kWh/año`);
+  lines.push(`${isEn ? 'Total Solar Radiation Received' : 'Energía Solar Recibida Total'};${Math.round(res.energyYield.recibida.annualTotalKwh)} ${isEn ? 'kWh/yr' : 'kWh/año'} (${res.energyYield.recibida.annualKwhM2.toFixed(1)} ${isEn ? 'kWh/m²·yr' : 'kWh/m²·año'})`);
+  lines.push(`${isEn ? 'PV Energy Yield (Osterwald)' : 'Energía FV Producida (Osterwald)'};${Math.round(res.energyYield.producida.osterwald.annualKwh)} ${isEn ? 'kWh/yr' : 'kWh/año'}`);
+  lines.push(`${isEn ? 'PV Energy Yield (Simplified PR)' : 'Energía FV Producida (Simplificado)'};${Math.round(res.energyYield.producida.simplified.annualKwh)} ${isEn ? 'kWh/yr' : 'kWh/año'}`);
   lines.push(`${isEn ? 'Specific Yield' : 'Productividad Específica'};${res.energyYield.producida.osterwald.specificYieldKwhKwp.toFixed(0)} kWh/kWp`);
   lines.push(`${isEn ? 'Cell Thermal Losses vs STC' : 'Pérdidas Térmicas por Temperatura de Célula'};-${res.energyYield.producida.osterwald.thermalLossKwh.toFixed(0)} kWh (-${res.energyYield.producida.osterwald.thermalLossPct.toFixed(2)} %)`);
-  lines.push(`${isEn ? 'Mean Operating Cell Temperature' : 'Temperatura Media de Célula Operativa'};${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)} °C (Máx: ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)} °C)`);
+  lines.push(`${isEn ? 'Mean Operating Cell Temperature' : 'Temperatura Media de Célula Operativa'};${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)} °C (${isEn ? 'Max' : 'Máx'}: ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)} °C)`);
   lines.push('');
 
   // 3. Monthly Breakdown Table
@@ -128,11 +128,11 @@ export function exportToCSV(
   lines.push('----------------------------------------------------------------------');
   lines.push(isEn ? 'CTE DB-HE4 CAPTURE LOSS MATRIX SUMMARY' : 'RESUMEN DEL MAPA DE PÉRDIDAS CTE DB-HE4');
   lines.push('----------------------------------------------------------------------');
-  lines.push(`${isEn ? 'Absolute Optimal Point' : 'Punto Óptimo Absoluto'};Inclinación Beta = ${res.captureLossMap.optimalPoint.betaDeg}° | Acimut Alpha = ${res.captureLossMap.optimalPoint.alphaDeg}°`);
-  lines.push(`${isEn ? 'Optimal Radiation' : 'Radiación Óptima'};${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} kWh/m²/día (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} kWh/m²·año)`);
-  lines.push(`${isEn ? 'CTE General Limit (<=10% loss)' : 'Límite General CTE (Pérdida <= 10%)'};${res.captureLossMap.cteZones.generalPctCompliant} % del mapa`);
-  lines.push(`${isEn ? 'CTE Superposition Limit (<=20% loss)' : 'Superposición CTE (Pérdida <= 20%)'};${res.captureLossMap.cteZones.superpositionPctCompliant} % del mapa`);
-  lines.push(`${isEn ? 'CTE Integration Limit (<=40% loss)' : 'Integración Arquitectónica CTE (Pérdida <= 40%)'};${res.captureLossMap.cteZones.integrationPctCompliant} % del mapa`);
+  lines.push(`${isEn ? 'Absolute Optimal Point' : 'Punto Óptimo Absoluto'};${isEn ? 'Tilt Beta' : 'Inclinación Beta'} = ${res.captureLossMap.optimalPoint.betaDeg}° | ${isEn ? 'Azimuth Alpha' : 'Acimut Alpha'} = ${res.captureLossMap.optimalPoint.alphaDeg}°`);
+  lines.push(`${isEn ? 'Optimal Radiation' : 'Radiación Óptima'};${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/día'} (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} ${isEn ? 'kWh/m²·yr' : 'kWh/m²·año'})`);
+  lines.push(`${isEn ? 'CTE General Limit (<=10% loss)' : 'Límite General CTE (Pérdida <= 10%)'};${res.captureLossMap.cteZones.generalPctCompliant} ${isEn ? '% of map' : '% del mapa'}`);
+  lines.push(`${isEn ? 'CTE Superposition Limit (<=20% loss)' : 'Superposición CTE (Pérdida <= 20%)'};${res.captureLossMap.cteZones.superpositionPctCompliant} ${isEn ? '% of map' : '% del mapa'}`);
+  lines.push(`${isEn ? 'CTE Integration Limit (<=40% loss)' : 'Integración Arquitectónica CTE (Pérdida <= 40%)'};${res.captureLossMap.cteZones.integrationPctCompliant} ${isEn ? '% of map' : '% del mapa'}`);
 
   const csvContent = BOM + lines.join('\r\n');
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

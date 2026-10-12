@@ -33,11 +33,11 @@ function renderAboutView(isEn: boolean): HTMLElement {
         <h4 style="margin-bottom: 0.75rem; color: var(--solar-amber);">${isEn ? 'Academic Framework (TFM)' : 'Marco Académico (TFM)'}</h4>
         <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.88rem;">
           <li><strong>${isEn ? 'Institution' : 'Institución'}:</strong> Universidad de Jaén (UJA)</li>
-          <li><strong>${isEn ? 'Degree' : 'Titulación'}:</strong> Máster Universitario en Energías Renovables</li>
-          <li><strong>${isEn ? 'Title' : 'Título'}:</strong> Desarrollo de un entorno software para optimización de posición y movimiento de superficies receptoras de radiación solar en un sistema fotovoltaico</li>
+          <li><strong>${isEn ? 'Degree' : 'Titulación'}:</strong> ${isEn ? "Master's Degree in Renewable Energy" : 'Máster Universitario en Energías Renovables'}</li>
+          <li><strong>${isEn ? 'Title' : 'Título'}:</strong> ${isEn ? 'Development of a software environment for position and motion optimization of solar radiation receiving surfaces in a photovoltaic system' : 'Desarrollo de un entorno software para optimización de posición y movimiento de superficies receptoras de radiación solar en un sistema fotovoltaico'}</li>
           <li><strong>${isEn ? 'Student' : 'Alumna'}:</strong> Karina Milagros Baldeón Zárate</li>
           <li><strong>${isEn ? 'Supervisors' : 'Directores'}:</strong> Dr. Leocadio Hontoria García &amp; Dra. Catalina Rus Casas</li>
-          <li><strong>${isEn ? 'Department' : 'Departamento'}:</strong> Ingeniería Electrónica y Automática</li>
+          <li><strong>${isEn ? 'Department' : 'Departamento'}:</strong> ${isEn ? 'Electronic and Automatic Engineering' : 'Ingeniería Electrónica y Automática'}</li>
         </ul>
       </div>
 
@@ -51,7 +51,7 @@ function renderAboutView(isEn: boolean): HTMLElement {
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <span class="badge badge-success">Vite + TypeScript</span>
           <span class="badge badge-neutral">NumPy 2.4.6 WASM</span>
-          <span class="badge badge-source">Multiplatform Web/Win/Android</span>
+          <span class="badge badge-source">${isEn ? 'Multiplatform Web/Win/Android' : 'Multiplataforma Web/Win/Android'}</span>
         </div>
       </div>
     </div>
@@ -79,17 +79,21 @@ function renderAboutView(isEn: boolean): HTMLElement {
         <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
-              <strong style="color: var(--text-main); font-size: 0.9rem;">🇪🇺 PVGIS (Comisión Europea - JRC)</strong>
-              <span class="badge badge-primary" style="font-size: 0.7rem; white-space: nowrap;">Mensual / 2-3 años (v5.x)</span>
+              <strong style="color: var(--text-main); font-size: 0.9rem;">🇪🇺 ${isEn ? 'PVGIS (European Commission - JRC)' : 'PVGIS (Comisión Europea - JRC)'}</strong>
+              <span class="badge badge-primary" style="font-size: 0.7rem; white-space: nowrap;">${isEn ? 'Monthly / 2-3 yrs (v5.x)' : 'Mensual / 2-3 años (v5.x)'}</span>
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
-              <strong>Frecuencia de Actualización:</strong> 
-              • <strong>Reanálisis ERA5 / SARAH-3:</strong> El ECMWF actualiza las series de radiación y meteorología <strong>mensualmente</strong> (con un retardo de latencia de 2 a 3 meses para consolidación).<br/>
-              • <strong>Versiones de API y Algoritmos:</strong> El JRC actualiza versiones mayores <strong>cada 2 a 3 años</strong> (v5.1 en 2020, v5.2 en 2022, v5.3 en 2024).
+              <strong>${isEn ? 'Update Frequency:' : 'Frecuencia de Actualización:'}</strong> 
+              • <strong>${isEn ? 'ERA5 / SARAH-3 Reanalysis:' : 'Reanálisis ERA5 / SARAH-3:'}</strong> ${isEn
+                ? 'ECMWF updates solar radiation and weather time series <strong>monthly</strong> (with a 2-3 month consolidation latency lag).'
+                : 'El ECMWF actualiza las series de radiación y meteorología <strong>mensualmente</strong> (con un retardo de latencia de 2 a 3 meses para consolidación).'}<br/>
+              • <strong>${isEn ? 'API & Algorithm Versions:' : 'Versiones de API y Algoritmos:'}</strong> ${isEn
+                ? 'The JRC publishes major updates <strong>every 2 to 3 years</strong> (v5.1 in 2020, v5.2 in 2022, v5.3 in 2024).'
+                : 'El JRC actualiza versiones mayores <strong>cada 2 a 3 años</strong> (v5.1 en 2020, v5.2 en 2022, v5.3 en 2024).'}
             </p>
           </div>
           <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
-            <strong>Referencias:</strong><br/>
+            <strong>${isEn ? 'References:' : 'Referencias:'}</strong><br/>
             • Huld, T., et al. (2012). <em>A new solar radiation database for estimating PV performance in Europe and Africa</em>. Solar Energy, 86(6), 1803-1815. DOI: 10.1016/j.solener.2012.03.006.<br/>
             • Pfeifroth, U., et al. (2023). <em>Surface Radiation Data Set - Heliosat (SARAH) - Edition 3</em>. CM SAF. DOI: 10.5676/EUM_SAF_CM/SARAH/V003.<br/>
             • JRC (2024). <em>PVGIS API Non-interactive service</em>. European Commission.
@@ -101,18 +105,26 @@ function renderAboutView(isEn: boolean): HTMLElement {
           <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
               <strong style="color: var(--text-main); font-size: 0.9rem;">🛰️ NASA POWER (CERES / MERRA-2)</strong>
-              <span class="badge badge-warning" style="font-size: 0.7rem; white-space: nowrap;">Diaria (NRT) / Mensual</span>
+              <span class="badge badge-warning" style="font-size: 0.7rem; white-space: nowrap;">${isEn ? 'Daily (NRT) / Monthly' : 'Diaria (NRT) / Mensual'}</span>
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
-              <strong>Frecuencia de Actualización:</strong>
-              • <strong>Cuasi tiempo real (NRT):</strong> Actualización <strong>diaria</strong> (latencia 2-4 días).<br/>
-              • <strong>Reanálisis asimilado MERRA-2:</strong> Consolidación <strong>mensual</strong> con 1 mes de desfase.<br/>
-              • <strong>Climatologías satelitales (POWER v2.x):</strong> Actualización <strong>anual</strong> integrando &gt;35 años (1984–presente).<br/>
-              • <strong>Variables extraídas:</strong> Radiación global horizontal diaria <code>ALLSKY_SFC_SW_DWN</code> (kWh/m²/día) y temperatura a 2m <code>T2M</code> (°C).
+              <strong>${isEn ? 'Update Frequency:' : 'Frecuencia de Actualización:'}</strong>
+              • <strong>${isEn ? 'Near Real-Time (NRT):' : 'Cuasi tiempo real (NRT):'}</strong> ${isEn
+                ? '<strong>Daily</strong> automated updates (2-4 day latency).'
+                : 'Actualización <strong>diaria</strong> (latencia 2-4 días).'}<br/>
+              • <strong>${isEn ? 'MERRA-2 Assimilated Reanalysis:' : 'Reanálisis asimilado MERRA-2:'}</strong> ${isEn
+                ? '<strong>Monthly</strong> consolidation with 1-month lag.'
+                : 'Consolidación <strong>mensual</strong> con 1 mes de desfase.'}<br/>
+              • <strong>${isEn ? 'Satellite Climatologies (POWER v2.x):' : 'Climatologías satelitales (POWER v2.x):'}</strong> ${isEn
+                ? '<strong>Annual</strong> update synthesizing &gt;35 years of observations (1984–present).'
+                : 'Actualización <strong>anual</strong> integrando &gt;35 años (1984–presente).'}<br/>
+              • <strong>${isEn ? 'Retrieved Variables:' : 'Variables extraídas:'}</strong> ${isEn
+                ? 'Daily global horizontal radiation <code>ALLSKY_SFC_SW_DWN</code> (kWh/m²/day) and 2m temperature <code>T2M</code> (°C).'
+                : 'Radiación global horizontal diaria <code>ALLSKY_SFC_SW_DWN</code> (kWh/m²/día) y temperatura a 2m <code>T2M</code> (°C).'}
             </p>
           </div>
           <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
-            <strong>Referencias:</strong><br/>
+            <strong>${isEn ? 'References:' : 'Referencias:'}</strong><br/>
             • Stackhouse, P. W., et al. (2022). <em>The NASA Prediction of Worldwide Energy Resources (POWER) Project</em>. NASA Technical Reports.<br/>
             • Gelaro, R., et al. (2017). <em>The Modern-Era Retrospective Analysis for Research and Applications, Version 2 (MERRA-2)</em>. J. Climate, 30(14), 5419-5454.
           </div>
@@ -122,19 +134,27 @@ function renderAboutView(isEn: boolean): HTMLElement {
         <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
-              <strong style="color: var(--text-main); font-size: 0.9rem;">🌐 Open-Meteo / ECMWF ERA5 (Reanálisis)</strong>
-              <span class="badge badge-primary" style="font-size: 0.7rem; white-space: nowrap;">Diaria / ERA5T (5 días)</span>
+              <strong style="color: var(--text-main); font-size: 0.9rem;">🌐 ${isEn ? 'Open-Meteo / ECMWF ERA5 (Reanalysis)' : 'Open-Meteo / ECMWF ERA5 (Reanálisis)'}</strong>
+              <span class="badge badge-primary" style="font-size: 0.7rem; white-space: nowrap;">${isEn ? 'Daily / ERA5T (5 days)' : 'Diaria / ERA5T (5 días)'}</span>
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
-              <strong>API Real Consultada:</strong> <code>archive-api.open-meteo.com</code> (modelo reanálisis global ECMWF ERA5 / ERA5-Land, resolución espacial 9–25 km).<br/>
-              • <strong>Frecuencia de Actualización:</strong> Serie histórica <strong>ERA5T</strong> actualizada <strong>diariamente con 5 días de latencia</strong>. Archivo consolidado ERA5 definitivo actualizado <strong>mensualmente</strong> (desfase 2 a 3 meses).<br/>
-              • <strong>Variables extraídas y conversión:</strong>
-                Radiación diaria incidente <code>shortwave_radiation_sum</code> (en MJ/m²/día, convertida a kWh/m²/día dividiendo por 3.6 y promediada a 12 meses para Gdm(0)) y temperatura a 2m <code>temperature_2m_mean</code> (°C), además de altitud (m).<br/>
-              • <em>Nota técnica:</em> Acceso abierto de alta disponibilidad sin cuotas restrictivas para modelado fotovoltaico mundial.
+              <strong>${isEn ? 'Live API Queried:' : 'API Real Consultada:'}</strong> <code>archive-api.open-meteo.com</code> ${isEn
+                ? '(ECMWF ERA5 / ERA5-Land global reanalysis, 9–25 km resolution).'
+                : '(modelo reanálisis global ECMWF ERA5 / ERA5-Land, resolución espacial 9–25 km).'}<br/>
+              • <strong>${isEn ? 'Update Frequency:' : 'Frecuencia de Actualización:'}</strong> ${isEn
+                ? '<strong>ERA5T</strong> time series updated <strong>daily with 5-day latency</strong>. Final consolidated ERA5 archive updated <strong>monthly</strong> (2-3 months lag).'
+                : 'Serie histórica <strong>ERA5T</strong> actualizada <strong>diariamente con 5 días de latencia</strong>. Archivo consolidado ERA5 definitivo actualizado <strong>mensualmente</strong> (desfase 2 a 3 meses).'}<br/>
+              • <strong>${isEn ? 'Retrieved Variables & Unit Conversion:' : 'Variables extraídas y conversión:'}</strong>
+                ${isEn
+                  ? 'Daily incident solar radiation <code>shortwave_radiation_sum</code> (in MJ/m²/day, converted to kWh/m²/day by dividing by 3.6 and averaged to 12 monthly values for Gdm(0)), 2m temperature <code>temperature_2m_mean</code> (°C), and elevation (m).'
+                  : 'Radiación diaria incidente <code>shortwave_radiation_sum</code> (en MJ/m²/día, convertida a kWh/m²/día dividiendo por 3.6 y promediada a 12 meses para Gdm(0)) y temperatura a 2m <code>temperature_2m_mean</code> (°C), además de altitud (m).'}<br/>
+              • <em>${isEn ? 'Technical Note:' : 'Nota técnica:'}</em> ${isEn
+                ? 'Open-access API with high availability and no restrictive quotas for global PV modeling.'
+                : 'Acceso abierto de alta disponibilidad sin cuotas restrictivas para modelado fotovoltaico mundial.'}
             </p>
           </div>
           <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
-            <strong>Referencias:</strong><br/>
+            <strong>${isEn ? 'References:' : 'Referencias:'}</strong><br/>
             • Hersbach, H., et al. (2020). <em>The ERA5 global reanalysis</em>. Quarterly Journal of the Royal Meteorological Society, 146(730), 1999-2049. DOI: 10.1002/qj.3803.<br/>
             • Zippenfenig, P. (2023). <em>Open-Meteo: Open-Source Weather API</em>. DOI: 10.5281/zenodo.7970649.<br/>
             • Muñoz-Sabater, J., et al. (2021). <em>ERA5-Land: a state-of-the-art global land surface dataset</em>. Earth System Science Data, 13(9), 4349-4383.
@@ -145,15 +165,17 @@ function renderAboutView(isEn: boolean): HTMLElement {
         <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
-              <strong style="color: var(--text-main); font-size: 0.9rem;">☀️ Constante Solar Gsc = 1367 W/m²</strong>
-              <span class="badge badge-success" style="font-size: 0.7rem; white-space: nowrap;">Estándar OMM / WRC</span>
+              <strong style="color: var(--text-main); font-size: 0.9rem;">☀️ ${isEn ? 'Solar Constant Gsc = 1367 W/m²' : 'Constante Solar Gsc = 1367 W/m²'}</strong>
+              <span class="badge badge-success" style="font-size: 0.7rem; white-space: nowrap;">${isEn ? 'WMO / WRC Standard' : 'Estándar OMM / WRC'}</span>
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
-              <strong>Justificación de Uso:</strong> Adoptada formalmente por el <em>World Radiation Center</em> (WRC, Davos, 1981) y la Organización Meteorológica Mundial (OMM). Es el estándar unánime de la literatura de ingeniería solar térmica y fotovoltaica (Duffie &amp; Beckman, Klein, Liu-Jordan), garantizando concordancia matemática del 100% con el código original OrientSol y la normativa CTE DB-HE4.
+              <strong>${isEn ? 'Usage Justification:' : 'Justificación de Uso:'}</strong> ${isEn
+                ? 'Formally adopted by the <em>World Radiation Center</em> (WRC, Davos, 1981) and the World Meteorological Organization (WMO). It is the unanimous benchmark in solar engineering literature (Duffie &amp; Beckman, Klein, Liu-Jordan), ensuring 100% mathematical fidelity with original OrientSol code and CTE DB-HE4 regulations.'
+                : 'Adoptada formalmente por el <em>World Radiation Center</em> (WRC, Davos, 1981) y la Organización Meteorológica Mundial (OMM). Es el estándar unánime de la literatura de ingeniería solar térmica y fotovoltaica (Duffie &amp; Beckman, Klein, Liu-Jordan), garantizando concordancia matemática del 100% con el código original OrientSol y la normativa CTE DB-HE4.'}
             </p>
           </div>
           <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
-            <strong>Referencias:</strong><br/>
+            <strong>${isEn ? 'References:' : 'Referencias:'}</strong><br/>
             • Duffie, J. A., &amp; Beckman, W. A. (2013). <em>Solar Engineering of Thermal Processes</em>. 4th Edition. John Wiley &amp; Sons. Cap. 1.2.<br/>
             • WRC / WMO (1981). <em>World Radiation Center Standard Solar Constant</em>. Commission for Instruments and Methods of Observation.<br/>
             • Klein, S. A. (1977). <em>Calculation of monthly average insolation on tilted surfaces</em>. Solar Energy, 19(4), 325-329.
@@ -165,7 +187,7 @@ function renderAboutView(isEn: boolean): HTMLElement {
   `;
 
   // Attach architecture technical details inside About view
-  const archPanel = renderArchitectureOverview();
+  const archPanel = renderArchitectureOverview(isEn);
   archPanel.style.marginTop = '1.5rem';
   container.appendChild(archPanel);
 

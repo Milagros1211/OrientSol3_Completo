@@ -430,9 +430,9 @@ export function exportOrientSolMasterExcel(
     [],
     [
       isEn ? 'OPTIMAL CAPTATION POINT' : 'PUNTO DE MÁXIMA CAPTACIÓN ABSOLUTO',
-      `Inclinación β = ${res.captureLossMap.optimalPoint.betaDeg}°`,
-      `Azimut α = ${res.captureLossMap.optimalPoint.alphaDeg}°`,
-      `Radiación Máxima = ${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} kWh/m²/d (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} kWh/m²·año)`,
+      `${isEn ? 'Tilt' : 'Inclinación'} β = ${res.captureLossMap.optimalPoint.betaDeg}°`,
+      `${isEn ? 'Azimuth' : 'Azimut'} α = ${res.captureLossMap.optimalPoint.alphaDeg}°`,
+      `${isEn ? 'Maximum Radiation' : 'Radiación Máxima'} = ${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/d'} (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} ${isEn ? 'kWh/m²·yr' : 'kWh/m²·año'})`,
     ],
     [],
     [isEn ? 'CTE DB-HE4 LIMITS & SEARCH SPACE COVERAGE' : 'EXIGENCIAS REGLAMENTARIAS CTE DB-HE4 Y COBERTURA DEL ESPACIO ANGULAR'],
@@ -444,25 +444,25 @@ export function exportOrientSolMasterExcel(
     ],
     [
       isEn ? 'General CTE Limit' : 'Límite General CTE',
-      'Pérdida ≤ 10%',
+      isEn ? 'Loss ≤ 10%' : 'Pérdida ≤ 10%',
       `${res.captureLossMap.cteZones.generalPctCompliant}%`,
       isEn ? 'COMPLIANT' : 'CONFORME (Uso General)',
     ],
     [
       isEn ? 'Superposition Limit' : 'Superposición CTE',
-      'Pérdida ≤ 20%',
+      isEn ? 'Loss ≤ 20%' : 'Pérdida ≤ 20%',
       `${res.captureLossMap.cteZones.superpositionPctCompliant}%`,
       isEn ? 'COMPLIANT' : 'CONFORME (Superposición en cubierta)',
     ],
     [
       isEn ? 'Architectural Integration Limit' : 'Integración Arquitectónica CTE',
-      'Pérdida ≤ 40%',
+      isEn ? 'Loss ≤ 40%' : 'Pérdida ≤ 40%',
       `${res.captureLossMap.cteZones.integrationPctCompliant}%`,
       isEn ? 'COMPLIANT' : 'CONFORME (Integración total en fachada/cubierta)',
     ],
     [
       isEn ? 'Non-Compliant Zone' : 'Fuera de Norma CTE',
-      'Pérdida > 40%',
+      isEn ? 'Loss > 40%' : 'Pérdida > 40%',
       `${Number((100 - res.captureLossMap.cteZones.integrationPctCompliant).toFixed(1))}%`,
       isEn ? 'NON-COMPLIANT' : 'NO CONFORME (Fuera de límites reglamentarios)',
     ],
@@ -481,7 +481,7 @@ export function exportOrientSolMasterExcel(
   const sampleAzimuths = [-90, -75, -60, -45, -30, -15, 0, 15, 30, 45, 60, 75, 90];
 
   cteSheetData.push([
-    'Inclinación β \\ Azimut α',
+    isEn ? 'Tilt β \\ Azimuth α' : 'Inclinación β \\ Azimut α',
     ...sampleAzimuths.map((az) => `${az > 0 ? '+' : ''}${az}°`),
   ]);
 
@@ -519,7 +519,7 @@ export function exportOrientSolMasterExcel(
   const anglesSheetData: (string | number)[][] = [
     ['ORIENTSOL 4.0 - ' + (isEn ? 'CONTINUOUS RADIATION CURVES (TILT ANGLES 1° TO 90°)' : 'DESARROLLO DE RADIACIÓN EN EL RANGO DE ÁNGULOS 1° A 90°')],
     [isEn ? 'Export Timestamp:' : 'Marca temporal de exportación:', formattedDateTime, '', isEn ? 'ISO Timestamp:' : 'Marca ISO:', isoTimestamp],
-    [res.locationName, `Latitud: ${res.latitude.toFixed(4)}°`, `Óptimo Anual: β = ${optAngle}°`],
+    [res.locationName, isEn ? `Latitude: ${res.latitude.toFixed(4)}°` : `Latitud: ${res.latitude.toFixed(4)}°`, isEn ? `Annual Optimum: β = ${optAngle}°` : `Óptimo Anual: β = ${optAngle}°`],
     [],
     [
       isEn ? 'Tilt Angle (°)' : 'Ángulo de Inclinación (°)',
@@ -557,6 +557,8 @@ export function exportOrientSolMasterExcel(
 
   // Download File with Full Timestamp in Filename
   const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `OrientSol4_${activeOp.toUpperCase()}_Completo_${cleanLoc}_${fileTimestamp}.xlsx`;
+  const filename = isEn
+    ? `OrientSol4_${activeOp.toUpperCase()}_Full_${cleanLoc}_${fileTimestamp}.xlsx`
+    : `OrientSol4_${activeOp.toUpperCase()}_Completo_${cleanLoc}_${fileTimestamp}.xlsx`;
   XLSX.writeFile(wb, filename);
 }

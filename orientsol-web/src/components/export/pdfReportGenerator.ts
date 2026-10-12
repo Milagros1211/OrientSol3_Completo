@@ -620,7 +620,7 @@ export async function generateOrientSolPDFReport(
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7.5);
     doc.setTextColor(2, 132, 199);
-    doc.text(`Pág. ${item.page}`, 175.2, curTocY);
+    doc.text(`${isEn ? 'p.' : 'Pág.'} ${item.page}`, 175.2, curTocY);
 
     // Register Clickable Hyperlink for entire row
     doc.link(20, curTocY - 4.5, 170, 7.5, { pageNumber: targetPage });
@@ -706,7 +706,7 @@ export async function generateOrientSolPDFReport(
   // PÁGINA 2: GRÁFICOS DE RADIACIÓN Y PRODUCCIÓN FV CON INSIGHTS (Imagen 1)
   // =========================================================================
   doc.addPage();
-  drawPageChrome('Capítulo 1. Balance Energético y Comportamiento Térmico', 2, totalPagesDyn);
+  drawPageChrome(isEn ? 'Chapter 1. Energy Yield Balance & Thermal Derating' : 'Capítulo 1. Balance Energético y Comportamiento Térmico', 2, totalPagesDyn);
 
   // Big Energy Metric Cards
   const bmY = 28;
@@ -717,10 +717,10 @@ export async function generateOrientSolPDFReport(
   doc.setTextColor(180, 83, 9);
   doc.text(isEn ? 'INCIDENT SOLAR ENERGY RECEIVED' : 'ENERGÍA SOLAR INCIDENTE RECIBIDA', 24, bmY + 6);
   doc.setFontSize(14);
-  doc.text(`${Math.round(res.energyYield.recibida.annualTotalKwh).toLocaleString()} kWh/año`, 24, bmY + 16);
+  doc.text(`${Math.round(res.energyYield.recibida.annualTotalKwh).toLocaleString()} kWh/${isEn ? 'yr' : 'año'}`, 24, bmY + 16);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
-  doc.text(`${res.energyYield.recibida.annualKwhM2.toFixed(1)} kWh/m²·año • ${res.energyYield.recibida.meanDailyKwhM2.toFixed(2)} kWh/m²/día`, 24, bmY + 23);
+  doc.text(`${res.energyYield.recibida.annualKwhM2.toFixed(1)} kWh/m²·${isEn ? 'yr' : 'año'} • ${res.energyYield.recibida.meanDailyKwhM2.toFixed(2)} kWh/m²/${isEn ? 'day' : 'día'}`, 24, bmY + 23);
 
   doc.setFillColor(209, 250, 229);
   doc.roundedRect(108, bmY, 82, 28, 2, 2, 'F');
@@ -729,10 +729,10 @@ export async function generateOrientSolPDFReport(
   doc.setTextColor(4, 120, 87);
   doc.text(isEn ? 'PRODUCED PV ENERGY (OSTERWALD)' : 'ENERGÍA FV GENERADA (OSTERWALD)', 112, bmY + 6);
   doc.setFontSize(14);
-  doc.text(`${Math.round(res.energyYield.producida.osterwald.annualKwh).toLocaleString()} kWh/año`, 112, bmY + 16);
+  doc.text(`${Math.round(res.energyYield.producida.osterwald.annualKwh).toLocaleString()} kWh/${isEn ? 'yr' : 'año'}`, 112, bmY + 16);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
-  doc.text(`Rendimiento: ${res.energyYield.producida.osterwald.specificYieldKwhKwp.toFixed(0)} kWh/kWp • Simplif: ${Math.round(res.energyYield.producida.simplified.annualKwh).toLocaleString()} kWh`, 112, bmY + 23);
+  doc.text(`${isEn ? 'Specific Yield' : 'Rendimiento'}: ${res.energyYield.producida.osterwald.specificYieldKwhKwp.toFixed(0)} kWh/kWp • ${isEn ? 'Simplified' : 'Simplif'}: ${Math.round(res.energyYield.producida.simplified.annualKwh).toLocaleString()} kWh`, 112, bmY + 23);
 
   // -------------------------------------------------------------
   // GRÁFICO 1: RADIACIÓN SOLAR MENSUAL POR SUPERFICIE
@@ -851,14 +851,14 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(5);
   doc.setTextColor(220, 38, 38);
-  doc.text(`▲ MÁX: ${maxRadVal.toFixed(2)}`, xMax1, yMax1, { align: 'center' });
+  doc.text(`▲ ${isEn ? 'MAX' : 'MÁX'}: ${maxRadVal.toFixed(2)}`, xMax1, yMax1, { align: 'center' });
 
   const xMin1 = axisX + 2.0 + minRadIdx * stepX1 + 7.6;
   const yMin1 = baseY1 - (minRadVal / maxRadPlot) * plotH1 - 1.8;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(5);
   doc.setTextColor(2, 132, 199);
-  doc.text(`▼ MÍN: ${minRadVal.toFixed(2)}`, xMin1, yMin1, { align: 'center' });
+  doc.text(`▼ ${isEn ? 'MIN' : 'MÍN'}: ${minRadVal.toFixed(2)}`, xMin1, yMin1, { align: 'center' });
 
   // -------------------------------------------------------------
   // GRÁFICO 2: PRODUCCIÓN FV Y COMPORTAMIENTO TÉRMICO
@@ -879,15 +879,15 @@ export async function generateOrientSolPDFReport(
   doc.setFillColor(16, 185, 129);
   doc.rect(28, c2BoxY + 4, 4, 3, 'F');
   doc.setTextColor(71, 85, 105);
-  doc.text('Producción FV (kWh)', 34, c2BoxY + 7);
+  doc.text(isEn ? 'PV Yield (kWh)' : 'Producción FV (kWh)', 34, c2BoxY + 7);
 
   doc.setFillColor(220, 38, 38);
   doc.circle(85, c2BoxY + 6, 2, 'F');
-  doc.text('Temp. Célula Tc (°C)', 89, c2BoxY + 7);
+  doc.text(isEn ? 'Cell Temp Tc (°C)' : 'Temp. Célula Tc (°C)', 89, c2BoxY + 7);
 
   doc.setFillColor(2, 132, 199);
   doc.circle(135, c2BoxY + 6, 2, 'F');
-  doc.text('Temp. Ambiente (°C)', 139, c2BoxY + 7);
+  doc.text(isEn ? 'Ambient Temp (°C)' : 'Temp. Ambiente (°C)', 139, c2BoxY + 7);
 
   const pvMonthly = res.energyYield.producida.osterwald.monthlyKwh;
   const maxPvVal = Math.max(...pvMonthly);
@@ -984,14 +984,14 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(5);
   doc.setTextColor(5, 150, 105);
-  doc.text(`▲ MÁX: ${Math.round(maxPvVal)} kWh`, xPvMax, yPvMax, { align: 'center' });
+  doc.text(`▲ ${isEn ? 'MAX' : 'MÁX'}: ${Math.round(maxPvVal)} kWh`, xPvMax, yPvMax, { align: 'center' });
 
   const xPvMin = axisX + 2.0 + minPvIdx * stepX1 + 4.1;
   const yPvMin = baseY2 - (minPvVal / maxPvPlot) * plotH2 - 1.8;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(5);
   doc.setTextColor(100, 116, 139);
-  doc.text(`▼ MÍN: ${Math.round(minPvVal)} kWh`, xPvMin, yPvMin, { align: 'center' });
+  doc.text(`▼ ${isEn ? 'MIN' : 'MÍN'}: ${Math.round(minPvVal)} kWh`, xPvMin, yPvMin, { align: 'center' });
 
   // Peak Cell Temperature Callout
   const tcVals = res.temperatures.cellOperating.monthlyCellTempOptimalC;
@@ -1003,7 +1003,7 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(5);
   doc.setTextColor(220, 38, 38);
-  doc.text(`Tc MÁX: ${maxTcVal.toFixed(1)}°C`, pTcMax.x, pTcMax.y - 2.5, { align: 'center' });
+  doc.text(`Tc ${isEn ? 'MAX' : 'MÁX'}: ${maxTcVal.toFixed(1)}°C`, pTcMax.x, pTcMax.y - 2.5, { align: 'center' });
 
   // -------------------------------------------------------------
   // CAJA DE INSIGHTS RELEVANTES RESALTADOS (Imagen 1)
@@ -1011,10 +1011,15 @@ export async function generateOrientSolPDFReport(
   const ins1Y = c2BoxY + c1H + 6;
   drawInsightBox(
     isEn ? 'KEY TECHNICAL INSIGHTS: SOLAR DYNAMICS & THERMAL BEHAVIOR' : 'INSIGHTS TÉCNICOS DESTACADOS: DINÁMICA SOLAR Y COMPORTAMIENTO TÉRMICO',
-    [
-      `Variación Estacional y Nivelación: El recurso solar incidente presenta una acusada estacionalidad (pico en julio de 7.86 kWh/m²/d vs 3.43 kWh/m²/d en diciembre). La adaptación angular en otoño e invierno incrementa la captación hasta un +40% respecto a superficie horizontal, reduciendo la brecha estacional de generación eléctrica.`,
-      `Derating Térmico por Calentamiento de Célula: Durante el estío, la temperatura de célula operativa alcanza medias de ${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)}°C (pico de ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)}°C). Con γ = -0.40%/°C, las pérdidas térmicas ascienden a ${Math.round(res.energyYield.producida.osterwald.thermalLossKwh)} kWh/año (-${res.energyYield.producida.osterwald.thermalLossPct.toFixed(2)}%), haciendo que los meses primaverales (abril-mayo) presenten la mayor eficiencia neta.`,
-    ],
+    isEn
+      ? [
+          `Seasonal Variation & Leveling: Incident solar resource exhibits marked seasonality (July peak vs December low). Angular adaptation in autumn and winter boosts collection by up to +40% over a horizontal plane, bridging the seasonal electricity generation gap.`,
+          `Thermal Derating from Cell Heating: During summer, operating cell temperature reaches means of ${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)}°C (peak ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)}°C). With gamma = -0.40%/°C, thermal losses reach ${Math.round(res.energyYield.producida.osterwald.thermalLossKwh)} kWh/yr (-${res.energyYield.producida.osterwald.thermalLossPct.toFixed(2)}%), making spring months (April-May) achieve the highest net electrical efficiency.`,
+        ]
+      : [
+          `Variación Estacional y Nivelación: El recurso solar incidente presenta una acusada estacionalidad (pico en julio de 7.86 kWh/m²/d vs 3.43 kWh/m²/d en diciembre). La adaptación angular en otoño e invierno incrementa la captación hasta un +40% respecto a superficie horizontal, reduciendo la brecha estacional de generación eléctrica.`,
+          `Derating Térmico por Calentamiento de Célula: Durante el estío, la temperatura de célula operativa alcanza medias de ${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)}°C (pico de ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)}°C). Con γ = -0.40%/°C, las pérdidas térmicas ascienden a ${Math.round(res.energyYield.producida.osterwald.thermalLossKwh)} kWh/año (-${res.energyYield.producida.osterwald.thermalLossPct.toFixed(2)}%), haciendo que los meses primaverales (abril-mayo) presenten la mayor eficiencia neta.`,
+        ],
     20,
     ins1Y,
     170,
@@ -1025,7 +1030,7 @@ export async function generateOrientSolPDFReport(
   // PÁGINA 3: OPERACIÓN SELECCIONADA Y TARJETAS MENSUALES (Imagen 3)
   // =========================================================================
   doc.addPage();
-  drawPageChrome(`Capítulo 2. Estudio Solar Seleccionado: ${currentStudyName}`, 3, totalPagesDyn);
+  drawPageChrome(isEn ? `Chapter 2. Selected Solar Study: ${currentStudyName}` : `Capítulo 2. Estudio Solar Seleccionado: ${currentStudyName}`, 3, totalPagesDyn);
 
   // Operational metrics bar (Imagen 3)
   const opBarY = 28;
@@ -1150,7 +1155,7 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6);
   doc.setTextColor(100, 116, 139);
-  doc.text(`+${Math.round(activeAnnualTotalKwh - res.horizontal.annualTotalKwh)} kWh/m²·año`, op4X + 4, opBarY + 19);
+  doc.text(`+${Math.round(activeAnnualTotalKwh - res.horizontal.annualTotalKwh)} kWh/m²·${isEn ? 'yr' : 'año'}`, op4X + 4, opBarY + 19);
 
   // -------------------------------------------------------------
   // 12 TARJETAS MENSUALES DE LA OPERACIÓN (Imagen 3)
@@ -1185,9 +1190,9 @@ export async function generateOrientSolPDFReport(
         : studyType === 'seasonal'
         ? `${res.seasonal.winterTiltDeg}°`
         : studyType === 'polar'
-        ? `Seg.ψ`
+        ? (isEn ? 'Polar ψ' : 'Seg.ψ')
         : studyType === 'dual'
-        ? `2 Ejes`
+        ? (isEn ? '2-Axis' : '2 Ejes')
         : `${optAngle}°`;
 
     doc.setFontSize(8);
@@ -1226,8 +1231,8 @@ export async function generateOrientSolPDFReport(
     'Gdm(0°)',
     isEn ? 'Tilt (°)' : 'Inc (°)',
     isEn ? 'Study Gdm' : 'Gdm Est.',
-    'Tª Amb',
-    'Tª Cél.',
+    isEn ? 'Tamb (°C)' : 'Tª Amb',
+    isEn ? 'Tcell (°C)' : 'Tª Cél.',
     isEn ? 'PV Yield' : 'Prod (kWh)',
     isEn ? 'Gain vs 0°' : 'Gan. s/ 0°',
     isEn ? 'Gain vs Opt' : 'Gan. s/ Ópt',
@@ -1297,10 +1302,15 @@ export async function generateOrientSolPDFReport(
   const ins2Y = curRowY + 9;
   drawInsightBox(
     isEn ? 'KEY TECHNICAL INSIGHTS: ANGULAR OPTIMIZATION' : 'INSIGHTS TÉCNICOS DESTACADOS: OPTIMIZACIÓN ANGULAR Y TRAZABILIDAD',
-    [
-      `Adaptación Estacional del Ángulo Óptimo: La declinación solar varía entre delta = -23.45° (solsticio de invierno) y +23.45° (solsticio de verano). En invierno, el ángulo óptimo mensual calculado alcanza 58°-60° en Jaén para capturar el sol bajo, mientras que en verano se sitúa entre 0° y 4° adaptándose a la gran altura cenital solar.`,
-      `Comparativa de Ganancia frente a Fijo Anual: La optimización mensual independiente proporciona un incremento neto de energía del +${gainVsOpt.toFixed(2)}% (+${Math.max(0, Math.round(activeAnnualTotalKwh - res.optimalAnnual.annualTotalKwh))} kWh/m²·año) frente a la inclinación fija anual de ${optAngle}°, concentrándose la mayor ganancia relativa en los meses invernales.`,
-    ],
+    isEn
+      ? [
+          `Seasonal Adaptation of Optimal Tilt: Solar declination varies between delta = -23.45° (winter solstice) and +23.45° (summer solstice). In winter, optimal monthly tilt reaches 58°-60° to capture low sun, whereas in summer it lies between 0° and 4° adapting to high solar altitude.`,
+          `Gain Comparison vs Annual Fixed: Independent monthly optimization provides a net energy boost of +${gainVsOpt.toFixed(2)}% (+${Math.max(0, Math.round(activeAnnualTotalKwh - res.optimalAnnual.annualTotalKwh))} kWh/m²·yr) compared to annual fixed tilt (${optAngle}°), concentrating maximum relative gains during winter months.`,
+        ]
+      : [
+          `Adaptación Estacional del Ángulo Óptimo: La declinación solar varía entre delta = -23.45° (solsticio de invierno) y +23.45° (solsticio de verano). En invierno, el ángulo óptimo mensual calculado alcanza 58°-60° en Jaén para capturar el sol bajo, mientras que en verano se sitúa entre 0° y 4° adaptándose a la gran altura cenital solar.`,
+          `Comparativa de Ganancia frente a Fijo Anual: La optimización mensual independiente proporciona un incremento neto de energía del +${gainVsOpt.toFixed(2)}% (+${Math.max(0, Math.round(activeAnnualTotalKwh - res.optimalAnnual.annualTotalKwh))} kWh/m²·año) frente a la inclinación fija anual de ${optAngle}°, concentrándose la mayor ganancia relativa en los meses invernales.`,
+        ],
     20,
     ins2Y,
     170,
@@ -1311,7 +1321,7 @@ export async function generateOrientSolPDFReport(
   // PÁGINA 4: RANKING DE RENDIMIENTO DE LAS 8 SUPERFICIES (Imagen 2 & Imagen 5)
   // =========================================================================
   doc.addPage();
-  drawPageChrome('Capítulo 3. Comparativa y Ranking Global de Superficies', 4, totalPagesDyn);
+  drawPageChrome(isEn ? 'Chapter 3. Global Benchmark & Ranking of Surfaces' : 'Capítulo 3. Comparativa y Ranking Global de Superficies', 4, totalPagesDyn);
 
   // Ranking Bar Chart (Matching Imagen 2)
   doc.setFont('helvetica', 'bold');
@@ -1391,12 +1401,12 @@ export async function generateOrientSolPDFReport(
   const h8 = [
     isEn ? 'Topology / Surface' : 'Topología / Superficie',
     isEn ? 'Type' : 'Tipo',
-    'Rad. Media',
-    'Total Anual',
-    'Gan. Horiz',
-    'Gan. Fijo Ópt',
-    'Prod. Osterwald',
-    'Temp. Célula',
+    isEn ? 'Mean Rad.' : 'Rad. Media',
+    isEn ? 'Annual Total' : 'Total Anual',
+    isEn ? 'Gain Horiz' : 'Gan. Horiz',
+    isEn ? 'Gain Opt Fixed' : 'Gan. Fijo Ópt',
+    isEn ? 'Osterwald Prod.' : 'Prod. Osterwald',
+    isEn ? 'Cell Temp' : 'Temp. Célula',
   ];
   const x8 = [22, 65, 80, 98, 117, 135, 154, 174];
   h8.forEach((col, idx) => doc.text(col, x8[idx], t8BoxY + 4));
@@ -1439,10 +1449,15 @@ export async function generateOrientSolPDFReport(
   const ins3Y = cur8Y + 8;
   drawInsightBox(
     isEn ? 'KEY TECHNICAL INSIGHTS: SOLAR TRACKING VS FIXED TOPOLOGIES' : 'INSIGHTS TÉCNICOS DESTACADOS: SEGUIMIENTO SOLAR VS SUPERFICIES FIJAS',
-    [
-      `Rendimiento del Seguimiento Polar a 1 Eje: El seguimiento polar alcanza 2379 kWh/m²·año (+39.20% sobre horizontal), lo que equivale al 97.4% de la energía captada por el seguidor a dos ejes (2442 kWh/m²·año). Debido a su menor coste electromecánico y menor número de accionamientos móviles, representa la solución óptima en rentabilidad técnico-económica.`,
-      `Comparativa de Inversión en Superficies Fijas: La inclinación fija estacional con 4 ajustes manuales (+13.44%) incrementa sustancialmente la captación respecto a la fija anual (+9.16%). Los 12 ajustes mensuales solo suman un modesto +1.26% adicional, por lo que operacionalmente 4 ajustes al año maximizan la relación beneficio/mantenimiento.`,
-    ],
+    isEn
+      ? [
+          `1-Axis Polar Tracking Performance: Polar tracking achieves 2379 kWh/m²·yr (+39.20% over horizontal), representing 97.4% of the energy collected by dual-axis tracking (2442 kWh/m²·yr). Given its lower electromechanical cost and fewer moving parts, it delivers the optimal techno-economic return.`,
+          `Investment Comparison on Fixed Structures: Seasonal tilt with 4 manual adjustments (+13.44%) substantially increases capture compared to annual fixed (+9.16%). 12 monthly adjustments only add a modest +1.26% extra, making 4 adjustments per year the ideal operational balance between maintenance effort and energy gain.`,
+        ]
+      : [
+          `Rendimiento del Seguimiento Polar a 1 Eje: El seguimiento polar alcanza 2379 kWh/m²·año (+39.20% sobre horizontal), lo que equivale al 97.4% de la energía captada por el seguidor a dos ejes (2442 kWh/m²·año). Debido a su menor coste electromecánico y menor número de accionamientos móviles, representa la solución óptima en rentabilidad técnico-económica.`,
+          `Comparativa de Inversión en Superficies Fijas: La inclinación fija estacional con 4 ajustes manuales (+13.44%) incrementa sustancialmente la captación respecto a la fija anual (+9.16%). Los 12 ajustes mensuales solo suman un modesto +1.26% adicional, por lo que operacionalmente 4 ajustes al año maximizan la relación beneficio/mantenimiento.`,
+        ],
     20,
     ins3Y,
     170,
@@ -1453,7 +1468,7 @@ export async function generateOrientSolPDFReport(
   // PÁGINA 5: MAPA DE PÉRDIDAS DE CAPTACIÓN CTE DB-HE4 (Imagen 4)
   // =========================================================================
   doc.addPage();
-  drawPageChrome('Capítulo 4. Pérdidas de Captación CTE DB-HE4', 5, totalPagesDyn);
+  drawPageChrome(isEn ? 'Chapter 4. CTE DB-HE4 Captation Losses' : 'Capítulo 4. Pérdidas de Captación CTE DB-HE4', 5, totalPagesDyn);
 
   // Optimal Point Card
   const cteTopY = 28;
@@ -1464,7 +1479,9 @@ export async function generateOrientSolPDFReport(
   doc.setFontSize(8.5);
   doc.setTextColor(4, 120, 87);
   doc.text(
-    `Óptimo Absoluto de Captación (CTE DB-HE4): Inclinación: ${res.captureLossMap.optimalPoint.betaDeg}°, Orientación: ${res.captureLossMap.optimalPoint.alphaDeg}° | ${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} kWh/m²/día (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} kWh/m²·año)`,
+    isEn
+      ? `Absolute Capture Optimum (CTE DB-HE4): Tilt: ${res.captureLossMap.optimalPoint.betaDeg}°, Azimuth: ${res.captureLossMap.optimalPoint.alphaDeg}° | ${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} kWh/m²/day (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} kWh/m²·yr)`
+      : `Óptimo Absoluto de Captación (CTE DB-HE4): Inclinación: ${res.captureLossMap.optimalPoint.betaDeg}°, Orientación: ${res.captureLossMap.optimalPoint.alphaDeg}° | ${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} kWh/m²/día (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} kWh/m²·año)`,
     24,
     cteTopY + 8.5
   );
@@ -1481,14 +1498,14 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(6.5);
   doc.setTextColor(22, 101, 52);
-  doc.text('LÍMITE GENERAL CTE', 24, lCardY + 5.5);
-  doc.text('(Pérdida <= 10%)', 24, lCardY + 9.5);
+  doc.text(isEn ? 'CTE GENERAL LIMIT' : 'LÍMITE GENERAL CTE', 24, lCardY + 5.5);
+  doc.text(isEn ? '(Loss <= 10%)' : '(Pérdida <= 10%)', 24, lCardY + 9.5);
   doc.setFontSize(11);
   doc.text(`${res.captureLossMap.cteZones.generalPctCompliant}%`, 24, lCardY + 16.5);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(5.5);
   doc.setTextColor(100, 116, 139);
-  doc.text('del espacio angular', 24, lCardY + 20);
+  doc.text(isEn ? 'of angular space' : 'del espacio angular', 24, lCardY + 20);
 
   // 2: Superposición (<= 20%)
   const l2X = 20 + lCardW + cardGap;
@@ -1498,14 +1515,14 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(6.5);
   doc.setTextColor(133, 77, 14);
-  doc.text('SUPERPOSICIÓN CTE', l2X + 4, lCardY + 5.5);
-  doc.text('(Pérdida <= 20%)', l2X + 4, lCardY + 9.5);
+  doc.text(isEn ? 'CTE SUPERPOSITION' : 'SUPERPOSICIÓN CTE', l2X + 4, lCardY + 5.5);
+  doc.text(isEn ? '(Loss <= 20%)' : '(Pérdida <= 20%)', l2X + 4, lCardY + 9.5);
   doc.setFontSize(11);
   doc.text(`${res.captureLossMap.cteZones.superpositionPctCompliant}%`, l2X + 4, lCardY + 16.5);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(5.5);
   doc.setTextColor(100, 116, 139);
-  doc.text('del espacio angular', l2X + 4, lCardY + 20);
+  doc.text(isEn ? 'of angular space' : 'del espacio angular', l2X + 4, lCardY + 20);
 
   // 3: Integración (<= 40%)
   const l3X = l2X + lCardW + cardGap;
@@ -1515,14 +1532,14 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(6.5);
   doc.setTextColor(154, 52, 18);
-  doc.text('INTEGRACIÓN ARQUITECT.', l3X + 4, lCardY + 5.5);
-  doc.text('(Pérdida <= 40%)', l3X + 4, lCardY + 9.5);
+  doc.text(isEn ? 'ARCH. INTEGRATION' : 'INTEGRACIÓN ARQUITECT.', l3X + 4, lCardY + 5.5);
+  doc.text(isEn ? '(Loss <= 40%)' : '(Pérdida <= 40%)', l3X + 4, lCardY + 9.5);
   doc.setFontSize(11);
   doc.text(`${res.captureLossMap.cteZones.integrationPctCompliant}%`, l3X + 4, lCardY + 16.5);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(5.5);
   doc.setTextColor(100, 116, 139);
-  doc.text('del espacio angular', l3X + 4, lCardY + 20);
+  doc.text(isEn ? 'of angular space' : 'del espacio angular', l3X + 4, lCardY + 20);
 
   // 4: Fuera de norma (> 40%)
   const l4X = l3X + lCardW + cardGap;
@@ -1532,15 +1549,15 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(6.5);
   doc.setTextColor(153, 27, 27);
-  doc.text('FUERA DE NORMA', l4X + 4, lCardY + 5.5);
-  doc.text('(Pérdida > 40%)', l4X + 4, lCardY + 9.5);
+  doc.text(isEn ? 'NON-COMPLIANT' : 'FUERA DE NORMA', l4X + 4, lCardY + 5.5);
+  doc.text(isEn ? '(Loss > 40%)' : '(Pérdida > 40%)', l4X + 4, lCardY + 9.5);
   doc.setFontSize(11);
   const outOfNorm = (100 - res.captureLossMap.cteZones.integrationPctCompliant).toFixed(1);
   doc.text(`${outOfNorm}%`, l4X + 4, lCardY + 16.5);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(5.5);
   doc.setTextColor(100, 116, 139);
-  doc.text('fuera de norma CTE', l4X + 4, lCardY + 20);
+  doc.text(isEn ? 'outside CTE limits' : 'fuera de norma CTE', l4X + 4, lCardY + 20);
 
   // Diagram of Capture Loss Map (positioned directly below CTE zone cards)
   const mapY = lCardY + lCardH + 6;
@@ -1602,27 +1619,32 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(6.5);
   doc.setTextColor(15, 23, 42);
-  doc.text(`* OPTIMO: Inc = ${optAngle}°, Ori = 0° (0% perdida)`, optXMap + 3, optYMap - 2.5);
+  doc.text(`* ${isEn ? 'OPTIMUM: Tilt' : 'OPTIMO: Inc'} = ${optAngle}°, ${isEn ? 'Azimuth' : 'Ori'} = 0° (0% ${isEn ? 'loss' : 'perdida'})`, optXMap + 3, optYMap - 2.5);
 
   // Axis Labels
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6);
   doc.setTextColor(100, 116, 139);
-  doc.text('-90° (Este)', 24, mapBoxY + mapH - 2);
-  doc.text('0° (Sur)', optXMap - 4, mapBoxY + mapH - 2);
-  doc.text('+90° (Oeste)', 166, mapBoxY + mapH - 2);
+  doc.text(isEn ? '-90° (East)' : '-90° (Este)', 24, mapBoxY + mapH - 2);
+  doc.text(isEn ? '0° (South)' : '0° (Sur)', optXMap - 4, mapBoxY + mapH - 2);
+  doc.text(isEn ? '+90° (West)' : '+90° (Oeste)', 166, mapBoxY + mapH - 2);
 
-  doc.text('90° (Vertical)', 23, mapBoxY + 6);
-  doc.text('0° (Horizontal)', 23, mapBoxY + mapH - 7);
+  doc.text(isEn ? '90° (Vertical)' : '90° (Vertical)', 23, mapBoxY + 6);
+  doc.text(isEn ? '0° (Horizontal)' : '0° (Horizontal)', 23, mapBoxY + mapH - 7);
 
   // Insights box on CTE
   const ins4Y = mapBoxY + mapH + 6;
   drawInsightBox(
     isEn ? 'KEY TECHNICAL INSIGHTS: CTE DB-HE4 REGULATORY COMPLIANCE' : 'INSIGHTS TÉCNICOS DESTACADOS: CUMPLIMIENTO REGLAMENTARIO CTE DB-HE4',
-    [
-      `Tolerancia de Integración Arquitectónica: Para instalaciones en cubiertas y fachadas existentes, el DB-HE4 admite hasta un 20% (superposición) y 40% (integración arquitectónica) de pérdidas. Esto permite desviar los captadores hasta +/-60° azimutales respecto al sur con una penalización admisible dentro de los estándares legales españoles.`,
-      `Ventana de Inclinación para Límite General (Pérdida <= 10%): El diseño óptimo para grandes generadores o instalaciones en suelo queda circunscrito al elipsoide verde (Inclinación entre 18° y 48°, Orientación entre -25° y +25°), asegurando captar más del 90% del recurso solar potencial disponible.`,
-    ],
+    isEn
+      ? [
+          `Architectural Integration Tolerance: For rooftop and facade installations, DB-HE4 allows up to 20% (superposition) and 40% (architectural integration) capture losses. This permits orienting collectors up to +/-60° azimuth from south within Spanish regulatory limits.`,
+          `Optimal Design Window for General Limit (Loss <= 10%): The optimal window for utility-scale ground or flat-roof arrays corresponds to the green domain (Tilt between 18° and 48°, Azimuth between -25° and +25°), securing over 90% of maximum potential solar yield.`,
+        ]
+      : [
+          `Tolerancia de Integración Arquitectónica: Para instalaciones en cubiertas y fachadas existentes, el DB-HE4 admite hasta un 20% (superposición) y 40% (integración arquitectónica) de pérdidas. Esto permite desviar los captadores hasta +/-60° azimutales respecto al sur con una penalización admisible dentro de los estándares legales españoles.`,
+          `Ventana de Inclinación para Límite General (Pérdida <= 10%): El diseño óptimo para grandes generadores o instalaciones en suelo queda circunscrito al elipsoide verde (Inclinación entre 18° y 48°, Orientación entre -25° y +25°), asegurando captar más del 90% del recurso solar potencial disponible.`,
+        ],
     20,
     ins4Y,
     170,
@@ -1653,7 +1675,7 @@ export async function generateOrientSolPDFReport(
     doc.setFontSize(6.5);
     doc.setTextColor(4, 120, 87);
     doc.text(
-      sanitizePdfText(`Optimo: Inc = ${m.betaDeg.toFixed(0)}°, Ori = ${m.alphaDeg.toFixed(0)}° | ${m.maxDaily.toFixed(2)} kWh/m²/d`),
+      sanitizePdfText(`${isEn ? 'Optimum: Tilt' : 'Optimo: Inc'} = ${m.betaDeg.toFixed(0)}°, ${isEn ? 'Az' : 'Ori'} = ${m.alphaDeg.toFixed(0)}° | ${m.maxDaily.toFixed(2)} kWh/m²/d`),
       x + 3,
       y + 10
     );
@@ -1713,7 +1735,7 @@ export async function generateOrientSolPDFReport(
     doc.text('0°', x + 3, hy + hh);
     doc.text('-90° E', hx, hy + hh + 3);
     doc.text('0° S', hx + hw / 2, hy + hh + 3, { align: 'center' });
-    doc.text('+90° O', hx + hw, hy + hh + 3, { align: 'right' });
+    doc.text(`+90° ${isEn ? 'W' : 'O'}`, hx + hw, hy + hh + 3, { align: 'right' });
 
     // CTE compliance summary
     doc.setFont('helvetica', 'bold');
@@ -1741,8 +1763,8 @@ export async function generateOrientSolPDFReport(
       const pageNo = 6 + p;
       drawPageChrome(
         studyType === 'monthly'
-          ? `Capítulo 4. Mapas de Pérdidas Mensuales (${p + 1}/${extraMapPages})`
-          : 'Capítulo 4. Mapas de Pérdidas Estacionales',
+          ? (isEn ? `Chapter 4. Monthly Loss Maps (${p + 1}/${extraMapPages})` : `Capítulo 4. Mapas de Pérdidas Mensuales (${p + 1}/${extraMapPages})`)
+          : (isEn ? 'Chapter 4. Seasonal Loss Maps' : 'Capítulo 4. Mapas de Pérdidas Estacionales'),
         pageNo,
         totalPagesDyn
       );
@@ -1795,7 +1817,7 @@ export async function generateOrientSolPDFReport(
   // PÁGINA FINAL: CURVA DE EVOLUCIÓN CONTINUA 1° A 90° (Capítulo Radiación)
   // =========================================================================
   doc.addPage();
-  drawPageChrome('Capítulo 5. Evolución Continua de Radiación (Inclinación 1° a 90°)', chapter5Page, totalPagesDyn);
+  drawPageChrome(isEn ? 'Chapter 5. Continuous Radiation Evolution Curve (Tilt 1° to 90°)' : 'Capítulo 5. Evolución Continua de Radiación (Inclinación 1° a 90°)', chapter5Page, totalPagesDyn);
 
   // Curve 1° to 90° Chart Frame
   doc.setFont('helvetica', 'bold');
@@ -1863,7 +1885,7 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7.5);
   doc.setTextColor(220, 38, 38);
-  doc.text(`* Inclinación Óptima: Inc = ${optClamped}° (${radCurve1to90[optClamped - 1].toFixed(2)} kWh/m²/d)`, optPx - 15, optPy - 4);
+  doc.text(`* ${isEn ? 'Optimal Tilt: Tilt' : 'Inclinación Óptima: Inc'} = ${optClamped}° (${radCurve1to90[optClamped - 1].toFixed(2)} kWh/m²/d)`, optPx - 15, optPy - 4);
 
   // Axis Ticks
   doc.setFont('helvetica', 'normal');
@@ -1880,13 +1902,13 @@ export async function generateOrientSolPDFReport(
   doc.setLineWidth(1.2);
   doc.line(40, cvBoxY + 8, 48, cvBoxY + 8);
   doc.setTextColor(37, 99, 235);
-  doc.text('Curva Gdm (1°..90°)', 50, cvBoxY + 9);
+  doc.text(isEn ? 'Gdm Curve (1°..90°)' : 'Curva Gdm (1°..90°)', 50, cvBoxY + 9);
 
   doc.setDrawColor(14, 165, 233);
   doc.setLineWidth(0.8);
   doc.line(90, cvBoxY + 8, 98, cvBoxY + 8);
   doc.setTextColor(14, 165, 233);
-  doc.text(`Plano Horizontal 0° (${meanRad0.toFixed(2)})`, 100, cvBoxY + 9);
+  doc.text(`${isEn ? 'Horizontal Plane 0°' : 'Plano Horizontal 0°'} (${meanRad0.toFixed(2)})`, 100, cvBoxY + 9);
 
   doc.setDrawColor(16, 185, 129);
   doc.setLineWidth(1.0);
@@ -1908,7 +1930,13 @@ export async function generateOrientSolPDFReport(
   doc.setFontSize(6.5);
   doc.setTextColor(255, 255, 255);
 
-  const dtCols = ['Inclinación', 'Gdm Media (kWh/m²/d)', 'Irradiación Anual (kWh/m²)', 'Ganancia vs Horiz (%)', 'Pérdida vs Óptimo (%)'];
+  const dtCols = [
+    isEn ? 'Tilt Angle' : 'Inclinación',
+    isEn ? 'Mean Gdm (kWh/m²/d)' : 'Gdm Media (kWh/m²/d)',
+    isEn ? 'Annual Irrad. (kWh/m²)' : 'Irradiación Anual (kWh/m²)',
+    isEn ? 'Gain vs Horiz (%)' : 'Ganancia vs Horiz (%)',
+    isEn ? 'Loss vs Opt (%)' : 'Pérdida vs Óptimo (%)',
+  ];
   const dtX = [24, 56, 95, 133, 162];
   dtCols.forEach((col, idx) => doc.text(col, dtX[idx], dtBoxY + 4));
 
@@ -1930,7 +1958,13 @@ export async function generateOrientSolPDFReport(
     doc.setFont('helvetica', deg === optAngle ? 'bold' : 'normal');
     doc.setFontSize(6.5);
     doc.setTextColor(deg === optAngle ? 220 : 15, deg === optAngle ? 38 : 23, deg === optAngle ? 38 : 42);
-    doc.text(deg === optAngle ? `Inc = ${deg}° (ÓPTIMO)` : `Inc = ${deg}°`, dtX[0], curDtY + 3.5);
+    doc.text(
+      deg === optAngle
+        ? (isEn ? `Tilt = ${deg}° (OPTIMAL)` : `Inc = ${deg}° (ÓPTIMO)`)
+        : (isEn ? `Tilt = ${deg}°` : `Inc = ${deg}°`),
+      dtX[0],
+      curDtY + 3.5
+    );
 
     doc.setTextColor(deg === optAngle ? 220 : 30, deg === optAngle ? 38 : 41, deg === optAngle ? 38 : 59);
     doc.text(`${val.toFixed(3)} kWh/m²/d`, dtX[1], curDtY + 3.5);
@@ -1940,7 +1974,7 @@ export async function generateOrientSolPDFReport(
     doc.text(`${gainH >= 0 ? '+' : ''}${gainH.toFixed(2)}%`, dtX[3], curDtY + 3.5);
 
     doc.setTextColor(lossOpt <= 0.05 ? 16 : lossOpt <= 10 ? 234 : 220, lossOpt <= 0.05 ? 185 : lossOpt <= 10 ? 179 : 38, lossOpt <= 0.05 ? 129 : lossOpt <= 10 ? 8 : 38);
-    doc.text(lossOpt <= 0.05 ? '0.00% (Máx)' : `-${lossOpt.toFixed(2)}%`, dtX[4], curDtY + 3.5);
+    doc.text(lossOpt <= 0.05 ? (isEn ? '0.00% (Max)' : '0.00% (Máx)') : `-${lossOpt.toFixed(2)}%`, dtX[4], curDtY + 3.5);
 
     curDtY += 5.0;
   });
@@ -1949,10 +1983,15 @@ export async function generateOrientSolPDFReport(
   const ins5Y = curDtY + 6;
   drawInsightBox(
     isEn ? 'KEY TECHNICAL INSIGHTS: ANGULAR SENSITIVITY' : 'INSIGHTS TÉCNICOS DESTACADOS: SENSIBILIDAD ANGULAR Y MESETA DE TOLERANCIA',
-    [
-      `Meseta de Tolerancia Angular: La curva anual de radiación exhibe una amplia meseta convexa en torno al óptimo (Inclinación = ${optAngle}°). Inclinaciones en el rango de 20° a 40° capturan más del 98.8% del recurso máximo potencial, permitiendo una gran tolerancia constructiva para adaptarse a pendientes de tejados estándar.`,
-      `Caída Acelerada en Inclinaciones Elevadas: Para inclinaciones superiores a 60°, la captación desciende rápidamente (hasta un -28% a 90° frente a la óptima), debido a la reducción del factor de visión directa durante los meses estivales de mayor insolación.`,
-    ],
+    isEn
+      ? [
+          `Angular Tolerance Plateau: The annual radiation curve exhibits a broad convex plateau around optimum (Tilt = ${optAngle}°). Tilts between 20° and 40° capture over 98.8% of maximum potential resource, offering generous construction tolerance for standard roof pitches.`,
+          `Accelerated Drop at Steep Angles: For inclinations above 60°, radiation capture drops sharply (up to -28% at 90° compared to optimum) due to reduced direct beam projection during peak summer insolation.`,
+        ]
+      : [
+          `Meseta de Tolerancia Angular: La curva anual de radiación exhibe una amplia meseta convexa en torno al óptimo (Inclinación = ${optAngle}°). Inclinaciones en el rango de 20° a 40° capturan más del 98.8% del recurso máximo potencial, permitiendo una gran tolerancia constructiva para adaptarse a pendientes de tejados estándar.`,
+          `Caída Acelerada en Inclinaciones Elevadas: Para inclinaciones superiores a 60°, la captación desciende rápidamente (hasta un -28% a 90° frente a la óptima), debido a la reducción del factor de visión directa durante los meses estivales de mayor insolación.`,
+        ],
     20,
     ins5Y,
     170,
@@ -2107,8 +2146,20 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
   doc.setTextColor(51, 65, 85);
-  doc.text('1. Introducción ................................................................................................................... 1', 25, 57);
-  doc.text('2. Energía generada ............................................................................................................ 2', 25, 64);
+  doc.text(
+    isEn
+      ? '1. Introduction ................................................................................................................... 1'
+      : '1. Introducción ................................................................................................................... 1',
+    25,
+    57
+  );
+  doc.text(
+    isEn
+      ? '2. Generated energy ............................................................................................................ 2'
+      : '2. Energía generada ............................................................................................................ 2',
+    25,
+    64
+  );
 
   // Box 2: Lista de figuras
   doc.setFillColor(248, 250, 252);
@@ -2122,9 +2173,27 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
   doc.setTextColor(51, 65, 85);
-  doc.text('2.1. Energía media mensual sobre superficie horizontal ..................................................... 2', 25, 95);
-  doc.text('2.2. Energía media mensual para el estudio seleccionado ................................................... 3', 25, 102);
-  doc.text('2.3. Ganancias de la rad. global respecto al plano horizontal ............................................... 3', 25, 109);
+  doc.text(
+    isEn
+      ? '2.1. Mean monthly energy on horizontal surface ................................................................ 2'
+      : '2.1. Energía media mensual sobre superficie horizontal ..................................................... 2',
+    25,
+    95
+  );
+  doc.text(
+    isEn
+      ? '2.2. Mean monthly energy for selected study .................................................................... 3'
+      : '2.2. Energía media mensual para el estudio seleccionado ................................................... 3',
+    25,
+    102
+  );
+  doc.text(
+    isEn
+      ? '2.3. Global radiation gains relative to horizontal plane ................................................... 3'
+      : '2.3. Ganancias de la rad. global respecto al plano horizontal ............................................... 3',
+    25,
+    109
+  );
 
   // Caption: Figura 5.2.83
   doc.setFont('helvetica', 'italic');
@@ -2194,12 +2263,16 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setFontSize(8.5);
   doc.setTextColor(71, 85, 105);
   doc.text(
-    'Cálculo implementado según la fórmula de Osterwald: PM = PM,STC · (G/1000) · [1 + γ · (Tc - 25)]',
+    isEn
+      ? 'Calculation implemented according to Osterwald formula: PM = PM,STC · (G/1000) · [1 + γ · (Tc - 25)]'
+      : 'Cálculo implementado según la fórmula de Osterwald: PM = PM,STC · (G/1000) · [1 + γ · (Tc - 25)]',
     25,
     199
   );
   doc.text(
-    'donde la temperatura de célula viene dada por: Tc = Tamb + [(TONC - 20) / 800] · G',
+    isEn
+      ? 'where the cell temperature is given by: Tc = Tamb + [(NOCT - 20) / 800] · G'
+      : 'donde la temperatura de célula viene dada por: Tc = Tamb + [(TONC - 20) / 800] · G',
     25,
     205
   );
@@ -2306,9 +2379,13 @@ export async function generateOrientSolEnergyPDFReport(
   const insE1Y = chart1Y + 60;
   drawPdfInsightBox(
     doc,
-    'INSIGHT TÉCNICO: RECURSO HORIZONTAL Y VARIACIÓN ESTACIONAL',
+    isEn
+      ? 'TECHNICAL INSIGHT: HORIZONTAL RESOURCE & SEASONAL VARIATION'
+      : 'INSIGHT TÉCNICO: RECURSO HORIZONTAL Y VARIACIÓN ESTACIONAL',
     [
-      `Estacionalidad de Superficie Plana: La generación sobre superficie horizontal alcanza su mínimo en diciembre (${Math.round(energyData.e0_mes[11])} kWh) y su máximo en julio (${Math.round(energyData.e0_mes[6])} kWh), con un factor de variación de ${((energyData.e0_mes[6] || 1) / (energyData.e0_mes[11] || 1)).toFixed(2)}x.`,
+      isEn
+        ? `Flat Surface Seasonality: Generation on a horizontal surface reaches its minimum in December (${Math.round(energyData.e0_mes[11])} kWh) and its maximum in July (${Math.round(energyData.e0_mes[6])} kWh), with a variation ratio of ${((energyData.e0_mes[6] || 1) / (energyData.e0_mes[11] || 1)).toFixed(2)}x.`
+        : `Estacionalidad de Superficie Plana: La generación sobre superficie horizontal alcanza su mínimo en diciembre (${Math.round(energyData.e0_mes[11])} kWh) y su máximo en julio (${Math.round(energyData.e0_mes[6])} kWh), con un factor de variación de ${((energyData.e0_mes[6] || 1) / (energyData.e0_mes[11] || 1)).toFixed(2)}x.`,
     ],
     20,
     insE1Y,
@@ -2416,9 +2493,13 @@ export async function generateOrientSolEnergyPDFReport(
   const insE2Y = chart3Y + 66;
   drawPdfInsightBox(
     doc,
-    'INSIGHT TÉCNICO: APORTE NETO DE LA OPTIMIZACIÓN ENERGÉTICA',
+    isEn
+      ? 'TECHNICAL INSIGHT: NET CONTRIBUTION OF ENERGY OPTIMIZATION'
+      : 'INSIGHT TÉCNICO: APORTE NETO DE LA OPTIMIZACIÓN ENERGÉTICA',
     [
-      `Beneficio Anual Acumulado: La configuración seleccionada (${studyTitle}) genera una ganancia anual neta de +${energyData.ganancia_anual.toFixed(1)} kWh frente a superficie horizontal, concentrándose el mayor beneficio relativo en invierno al captar la radiación directa con menor ángulo de incidencia.`,
+      isEn
+        ? `Cumulative Annual Gain: The selected configuration (${studyTitle}) provides a net annual gain of +${energyData.ganancia_anual.toFixed(1)} kWh compared to a horizontal surface, concentrating the greatest relative gain during winter by intercepting beam irradiance at a lower incident angle.`
+        : `Beneficio Anual Acumulado: La configuración seleccionada (${studyTitle}) genera una ganancia anual neta de +${energyData.ganancia_anual.toFixed(1)} kWh frente a superficie horizontal, concentrándose el mayor beneficio relativo en invierno al captar la radiación directa con menor ángulo de incidencia.`,
     ],
     20,
     insE2Y,
@@ -2428,7 +2509,9 @@ export async function generateOrientSolEnergyPDFReport(
 
   // Save the Energy PDF
   const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `OrientSol4_Informe_Energia_${cleanLoc}_${fileTimestamp}.pdf`;
+  const filename = isEn
+    ? `OrientSol4_Energy_Report_${cleanLoc}_${fileTimestamp}.pdf`
+    : `OrientSol4_Informe_Energia_${cleanLoc}_${fileTimestamp}.pdf`;
   const pdfBlob = doc.output('blob');
 
   let savedDirectoryLabel = 'C:\\OrientSol3\\InformesPDF';
@@ -2439,7 +2522,7 @@ export async function generateOrientSolEnergyPDFReport(
         suggestedName: filename,
         types: [
           {
-            description: 'Documento PDF (*.pdf)',
+            description: isEn ? 'PDF Document (*.pdf)' : 'Documento PDF (*.pdf)',
             accept: { 'application/pdf': ['.pdf'] },
           },
         ],

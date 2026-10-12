@@ -5,6 +5,7 @@ import {
 } from './supabaseClient';
 import type { ClimateDataRecord } from '@/types/climate';
 import { LOCATIONS_DATABASE } from '@/database/locations';
+import { i18n } from '@/i18n';
 
 const LOCAL_STORAGE_CACHE_KEY = 'orientsol_climate_datasets_cache';
 const OFFLINE_SYNC_QUEUE_KEY = 'orientsol_supabase_offline_queue';
@@ -87,7 +88,7 @@ export function calculateStringSimilarity(str1: string, str2: string): number {
  */
 export function validateClimateRecordForSaving(
   record: Partial<ClimateDataRecord> | null | undefined,
-  isEn: boolean = false
+  isEn: boolean = i18n.getLocale() === 'en'
 ): { valid: boolean; error?: string } {
   if (!record) {
     return {
@@ -481,6 +482,7 @@ export class ClimateDatabaseService {
     target: ClimateDataRecord,
     thresholdPct: number = 90.0
   ): Promise<SimilarityResult> {
+    const isEn = i18n.getLocale() === 'en';
     const allRecords = await this.getClimateDatasets();
     let highestSim = 0;
     let bestMatch: ClimateDataRecord | undefined = undefined;
@@ -495,7 +497,9 @@ export class ClimateDatabaseService {
           duplicateReason: 'coordinates',
           similarityPct: 100,
           matchedRecord: existing,
-          message: `⚠️ No se puede registrar: Ya existe un emplazamiento registrado ("${existing.locationName}") con las mismas coordenadas geográficas (Lat: ${existing.latitude.toFixed(3)}°, Lon: ${existing.longitude.toFixed(3)}°), aunque el nombre sea diferente.`,
+          message: isEn
+            ? `⚠️ Cannot register: An emplacement ("${existing.locationName}") is already registered with the exact same geographic coordinates (Lat: ${existing.latitude.toFixed(3)}°, Lon: ${existing.longitude.toFixed(3)}°), even though the name is different.`
+            : `⚠️ No se puede registrar: Ya existe un emplazamiento registrado ("${existing.locationName}") con las mismas coordenadas geográficas (Lat: ${existing.latitude.toFixed(3)}°, Lon: ${existing.longitude.toFixed(3)}°), aunque el nombre sea diferente.`,
         };
       }
 
@@ -507,7 +511,9 @@ export class ClimateDatabaseService {
           duplicateReason: 'name',
           similarityPct: nameSim,
           matchedRecord: existing,
-          message: `⚠️ No se puede registrar: El nombre "${target.locationName}" presenta una similitud del ${nameSim}% (≥ 90%) con el emplazamiento existente "${existing.locationName}".`,
+          message: isEn
+            ? `⚠️ Cannot register: The name "${target.locationName}" has a ${nameSim}% similarity (≥ 90%) with existing emplacement "${existing.locationName}".`
+            : `⚠️ No se puede registrar: El nombre "${target.locationName}" presenta una similitud del ${nameSim}% (≥ 90%) con el emplazamiento existente "${existing.locationName}".`,
         };
       }
 
@@ -525,7 +531,9 @@ export class ClimateDatabaseService {
         duplicateReason: 'data',
         similarityPct: highestSim,
         matchedRecord: bestMatch,
-        message: `⚠️ El emplazamiento ya ha sido registrado previamente con ${highestSim}% de coincidencia en datos numéricos con "${bestMatch.locationName}".`,
+        message: isEn
+          ? `⚠️ The emplacement was already registered previously with ${highestSim}% numerical data match with "${bestMatch.locationName}".`
+          : `⚠️ El emplazamiento ya ha sido registrado previamente con ${highestSim}% de coincidencia en datos numéricos con "${bestMatch.locationName}".`,
       };
     }
 
