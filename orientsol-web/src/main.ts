@@ -118,7 +118,30 @@ function renderAboutView(isEn: boolean): HTMLElement {
           </div>
         </div>
 
-        <!-- BD 5: Constante Solar y Modelos Físicos -->
+        <!-- BD 3: Open-Meteo Historical Archive / ERA5 Reanalysis -->
+        <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
+              <strong style="color: var(--text-main); font-size: 0.9rem;">🌐 Open-Meteo / ECMWF ERA5 (Reanálisis)</strong>
+              <span class="badge badge-primary" style="font-size: 0.7rem; white-space: nowrap;">Diaria / ERA5T (5 días)</span>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
+              <strong>API Real Consultada:</strong> <code>archive-api.open-meteo.com</code> (modelo reanálisis global ECMWF ERA5 / ERA5-Land, resolución espacial 9–25 km).<br/>
+              • <strong>Frecuencia de Actualización:</strong> Serie histórica <strong>ERA5T</strong> actualizada <strong>diariamente con 5 días de latencia</strong>. Archivo consolidado ERA5 definitivo actualizado <strong>mensualmente</strong> (desfase 2 a 3 meses).<br/>
+              • <strong>Variables extraídas y conversión:</strong>
+                Radiación diaria incidente <code>shortwave_radiation_sum</code> (en MJ/m²/día, convertida a kWh/m²/día dividiendo por 3.6 y promediada a 12 meses para Gdm(0)) y temperatura a 2m <code>temperature_2m_mean</code> (°C), además de altitud (m).<br/>
+              • <em>Nota técnica:</em> Acceso abierto de alta disponibilidad sin cuotas restrictivas para modelado fotovoltaico mundial.
+            </p>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
+            <strong>Referencias:</strong><br/>
+            • Hersbach, H., et al. (2020). <em>The ERA5 global reanalysis</em>. Quarterly Journal of the Royal Meteorological Society, 146(730), 1999-2049. DOI: 10.1002/qj.3803.<br/>
+            • Zippenfenig, P. (2023). <em>Open-Meteo: Open-Source Weather API</em>. DOI: 10.5281/zenodo.7970649.<br/>
+            • Muñoz-Sabater, J., et al. (2021). <em>ERA5-Land: a state-of-the-art global land surface dataset</em>. Earth System Science Data, 13(9), 4349-4383.
+          </div>
+        </div>
+
+        <!-- BD 4: Constante Solar y Modelos Físicos -->
         <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
