@@ -30,11 +30,11 @@ export function showPdfGenerationNoticeModal(
             <path d="M19 18a5 5 0 0 1 10 0c0 3-4 4.5-4 7m0 5.5h.01" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
           </svg>
         </div>
-        <div class="matlab-dialog-msg" style="font-size: 0.92rem; line-height: 1.5; color: #f1f5f9;">
-          <p style="margin: 0 0 0.5rem; font-weight: 700;">
+        <div class="matlab-dialog-msg" style="font-size: 0.92rem; line-height: 1.5; color: var(--text-main, #0f172a);">
+          <p style="margin: 0 0 0.5rem; font-weight: 700; color: var(--text-main, #0f172a);">
             ${isEn ? 'PLEASE WAIT a few seconds while the process is being performed.' : 'ESPERE unos segundos mientras se realiza el proceso.'}
           </p>
-          <p style="margin: 0; color: #cbd5e1;">
+          <p style="margin: 0; color: var(--text-muted, #334155);">
             ${isEn
               ? 'The technical report in PDF format will now be generated with high-resolution vector charts, thermal insights, and CTE compliance metrics.'
               : 'A continuación se generará el informe técnico en formato PDF con gráficos vectoriales de alta precisión, balance energético, ranking de superficies y cumplimiento CTE DB-HE4.'}
@@ -84,7 +84,7 @@ export function showPdfGeneratedSuccessModal(
         <button type="button" class="matlab-close-btn" aria-label="Cerrar">&times;</button>
       </div>
       <div class="matlab-dialog-body" style="padding: 1.75rem 1.5rem; text-align: center;">
-        <p class="matlab-dialog-msg" style="font-size: 0.95rem; color: #f8fafc; font-weight: 600; width: 100%;">
+        <p class="matlab-dialog-msg" style="font-size: 0.95rem; color: var(--text-main, #0f172a); font-weight: 600; width: 100%;">
           ${isEn
             ? `Report successfully generated and saved to ${saveLocationText}`
             : `Informe generado y guardado en ${saveLocationText}`}

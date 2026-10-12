@@ -6515,8 +6515,22 @@ body:not(.dark) .matlab-close-btn {
   color: #64748b;
 }
 
-body:not(.dark) .matlab-dialog-msg {
-  color: #1e293b;
+body:not(.dark) .matlab-dialog-msg,
+body:not(.dark) .matlab-dialog-msg p {
+  color: #0f172a !important;
+}
+
+body:not(.dark) .matlab-dialog-msg p:last-child {
+  color: #334155 !important;
+}
+
+.dark .matlab-dialog-msg,
+.dark .matlab-dialog-msg p {
+  color: #f8fafc !important;
+}
+
+.dark .matlab-dialog-msg p:last-child {
+  color: #cbd5e1 !important;
 }
 
 body:not(.dark) .matlab-dialog-actions {

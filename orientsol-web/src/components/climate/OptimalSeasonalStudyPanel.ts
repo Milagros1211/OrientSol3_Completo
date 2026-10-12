@@ -137,7 +137,7 @@ export function showSeasonalExcelExportModal(
             <line x1="12" y1="17" x2="12.01" y2="17"></line>
           </svg>
         </div>
-        <div class="matlab-dialog-msg" style="font-size: 0.95rem; font-weight: 600; color: #f8fafc;">
+        <div class="matlab-dialog-msg" style="font-size: 0.95rem; font-weight: 600; color: var(--text-main, #0f172a);">
           ${isEn ? 'What would you like to export to an Excel file?' : '¿Qué desea exportar a un fichero Excel?'}
         </div>
       </div>
@@ -599,7 +599,7 @@ function showSuccessExportNotice(isEn: boolean) {
         <button type="button" class="matlab-close-btn" aria-label="Cerrar">&times;</button>
       </div>
       <div class="matlab-dialog-body" style="padding: 1.5rem 1.25rem; text-align: center;">
-        <p class="matlab-dialog-msg" style="font-size: 0.95rem; color: #f8fafc; font-weight: 600;">
+        <p class="matlab-dialog-msg" style="font-size: 0.95rem; color: var(--text-main, #0f172a); font-weight: 600;">
           ${
             isEn
               ? 'Data successfully exported to the desired directory'
