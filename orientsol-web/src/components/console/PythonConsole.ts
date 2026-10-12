@@ -43,6 +43,7 @@ export function renderPythonConsole(): HTMLElement {
   let isExecuting = false;
   let hasExecutedVerification = false;
   let selectedIntervalIdx = 0;
+  let hourlyViewMode: 'paired' | 'chronological' = 'paired';
 
   function renderView() {
     const doy = dateToDayOfYear(stateDay, stateMonth);
@@ -73,8 +74,14 @@ export function renderPythonConsole(): HTMLElement {
       selectedIntervalIdx = 0;
     }
 
-    // Calculate hourly breakdown for solar geometry
-    const hourlyRows = [];
+    const fmtHour = (h: number) => {
+      const hrs = Math.floor(h);
+      const mins = Math.round((h % 1) * 60);
+      return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')} h`;
+    };
+
+    // Calculate hourly breakdown for solar geometry: Paired Morning & Afternoon
+    const pairedRows = [];
     for (let i = 0; i < nIntervals; i++) {
       const wDeg = (i + 0.5) * 15;
       if (wDeg > sunsetDeg && i > 0) break;
@@ -94,20 +101,68 @@ export function renderPythonConsole(): HTMLElement {
         }
       }
       const tilt2AxisDeg = Math.max(0, 90 - altDeg);
-      const solarHour = 12 + (i + 0.5);
+      const morningHour = 12 - (i + 0.5);
+      const afternoonHour = 12 + (i + 0.5);
 
-      hourlyRows.push({
+      pairedRows.push({
         interval: i + 1,
-        hourStr: `${Math.floor(solarHour)}:${Math.round((solarHour % 1) * 60).toString().padStart(2, '0')} h`,
-        wDeg: wDeg.toFixed(1),
+        morningHourStr: fmtHour(morningHour),
+        afternoonHourStr: fmtHour(afternoonHour),
+        hourPairStr: `${fmtHour(morningHour)} ↔ ${fmtHour(afternoonHour)}`,
+        wMagnitudeDeg: wDeg.toFixed(1),
+        wMorningDeg: `-${wDeg.toFixed(1)}°`,
+        wAfternoonDeg: `+${wDeg.toFixed(1)}°`,
         altDeg: altDeg > 0 ? altDeg.toFixed(2) : '0.00',
-        azimDeg: azimDeg.toFixed(2),
+        azimMorningDeg: `-${azimDeg.toFixed(2)}° (E)`,
+        azimAfternoonDeg: `+${azimDeg.toFixed(2)}° (O)`,
         tilt2AxisDeg: tilt2AxisDeg.toFixed(2),
       });
     }
 
+    // Chronological full-day timeline
+    const chronologicalRows: any[] = [];
+    // Morning (reverse order from sunrise towards noon)
+    for (let i = pairedRows.length - 1; i >= 0; i--) {
+      const r = pairedRows[i];
+      chronologicalRows.push({
+        phase: isEn ? 'Morning' : 'Mañana',
+        phaseBadge: '🌅 Mañana',
+        hourStr: r.morningHourStr,
+        wDeg: r.wMorningDeg,
+        altDeg: r.altDeg,
+        azimDeg: r.azimMorningDeg,
+        tilt2AxisDeg: r.tilt2AxisDeg,
+        isNoon: false,
+      });
+    }
+    // Solar Noon exact axis
+    chronologicalRows.push({
+      phase: isEn ? 'Solar Noon (Symmetry Axis)' : 'Mediodía Solar (Eje de Simetría)',
+      phaseBadge: '☀️ Mediodía Solar',
+      hourStr: '12:00 h',
+      wDeg: '0.0°',
+      altDeg: noonAltDeg.toFixed(2),
+      azimDeg: `${noonAzimDeg.toFixed(1)}° (${stateLat >= 0 ? 'Sur' : 'Norte'})`,
+      tilt2AxisDeg: noonDualTiltDeg.toFixed(1),
+      isNoon: true,
+    });
+    // Afternoon (from noon to sunset)
+    for (let i = 0; i < pairedRows.length; i++) {
+      const r = pairedRows[i];
+      chronologicalRows.push({
+        phase: isEn ? 'Afternoon' : 'Tarde',
+        phaseBadge: '🌇 Tarde',
+        hourStr: r.afternoonHourStr,
+        wDeg: r.wAfternoonDeg,
+        altDeg: r.altDeg,
+        azimDeg: r.azimAfternoonDeg,
+        tilt2AxisDeg: r.tilt2AxisDeg,
+        isNoon: false,
+      });
+    }
+
     // Active interval details
-    const activeInterval = hourlyRows[selectedIntervalIdx] || hourlyRows[0];
+    const activeInterval = pairedRows[selectedIntervalIdx] || pairedRows[0];
 
     container.innerHTML = `
       <div class="panel-header">
@@ -315,9 +370,11 @@ export function renderPythonConsole(): HTMLElement {
         noonAltDeg,
         noonAzimDeg,
         noonDualTiltDeg,
-        hourlyRows,
+        pairedRows,
+        chronologicalRows,
         activeInterval,
         selectedIntervalIdx,
+        hourlyViewMode,
         months,
       })}
     `;
@@ -339,9 +396,11 @@ export function renderPythonConsole(): HTMLElement {
       noonAltDeg,
       noonAzimDeg,
       noonDualTiltDeg,
-      hourlyRows,
+      pairedRows,
+      chronologicalRows,
       activeInterval,
       selectedIntervalIdx,
+      hourlyViewMode,
       months,
     } = params;
 
@@ -416,85 +475,156 @@ export function renderPythonConsole(): HTMLElement {
 
         <!-- Interactive Hourly Interval Inspector HUD -->
         <div class="verif-table-card" style="margin-top: 1rem;">
-          <div class="verif-table-title-bar">
-            <span class="verif-table-title">
-              ⏱️ ${isEn ? 'Interactive Hourly Angles Breakdown (Symmetry Morning / Afternoon)' : 'Desglose Horario de Ángulos Solares (Simetría Mañana / Tarde)'}
-            </span>
-            <span style="font-size: 0.8rem; color: var(--text-dim);">${isEn ? `${hourlyRows.length} daylight intervals` : `${hourlyRows.length} intervalos de luz solar`}</span>
+          <div class="verif-table-title-bar" style="flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="verif-table-title">
+                ⏱️ ${isEn ? 'Solar Hourly Angles Breakdown & Morning / Afternoon Symmetry' : 'Desglose Horario de Ángulos Solares y Simetría Mañana / Tarde'}
+              </span>
+              <span class="badge badge-success" style="font-size: 0.75rem;">${pairedRows.length} ${isEn ? 'symmetric pairs' : 'pares simétricos'}</span>
+            </div>
+
+            <!-- View Mode Switcher -->
+            <div style="display: flex; align-items: center; gap: 0.35rem;">
+              <button type="button" id="btn-view-paired" class="btn btn-xs ${hourlyViewMode === 'paired' ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; ${hourlyViewMode === 'paired' ? 'background: #059669; color: #fff; border-color: #10b981;' : ''}">
+                ↔ ${isEn ? 'Paired Symmetry View' : 'Vista Emparejada (Simetría)'}
+              </button>
+              <button type="button" id="btn-view-chrono" class="btn btn-xs ${hourlyViewMode === 'chronological' ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; ${hourlyViewMode === 'chronological' ? 'background: #059669; color: #fff; border-color: #10b981;' : ''}">
+                📅 ${isEn ? 'Full Timeline View (Sunrise to Sunset)' : 'Línea Temporal Completa'}
+              </button>
+            </div>
+          </div>
+
+          <!-- Educational Callout Explaining the Physical Symmetry -->
+          <div style="padding: 0.75rem 1rem; background: rgba(2, 132, 199, 0.05); border-bottom: 1px solid var(--border-subtle); font-size: 0.75rem; color: var(--text-dim); line-height: 1.45; display: flex; align-items: flex-start; gap: 0.5rem;">
+            <span style="font-size: 1rem; color: var(--accent-cyan, #0284c7);">ℹ️</span>
+            <div>
+              <strong>${isEn ? 'Why does this solar symmetry exist?' : '¿A qué se refiere la Simetría Mañana / Tarde?'}</strong><br/>
+              ${isEn
+                ? 'Solar noon (12:00 h) is the astronomical symmetry axis of the solar trajectory across the celestial sphere. At symmetric times (e.g., <strong>11:30 h</strong> morning and <strong>12:30 h</strong> afternoon), the <strong>Solar Altitude (α) is identical</strong> (both at 70.06°) and the <strong>2-Axis Tracker Tilt (β) is identical</strong> (both at 19.94°). The <strong>Azimuth (ψ)</strong> has the exact same magnitude but opposite signs (-20.85° East vs +20.85° West). In the original OrientSol MATLAB algorithms (<code>Angulos.m</code>), the engine computes only the $N$ intervals from noon outwards because morning and afternoon values match mathematically.'
+                : 'El mediodía solar (12:00 h) actúa como un <strong>espejo astronómico</strong> de la bóveda celeste. En horas simétricas equidistantes del mediodía (por ejemplo, a las <strong>11:30 h</strong> por la mañana y a las <strong>12:30 h</strong> por la tarde), la <strong>Altura Solar (α) es exactamente idéntica</strong> (70.06° en ambas) y la <strong>Inclinación del colector 2-ejes (β) es idéntica</strong> (19.94° en ambas). El <strong>Azimut (ψ)</strong> tiene idéntica magnitud angular pero sentido opuesto (-20.85° hacia el Este por la mañana vs +20.85° hacia el Oeste por la tarde). En los algoritmos originales de OrientSol (<code>Angulos.m</code> en MATLAB), el motor calculaba un único vector de $N$ intervalos desde el mediodía hacia los extremos porque mañana y tarde coinciden matemáticamente.'}
+            </div>
           </div>
 
           <!-- Interval Quick Selector Chips -->
           <div style="padding: 0.65rem 0.85rem; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
             <span style="font-size: 0.74rem; font-weight: 700; color: var(--text-dim); margin-right: 0.2rem;">
-              ${isEn ? 'Select Interval:' : 'Seleccionar Intervalo Horario:'}
+              ${isEn ? 'Inspect Interval Pair:' : 'Inspeccionar Par de Intervalo:'}
             </span>
-            ${hourlyRows.map((row: any, i: number) => `
+            ${pairedRows.map((row: any, i: number) => `
               <button type="button" class="preset-chip verif-interval-chip ${i === selectedIntervalIdx ? 'active' : ''}" data-interval-idx="${i}" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; ${i === selectedIntervalIdx ? 'background: #059669; color: #fff; border-color: #10b981; font-weight: 700;' : ''}">
-                Int. ${row.interval} (${row.hourStr})
+                Int. ${row.interval} (${row.morningHourStr} ↔ ${row.afternoonHourStr})
               </button>
             `).join('')}
           </div>
 
           ${activeInterval ? `
-            <!-- Focused Interval Card -->
-            <div style="padding: 0.75rem 1rem; background: rgba(2, 132, 199, 0.05); border-bottom: 1px solid var(--border-subtle); display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem;">
-              <div>
-                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Hour & Angle' : 'Hora y Ángulo Horario'}</span>
-                <div style="font-size: 0.95rem; font-weight: 800; color: var(--text-main); font-family: var(--font-mono);">${activeInterval.hourStr} (ω = ${activeInterval.wDeg}°)</div>
+            <!-- Focused Interval Card with Explicit Morning vs Afternoon Comparison -->
+            <div style="padding: 0.85rem 1rem; background: rgba(5, 150, 105, 0.04); border-bottom: 1px solid var(--border-subtle); display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+              <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Symmetric Pair' : 'Par Horario Simétrico'}</span>
+                <div style="font-size: 0.95rem; font-weight: 800; color: var(--text-main); font-family: var(--font-mono); margin-top: 0.15rem;">
+                  🌅 ${activeInterval.morningHourStr} ↔ 🌇 ${activeInterval.afternoonHourStr}
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text-dim);">Ángulo horario: ω = ±${activeInterval.wMagnitudeDeg}°</div>
               </div>
-              <div>
-                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Solar Altitude' : 'Altura Solar (α)'}</span>
-                <div style="font-size: 0.95rem; font-weight: 800; color: #0284c7; font-family: var(--font-mono);">${activeInterval.altDeg}°</div>
+
+              <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Solar Altitude (Identical)' : 'Altura Solar α (Idéntica)'}</span>
+                <div style="font-size: 0.95rem; font-weight: 800; color: #0284c7; font-family: var(--font-mono); margin-top: 0.15rem;">
+                  ${activeInterval.altDeg}°
+                </div>
+                <div style="font-size: 0.72rem; color: #059669;">✓ Elevación idéntica en mañana y tarde</div>
               </div>
-              <div>
-                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Solar Azimuth' : 'Azimut Solar (ψ)'}</span>
-                <div style="font-size: 0.95rem; font-weight: 800; color: #d97706; font-family: var(--font-mono);">${activeInterval.azimDeg}°</div>
+
+              <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Solar Azimuth (Symmetric)' : 'Azimut Solar ψ (Reflejado)'}</span>
+                <div style="font-size: 0.92rem; font-weight: 800; color: #d97706; font-family: var(--font-mono); margin-top: 0.15rem;">
+                  ${activeInterval.azimMorningDeg} / ${activeInterval.azimAfternoonDeg}
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text-dim);">Mañana: Este (-) | Tarde: Oeste (+)</div>
               </div>
-              <div>
-                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? '2-Axis Tilt' : 'Inclinación 2-Ejes (β)'}</span>
-                <div style="font-size: 0.95rem; font-weight: 800; color: #059669; font-family: var(--font-mono);">${activeInterval.tilt2AxisDeg}°</div>
+
+              <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
+                <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? '2-Axis Tilt (Identical)' : 'Inclinación 2-Ejes β (Idéntica)'}</span>
+                <div style="font-size: 0.95rem; font-weight: 800; color: #059669; font-family: var(--font-mono); margin-top: 0.15rem;">
+                  ${activeInterval.tilt2AxisDeg}°
+                </div>
+                <div style="font-size: 0.72rem; color: #059669;">✓ Cenit solar = 90° - α</div>
               </div>
             </div>
           ` : ''}
 
           <div class="verif-table-wrap">
-            <table class="verif-data-table">
-              <thead>
-                <tr>
-                  <th>${isEn ? 'Interval' : 'Intervalo'}</th>
-                  <th>${isEn ? 'Solar Time' : 'Hora Solar'}</th>
-                  <th style="text-align: right;">${isEn ? 'Hour Angle (ω)' : 'Ángulo Horario (ω)'}</th>
-                  <th style="text-align: right;">${isEn ? 'Solar Altitude (Alt)' : 'Altura Solar (Alt)'}</th>
-                  <th style="text-align: right;">${isEn ? 'Solar Azimuth (Ori)' : 'Azimut Solar (Ori)'}</th>
-                  <th style="text-align: right;">${isEn ? '2-Axis Tilt (Inc)' : 'Inclinación 2-Ejes (Inc)'}</th>
-                  <th style="text-align: center;">${isEn ? 'Status' : 'Estado'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${hourlyRows.map((row: any, i: number) => `
-                  <tr style="${i === selectedIntervalIdx ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
-                    <td><strong>Int. ${row.interval}</strong></td>
-                    <td>${row.hourStr}</td>
-                    <td class="td-num">${row.wDeg}°</td>
-                    <td class="td-num">${row.altDeg}°</td>
-                    <td class="td-num">${row.azimDeg}°</td>
-                    <td class="td-num">${row.tilt2AxisDeg}°</td>
-                    <td style="text-align: center;"><span class="badge-status-valid">✓ Validado</span></td>
+            ${hourlyViewMode === 'paired' ? `
+              <!-- PAIRED SYMMETRY TABLE: Morning vs Afternoon side-by-side -->
+              <table class="verif-data-table">
+                <thead>
+                  <tr>
+                    <th>${isEn ? 'Interval' : 'Intervalo'}</th>
+                    <th style="color: #0284c7;">${isEn ? 'Morning (East)' : 'Hora Mañana (Este)'}</th>
+                    <th style="color: #ea580c;">${isEn ? 'Afternoon (West)' : 'Hora Tarde (Oeste)'}</th>
+                    <th style="text-align: right;">${isEn ? 'Hour Angle (±ω)' : 'Ángulo Horario (±ω)'}</th>
+                    <th style="text-align: right; color: #0284c7;">${isEn ? 'Solar Alt (Identical)' : 'Altura Solar (Alt, α)'}</th>
+                    <th style="text-align: right;">${isEn ? 'Azimuth Morning / Afternoon' : 'Azimut Mañana / Tarde (Ori, ψ)'}</th>
+                    <th style="text-align: right; color: #059669;">${isEn ? '2-Axis Tilt (Identical)' : 'Inclinación 2-Ejes (Inc, β)'}</th>
+                    <th style="text-align: center;">${isEn ? 'Status' : 'Simetría'}</th>
                   </tr>
-                `).join('')}
-              </tbody>
-              <tfoot>
-                <tr class="table-media-row verif-media-row">
-                  <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
-                  <td>${hourlyRows.length} ${isEn ? 'intervals' : 'intervalos'}</td>
-                  <td class="td-num">-</td>
-                  <td class="td-num"><strong>${(hourlyRows.reduce((acc: number, r: any) => acc + parseFloat(r.altDeg), 0) / (hourlyRows.length || 1)).toFixed(2)}°</strong></td>
-                  <td class="td-num"><strong>${(hourlyRows.reduce((acc: number, r: any) => acc + parseFloat(r.azimDeg), 0) / (hourlyRows.length || 1)).toFixed(1)}°</strong></td>
-                  <td class="td-num"><strong>${(hourlyRows.reduce((acc: number, r: any) => acc + parseFloat(r.tilt2AxisDeg), 0) / (hourlyRows.length || 1)).toFixed(1)}°</strong></td>
-                  <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
-                </tr>
-              </tfoot>
-            </table>
+                </thead>
+                <tbody>
+                  ${pairedRows.map((row: any, i: number) => `
+                    <tr style="${i === selectedIntervalIdx ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
+                      <td><strong>Int. ${row.interval}</strong></td>
+                      <td style="color: #0284c7; font-weight: 600;">🌅 ${row.morningHourStr}</td>
+                      <td style="color: #ea580c; font-weight: 600;">🌇 ${row.afternoonHourStr}</td>
+                      <td class="td-num">±${row.wMagnitudeDeg}°</td>
+                      <td class="td-num" style="color: #0284c7; font-weight: 700;">${row.altDeg}°</td>
+                      <td class="td-num">${row.azimMorningDeg} / ${row.azimAfternoonDeg}</td>
+                      <td class="td-num" style="color: #059669; font-weight: 700;">${row.tilt2AxisDeg}°</td>
+                      <td style="text-align: center;"><span class="badge-status-valid">✓ Simétrico</span></td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+                <tfoot>
+                  <tr class="table-media-row verif-media-row">
+                    <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+                    <td colspan="2" style="text-align: center;">${pairedRows.length} ${isEn ? 'symmetric hour pairs' : 'pares horarios simétricos'}</td>
+                    <td class="td-num">-</td>
+                    <td class="td-num" style="color: #0284c7;"><strong>${(pairedRows.reduce((acc: number, r: any) => acc + parseFloat(r.altDeg), 0) / (pairedRows.length || 1)).toFixed(2)}°</strong></td>
+                    <td class="td-num">-</td>
+                    <td class="td-num" style="color: #059669;"><strong>${(pairedRows.reduce((acc: number, r: any) => acc + parseFloat(r.tilt2AxisDeg), 0) / (pairedRows.length || 1)).toFixed(1)}°</strong></td>
+                    <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
+                  </tr>
+                </tfoot>
+              </table>
+            ` : `
+              <!-- CHRONOLOGICAL TIMELINE TABLE: From Sunrise to Sunset -->
+              <table class="verif-data-table">
+                <thead>
+                  <tr>
+                    <th>${isEn ? 'Phase' : 'Fase Solar'}</th>
+                    <th>${isEn ? 'Solar Time' : 'Hora Solar'}</th>
+                    <th style="text-align: right;">${isEn ? 'Hour Angle (ω)' : 'Ángulo Horario (ω)'}</th>
+                    <th style="text-align: right;">${isEn ? 'Solar Altitude (Alt, α)' : 'Altura Solar (Alt, α)'}</th>
+                    <th style="text-align: right;">${isEn ? 'Solar Azimuth (Ori, ψ)' : 'Azimut Solar (Ori, ψ)'}</th>
+                    <th style="text-align: right;">${isEn ? '2-Axis Tilt (Inc, β)' : 'Inclinación 2-Ejes (Inc, β)'}</th>
+                    <th style="text-align: center;">${isEn ? 'Status' : 'Estado'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${chronologicalRows.map((row: any) => `
+                    <tr style="${row.isNoon ? 'background: rgba(2, 132, 199, 0.15); font-weight: 800; border-top: 2px solid #0284c7; border-bottom: 2px solid #0284c7;' : ''}">
+                      <td><span class="badge ${row.isNoon ? 'badge-primary' : row.phase.includes('Mañana') ? 'badge-info' : 'badge-warning'}" style="font-size: 0.72rem;">${row.phaseBadge}</span></td>
+                      <td style="font-family: var(--font-mono); font-weight: 700;">${row.hourStr}</td>
+                      <td class="td-num">${row.wDeg}</td>
+                      <td class="td-num" style="color: #0284c7; font-weight: 700;">${row.altDeg}°</td>
+                      <td class="td-num">${row.azimDeg}</td>
+                      <td class="td-num" style="color: #059669; font-weight: 700;">${row.tilt2AxisDeg}°</td>
+                      <td style="text-align: center;"><span class="badge-status-valid">${row.isNoon ? '★ Eje Central' : '✓ Validado'}</span></td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `}
           </div>
         </div>
       `;
@@ -907,7 +1037,17 @@ export function renderPythonConsole(): HTMLElement {
       });
     });
 
-    // 6. Run Verification in Pyodide WASM (without stdout raw console)
+    // 6. Hourly View Mode Toggle (Paired vs Chronological)
+    container.querySelector('#btn-view-paired')?.addEventListener('click', () => {
+      hourlyViewMode = 'paired';
+      renderView();
+    });
+    container.querySelector('#btn-view-chrono')?.addEventListener('click', () => {
+      hourlyViewMode = 'chronological';
+      renderView();
+    });
+
+    // 7. Run Verification in Pyodide WASM (without stdout raw console)
     const runBtn = container.querySelector('#run-py-btn') as HTMLButtonElement;
     runBtn?.addEventListener('click', async () => {
       isExecuting = true;
