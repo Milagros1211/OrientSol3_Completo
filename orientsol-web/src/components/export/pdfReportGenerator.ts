@@ -216,6 +216,82 @@ function drawPdfInsightBox(
 }
 
 /**
+ * Shared academic & corporate header and footer chrome across all OrientSol 4.0 PDF reports.
+ * Fully wraps chapter titles and subheaders with splitTextToSize so that no phrases are ever cut.
+ */
+export function drawOrientSolPageChrome(
+  doc: jsPDF,
+  options: {
+    chapterTitle: string;
+    subHeader: string;
+    pageNum: number;
+    totalPages: number;
+    formattedDateTime: string;
+    isoTimestamp: string;
+    isEn: boolean;
+    skipHeader?: boolean;
+  }
+): void {
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  if (!options.skipHeader) {
+    // 1. Right badge: Universidad de Jaén & Export date
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(180, 83, 9);
+    doc.text('UNIVERSIDAD DE JAEN', 190, 13, { align: 'right' });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(100, 116, 139);
+    const exportLabel = options.isEn ? 'Exported:' : 'Exportado:';
+    doc.text(`${exportLabel} ${options.formattedDateTime}`, 190, 17.5, { align: 'right' });
+
+    // 2. Left running title: wrap without cutting any phrase (max 122mm width)
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(15, 23, 42);
+    const titleLines: string[] = doc.splitTextToSize(sanitizePdfText(options.chapterTitle), 122);
+    titleLines.forEach((line, idx) => {
+      doc.text(line, 20, 11.5 + idx * 3.8);
+    });
+
+    // 3. Left running subheader: wrap without cutting any phrase
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.2);
+    doc.setTextColor(100, 116, 139);
+    const subLines: string[] = doc.splitTextToSize(sanitizePdfText(options.subHeader), 122);
+    const subStartY = 11.5 + titleLines.length * 3.8;
+    subLines.forEach((line, idx) => {
+      doc.text(line, 20, subStartY + idx * 3.2);
+    });
+
+    // 4. Divider line
+    const dividerY = Math.max(22.5, subStartY + subLines.length * 3.2 + 1.5);
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.4);
+    doc.line(20, dividerY, 190, dividerY);
+  }
+
+  // 5. Running footer on every page
+  doc.setDrawColor(226, 232, 240);
+  doc.setLineWidth(0.4);
+  doc.line(20, pageHeight - 12, 190, pageHeight - 12);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(148, 163, 184);
+  doc.text(
+    options.isEn
+      ? `OrientSol 4.0 Report • Timestamp: ${options.formattedDateTime} (${options.isoTimestamp})`
+      : `Informe Técnico OrientSol 4.0 • Timestamp: ${options.formattedDateTime} (${options.isoTimestamp})`,
+    20,
+    pageHeight - 7
+  );
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${options.pageNum} / ${options.totalPages}`, 190, pageHeight - 7, { align: 'right' });
+}
+
+/**
  * Generates the full OrientSol 4.0 Technical PDF Report strictly matching the layout,
  * operations, temperature cards, ranking of 8 topologies, CTE DB-HE4 loss map, and highlighted
  * technical insights boxes on all figures.
@@ -386,55 +462,16 @@ export async function generateOrientSolPDFReport(
 
   // Header & Footer helper
   const drawPageChrome = (chapterTitle: string, pageNum: number, totalPages: number) => {
-    // Only draw running header on pages > 1 (Page 1 has its own dedicated title banner)
-    if (pageNum > 1) {
-      // University badge text (right aligned to right margin X=190)
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8);
-      doc.setTextColor(180, 83, 9);
-      doc.text('UNIVERSIDAD DE JAEN', 190, 15, { align: 'right' });
-
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(100, 116, 139);
-      doc.setFontSize(7.5);
-      doc.text(`Exportado: ${formattedDateTime}`, 190, 20, { align: 'right' });
-
-      // Running chapter title (left aligned with max width 112mm so it strictly never collides with university badge)
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(15, 23, 42);
-      const splitTitle = doc.splitTextToSize(sanitizePdfText(chapterTitle), 112);
-      doc.text(splitTitle[0] || '', 20, 15);
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7.5);
-      doc.setTextColor(100, 116, 139);
-      const subHeader = `OrientSol 4.0 • ${cleanStudyName} • ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`;
-      const splitSub = doc.splitTextToSize(subHeader, 112);
-      doc.text(splitSub[0] || '', 20, 20);
-
-      // Divider
-      doc.setDrawColor(226, 232, 240);
-      doc.setLineWidth(0.4);
-      doc.line(20, 23, 190, 23);
-    }
-
-    // Running Footer on every page
-    doc.setDrawColor(226, 232, 240);
-    doc.setLineWidth(0.4);
-    doc.line(20, pageHeight - 12, 190, pageHeight - 12);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
-    doc.setTextColor(148, 163, 184);
-    doc.text(
-      isEn
-        ? `OrientSol 4.0 Report • Timestamp: ${formattedDateTime} (${isoTimestamp})`
-        : `Informe Técnico OrientSol 4.0 • Timestamp: ${formattedDateTime} (${isoTimestamp})`,
-      20,
-      pageHeight - 7
-    );
-    doc.setFont('helvetica', 'bold');
-    doc.text(`${pageNum} / ${totalPages}`, 190, pageHeight - 7, { align: 'right' });
+    drawOrientSolPageChrome(doc, {
+      chapterTitle,
+      subHeader: `OrientSol 4.0 • ${cleanStudyName} • ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`,
+      pageNum,
+      totalPages,
+      formattedDateTime,
+      isoTimestamp,
+      isEn,
+      skipHeader: pageNum === 1,
+    });
   };
 
   // Helper for highlighted insight boxes
@@ -457,20 +494,27 @@ export async function generateOrientSolPDFReport(
   doc.rect(0, 0, pageWidth, 42, 'F');
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(20);
+  doc.setFontSize(18);
   doc.setTextColor(248, 250, 252);
-  doc.text(`Resultados OrientSol 4.0: ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`, 20, 20);
+  const bannerTitle = isEn
+    ? `OrientSol 4.0 Results: ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`
+    : `Resultados OrientSol 4.0: ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`;
+  const bannerLines = doc.splitTextToSize(sanitizePdfText(bannerTitle), 170);
+  if (bannerLines.length > 1) {
+    doc.text(bannerLines[0], 20, 16);
+    doc.text(bannerLines[1], 20, 23);
+  } else {
+    doc.text(bannerLines[0] || '', 20, 20);
+  }
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
   doc.setTextColor(148, 163, 184);
-  doc.text(
-    isEn
-      ? `Solar Radiation & PV Simulation Report • MATLAB to Web & Desktop Migration`
-      : `Informe Técnico de Simulación Solar y Fotovoltaica • Migración MATLAB a Web & Desktop`,
-    20,
-    28
-  );
+  const subBanner = isEn
+    ? `Solar Radiation & PV Simulation Report • MATLAB to Web & Desktop Migration`
+    : `Informe Técnico de Simulación Solar y Fotovoltaica • Migración MATLAB a Web & Desktop`;
+  const subBannerLines = doc.splitTextToSize(subBanner, 170);
+  doc.text(subBannerLines[0] || '', 20, 28);
 
   // Prominent Timestamp Pill
   doc.setFillColor(30, 41, 59);
@@ -697,8 +741,8 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Study' : 'Estudio'}:`, c2LabX, paramsY + 39);
   doc.setFont('helvetica', 'normal');
-  const shortStudyName = cleanStudyName.length > 22 ? cleanStudyName.substring(0, 22) + '...' : cleanStudyName;
-  doc.text(shortStudyName, c2ValX, paramsY + 39);
+  const studyParamsLines = doc.splitTextToSize(cleanStudyName, 186 - c2ValX);
+  doc.text(studyParamsLines, c2ValX, paramsY + 39);
 
   drawPageChrome('', 1, totalPagesDyn);
 
@@ -760,11 +804,12 @@ export async function generateOrientSolPDFReport(
 
   doc.setFillColor(234, 179, 8);
   doc.circle(75, c1BoxY + 6, 2, 'F');
-  doc.text(`Fijo Óptimo (${optAngle}°)`, 79, c1BoxY + 7);
+  doc.text(isEn ? `Fixed Optimum (${optAngle}°)` : `Fijo Óptimo (${optAngle}°)`, 79, c1BoxY + 7);
 
   doc.setFillColor(16, 185, 129);
   doc.circle(125, c1BoxY + 6, 2, 'F');
-  doc.text(currentStudyName.substring(0, 30), 129, c1BoxY + 7);
+  const legLines = doc.splitTextToSize(cleanStudyName, 55);
+  doc.text(legLines, 129, c1BoxY + (legLines.length > 1 ? 5.5 : 7));
 
   // Bars for each month
   const radH = res.horizontal.gdm0;
@@ -1030,7 +1075,7 @@ export async function generateOrientSolPDFReport(
   // PÁGINA 3: OPERACIÓN SELECCIONADA Y TARJETAS MENSUALES (Imagen 3)
   // =========================================================================
   doc.addPage();
-  drawPageChrome(isEn ? `Chapter 2. Selected Solar Study: ${currentStudyName}` : `Capítulo 2. Estudio Solar Seleccionado: ${currentStudyName}`, 3, totalPagesDyn);
+  drawPageChrome(isEn ? `Chapter 2. Selected Solar Study: ${cleanStudyName}` : `Capítulo 2. Estudio Solar Seleccionado: ${cleanStudyName}`, 3, totalPagesDyn);
 
   // Operational metrics bar (Imagen 3)
   const opBarY = 28;
@@ -1067,7 +1112,7 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6);
   doc.setTextColor(100, 116, 139);
-  doc.text(`${Math.round(activeAnnualTotalKwh)} kWh/m²·año`, 24, opBarY + 19);
+  doc.text(`${Math.round(activeAnnualTotalKwh)} kWh/m²·${isEn ? 'yr' : 'año'}`, 24, opBarY + 19);
 
   // Metric 2: Inclinación Media / Rango
   const op2X = 20 + opCardW + cardGap;
@@ -1091,8 +1136,10 @@ export async function generateOrientSolPDFReport(
   doc.setTextColor(100, 116, 139);
   doc.text(
     studyType === 'monthly'
-      ? `Mín: ${Math.min(...res.monthlyOptimum12.optimalTiltsDeg)}° | Máx: ${Math.max(...res.monthlyOptimum12.optimalTiltsDeg)}°`
-      : `Óptimo fijo de diseño`,
+      ? (isEn
+          ? `Min: ${Math.min(...res.monthlyOptimum12.optimalTiltsDeg)}° | Max: ${Math.max(...res.monthlyOptimum12.optimalTiltsDeg)}°`
+          : `Mín: ${Math.min(...res.monthlyOptimum12.optimalTiltsDeg)}° | Máx: ${Math.max(...res.monthlyOptimum12.optimalTiltsDeg)}°`)
+      : (isEn ? 'Design fixed optimum' : 'Óptimo fijo de diseño'),
     op2X + 4,
     opBarY + 19
   );
@@ -1125,7 +1172,7 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6);
   doc.setTextColor(100, 116, 139);
-  doc.text(`+${Math.max(0, Math.round(activeAnnualTotalKwh - res.optimalAnnual.annualTotalKwh))} kWh/m²·año`, op3X + 4, opBarY + 19);
+  doc.text(`+${Math.max(0, Math.round(activeAnnualTotalKwh - res.optimalAnnual.annualTotalKwh))} kWh/m²·${isEn ? 'yr' : 'año'}`, op3X + 4, opBarY + 19);
 
   // Metric 4: Ganancia s/ Horizontal
   const op4X = op3X + opCardW + cardGap;
@@ -1184,13 +1231,22 @@ export async function generateOrientSolPDFReport(
     doc.text(mShort[i].toUpperCase(), mx + 2, mCardBaseY + 4.5);
 
     // Calculated Tilt / tracker indication
+    const seasonalTiltDeg =
+      i === 11 || i === 0 || i === 1
+        ? res.seasonal.winterTiltDeg
+        : i >= 2 && i <= 4
+        ? res.seasonal.springTiltDeg
+        : i >= 5 && i <= 7
+        ? res.seasonal.summerTiltDeg
+        : res.seasonal.autumnTiltDeg;
+
     const angleText =
       studyType === 'monthly'
         ? `${res.monthlyOptimum12.optimalTiltsDeg[i]}°`
         : studyType === 'seasonal'
-        ? `${res.seasonal.winterTiltDeg}°`
+        ? `${seasonalTiltDeg}°`
         : studyType === 'polar'
-        ? (isEn ? 'Polar ψ' : 'Seg.ψ')
+        ? (isEn ? 'Polar psi' : 'Seg.psi')
         : studyType === 'dual'
         ? (isEn ? '2-Axis' : '2 Ejes')
         : `${optAngle}°`;
@@ -1252,11 +1308,20 @@ export async function generateOrientSolPDFReport(
     doc.text(mFull[i], colX[0], curRowY + 3.5);
     doc.text(radH[i].toFixed(2), colX[1], curRowY + 3.5);
 
+    const seasonalTiltDeg =
+      i === 11 || i === 0 || i === 1
+        ? res.seasonal.winterTiltDeg
+        : i >= 2 && i <= 4
+        ? res.seasonal.springTiltDeg
+        : i >= 5 && i <= 7
+        ? res.seasonal.summerTiltDeg
+        : res.seasonal.autumnTiltDeg;
+
     const tiltStr =
       studyType === 'monthly'
         ? `${res.monthlyOptimum12.optimalTiltsDeg[i]}°`
         : studyType === 'seasonal'
-        ? `${i < 3 || i === 11 ? res.seasonal.winterTiltDeg : res.seasonal.summerTiltDeg}°`
+        ? `${seasonalTiltDeg}°`
         : `${optAngle}°`;
     doc.text(tiltStr, colX[2], curRowY + 3.5);
 
@@ -1308,7 +1373,7 @@ export async function generateOrientSolPDFReport(
           `Gain Comparison vs Annual Fixed: Independent monthly optimization provides a net energy boost of +${gainVsOpt.toFixed(2)}% (+${Math.max(0, Math.round(activeAnnualTotalKwh - res.optimalAnnual.annualTotalKwh))} kWh/m²·yr) compared to annual fixed tilt (${optAngle}°), concentrating maximum relative gains during winter months.`,
         ]
       : [
-          `Adaptación Estacional del Ángulo Óptimo: La declinación solar varía entre delta = -23.45° (solsticio de invierno) y +23.45° (solsticio de verano). En invierno, el ángulo óptimo mensual calculado alcanza 58°-60° en Jaén para capturar el sol bajo, mientras que en verano se sitúa entre 0° y 4° adaptándose a la gran altura cenital solar.`,
+          `Adaptación Estacional del Ángulo Óptimo: La declinación solar varía entre delta = -23.45° (solsticio de invierno) y +23.45° (solsticio de verano). En invierno, el ángulo óptimo mensual calculado alcanza 58°-60° en ${res.locationName} para capturar el sol bajo, mientras que en verano se sitúa entre 0° y 4° adaptándose a la gran altura cenital solar.`,
           `Comparativa de Ganancia frente a Fijo Anual: La optimización mensual independiente proporciona un incremento neto de energía del +${gainVsOpt.toFixed(2)}% (+${Math.max(0, Math.round(activeAnnualTotalKwh - res.optimalAnnual.annualTotalKwh))} kWh/m²·año) frente a la inclinación fija anual de ${optAngle}°, concentrándose la mayor ganancia relativa en los meses invernales.`,
         ],
     20,
@@ -1419,8 +1484,14 @@ export async function generateOrientSolPDFReport(
     }
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.5);
-    doc.setTextColor(15, 23, 42);
-    doc.text(getSurfaceDisplayName(surf, isEn).substring(0, 28), x8[0], cur8Y + 3.5);
+    const sName = getSurfaceDisplayName(surf, isEn);
+    const sLines = doc.splitTextToSize(sName, 41);
+    if (sLines.length > 1) {
+      doc.text(sLines[0], x8[0], cur8Y + 2.2);
+      doc.text(sLines[1], x8[0], cur8Y + 4.3);
+    } else {
+      doc.text(sLines[0] || '', x8[0], cur8Y + 3.5);
+    }
 
     // Type Badge text
     doc.setFont('helvetica', 'bold');
@@ -1912,9 +1983,13 @@ export async function generateOrientSolPDFReport(
 
   doc.setDrawColor(16, 185, 129);
   doc.setLineWidth(1.0);
-  doc.line(145, cvBoxY + 8, 153, cvBoxY + 8);
-  doc.setTextColor(16, 185, 129);
-  doc.text(`${cleanStudyName.substring(0, 16)} (${meanRadStudy.toFixed(2)})`, 155, cvBoxY + 9);
+  const legendStudyCurve = doc.splitTextToSize(`${cleanStudyName} (${meanRadStudy.toFixed(2)})`, 34);
+  if (legendStudyCurve.length > 1) {
+    doc.text(legendStudyCurve[0], 155, cvBoxY + 7.5);
+    doc.text(legendStudyCurve[1], 155, cvBoxY + 10.5);
+  } else {
+    doc.text(legendStudyCurve[0] || '', 155, cvBoxY + 9);
+  }
 
   // Key Tilts Discrete Table
   const dtY = cvBoxY + cvH + 6;
@@ -2002,7 +2077,9 @@ export async function generateOrientSolPDFReport(
   // SAVE / DOWNLOAD PDF WITH TIMESTAMP
   // -------------------------------------------------------------
   const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `OrientSol4_Informe_${studyType.toUpperCase()}_${cleanLoc}_${fileTimestamp}.pdf`;
+  const filename = isEn
+    ? `OrientSol4_Technical_Report_${studyType.toUpperCase()}_${cleanLoc}_${fileTimestamp}.pdf`
+    : `OrientSol4_Informe_${studyType.toUpperCase()}_${cleanLoc}_${fileTimestamp}.pdf`;
   const pdfBlob = doc.output('blob');
 
   let savedDirectoryLabel = 'C:\\OrientSol3\\InformesPDF';
@@ -2084,51 +2161,40 @@ export async function generateOrientSolEnergyPDFReport(
   const downloadDateFormatted = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
   const fileTimestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
 
-  const drawAcademicHeader = (pageNumber: number) => {
-    doc.setFont('helvetica', 'italic');
-    doc.setFontSize(8.5);
-    doc.setTextColor(100, 116, 139);
-    doc.text('Miriam Jiménez Torres', 20, 12);
-    doc.text(
-      isEn
-        ? 'Energy study and planning according to optimal module tilt.'
-        : 'Estudio y planificación energética en función de la posición óptima de los módulos.',
-      95,
-      12
-    );
-    doc.text(
-      isEn
-        ? 'Industrial Organization Engineering'
-        : 'Ingeniería de Organización Industrial',
-      20,
-      17
-    );
-    doc.text('OrientSol 4.0', 160, 17);
+  const cleanStudyTitle = sanitizePdfText(studyTitle);
 
-    doc.setDrawColor(203, 213, 225);
-    doc.setLineWidth(0.4);
-    doc.line(20, 20, 190, 20);
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
-    doc.text(`${isEn ? 'Exported at' : 'Fecha y hora de exportación'}: ${downloadDateFormatted} (Timestamp: ${now.toISOString()})`, 20, 287);
-    doc.setFontSize(9);
-    doc.text(String(pageNumber), 185, 287);
+  // Header & Footer helper using the exact same format
+  const drawPageChrome = (chapterTitle: string, pageNum: number, totalPages: number) => {
+    drawOrientSolPageChrome(doc, {
+      chapterTitle,
+      subHeader: `OrientSol 4.0 • ${cleanStudyTitle} • ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`,
+      pageNum,
+      totalPages,
+      formattedDateTime: downloadDateFormatted,
+      isoTimestamp: now.toISOString(),
+      isEn,
+      skipHeader: false,
+    });
   };
 
   // =========================================================================
   // PÁGINA 1: PORTADA & CONTENIDOS DEL INFORME (Figura 5.2.83)
   // =========================================================================
-  drawAcademicHeader(1);
+  drawPageChrome(
+    isEn
+      ? 'Chapter 1. Introduction & PV Installation Parameters'
+      : 'Capítulo 1. Introducción y Parámetros de la Instalación FV',
+    1,
+    3
+  );
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(13);
+  doc.setFontSize(11);
   doc.setTextColor(15, 23, 42);
   doc.text(
     isEn
-      ? 'Chapter 5. New software: OrientSol 4.0'
-      : 'Capítulo 5. Nuevo software: OrientSol 4.0',
+      ? 'OrientSol 4.0 • Software Implementation & Energy Study'
+      : 'OrientSol 4.0 • Implementación de Software y Estudio Energético',
     20,
     30
   );
@@ -2232,7 +2298,8 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Study' : 'Estudio'}:`, 25, 154);
   doc.setFont('helvetica', 'normal');
-  doc.text(studyTitle, 55, 154);
+  const studyTitleLines = doc.splitTextToSize(cleanStudyTitle, 52);
+  doc.text(studyTitleLines, 55, 154);
 
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Method' : 'Método'}:`, 110, 154);
@@ -2245,7 +2312,7 @@ export async function generateOrientSolEnergyPDFReport(
   doc.text(`${peakKw} kWp`, 80, 162);
 
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Temperature coefficient' : 'Coeficiente de temperatura'} (γ):`, 25, 170);
+  doc.text(`${isEn ? 'Temperature coefficient' : 'Coeficiente de temperatura'} (gamma):`, 25, 170);
   doc.setFont('helvetica', 'normal');
   doc.text(`${coefTemp} 1/°C`, 85, 170);
 
@@ -2262,26 +2329,29 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(71, 85, 105);
-  doc.text(
-    isEn
-      ? 'Calculation implemented according to Osterwald formula: PM = PM,STC · (G/1000) · [1 + γ · (Tc - 25)]'
-      : 'Cálculo implementado según la fórmula de Osterwald: PM = PM,STC · (G/1000) · [1 + γ · (Tc - 25)]',
-    25,
-    199
-  );
-  doc.text(
-    isEn
-      ? 'where the cell temperature is given by: Tc = Tamb + [(NOCT - 20) / 800] · G'
-      : 'donde la temperatura de célula viene dada por: Tc = Tamb + [(TONC - 20) / 800] · G',
-    25,
-    205
-  );
+  const formula1 = isEn
+    ? 'Calculation implemented according to Osterwald formula: PM = PM,STC · (G/1000) · [1 + gamma · (Tc - 25)]'
+    : 'Cálculo implementado según la fórmula de Osterwald: PM = PM,STC · (G/1000) · [1 + gamma · (Tc - 25)]';
+  const f1Lines = doc.splitTextToSize(sanitizePdfText(formula1), 160);
+  doc.text(f1Lines, 25, 199);
+
+  const formula2 = isEn
+    ? 'where cell temperature is given by: Tc = Tamb + [(NOCT - 20) / 800] · G'
+    : 'donde la temperatura de célula viene dada por: Tc = Tamb + [(TONC - 20) / 800] · G';
+  const f2Lines = doc.splitTextToSize(sanitizePdfText(formula2), 160);
+  doc.text(f2Lines, 25, 205);
 
   // =========================================================================
   // PÁGINA 2: ENERGÍA GENERADA & FIGURA 2.1
   // =========================================================================
   doc.addPage();
-  drawAcademicHeader(2);
+  drawPageChrome(
+    isEn
+      ? 'Chapter 2. Monthly Energy Yield & Horizontal Plane Resource'
+      : 'Capítulo 2. Energía Generada Mensual y Recurso en Superficie Horizontal',
+    2,
+    3
+  );
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
@@ -2397,7 +2467,13 @@ export async function generateOrientSolEnergyPDFReport(
   // PÁGINA 3: FIGURAS 2.2 Y 2.3 CON INSIGHTS
   // =========================================================================
   doc.addPage();
-  drawAcademicHeader(3);
+  drawPageChrome(
+    isEn
+      ? 'Chapter 3. Energy Comparison & Net Yield Optimization'
+      : 'Capítulo 3. Comparativa Energética y Ganancias Netas',
+    3,
+    3
+  );
 
   // Figura 2.2: Energía estudio seleccionado
   const chart2Y = 32;
