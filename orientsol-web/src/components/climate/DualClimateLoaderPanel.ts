@@ -9,6 +9,7 @@ import type { ClimateDataRecord } from '@/types/climate';
 import {
   climateDatabaseService,
   validateClimateRecordForSaving,
+  formatLocationWithCountry,
 } from '@/services/supabase';
 import { fetchUnifiedClimateData } from '@/services/external';
 import { i18n } from '@/i18n';
@@ -620,14 +621,12 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     const annualG = record.monthlyGdm0.reduce((a, b) => a + b, 0) / 12;
     const annualT = record.monthlyTemperature.reduce((a, b) => a + b, 0) / 12;
 
-    const countryTag = record.country && typeof record.country === 'string' && record.country.trim() && !record.locationName.includes(record.country)
-      ? ` (${record.country})`
-      : '';
+    const titleWithCountry = formatLocationWithCountry(record.locationName, record.country);
 
     activeCard.innerHTML = `
       <div class="active-record-badge-bar">
         <div class="record-title-box">
-          <h4>${record.locationName}${countryTag}</h4>
+          <h4>${titleWithCountry}</h4>
           <span class="badge badge-source">${record.source.toUpperCase()}</span>
           ${record.metadata?.pvgisEquivalent ? `<span class="badge badge-warning" title="Base satelital ERA5 (Reanálisis oficial de PVGIS)">ERA5 PVGIS</span>` : ''}
           ${record.metadata?.rawFormat ? `<span class="badge badge-neutral">${record.metadata.rawFormat}</span>` : ''}
@@ -790,10 +789,11 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     hideNotFoundBanner();
     renderActiveRecord(loc);
     const sourceTag = loc.source === 'supabase' || (Boolean(loc.id) && loc.id!.startsWith('supabase-')) ? 'SUPABASE' : 'ORIENTSOL 4.0';
+    const displayTitle = formatLocationWithCountry(loc.locationName, loc.country);
     setStatus(
       isEn
-        ? `Loaded station: ${loc.locationName} (${loc.country}) [${sourceTag}].`
-        : `Cargada estación: ${loc.locationName} (${loc.country}) [${sourceTag}].`,
+        ? `Loaded station: ${displayTitle} [${sourceTag}].`
+        : `Cargada estación: ${displayTitle} [${sourceTag}].`,
       'success'
     );
   }
@@ -838,11 +838,14 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
               const badgeClass = isSupabase ? 'badge-supabase' : 'badge-historical';
               const badgeText = isSupabase ? 'SUPABASE' : 'ORIENTSOL 4.0';
               const annualG = m.monthlyGdm0.reduce((a, b) => a + b, 0) / 12;
+              const cStr = (m.country || '').trim();
+              const hasParenCountry = /\([^)]+\)$/.test(m.locationName.trim()) || (Boolean(cStr) && m.locationName.toLowerCase().includes(cStr.toLowerCase()));
+              const countryBadge = cStr && !hasParenCountry ? `<span class="suggestion-country">(${cStr})</span>` : '';
               return `
                 <div class="suggestion-item" data-id="${m.id || m.locationName}" role="option">
                   <div class="suggestion-main">
                     <span class="suggestion-name"><strong>${m.locationName}</strong></span>
-                    <span class="suggestion-country">(${m.country})</span>
+                    ${countryBadge}
                     <span class="suggestion-pill ${badgeClass}">${badgeText}</span>
                   </div>
                   <div class="suggestion-meta">
