@@ -4,6 +4,7 @@ import { getMonthlyRadiationForAngle, type TableRadiationComponent } from '@/com
 import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslations';
 import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
 import { buildSeasonalComponentSheet } from '@/components/export/seasonalExportHelper';
+import { buildPolarComponentSheet } from '@/components/export/polarExportHelper';
 
 const MONTHS_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -165,6 +166,9 @@ export function exportOrientSolMasterExcel(
     const compType = (compName === 'beam' || compName === 'diffuse' || compName === 'albedo' ? compName : 'global') as TableRadiationComponent;
     if (activeOp === 'seasonal') {
       return buildSeasonalComponentSheet(res, compType, isEn);
+    }
+    if (activeOp === 'polar') {
+      return buildPolarComponentSheet(res, compType, isEn);
     }
     const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
