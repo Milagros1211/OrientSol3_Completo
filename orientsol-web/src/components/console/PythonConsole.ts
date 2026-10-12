@@ -207,7 +207,7 @@ export function renderPythonConsole(): HTMLElement {
                   ${isEn ? 'Python WASM Engines Verified & Synchronized' : 'Motores de Cálculo OrientSol 4.0 Validados con Éxito'}
                 </strong>
                 <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 1px;">
-                  ${isEn ? `Executed in Pyodide WebAssembly runtime in ${executionTimingMs} ms` : `Ejecutado en entorno Pyodide WebAssembly en ${executionTimingMs} ms (100.0% concordancia con el PFC)`}
+                  ${isEn ? `Executed in Pyodide WebAssembly runtime in ${executionTimingMs} ms` : `Ejecutado en entorno Pyodide WebAssembly en ${executionTimingMs} ms (100.0% concordancia matemática)`}
                 </div>
               </div>
             </div>
@@ -220,7 +220,7 @@ export function renderPythonConsole(): HTMLElement {
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.5rem; margin-top: 0.25rem;">
             <div style="background: var(--bg-card); padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle); font-size: 0.74rem;">
               <span style="color: #10b981; font-weight: 700;">✓ matriz_declinacion</span>
-              <div style="color: var(--text-dim); font-size: 0.7rem;">Ec. Cooper: Error < 0.001°</div>
+              <div style="color: var(--text-dim); font-size: 0.7rem;">${isEn ? 'Cooper Model: Error < 0.001°' : 'Modelo Cooper: Error < 0.001°'}</div>
             </div>
             <div style="background: var(--bg-card); padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle); font-size: 0.74rem;">
               <span style="color: #10b981; font-weight: 700;">✓ AngulosSalida / Angulos</span>
@@ -423,7 +423,7 @@ export function renderPythonConsole(): HTMLElement {
               <thead>
                 <tr>
                   <th>${isEn ? 'Parameter' : 'Parámetro Solar'}</th>
-                  <th>${isEn ? 'Equation / PFC Source' : 'Ecuación / Fuente PFC'}</th>
+                  <th>${isEn ? 'Equation' : 'Ecuación'}</th>
                   <th style="text-align: right;">${isEn ? 'Calculated Value' : 'Valor Calculado'}</th>
                   <th>${isEn ? 'Units' : 'Unidad'}</th>
                   <th style="text-align: center;">${isEn ? 'Status' : 'Estado'}</th>
@@ -432,42 +432,42 @@ export function renderPythonConsole(): HTMLElement {
               <tbody>
                 <tr>
                   <td><strong>${isEn ? 'Solar Declination' : 'Declinación Solar'} (δ)</strong></td>
-                  <td>Ec. Cooper: <code>23.45 · sen(2π·(n+284)/365)</code></td>
+                  <td><code>δ = 23.45 · ${isEn ? 'sin' : 'sen'}(2π · (n + 284) / 365)</code></td>
                   <td class="td-num">${decDeg > 0 ? `+${decDeg.toFixed(2)}` : decDeg.toFixed(2)}°</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Sunset Hour Angle' : 'Ángulo Horario de Salida / Puesta'} (ωs)</strong></td>
-                  <td>Ec. <code>cos(ωs) = -tan(φ) · tan(δ)</code></td>
+                  <td><code>cos(ωs) = -tan(φ) · tan(δ)</code></td>
                   <td class="td-num">${sunsetDeg.toFixed(2)}°</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Daylight Length' : 'Duración Solar del Día'} (S0)</strong></td>
-                  <td>Ec. <code>(2 · ωs) / 15°</code></td>
+                  <td><code>S0 = (2 · ωs) / 15°</code></td>
                   <td class="td-num">${dayLengthHours.toFixed(2)} h</td>
                   <td>${isEn ? 'hours' : 'horas'}</td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Solar Altitude at Noon' : 'Altura Solar al Mediodía (12:00h)'} (γs)</strong></td>
-                  <td>Ec. 4.30: <code>90° - |φ - δ|</code></td>
+                  <td><code>γs = 90° - |φ - δ|</code></td>
                   <td class="td-num">${noonAltDeg.toFixed(2)}°</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Solar Azimuth / Orientation at Noon' : 'Orientación / Azimut Solar al Mediodía (12:00h)'}</strong></td>
-                  <td>Ec. 4.31 y Pág. 220 (${stateLat >= 0 ? (isEn ? 'North = 0.0° South' : 'Norte = 0.0° Sur') : (isEn ? 'South = 180.0° North' : 'Sur = 180.0° Norte')})</td>
+                  <td><code>cos(αs) = (${isEn ? 'sin' : 'sen'}(γs) · ${isEn ? 'sin' : 'sen'}(φ) - ${isEn ? 'sin' : 'sen'}(δ)) / (cos(γs) · cos(φ))</code></td>
                   <td class="td-num">${noonAzimDeg.toFixed(1)}°</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Dual-Axis Tracker Tilt at Noon' : 'Inclinación Colector 2-Ejes al Mediodía'}</strong></td>
-                  <td>Ec. Cenital: <code>90° - γs = |φ - δ|</code></td>
+                  <td><code>θz = 90° - γs = |φ - δ|</code></td>
                   <td class="td-num">${noonDualTiltDeg.toFixed(1)}°</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
