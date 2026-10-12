@@ -1119,6 +1119,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
       cachedLastSimulationResult = result;
       cachedActiveRecord = currentActiveRecord;
+      solarSyncState.setLastSimulationResult(result);
 
       setStatus(
         isEn
