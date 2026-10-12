@@ -2990,6 +2990,56 @@ body.theme-dark .loss-map-month-dropdown {
 .cte-color-box.box-orange { background: #f97316; }
 .cte-color-box.box-red { background: #ef4444; }
 
+/* Interactive Capture Loss Map Enhancements */
+.loss-map-visual-container {
+  border-radius: var(--radius-sm);
+}
+
+.loss-map-canvas-wrapper {
+  background: #0b1329;
+  position: relative;
+  transition: border-color var(--transition-fast);
+}
+
+.loss-preset-btn {
+  transition: all var(--transition-fast);
+}
+
+.loss-preset-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.loss-inspector-hud {
+  transition: background-color var(--transition-normal);
+}
+
+[data-theme="light"] .loss-inspector-hud,
+body.theme-light .loss-inspector-hud {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+[data-theme="dark"] .loss-inspector-hud,
+body.theme-dark .loss-inspector-hud {
+  background: rgba(15, 23, 42, 0.75);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.loss-map-matrix-details {
+  transition: all var(--transition-normal);
+}
+
+.loss-map-matrix-details[open] {
+  padding-bottom: 0.75rem;
+}
+
+.loss-map-matrix-details summary:hover {
+  color: var(--text-main);
+}
+
+
 /* Global 8-Surfaces Comparison Table */
 .all-surfaces-table {
   width: 100%;
