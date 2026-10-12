@@ -5,6 +5,7 @@ import {
   type TableRadiationComponent,
 } from '@/components/climate/OptimalAnnualStudyPanel';
 import { themeManager } from '@/services/theme/themeManager';
+import { renderWrappedSvgTitle } from './chartSvgUtils';
 
 export type SeasonalGraphComponentChoice = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -284,7 +285,14 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
 
     const svgTopHtml = `
       <svg viewBox="0 0 ${plotW} ${plotH}" style="width: 100%; height: auto; background: ${plotBg}; border: 1px solid ${plotBorder}; border-radius: 4px;">
-        <text x="${plotW / 2 - 20}" y="19" fill="${titleColor}" font-size="12" font-weight="700" text-anchor="middle">${topPlotTitle}</text>
+        ${renderWrappedSvgTitle({
+          text: topPlotTitle,
+          centerX: plotW / 2 - 20,
+          startY: 19,
+          fill: titleColor,
+          fontSize: 12,
+          maxCharsPerLine: 48,
+        })}
         <text x="14" y="${plotH / 2}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle" transform="rotate(-90 14 ${plotH / 2})">${isEn ? 'Radiation' : 'Radiación'}</text>
         <text x="${pad.left + innerW / 2}" y="${plotH - 8}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle">${isEn ? 'Months' : 'Meses'}</text>
 
@@ -395,12 +403,14 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
       }
 
       bottomLegendHtml = `
-        <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 8})">
-          <rect x="0" y="0" width="84" height="48" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+        <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 4})">
+          <rect x="0" y="0" width="86" height="52" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
           <rect x="6" y="8" width="10" height="10" fill="#0284c7" stroke="#0f172a" stroke-width="0.5" />
-          <text x="22" y="17" fill="${legendText}" font-size="8.5" font-weight="600">${isEn ? 'vs 0° (Horiz)' : 'vs 0° (Plano hor.)'}</text>
-          <rect x="6" y="26" width="10" height="10" fill="#10b981" stroke="#0f172a" stroke-width="0.5" />
-          <text x="22" y="35" fill="${legendText}" font-size="8.5" font-weight="600">${isEn ? 'vs Ann. opt' : 'vs Ópt. anu'}</text>
+          <text x="20" y="13" fill="${legendText}" font-size="8" font-weight="700">vs 0°</text>
+          <text x="20" y="21" fill="${legendText}" font-size="7" font-weight="500">${isEn ? '(Horiz)' : '(Plano hor.)'}</text>
+          <rect x="6" y="29" width="10" height="10" fill="#10b981" stroke="#0f172a" stroke-width="0.5" />
+          <text x="20" y="35" fill="${legendText}" font-size="8" font-weight="700">${isEn ? 'vs Ann.' : 'vs Ópt.'}</text>
+          <text x="20" y="44" fill="${legendText}" font-size="7" font-weight="500">${isEn ? 'opt' : 'anual'}</text>
         </g>
       `;
     } else {
@@ -435,23 +445,31 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
 
       bottomLegendHtml = `
         <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 4})">
-          <rect x="0" y="0" width="84" height="96" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-          <text x="42" y="11" fill="${legendText}" font-size="8" font-weight="700" text-anchor="middle">${isEn ? 'vs 0° (Horiz)' : 'vs 0° (Plano hor.)'}</text>
-          <rect x="6" y="18" width="10" height="10" fill="#0284c7" />
-          <text x="22" y="26" fill="${legendText}" font-size="8.5" font-weight="600">Gdm (Glob)</text>
-          <rect x="6" y="36" width="10" height="10" fill="#ef4444" />
-          <text x="22" y="44" fill="${legendText}" font-size="8.5" font-weight="600">Bdm (Dir)</text>
-          <rect x="6" y="54" width="10" height="10" fill="#84cc16" />
-          <text x="22" y="62" fill="${legendText}" font-size="8.5" font-weight="600">Ddm (Dif)</text>
-          <rect x="6" y="72" width="10" height="10" fill="#f59e0b" />
-          <text x="22" y="80" fill="${legendText}" font-size="8.5" font-weight="600">Rdm (Alb)</text>
+          <rect x="0" y="0" width="86" height="98" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+          <text x="43" y="11" fill="${legendText}" font-size="8" font-weight="700" text-anchor="middle">vs 0°</text>
+          <text x="43" y="20" fill="${legendText}" font-size="7" font-weight="500" text-anchor="middle">${isEn ? '(Horiz)' : '(Plano hor.)'}</text>
+          <rect x="6" y="26" width="10" height="9" fill="#0284c7" />
+          <text x="20" y="34" fill="${legendText}" font-size="8.5" font-weight="600">Gdm (Glob)</text>
+          <rect x="6" y="42" width="10" height="9" fill="#ef4444" />
+          <text x="20" y="50" fill="${legendText}" font-size="8.5" font-weight="600">Bdm (Dir)</text>
+          <rect x="6" y="58" width="10" height="9" fill="#84cc16" />
+          <text x="20" y="66" fill="${legendText}" font-size="8.5" font-weight="600">Ddm (Dif)</text>
+          <rect x="6" y="74" width="10" height="9" fill="#f59e0b" />
+          <text x="20" y="82" fill="${legendText}" font-size="8.5" font-weight="600">Rdm (Alb)</text>
         </g>
       `;
     }
 
     const svgBottomHtml = `
       <svg viewBox="0 0 ${bottomPlotW} ${bottomPlotH}" style="width: 100%; height: auto; background: ${plotBg}; border: 1px solid ${plotBorder}; border-radius: 4px;">
-        <text x="${bottomPlotW / 2 - 20}" y="19" fill="${titleColor}" font-size="12" font-weight="700" text-anchor="middle">${bottomPlotTitle}</text>
+        ${renderWrappedSvgTitle({
+          text: bottomPlotTitle,
+          centerX: bottomPlotW / 2 - 20,
+          startY: 19,
+          fill: titleColor,
+          fontSize: 11.5,
+          maxCharsPerLine: 46,
+        })}
         <text x="14" y="${bottomPlotH / 2}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle" transform="rotate(-90 14 ${bottomPlotH / 2})">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</text>
         <text x="${bPad.left + bInnerW / 2}" y="${bottomPlotH - 8}" fill="${labelColor}" font-size="10.5" font-weight="600" text-anchor="middle">${isEn ? 'Months' : 'Meses'}</text>
 
