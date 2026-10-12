@@ -199,7 +199,7 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
                   <tr>
                     <td class="td-track-month"><strong>${mName}</strong></td>
                     <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 600; white-space: nowrap; text-align: center;">
-                      <span style="color: #fbbf24;">Inc: 0.0°</span> <span style="opacity: 0.4;">|</span> <span style="color: var(--text-muted);">Ori: 90.0°</span>
+                      <span style="color: #fbbf24;">Inc: 0.0° (mín 12h)</span> <span style="opacity: 0.4;">|</span> <span style="color: var(--text-muted);">Ori: 90.0°</span>
                     </td>
                     <td class="td-num">${radHoriz[i].toFixed(2)}</td>
                     <td class="td-num td-track-val"><strong>${radHorizTrack[i].toFixed(2)}</strong></td>
@@ -216,7 +216,7 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
                 <tr class="tracking-media-row">
                   <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
                   <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 700; white-space: nowrap; text-align: center; color: #fbbf24;">
-                    Inc: 0.0° | Ori: 90.0°
+                    Inc: 0.0° (mín 12h) | Ori: 90.0°
                   </td>
                   <td class="td-num"><strong>${meanHoriz.toFixed(2)}</strong></td>
                   <td class="td-num td-track-val"><strong>${meanHorizTrack.toFixed(2)}</strong></td>

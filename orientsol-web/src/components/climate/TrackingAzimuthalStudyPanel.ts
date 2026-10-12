@@ -204,7 +204,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
                     <tr>
                       <td class="td-track-month"><strong>${mName}</strong></td>
                       <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 600; white-space: nowrap; text-align: center;">
-                        <span style="color: #c084fc;">Inc: ${res.latitude.toFixed(1)}°</span> <span style="opacity: 0.4;">|</span> <span style="color: var(--text-muted);">Ori: ${noonAzim.toFixed(1)}°</span>
+                        <span style="color: #c084fc;">Inc: ${res.latitude.toFixed(1)}°</span> <span style="opacity: 0.4;">|</span> <span style="color: var(--text-muted);">Ori: Seg. ψs (${noonAzim.toFixed(0)}° a 12h)</span>
                       </td>
                       <td class="td-num">${g0.toFixed(2)}</td>
                       <td class="td-num td-track-val"><strong>${pVal.toFixed(2)}</strong></td>
@@ -222,7 +222,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
                 <tr class="tracking-media-row">
                   <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
                   <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 700; white-space: nowrap; text-align: center; color: #c084fc;">
-                    Inc: ${res.latitude.toFixed(1)}° | Ori: ${(months.reduce((acc, _, idx) => acc + getNoonAzimuthDeg(res.latitude, idx), 0) / 12).toFixed(1)}°
+                    Inc: ${res.latitude.toFixed(1)}° | Ori: Seg. ψs (${(months.reduce((acc, _, idx) => acc + getNoonAzimuthDeg(res.latitude, idx), 0) / 12).toFixed(0)}° a 12h)
                   </td>
                   <td class="td-num"><strong>${meanHoriz.toFixed(2)}</strong></td>
                   <td class="td-num td-track-val"><strong>${meanAzim.toFixed(2)}</strong></td>

@@ -8,7 +8,7 @@ import {
 } from '@/components/export/pdfReportGenerator';
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
-import { getDualAxisNoonTiltDeg, getNoonAzimuthDeg } from '@/services/solarGeometryAngles';
+import { getDualAxisNoonTiltDeg } from '@/services/solarGeometryAngles';
 
 export type TrackingDualComponent = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -207,12 +207,11 @@ export function renderTrackingDualAxisStudyPanel(props: TrackingDualStudyProps):
               <tbody>
                 ${months.map((mName, i) => {
                   const noonTilt = getDualAxisNoonTiltDeg(res.latitude, i);
-                  const noonAzim = getNoonAzimuthDeg(res.latitude, i);
                   return `
                   <tr>
                     <td class="td-track-month"><strong>${mName}</strong></td>
                     <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 600; white-space: nowrap; text-align: center;">
-                      <span style="color: #34d399;">Inc: ${noonTilt.toFixed(1)}°</span> <span style="opacity: 0.4;">|</span> <span style="color: #38bdf8;">Ori: ${noonAzim.toFixed(1)}°</span>
+                      <span style="color: #34d399;">Inc: ${noonTilt.toFixed(1)}° (mín)</span> <span style="opacity: 0.4;">|</span> <span style="color: #38bdf8;">Ori: Seg. ψs</span>
                     </td>
                     <td class="td-num">${radHoriz[i].toFixed(2)}</td>
                     <td class="td-num td-track-val"><strong>${radDual[i].toFixed(2)}</strong></td>
@@ -230,7 +229,7 @@ export function renderTrackingDualAxisStudyPanel(props: TrackingDualStudyProps):
                 <tr class="tracking-media-row">
                   <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
                   <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 700; white-space: nowrap; text-align: center; color: #34d399;">
-                    Inc: ${(months.reduce((acc, _, idx) => acc + getDualAxisNoonTiltDeg(res.latitude, idx), 0) / 12).toFixed(1)}° | Ori: ${(months.reduce((acc, _, idx) => acc + getNoonAzimuthDeg(res.latitude, idx), 0) / 12).toFixed(1)}°
+                    Inc: ${(months.reduce((acc, _, idx) => acc + getDualAxisNoonTiltDeg(res.latitude, idx), 0) / 12).toFixed(1)}° (mín) | Ori: Seg. ψs
                   </td>
                   <td class="td-num"><strong>${meanHoriz.toFixed(2)}</strong></td>
                   <td class="td-num td-track-val"><strong>${meanDual.toFixed(2)}</strong></td>
