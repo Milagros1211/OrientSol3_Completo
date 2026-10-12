@@ -160,27 +160,6 @@ function renderAboutView(isEn: boolean): HTMLElement {
             • Muñoz-Sabater, J., et al. (2021). <em>ERA5-Land: a state-of-the-art global land surface dataset</em>. Earth System Science Data, 13(9), 4349-4383.
           </div>
         </div>
-
-        <!-- BD 4: Constante Solar y Modelos Físicos -->
-        <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
-              <strong style="color: var(--text-main); font-size: 0.9rem;">☀️ ${isEn ? 'Solar Constant Gsc = 1367 W/m²' : 'Constante Solar Gsc = 1367 W/m²'}</strong>
-              <span class="badge badge-success" style="font-size: 0.7rem; white-space: nowrap;">${isEn ? 'WMO / WRC Standard' : 'Estándar OMM / WRC'}</span>
-            </div>
-            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
-              <strong>${isEn ? 'Usage Justification:' : 'Justificación de Uso:'}</strong> ${isEn
-                ? 'Formally adopted by the <em>World Radiation Center</em> (WRC, Davos, 1981) and the World Meteorological Organization (WMO). It is the unanimous benchmark in solar engineering literature (Duffie &amp; Beckman, Klein, Liu-Jordan), ensuring 100% mathematical fidelity with original OrientSol code and CTE DB-HE4 regulations.'
-                : 'Adoptada formalmente por el <em>World Radiation Center</em> (WRC, Davos, 1981) y la Organización Meteorológica Mundial (OMM). Es el estándar unánime de la literatura de ingeniería solar térmica y fotovoltaica (Duffie &amp; Beckman, Klein, Liu-Jordan), garantizando concordancia matemática del 100% con el código original OrientSol y la normativa CTE DB-HE4.'}
-            </p>
-          </div>
-          <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
-            <strong>${isEn ? 'References:' : 'Referencias:'}</strong><br/>
-            • Duffie, J. A., &amp; Beckman, W. A. (2013). <em>Solar Engineering of Thermal Processes</em>. 4th Edition. John Wiley &amp; Sons. Cap. 1.2.<br/>
-            • WRC / WMO (1981). <em>World Radiation Center Standard Solar Constant</em>. Commission for Instruments and Methods of Observation.<br/>
-            • Klein, S. A. (1977). <em>Calculation of monthly average insolation on tilted surfaces</em>. Solar Energy, 19(4), 325-329.
-          </div>
-        </div>
       </div>
     </div>
 
