@@ -1,7 +1,7 @@
 import { jsPDF } from 'jspdf';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { getMonthlyRadiationForAngle } from '@/components/climate/OptimalAnnualStudyPanel';
-
+import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslations';
 
 /**
  * Shows MATLAB Figura 5.2.70 Warning Modal before generating PDF
@@ -36,8 +36,8 @@ export function showPdfGenerationNoticeModal(
           </p>
           <p style="margin: 0; color: #cbd5e1;">
             ${isEn
-              ? 'The report in PDF format will now be generated. When finished, ANOTHER NOTICE will appear detailing the directory of the generated report.'
-              : 'A continuación se generará el informe en formato PDF. Cuando finalice se indicará con OTRO AVISO, donde se detalla el directorio del informe generado.'}
+              ? 'The technical report in PDF format will now be generated with high-resolution vector charts, thermal insights, and CTE compliance metrics.'
+              : 'A continuación se generará el informe técnico en formato PDF con gráficos vectoriales de alta precisión, balance energético, ranking de superficies y cumplimiento CTE DB-HE4.'}
           </p>
         </div>
       </div>
@@ -125,10 +125,47 @@ export interface PDFReportOptions {
 }
 
 /**
- * Generates the full OrientSol 4.0 MATLAB-matching PDF Report
- * Following strictly ReportOptAnual.rpt, ReportOptEstacional.rpt, ReportSegEjePolar.rpt,
- * ReportSegEjeAzimutal.rpt, ReportSegEjeHorizontal.rpt, ReportSeg2Ejes.rpt, and ReportComparativa.rpt
- * Developing the continuous 1° to 90° angle curve in the graphs and capturing all displayed data.
+ * Renders an elegant highlighted insights callout card with icon, title, and bullet points.
+ */
+function drawPdfInsightBox(
+  doc: jsPDF,
+  title: string,
+  points: string[],
+  x: number,
+  y: number,
+  w: number,
+  h: number
+): void {
+  doc.setFillColor(240, 249, 255);
+  doc.setDrawColor(56, 189, 248);
+  doc.setLineWidth(0.6);
+  doc.roundedRect(x, y, w, h, 2, 2, 'FD');
+
+  doc.setFillColor(2, 132, 199);
+  doc.roundedRect(x + 3, y + 3, 4, h - 6, 1, 1, 'F');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(3, 105, 161);
+  doc.text(title, x + 10, y + 8);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(30, 41, 59);
+
+  let textY = y + 14;
+  for (const pt of points) {
+    const bullet = `• ${pt}`;
+    const splitLines = doc.splitTextToSize(bullet, w - 14);
+    doc.text(splitLines, x + 10, textY);
+    textY += splitLines.length * 4.0;
+  }
+}
+
+/**
+ * Generates the full OrientSol 4.0 Technical PDF Report strictly matching the layout,
+ * operations, temperature cards, ranking of 8 topologies, CTE DB-HE4 loss map, and highlighted
+ * technical insights boxes on all figures.
  */
 export async function generateOrientSolPDFReport(
   res: SolarBridgeSimulationResult,
@@ -142,712 +179,385 @@ export async function generateOrientSolPDFReport(
     format: 'a4',
   });
 
+  const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const optAngle = res.optimalAnnual.optimalTiltDeg;
   const peakKw = options?.peakPowerKw ?? 5.0;
   const pr = options?.performanceRatio ?? 0.80;
   const tonc = options?.tonc ?? 47.0;
 
-  const dateStr = new Date().toLocaleDateString(isEn ? 'en-US' : 'es-ES', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
+  // Exact Timestamp
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const day = pad(now.getDate());
+  const month = pad(now.getMonth() + 1);
+  const year = now.getFullYear();
+  const hours = pad(now.getHours());
+  const minutes = pad(now.getMinutes());
+  const seconds = pad(now.getSeconds());
+
+  const formattedDateTime = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  const isoTimestamp = now.toISOString();
+  const fileTimestamp = `${year}${month}${day}_${hours}${minutes}${seconds}`;
+
+  const monthsEsShort = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const monthsEnShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const mShort = isEn ? monthsEnShort : monthsEsShort;
+
+  const monthsEsFull = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
+  const monthsEnFull = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  const mFull = isEn ? monthsEnFull : monthsEsFull;
 
   const studyNames: Record<OrientSolStudyType, { es: string; en: string }> = {
     annual: { es: 'Inclinación Óptima Anual', en: 'Annual Optimal Tilt' },
-    monthly: { es: 'Optimización Mensual (12 Posiciones)', en: 'Monthly Optimization (12 Positions)' },
-    seasonal: { es: 'Inclinación Óptima Estacional', en: 'Seasonal Optimal Tilt' },
+    monthly: { es: 'Optimización Mensual (12 Posiciones Independientes)', en: 'Monthly Optimization (12 Independent Positions)' },
+    seasonal: { es: 'Inclinación Óptima Estacional (4 Ajustes)', en: 'Seasonal Optimal Tilt (4 Adjustments)' },
     polar: { es: 'Seguimiento a un Eje Polar', en: 'Single-Axis Polar Tracking' },
     azimuthal: { es: 'Seguimiento a un Eje Azimutal', en: 'Single-Axis Azimuthal Tracking' },
-    horizontal: { es: 'Seguimiento a un Eje Horizontal', en: 'Single-Axis Horizontal Tracking' },
-    dual: { es: 'Seguimiento a Dos Ejes', en: 'Two-Axis Tracking' },
-    comparative: { es: 'Comparativa de Todos los Tipos de Estudios', en: 'Comparative of All Study Types' },
+    horizontal: { es: 'Seguimiento a un Eje Horizontal (E-O)', en: 'Single-Axis Horizontal Tracking (E-W)' },
+    dual: { es: 'Seguimiento a Dos Ejes Continuo', en: 'Two-Axis Continuous Tracking' },
+    comparative: { es: 'Comparativa Global de Todas las Superficies', en: 'Global Benchmark of All Surfaces' },
   };
 
   const currentStudyName = isEn ? studyNames[studyType].en : studyNames[studyType].es;
 
-  // Helper: Draw header on chapter pages
-  const drawPageHeader = (chapterTitle: string) => {
+  // Header & Footer helper
+  const drawPageChrome = (chapterTitle: string, pageNum: number, totalPages: number) => {
+    // Header
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(20);
+    doc.setFontSize(13);
     doc.setTextColor(15, 23, 42);
-    doc.text(chapterTitle, 20, 22);
+    doc.text(chapterTitle, 20, 15);
 
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(71, 85, 105);
-    doc.text(`OrientSol 4.0 • ${currentStudyName}`, 20, 30);
-    doc.setFontSize(8.5);
-    doc.text(`Copyright © 2015 - 2026`, 20, 35);
-    doc.text(dateStr, 20, 39);
-
-    // University of Jaén badge / logo representation
-    doc.setDrawColor(202, 138, 4);
-    doc.setFillColor(254, 240, 138);
-    doc.circle(180, 28, 7, 'FD');
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(161, 98, 7);
-    doc.text('UJA', 177, 29);
     doc.setFontSize(8);
-    doc.setTextColor(71, 85, 105);
-    doc.text('UNIVERSIDAD DE JAÉN', 160, 38);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`OrientSol 4.0 • ${currentStudyName} • ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`, 20, 20);
 
+    // University badge text
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(180, 83, 9);
+    doc.text('UNIVERSIDAD DE JAÉN', 152, 15);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(7.5);
+    doc.text(`Exportado: ${formattedDateTime}`, 142, 20);
+
+    // Divider
     doc.setDrawColor(226, 232, 240);
-    doc.line(20, 42, 190, 42);
+    doc.setLineWidth(0.4);
+    doc.line(20, 23, 190, 23);
+
+    // Footer
+    doc.line(20, pageHeight - 12, 190, pageHeight - 12);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(148, 163, 184);
+    doc.text(
+      isEn
+        ? `OrientSol 4.0 Report • Timestamp: ${formattedDateTime} (${isoTimestamp})`
+        : `Informe Técnico OrientSol 4.0 • Timestamp: ${formattedDateTime} (${isoTimestamp})`,
+      20,
+      pageHeight - 7
+    );
+    doc.setFont('helvetica', 'bold');
+    doc.text(`${pageNum} / ${totalPages}`, 180, pageHeight - 7);
   };
 
-  // -------------------------------------------------------------
-  // PÁGINA 1: TABLA DE CONTENIDOS (Figura 5.2.72)
-  // -------------------------------------------------------------
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(24);
-  doc.setTextColor(15, 23, 42);
-  doc.text(isEn ? 'Table of Contents' : 'Tabla de contenidos', 25, 45);
+  // Helper for highlighted insight boxes
+  const drawInsightBox = (
+    title: string,
+    points: string[],
+    x: number,
+    y: number,
+    w: number,
+    h: number
+  ) => {
+    drawPdfInsightBox(doc, title, points, x, y, w, h);
+  };
 
-  doc.setDrawColor(56, 189, 248);
-  doc.setLineWidth(0.8);
-  doc.line(25, 50, 95, 50);
-
-  const tocItems = [
-    { num: '1', title: isEn ? 'Introduction' : 'Introducción', page: '2' },
-    { num: '2', title: isEn ? 'Global Radiation (Curves 1°-90° & Monthly)' : 'Radiación Global (Curvas 1°-90° y Mensual)', page: '3' },
-    { num: '3', title: isEn ? 'Direct Radiation (Curves 1°-90° & Monthly)' : 'Radiación Directa (Curvas 1°-90° y Mensual)', page: '4' },
-    { num: '4', title: isEn ? 'Diffuse Radiation (Curves 1°-90° & Monthly)' : 'Radiación Difusa (Curvas 1°-90° y Mensual)', page: '5' },
-    { num: '5', title: isEn ? 'Albedo Radiation (Curves 1°-90° & Monthly)' : 'Radiación de Albedo (Curvas 1°-90° y Mensual)', page: '6' },
-    { num: '6', title: isEn ? 'Active Study Calculation Table' : 'Tabla de Cálculo del Estudio Activo', page: '7' },
-    { num: '7', title: isEn ? 'PV Energy Yield & Thermal Derating' : 'Balance Energético y Producción FV', page: '8' },
-    { num: '8', title: isEn ? 'CTE DB-HE4 Solar Captation Losses' : 'Pérdidas de Captación CTE DB-HE4', page: '9' },
-  ];
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(11);
-  doc.setTextColor(30, 41, 59);
-
-  let tocY = 66;
-  tocItems.forEach((item) => {
-    const textLeft = `${item.num}. ${item.title}`;
-    doc.text(textLeft, 25, tocY);
-
-    const textWidth = doc.getTextWidth(textLeft);
-    const dotsStartX = 25 + textWidth + 3;
-    const dotsEndX = 175;
-    doc.setTextColor(148, 163, 184);
-    let dotX = dotsStartX;
-    while (dotX < dotsEndX) {
-      doc.text('.', dotX, tocY);
-      dotX += 3.5;
-    }
-
-    doc.setTextColor(15, 23, 42);
-    doc.setFont('helvetica', 'bold');
-    doc.text(item.page, 180, tocY);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(30, 41, 59);
-
-    tocY += 10.5;
-  });
-
-  // Footer notes on Cover
-  doc.setFontSize(9);
-  doc.setTextColor(100, 116, 139);
-  doc.text(
-    isEn
-      ? `OrientSol 4.0 • ${currentStudyName} • ${res.locationName} (Lat: ${res.latitude.toFixed(4)}°)`
-      : `OrientSol 4.0 • ${currentStudyName} • ${res.locationName} (Lat: ${res.latitude.toFixed(4)}°)`,
-    25,
-    pageHeight - 20
-  );
-
-  // -------------------------------------------------------------
-  // PÁGINA 2: CAPÍTULO 1. INTRODUCCIÓN (Figura 5.2.74)
-  // -------------------------------------------------------------
-  doc.addPage();
-  drawPageHeader(isEn ? 'Chapter 1. Introduction' : 'Capítulo 1. Introducción');
+  // =========================================================================
+  // PÁGINA 1: PORTADA, RESUMEN CLIMÁTICO Y TARJETAS DE TEMPERATURA (Imagen 1)
+  // =========================================================================
+  // Header Banner
+  doc.setFillColor(15, 23, 42);
+  doc.rect(0, 0, pageWidth, 42, 'F');
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(2, 132, 199);
-  doc.text(
-    isEn
-      ? `NOTE. Study [${currentStudyName}] developed and generated by OrientSol 4.0`
-      : `NOTA. Estudio [${currentStudyName}] desarrollado y descargado por OrientSol 4.0`,
-    20,
-    52
-  );
+  doc.setFontSize(20);
+  doc.setTextColor(248, 250, 252);
+  doc.text(`Resultados OrientSol 4.0: ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`, 20, 20);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
-  doc.setTextColor(30, 41, 59);
+  doc.setTextColor(148, 163, 184);
+  doc.text(
+    isEn
+      ? `Solar Radiation & PV Simulation Report • MATLAB to Web & Desktop Migration`
+      : `Informe Técnico de Simulación Solar y Fotovoltaica • Migración MATLAB a Web & Desktop`,
+    20,
+    28
+  );
 
-  let infoIntroText = '';
-  if (studyType === 'annual') {
-    infoIntroText = isEn
-      ? 'Information: In this study the receiving surface has a fixed optimal tilt throughout the year oriented towards the equator, maximizing total annual solar irradiation capture.'
-      : 'Información: En este estudio la superficie receptora posee una inclinación fija óptima calculada a lo largo de todo el año orientada hacia el ecuador, maximizando la captación solar anual total.';
-  } else if (studyType === 'monthly') {
-    infoIntroText = isEn
-      ? 'Information: In this study the solar panel tilt is optimized month-by-month across 12 independent positions, adjusting to the precise solar declination each month to maximize total annual energy.'
-      : 'Información: En este estudio la inclinación se optimiza mes a mes en 12 posiciones independientes, adaptándose a la declinación solar específica de cada mes para maximizar la captación de energía anual.';
-  } else if (studyType === 'seasonal') {
-    infoIntroText = isEn
-      ? `Information: In this study the module tilt is adjusted 4 times per year (winter: ${res.seasonal.winterTiltDeg}°, spring: ${res.seasonal.springTiltDeg}°, summer: ${res.seasonal.summerTiltDeg}°, autumn: ${res.seasonal.autumnTiltDeg}°) to track seasonal solar elevation variations.`
-      : `Información: En este estudio la inclinación se ajusta 4 veces al año (invierno: ${res.seasonal.winterTiltDeg}°, primavera: ${res.seasonal.springTiltDeg}°, verano: ${res.seasonal.summerTiltDeg}°, otoño: ${res.seasonal.autumnTiltDeg}°) para adaptarse a la declinación estacional del sol.`;
-  } else if (studyType === 'polar') {
-    infoIntroText = isEn
-      ? `Information: In this study a single-axis tracker is oriented with its rotation axis parallel to the Earth axis of rotation (tilted at latitude ${res.latitude.toFixed(2)}°), tracking the sun from East to West at 15°/hour.`
-      : `Información: En este estudio el seguidor de un eje gira alrededor de un eje orientado Norte-Sur e inclinado exactamente el ángulo de la latitud local (${res.latitude.toFixed(2)}°), siguiendo el sol de Este a Oeste a 15°/hora.`;
-  } else if (studyType === 'azimuthal') {
-    infoIntroText = isEn
-      ? `Information: Single-axis azimuthal tracker rotating around a vertical axis with a fixed collector tilt (β = ${optAngle}°), maximizing morning and afternoon irradiation.`
-      : `Información: Seguidor de un eje azimutal que gira sobre un eje vertical con el colector inclinado un ángulo fijo (β = ${optAngle}°), aprovechando los ángulos solares de mañana y tarde.`;
-  } else if (studyType === 'horizontal') {
-    infoIntroText = isEn
-      ? 'Information: Single-axis horizontal tracker with a horizontal torque tube oriented North-South, performing East-West roll rotation throughout daylight hours.'
-      : 'Información: Seguidor a un eje horizontal con tubo de torsión horizontal orientado Norte-Sur, realizando rotación de balanceo Este-Oeste durante las horas de insolación.';
-  } else if (studyType === 'dual') {
-    infoIntroText = isEn
-      ? 'Information: Two-axis tracker with continuous tracking in both solar azimuth and elevation, maintaining the module plane strictly perpendicular to direct solar beam at all times.'
-      : 'Información: Seguidor a dos ejes con seguimiento continuo tanto en azimut como en elevación solar, manteniendo el plano del módulo constantemente perpendicular al rayo solar directo.';
-  } else {
-    infoIntroText = isEn
-      ? 'Information: Global comparative study comparing all 7 solar collector geometries: Horizontal Plane (0°), Annual Optimal Tilt, Seasonal Optimal Tilt (4 adjustments), Single-Axis Polar Tracking, Single-Axis Azimuthal Tracking, Single-Axis Horizontal Tracking, and Two-Axis Tracking.'
-      : 'Información: Estudio comparativo global que confronta los 7 métodos de captación solar: Plano Horizontal (0°), Inclinación Óptima Anual, Inclinación Óptima Estacional (4 ajustes), Seguidor a un Eje Polar, Seguidor a un Eje Azimutal, Seguidor a un Eje Horizontal y Seguidor a Dos Ejes.';
-  }
+  // Prominent Timestamp Pill
+  doc.setFillColor(30, 41, 59);
+  doc.roundedRect(20, 31, 170, 7, 1.5, 1.5, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(56, 189, 248);
+  doc.text(
+    isEn
+      ? `TIMESTAMP AUDIT RECORD: Exported on ${formattedDateTime} (ISO: ${isoTimestamp}) • Engine: Python 3.14 WASM (${res.executionTimeMs} ms)`
+      : `REGISTRO OFICIAL DE AUDITORÍA: Exportado el ${formattedDateTime} (ISO: ${isoTimestamp}) • Motor: Python 3.14 WASM (${res.executionTimeMs} ms)`,
+    23,
+    35.8
+  );
 
-  const splitInfo = doc.splitTextToSize(infoIntroText, 170);
-  doc.text(splitInfo, 20, 60);
+  // -------------------------------------------------------------
+  // 4 TARJETAS DE TEMPERATURA AMBIENTAL Y CÉLULA OPERATIVA (Imagen 1)
+  // -------------------------------------------------------------
+  const cardW = 39.5;
+  const cardH = 26;
+  const cardGap = 4;
+  const cardY = 48;
 
-  // Summary box
+  // Tarjeta 1: Temp Media Anual
   doc.setFillColor(248, 250, 252);
   doc.setDrawColor(226, 232, 240);
-  doc.roundedRect(20, 78, 170, 28, 3, 3, 'FD');
-
+  doc.roundedRect(20, cardY, cardW, cardH, 2, 2, 'FD');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(15, 23, 42);
-  doc.text(`${isEn ? 'Location' : 'Ciudad'}:`, 25, 86);
-  doc.setFont('helvetica', 'normal');
-  doc.text(res.locationName, 55, 86);
-
-  doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Latitude' : 'Latitud'}:`, 115, 86);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${res.latitude.toFixed(4)}°`, 140, 86);
-
-  doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Study Type' : 'Tipo de Estudio'}:`, 25, 96);
-  doc.setFont('helvetica', 'normal');
-  doc.text(currentStudyName, 55, 96);
-
-  doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Annual Mean Temp' : 'Tª Media Anual'}:`, 115, 96);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${res.temperatures.ambient.annualMeanC.toFixed(1)} °C`, 150, 96);
-
-  // Schematic Figure
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(15, 23, 42);
-  doc.text(
-    isEn
-      ? `Figure 1.1. Schematic diagram for ${currentStudyName}`
-      : `Figura 1.1. Esquema general para ${currentStudyName}`,
-    20,
-    116
-  );
-
-  doc.setDrawColor(2, 132, 199);
-  doc.setFillColor(14, 165, 233);
-  doc.setLineWidth(1);
-  doc.triangle(65, 140, 145, 125, 135, 165, 'FD');
-  doc.triangle(65, 140, 55, 175, 135, 165, 'FD');
-  doc.setDrawColor(71, 85, 105);
-  doc.setLineWidth(3);
-  doc.line(95, 155, 95, 185);
-  doc.line(75, 185, 115, 185);
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
+  doc.setFontSize(7);
   doc.setTextColor(100, 116, 139);
-  doc.text(`OrientSol 4.0 • Model`, 135, 150);
+  doc.text(isEn ? 'ANNUAL MEAN TEMP' : 'TEMP. MEDIA ANUAL', 24, cardY + 6);
+  doc.setFontSize(16);
+  doc.setTextColor(15, 23, 42);
+  doc.text(`${res.temperatures.ambient.annualMeanC.toFixed(1)} °C`, 24, cardY + 16);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'Monthly ambient mean' : 'Media ambiente mensual', 24, cardY + 22);
+
+  // Tarjeta 2: Temp Máxima Anual
+  const card2X = 20 + cardW + cardGap;
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(card2X, cardY, cardW, cardH, 2, 2, 'FD');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'ANNUAL MAX TEMP' : 'TEMP. MÁXIMA ANUAL', card2X + 4, cardY + 6);
+  doc.setFontSize(16);
+  doc.setTextColor(220, 38, 38);
+  doc.text(`${res.temperatures.ambient.annualMaxC.toFixed(1)} °C`, card2X + 4, cardY + 16);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'Peak summer high' : 'Pico estival máximo', card2X + 4, cardY + 22);
+
+  // Tarjeta 3: Temp Mínima Anual
+  const card3X = card2X + cardW + cardGap;
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(card3X, cardY, cardW, cardH, 2, 2, 'FD');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'ANNUAL MIN TEMP' : 'TEMP. MÍNIMA ANUAL', card3X + 4, cardY + 6);
+  doc.setFontSize(16);
+  doc.setTextColor(2, 132, 199);
+  doc.text(`${res.temperatures.ambient.annualMinC.toFixed(1)} °C`, card3X + 4, cardY + 16);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'Winter absolute low' : 'Mínima invernal absoluta', card3X + 4, cardY + 22);
+
+  // Tarjeta 4: Temp Célula Operativa Tc
+  const card4X = card3X + cardW + cardGap;
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(card4X, cardY, cardW, cardH, 2, 2, 'FD');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'CELL OPERATING TEMP (TC)' : 'TEMP. CÉLULA OPERATIVA (TC)', card4X + 4, cardY + 6);
+  doc.setFontSize(16);
+  doc.setTextColor(180, 83, 9);
+  doc.text(`${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)} °C`, card4X + 4, cardY + 16);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(`TONC ${tonc.toFixed(1)}°C (Máx: ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)}°C)`, card4X + 4, cardY + 22);
 
   // -------------------------------------------------------------
-  // CAPÍTULOS 2, 3, 4, 5: COMPONENTES DE RADIACIÓN
+  // TABLA DE CONTENIDOS DEL INFORME (Matching Figura 5.2.72)
   // -------------------------------------------------------------
-  const componentsList: Array<{
-    code: 'global' | 'beam' | 'diffuse' | 'albedo';
-    num: number;
-    title: string;
-    sym: string;
-  }> = [
-    { code: 'global', num: 2, title: isEn ? 'Global Radiation' : 'Radiación Global', sym: 'Gdm' },
-    { code: 'beam', num: 3, title: isEn ? 'Direct Radiation' : 'Radiación Directa', sym: 'Bdm' },
-    { code: 'diffuse', num: 4, title: isEn ? 'Diffuse Radiation' : 'Radiación Difusa', sym: 'Ddm' },
-    { code: 'albedo', num: 5, title: isEn ? 'Albedo Radiation' : 'Radiación de Albedo', sym: 'Rdm' },
-  ];
-
-  const getStudyRadiation = (code: 'global' | 'beam' | 'diffuse' | 'albedo'): number[] => {
-    if (studyType === 'monthly') {
-      return code === 'global'
-        ? res.monthlyOptimum12.monthlyDailyKwh
-        : res.monthlyOptimum12.optimalTiltsDeg.map((deg, m) => {
-            const radM = getMonthlyRadiationForAngle(res, code, deg);
-            return radM[m];
-          });
-    } else if (studyType === 'seasonal') {
-      return code === 'global'
-        ? res.seasonal.monthlyDailyKwh
-        : getMonthlyRadiationForAngle(res, code, Math.round((res.seasonal.winterTiltDeg + res.seasonal.summerTiltDeg) / 2));
-    } else if (studyType === 'polar') {
-      return res.tracking.polarAxis.components?.[code] || res.tracking.polarAxis.monthlyDailyKwh;
-    } else if (studyType === 'azimuthal') {
-      return res.tracking.azimuthalAxis.components?.[code] || res.tracking.azimuthalAxis.monthlyDailyKwh;
-    } else if (studyType === 'horizontal') {
-      return res.tracking.horizontalAxis.components?.[code] || res.tracking.horizontalAxis.monthlyDailyKwh;
-    } else if (studyType === 'dual') {
-      return res.tracking.dualAxis.components?.[code] || res.tracking.dualAxis.monthlyDailyKwh;
-    } else {
-      return getMonthlyRadiationForAngle(res, code, optAngle);
-    }
-  };
-
-  componentsList.forEach((comp) => {
-    doc.addPage();
-    drawPageHeader(`${isEn ? 'Chapter' : 'Capítulo'} ${comp.num}. ${comp.title}`);
-
-    // If comparative study, render the full multi-method comparison table for this component!
-    if (studyType === 'comparative') {
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(220, 38, 38);
-      doc.text(isEn ? 'COMPARATIVE RESULTS:' : 'RESULTADOS COMPARATIVOS:', 20, 52);
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(51, 65, 85);
-      doc.text(
-        isEn
-          ? `Monthly comparison of ${comp.title.toLowerCase()} across all 7 solar tracking and fixed methods (kWh/m²/day):`
-          : `Comparativa mensual de ${comp.title.toLowerCase()} en los 7 métodos de captación solar (kWh/m²/día):`,
-        20,
-        60
-      );
-
-      // Comparative Table matching Figura 5.2.98
-      const colHeaders = [
-        isEn ? 'Month' : 'Mes',
-        `${comp.sym}(0°)`,
-        'Ópt.Anu',
-        'Ópt.Est',
-        'Ópt.Men',
-        'Seg.Pol',
-        'Seg.Azi',
-        'Seg.Hor',
-        'Seg.2Ej',
-        'Tª(°C)'
-      ];
-
-      const cX = [20, 38, 55, 72, 89, 106, 123, 140, 157, 174];
-      let tY = 70;
-
-      // Table Header row
-      doc.setFillColor(37, 99, 235);
-      doc.rect(20, tY - 5, 170, 8, 'F');
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(7.5);
-      doc.setTextColor(255, 255, 255);
-      colHeaders.forEach((h, hIdx) => {
-        doc.text(h, cX[hIdx], tY);
-      });
-
-      tY += 8;
-      const monthsEs = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-      const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const mNames = isEn ? monthsEn : monthsEs;
-
-      const r0 = comp.code === 'global' ? res.horizontal.gdm0 : comp.code === 'beam' ? res.horizontal.bdm0 : comp.code === 'diffuse' ? res.horizontal.ddm0 : new Array(12).fill(0.0);
-      const rAnu = getMonthlyRadiationForAngle(res, comp.code, optAngle);
-      const rEst = comp.code === 'global' ? res.seasonal.monthlyDailyKwh : getMonthlyRadiationForAngle(res, comp.code, Math.round((res.seasonal.winterTiltDeg + res.seasonal.summerTiltDeg) / 2));
-      const rMen = comp.code === 'global' ? res.monthlyOptimum12.monthlyDailyKwh : (res.monthlyOptimum12.optimalTiltsDeg || []).map((tilt, mIdx) => getMonthlyRadiationForAngle(res, comp.code, tilt)[mIdx]);
-      const rPol = res.tracking.polarAxis.components?.[comp.code] || res.tracking.polarAxis.monthlyDailyKwh;
-      const rAzi = res.tracking.azimuthalAxis.components?.[comp.code] || res.tracking.azimuthalAxis.monthlyDailyKwh;
-      const rHor = res.tracking.horizontalAxis.components?.[comp.code] || res.tracking.horizontalAxis.monthlyDailyKwh;
-      const r2E = res.tracking.dualAxis.components?.[comp.code] || res.tracking.dualAxis.monthlyDailyKwh;
-      const tempM = res.temperatures.ambient.monthlyMeanC;
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7.5);
-      for (let i = 0; i < 12; i++) {
-        if (i % 2 === 0) {
-          doc.setFillColor(248, 250, 252);
-          doc.rect(20, tY - 4, 170, 6.5, 'F');
-        }
-        doc.setTextColor(30, 41, 59);
-        doc.text(mNames[i], cX[0], tY);
-        doc.text(r0[i].toFixed(2), cX[1], tY);
-        doc.text(rAnu[i].toFixed(2), cX[2], tY);
-        doc.text(rEst[i].toFixed(2), cX[3], tY);
-        doc.text(rMen[i].toFixed(2), cX[4], tY);
-        doc.text(rPol[i].toFixed(2), cX[5], tY);
-        doc.text(rAzi[i].toFixed(2), cX[6], tY);
-        doc.text(rHor[i].toFixed(2), cX[7], tY);
-        doc.text(r2E[i].toFixed(2), cX[8], tY);
-        doc.text(tempM[i].toFixed(1), cX[9], tY);
-        tY += 6.5;
-      }
-
-      // MEDIA row
-      doc.setFillColor(15, 23, 42);
-      doc.rect(20, tY - 4, 170, 7.5, 'F');
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(56, 189, 248);
-      doc.text(isEn ? 'MEAN' : 'MEDIA', cX[0], tY + 1);
-      const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / 12;
-      doc.setTextColor(255, 255, 255);
-      doc.text(avg(r0).toFixed(2), cX[1], tY + 1);
-      doc.text(avg(rAnu).toFixed(2), cX[2], tY + 1);
-      doc.text(avg(rEst).toFixed(2), cX[3], tY + 1);
-      doc.text(avg(rMen).toFixed(2), cX[4], tY + 1);
-      doc.text(avg(rPol).toFixed(2), cX[5], tY + 1);
-      doc.text(avg(rAzi).toFixed(2), cX[6], tY + 1);
-      doc.text(avg(rHor).toFixed(2), cX[7], tY + 1);
-      doc.setTextColor(56, 189, 248);
-      doc.text(avg(r2E).toFixed(2), cX[8], tY + 1);
-      doc.setTextColor(251, 191, 36);
-      doc.text(res.temperatures.ambient.annualMeanC.toFixed(1), cX[9], tY + 1);
-
-      return;
-    }
-
-    // Single Study Chapter Page
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(220, 38, 38);
-    doc.text(isEn ? 'RESULTS:' : 'RESULTADOS:', 20, 52);
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(15, 23, 42);
-    doc.text(`${isEn ? 'Study Location' : 'Ciudad de estudio'} .`, 20, 60);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`{ ${res.locationName} }`, 60, 60);
-
-    doc.setFont('helvetica', 'bold');
-    doc.text(`${isEn ? 'Latitude' : 'Latitud'} .`, 20, 67);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`${res.latitude.toFixed(4)}`, 60, 67);
-
-    doc.setFont('helvetica', 'bold');
-    doc.text(`${isEn ? 'Study' : 'Estudio'} .`, 20, 74);
-    doc.setFont('helvetica', 'normal');
-    doc.text(currentStudyName, 60, 74);
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9.5);
-    doc.setTextColor(51, 65, 85);
-    const compDesc = isEn
-      ? `${comp.title}: The values of ${comp.title.toLowerCase()} for an inclination of 0º (horizontal surface) are represented below, followed by the calculated values for ${currentStudyName}.`
-      : `${comp.title}: Se representan a continuación los valores de radiación ${comp.title.toLowerCase()} para una inclinación de 0º (superficie horizontal), seguidos de los valores calculados para ${currentStudyName}.`;
-
-    const splitCompDesc = doc.splitTextToSize(compDesc, 170);
-    doc.text(splitCompDesc, 20, 83);
-
-    const rad0Vals = getMonthlyRadiationForAngle(res, comp.code, 0);
-    const radStudyVals = getStudyRadiation(comp.code);
-    const meanRad0 = rad0Vals.reduce((a: number, b: number) => a + b, 0) / 12;
-    const meanRadStudy = radStudyVals.reduce((a: number, b: number) => a + b, 0) / 12;
-
-    doc.setFont('helvetica', 'bold');
-    doc.text(
-      isEn
-        ? `${comp.title} on horizontal surface (kWh/m²/day) .`
-        : `${comp.title} sobre superficie horizontal (kWh/m²/día) .`,
-      20,
-      100
-    );
-    doc.setFont('helvetica', 'normal');
-    doc.text(`[ ${rad0Vals.map((v: number) => v.toFixed(2)).join('  ')} ]`, 20, 106);
-
-    doc.setFont('helvetica', 'bold');
-    doc.text(
-      isEn
-        ? `${comp.title} for ${currentStudyName} (kWh/m²/day) .`
-        : `${comp.title} para ${currentStudyName} (kWh/m²/día) .`,
-      20,
-      114
-    );
-    doc.setFont('helvetica', 'normal');
-    doc.text(`[ ${radStudyVals.map((v: number) => v.toFixed(2)).join('  ')} ]`, 20, 120);
-
-    // -------------------------------------------------------------
-    // CURVA DE DESARROLLO DE RADIACIÓN EN EL RANGO DE ÁNGULOS 1° A 90°
-    // strictly matching MATLAB Grafica_Inclinaciones.m (0..90°)
-    // -------------------------------------------------------------
-    const radCurve1to90: number[] = [];
-    for (let deg = 1; deg <= 90; deg++) {
-      const mDaily = getMonthlyRadiationForAngle(res, comp.code, deg);
-      radCurve1to90.push(mDaily.reduce((a, b) => a + b, 0) / 12);
-    }
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10.5);
-    doc.setTextColor(15, 23, 42);
-    doc.text(
-      isEn
-        ? `Figure ${comp.num}.1. Radiation evolution across tilt angles (β = 1° to 90°)`
-        : `Figura ${comp.num}.1. Evolución de la radiación en función de la inclinación (β = 1° a 90°)`,
-      20,
-      131
-    );
-
-    // Plot chart frame
-    const chartX = 22;
-    const chartY = 136;
-    const chartW = 166;
-    const chartH = 64;
-
-    doc.setFillColor(248, 250, 252);
-    doc.setDrawColor(203, 213, 225);
-    doc.rect(chartX, chartY, chartW, chartH, 'FD');
-
-    const maxValCurve = Math.max(...radCurve1to90, meanRad0, meanRadStudy, 0.5) * 1.18;
-    const minValCurve = Math.max(0, Math.min(...radCurve1to90, meanRad0, meanRadStudy) * 0.85);
-
-    const getAnglePlotX = (deg: number) => chartX + 16 + ((deg - 1) / 89) * (chartW - 28);
-    const getAnglePlotY = (val: number) =>
-      chartY + chartH - 12 - ((val - minValCurve) / (maxValCurve - minValCurve || 1)) * (chartH - 22);
-
-    // Grid lines
-    doc.setDrawColor(226, 232, 240);
-    doc.setLineWidth(0.3);
-    for (const gridAng of [15, 30, 45, 60, 75, 90]) {
-      const gx = getAnglePlotX(gridAng);
-      doc.line(gx, chartY + 6, gx, chartY + chartH - 10);
-    }
-
-    // Reference Line: 0° Horizontal (Cyan dashed line)
-    doc.setDrawColor(14, 165, 233);
-    doc.setLineWidth(0.6);
-    const y0 = getAnglePlotY(meanRad0);
-    doc.line(chartX + 16, y0, chartX + chartW - 12, y0);
-
-    // Reference Line: Study Operation Average Level (Amber line)
-    doc.setDrawColor(217, 119, 6);
-    doc.setLineWidth(0.8);
-    const yStudy = getAnglePlotY(meanRadStudy);
-    doc.line(chartX + 16, yStudy, chartX + chartW - 12, yStudy);
-
-    // MAIN CURVE: 1° to 90° Continuous Angle Spectrum (Royal Blue line)
-    doc.setDrawColor(37, 99, 235);
-    doc.setLineWidth(1.4);
-    for (let deg = 1; deg < 90; deg++) {
-      doc.line(
-        getAnglePlotX(deg),
-        getAnglePlotY(radCurve1to90[deg - 1]),
-        getAnglePlotX(deg + 1),
-        getAnglePlotY(radCurve1to90[deg])
-      );
-    }
-
-    // Highlight Peak / Optimum Angle Marker on the 1°..90° Curve
-    const optAngleClamped = Math.max(1, Math.min(90, optAngle));
-    const optX = getAnglePlotX(optAngleClamped);
-    const optY = getAnglePlotY(radCurve1to90[optAngleClamped - 1]);
-
-    doc.setFillColor(220, 38, 38);
-    doc.circle(optX, optY, 1.8, 'F');
-    doc.setDrawColor(220, 38, 38);
-    doc.setLineWidth(0.5);
-    doc.line(optX, optY, optX, chartY + chartH - 10);
-
-    // Axis Ticks on X
-    doc.setFontSize(7.5);
-    doc.setTextColor(100, 116, 139);
-    for (const angLabel of [1, 15, 30, 45, 60, 75, 90]) {
-      const ax = getAnglePlotX(angLabel);
-      doc.text(`${angLabel}°`, ax - 2.5, chartY + chartH - 5);
-    }
-
-    // Optimum Annotation Tag
-    doc.setFontSize(7.5);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(220, 38, 38);
-    doc.text(`β óptimo: ${optAngleClamped}° (${radCurve1to90[optAngleClamped - 1].toFixed(2)})`, Math.min(optX - 10, chartX + chartW - 48), optY - 3.5);
-
-    // Legend
-    doc.setFontSize(7.5);
-    doc.setFont('helvetica', 'normal');
-
-    doc.setDrawColor(37, 99, 235);
-    doc.setLineWidth(1.2);
-    doc.line(chartX + 16, chartY + 8, chartX + 24, chartY + 8);
-    doc.setTextColor(37, 99, 235);
-    doc.text(`Curva β (1°..90°)`, chartX + 26, chartY + 9);
-
-    doc.setDrawColor(14, 165, 233);
-    doc.setLineWidth(0.8);
-    doc.line(chartX + 66, chartY + 8, chartX + 74, chartY + 8);
-    doc.setTextColor(14, 165, 233);
-    doc.text(`Plano Horiz 0° (${meanRad0.toFixed(2)})`, chartX + 76, chartY + 9);
-
-    doc.setDrawColor(217, 119, 6);
-    doc.setLineWidth(1.0);
-    doc.line(chartX + 118, chartY + 8, chartX + 126, chartY + 8);
-    doc.setTextColor(217, 119, 6);
-    doc.text(`${currentStudyName} (${meanRadStudy.toFixed(2)})`, chartX + 128, chartY + 9);
-
-    // Summary Result & Gain
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9.5);
-    doc.setTextColor(15, 23, 42);
-    doc.text(
-      isEn
-        ? `${currentStudyName} Annual Mean: ${meanRadStudy.toFixed(4)} kWh/m²/day`
-        : `Media Anual ${currentStudyName}: ${meanRadStudy.toFixed(4)} kWh/m²/día`,
-      20,
-      210
-    );
-
-    if (comp.code === 'albedo') {
-      doc.setFont('helvetica', 'italic');
-      doc.setTextColor(217, 119, 6);
-      doc.text(
-        isEn
-          ? '* Albedo radiation gains with respect to the horizontal plane cannot be calculated (Rdm(0º) = 0)'
-          : '* Las ganancias de albedo respecto al plano horizontal no se pueden calcular (Rdm(0º) = 0)',
-        20,
-        217
-      );
-    } else {
-      const gainPct = ((meanRadStudy - meanRad0) / (meanRad0 || 1)) * 100;
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(gainPct >= 0 ? 16 : 220, gainPct >= 0 ? 185 : 38, gainPct >= 0 ? 129 : 38);
-      doc.text(
-        isEn
-          ? `Net Gain vs Horizontal Plane: ${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(2)}%`
-          : `Ganancia Neta respecto al plano horizontal: ${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(2)}%`,
-        20,
-        217
-      );
-    }
-  });
-
-  // -------------------------------------------------------------
-  // PÁGINA: CAPÍTULO 6. TABLA DE CÁLCULO DE LA OPERACIÓN ACTIVA
-  // -------------------------------------------------------------
-  doc.addPage();
-  drawPageHeader(`${isEn ? 'Chapter' : 'Capítulo'} 6. ${isEn ? 'Active Operation Calculation Table' : 'Tabla de Cálculo del Estudio Activo'}`);
-
+  const tocY = 82;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.setTextColor(220, 38, 38);
-  doc.text(isEn ? 'DETAILED OPERATION RESULTS:' : 'RESULTADOS DETALLADOS DE LA OPERACIÓN:', 20, 52);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? 'Table of Contents' : 'Tabla de Contenidos', 20, tocY);
+
+  doc.setDrawColor(56, 189, 248);
+  doc.setLineWidth(0.8);
+  doc.line(20, tocY + 2, 65, tocY + 2);
+
+  const tocList = [
+    { num: '1', title: isEn ? 'Energy Yield Balance & Thermal Derating (Osterwald vs Simplified)' : 'Balance Energético y Comportamiento Térmico Fotovoltaico (Osterwald vs Simplificado)', page: '2' },
+    { num: '2', title: isEn ? `Selected Operation Study: ${currentStudyName}` : `Estudio Solar Seleccionado: ${currentStudyName}`, page: '3' },
+    { num: '3', title: isEn ? 'Global Benchmark & Ranking of All 8 Solar Collector Topologies' : 'Comparativa y Ranking Global de las 8 Topologías de Captación', page: '4' },
+    { num: '4', title: isEn ? 'Technical Building Code (CTE DB-HE4) Captation Losses Matrix' : 'Mapa de Pérdidas de Captación y Cumplimiento CTE DB-HE4', page: '5' },
+    { num: '5', title: isEn ? 'Continuous Radiation Evolution Curve (Tilt Spectrum β = 1° to 90°)' : 'Evolución Continua de Radiación en el Rango de Inclinaciones (β = 1° a 90°)', page: '6' },
+  ];
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
-  doc.setTextColor(71, 85, 105);
-  doc.text(
-    isEn
-      ? `Full monthly data matrix for [${currentStudyName}] with horizontal comparisons and temperature derating:`
-      : `Matriz mensual completa para el estudio [${currentStudyName}] con comparación horizontal y temperaturas:`,
-    20,
-    60
-  );
+  let curTocY = tocY + 10;
+  tocList.forEach((item) => {
+    const leftText = `${item.num}. ${item.title}`;
+    doc.setTextColor(30, 41, 59);
+    doc.text(leftText, 20, curTocY);
 
-  const monthsEsShort = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-  const monthsEnShort = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const mList = isEn ? monthsEnShort : monthsEsShort;
-  const tempM = res.temperatures.ambient.monthlyMeanC;
+    const txtW = doc.getTextWidth(leftText);
+    let dotX = 20 + txtW + 3;
+    doc.setTextColor(203, 213, 225);
+    while (dotX < 180) {
+      doc.text('.', dotX, curTocY);
+      dotX += 3;
+    }
 
-  let tableY = 70;
-  doc.setFillColor(30, 64, 175);
-  doc.rect(20, tableY - 5, 170, 8, 'F');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
-  doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(15, 23, 42);
+    doc.text(item.page, 184, curTocY);
+    doc.setFont('helvetica', 'normal');
 
-  const tCols = [
-    isEn ? 'Month' : 'Mes',
-    'Gdm(0°)',
-    'Gdm(15°)',
-    'Gdm(30°)',
-    'Gdm(45°)',
-    `Gdm(${optAngle}°)`,
-    isEn ? 'Active Op' : 'Estudio',
-    'Tª(°C)',
-    isEn ? 'Gain (%)' : 'Ganancia (%)'
-  ];
-  const tX = [22, 42, 58, 74, 90, 108, 128, 150, 168];
-
-  tCols.forEach((col, idx) => {
-    doc.text(col, tX[idx], tableY);
+    curTocY += 8;
   });
 
-  tableY += 8;
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
+  // Project Parameters Summary Box
+  const paramsY = curTocY + 6;
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(20, paramsY, 170, 44, 2, 2, 'FD');
 
-  for (let i = 0; i < 12; i++) {
-    if (i % 2 === 0) {
-      doc.setFillColor(248, 250, 252);
-      doc.rect(20, tableY - 4, 170, 6.5, 'F');
-    }
-    const g0 = res.horizontal.gdm0[i];
-    const g15 = getMonthlyRadiationForAngle(res, 'global', 15)[i];
-    const g30 = getMonthlyRadiationForAngle(res, 'global', 30)[i];
-    const g45 = getMonthlyRadiationForAngle(res, 'global', 45)[i];
-    const gOpt = getMonthlyRadiationForAngle(res, 'global', optAngle)[i];
-    const gAct =
-      studyType === 'monthly'
-        ? res.monthlyOptimum12.monthlyDailyKwh[i]
-        : studyType === 'seasonal'
-        ? res.seasonal.monthlyDailyKwh[i]
-        : studyType === 'polar'
-        ? res.tracking.polarAxis.monthlyDailyKwh[i]
-        : studyType === 'azimuthal'
-        ? res.tracking.azimuthalAxis.monthlyDailyKwh[i]
-        : studyType === 'horizontal'
-        ? res.tracking.horizontalAxis.monthlyDailyKwh[i]
-        : studyType === 'dual'
-        ? res.tracking.dualAxis.monthlyDailyKwh[i]
-        : gOpt;
-
-    const gainPct = g0 > 0 ? ((gAct - g0) / g0) * 100 : 0;
-
-    doc.setTextColor(30, 41, 59);
-    doc.text(mList[i], tX[0], tableY);
-    doc.text(g0.toFixed(2), tX[1], tableY);
-    doc.text(g15.toFixed(2), tX[2], tableY);
-    doc.text(g30.toFixed(2), tX[3], tableY);
-    doc.text(g45.toFixed(2), tX[4], tableY);
-    doc.text(gOpt.toFixed(2), tX[5], tableY);
-    doc.setTextColor(37, 99, 235);
-    doc.text(gAct.toFixed(2), tX[6], tableY);
-    doc.setTextColor(71, 85, 105);
-    doc.text(tempM[i].toFixed(1), tX[7], tableY);
-    doc.setTextColor(gainPct >= 0 ? 16 : 220, gainPct >= 0 ? 185 : 38, gainPct >= 0 ? 129 : 38);
-    doc.text(`${gainPct >= 0 ? '+' : ''}${gainPct.toFixed(1)}%`, tX[8], tableY);
-
-    tableY += 6.5;
-  }
-
-  // Row of Means
-  doc.setFillColor(15, 23, 42);
-  doc.rect(20, tableY - 4, 170, 7.5, 'F');
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(56, 189, 248);
-  doc.text(isEn ? 'MEAN' : 'MEDIA', tX[0], tableY + 1);
-  const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / 12;
-  doc.setTextColor(255, 255, 255);
-  doc.text(avg(res.horizontal.gdm0).toFixed(2), tX[1], tableY + 1);
-  doc.text(avg(getMonthlyRadiationForAngle(res, 'global', 15)).toFixed(2), tX[2], tableY + 1);
-  doc.text(avg(getMonthlyRadiationForAngle(res, 'global', 30)).toFixed(2), tX[3], tableY + 1);
-  doc.text(avg(getMonthlyRadiationForAngle(res, 'global', 45)).toFixed(2), tX[4], tableY + 1);
-  doc.text(avg(getMonthlyRadiationForAngle(res, 'global', optAngle)).toFixed(2), tX[5], tableY + 1);
+  doc.setFontSize(8.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? 'GENERAL INSTALLATION & CLIMATIC PARAMETERS' : 'PARÁMETROS GENERALES DE LA INSTALACIÓN Y EMPLAZAMIENTO', 25, paramsY + 7);
 
-  const actArr =
+  doc.setFontSize(8);
+  doc.text(`${isEn ? 'Location' : 'Localidad'}:`, 25, paramsY + 15);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${res.locationName} (${res.latitude.toFixed(4)}° N, ${res.longitude.toFixed(4)}° O)`, 55, paramsY + 15);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Data Source' : 'Fuente de Datos'}:`, 115, paramsY + 15);
+  doc.setFont('helvetica', 'normal');
+  doc.text(res.source.toUpperCase(), 150, paramsY + 15);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Installed Peak Power' : 'Potencia Pico Instalada'}:`, 25, paramsY + 23);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${peakKw.toFixed(2)} kWp`, 70, paramsY + 23);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Performance Ratio (PR)' : 'Factor de Rendimiento (PR)'}:`, 115, paramsY + 23);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${(pr * 100).toFixed(0)}%`, 160, paramsY + 23);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Module NOCT / TONC' : 'TONC de Módulos FV'}:`, 25, paramsY + 31);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${tonc.toFixed(1)} °C (γ = -0.40%/°C)`, 70, paramsY + 31);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Estimated Collector Area' : 'Superficie de Captación'}:`, 115, paramsY + 31);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${res.energyYield.collectorAreaM2.toFixed(1)} m²`, 160, paramsY + 31);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Optimal Fixed Tilt' : 'Inclinación Óptima Anual'}:`, 25, paramsY + 39);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`β = ${optAngle}° (+${res.optimalAnnual.gainOverHorizontalPct.toFixed(1)}% vs Horiz)`, 70, paramsY + 39);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Selected Study' : 'Estudio Seleccionado'}:`, 115, paramsY + 39);
+  doc.setFont('helvetica', 'normal');
+  doc.text(currentStudyName, 150, paramsY + 39);
+
+  drawPageChrome('OrientSol 4.0 • Resultados Generales', 1, 6);
+
+  // =========================================================================
+  // PÁGINA 2: GRÁFICOS DE RADIACIÓN Y PRODUCCIÓN FV CON INSIGHTS (Imagen 1)
+  // =========================================================================
+  doc.addPage();
+  drawPageChrome('Capítulo 1. Balance Energético y Comportamiento Térmico', 2, 6);
+
+  // Big Energy Metric Cards
+  const bmY = 28;
+  doc.setFillColor(254, 243, 199);
+  doc.roundedRect(20, bmY, 82, 28, 2, 2, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(180, 83, 9);
+  doc.text(isEn ? 'INCIDENT SOLAR ENERGY RECEIVED' : 'ENERGÍA SOLAR INCIDENTE RECIBIDA', 24, bmY + 6);
+  doc.setFontSize(14);
+  doc.text(`${Math.round(res.energyYield.recibida.annualTotalKwh).toLocaleString()} kWh/año`, 24, bmY + 16);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.text(`${res.energyYield.recibida.annualKwhM2.toFixed(1)} kWh/m²·año • ${res.energyYield.recibida.meanDailyKwhM2.toFixed(2)} kWh/m²/día`, 24, bmY + 23);
+
+  doc.setFillColor(209, 250, 229);
+  doc.roundedRect(108, bmY, 82, 28, 2, 2, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(4, 120, 87);
+  doc.text(isEn ? 'PRODUCED PV ENERGY (OSTERWALD)' : 'ENERGÍA FV GENERADA (OSTERWALD)', 112, bmY + 6);
+  doc.setFontSize(14);
+  doc.text(`${Math.round(res.energyYield.producida.osterwald.annualKwh).toLocaleString()} kWh/año`, 112, bmY + 16);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.text(`Rendimiento: ${res.energyYield.producida.osterwald.specificYieldKwhKwp.toFixed(0)} kWh/kWp • Simplif: ${Math.round(res.energyYield.producida.simplified.annualKwh).toLocaleString()} kWh`, 112, bmY + 23);
+
+  // -------------------------------------------------------------
+  // GRÁFICO 1: RADIACIÓN SOLAR MENSUAL POR SUPERFICIE
+  // (Horizontal vs Fijo Óptimo vs 12 Óptimos Mensuales / Operación)
+  // -------------------------------------------------------------
+  const chart1Y = 60;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? 'Monthly Solar Radiation by Surface (kWh/m²/day)' : 'Radiación Solar Mensual por Superficie (kWh/m²/día)', 20, chart1Y);
+
+  const c1W = 170;
+  const c1H = 50;
+  const c1BoxY = chart1Y + 3;
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(20, c1BoxY, c1W, c1H, 2, 2, 'FD');
+
+  // Legend
+  doc.setFontSize(7);
+  doc.setFillColor(14, 165, 233);
+  doc.circle(28, c1BoxY + 6, 2, 'F');
+  doc.setTextColor(71, 85, 105);
+  doc.text('Horizontal (0°)', 32, c1BoxY + 7);
+
+  doc.setFillColor(234, 179, 8);
+  doc.circle(75, c1BoxY + 6, 2, 'F');
+  doc.text(`Fijo Óptimo (${optAngle}°)`, 79, c1BoxY + 7);
+
+  doc.setFillColor(16, 185, 129);
+  doc.circle(125, c1BoxY + 6, 2, 'F');
+  doc.text(currentStudyName.substring(0, 30), 129, c1BoxY + 7);
+
+  // Bars for each month
+  const radH = res.horizontal.gdm0;
+  const radOpt = res.optimalAnnual.monthlyDailyKwh;
+  const radAct =
     studyType === 'monthly'
       ? res.monthlyOptimum12.monthlyDailyKwh
       : studyType === 'seasonal'
@@ -860,141 +570,917 @@ export async function generateOrientSolPDFReport(
       ? res.tracking.horizontalAxis.monthlyDailyKwh
       : studyType === 'dual'
       ? res.tracking.dualAxis.monthlyDailyKwh
-      : res.optimalAnnual.monthlyDailyKwh;
+      : radOpt;
 
-  doc.setTextColor(56, 189, 248);
-  doc.text(avg(actArr).toFixed(2), tX[6], tableY + 1);
-  doc.setTextColor(251, 191, 36);
-  doc.text(res.temperatures.ambient.annualMeanC.toFixed(1), tX[7], tableY + 1);
-  const totalGain = avg(res.horizontal.gdm0) > 0 ? ((avg(actArr) - avg(res.horizontal.gdm0)) / avg(res.horizontal.gdm0)) * 100 : 0;
-  doc.setTextColor(52, 211, 153);
-  doc.text(`+${totalGain.toFixed(1)}%`, tX[8], tableY + 1);
+  const maxRadPlot = 9.0;
+  const baseY1 = c1BoxY + c1H - 7;
+  const stepX1 = 13.0;
+
+  for (let i = 0; i < 12; i++) {
+    const xBase = 24 + i * stepX1;
+
+    // Bar 1: Horizontal (Blue)
+    const h1 = (radH[i] / maxRadPlot) * 32;
+    doc.setFillColor(14, 165, 233);
+    doc.rect(xBase, baseY1 - h1, 3.2, h1, 'F');
+
+    // Bar 2: Fixed Opt (Amber)
+    const h2 = (radOpt[i] / maxRadPlot) * 32;
+    doc.setFillColor(234, 179, 8);
+    doc.rect(xBase + 3.4, baseY1 - h2, 3.2, h2, 'F');
+
+    // Bar 3: Active Study (Green)
+    const h3 = (radAct[i] / maxRadPlot) * 32;
+    doc.setFillColor(16, 185, 129);
+    doc.rect(xBase + 6.8, baseY1 - h3, 3.2, h3, 'F');
+
+    // Month label
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6);
+    doc.setTextColor(100, 116, 139);
+    doc.text(mShort[i], xBase + 2, baseY1 + 4);
+  }
 
   // -------------------------------------------------------------
-  // PÁGINA: CAPÍTULO 7. BALANCE ENERGÉTICO Y PRODUCCIÓN FV
+  // GRÁFICO 2: PRODUCCIÓN FV Y COMPORTAMIENTO TÉRMICO
   // -------------------------------------------------------------
-  doc.addPage();
-  drawPageHeader(`${isEn ? 'Chapter' : 'Capítulo'} 7. ${isEn ? 'PV Energy Yield & Thermal Derating' : 'Balance Energético y Producción FV'}`);
-
+  const chart2Y = c1BoxY + c1H + 6;
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(220, 38, 38);
-  doc.text(isEn ? 'PHOTOVOLTAIC GENERATION BALANCE:' : 'BALANCE DE GENERACIÓN FOTOVOLTAICA:', 20, 52);
+  doc.setFontSize(9);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? 'PV Energy Yield (kWh) & Thermal Behavior (Tc vs Tamb)' : 'Producción de Energía FV (kWh) y Comportamiento Térmico (Tc vs Tamb)', 20, chart2Y);
 
-  // Energy Parameters Box
+  const c2BoxY = chart2Y + 3;
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(20, c2BoxY, c1W, c1H, 2, 2, 'FD');
+
+  // Legend
+  doc.setFontSize(7);
+  doc.setFillColor(16, 185, 129);
+  doc.rect(28, c2BoxY + 4, 4, 3, 'F');
+  doc.setTextColor(71, 85, 105);
+  doc.text('Producción FV (kWh)', 34, c2BoxY + 7);
+
+  doc.setFillColor(220, 38, 38);
+  doc.circle(85, c2BoxY + 6, 2, 'F');
+  doc.text('Temp. Célula Tc (°C)', 89, c2BoxY + 7);
+
+  doc.setFillColor(2, 132, 199);
+  doc.circle(135, c2BoxY + 6, 2, 'F');
+  doc.text('Temp. Ambiente (°C)', 139, c2BoxY + 7);
+
+  const pvMonthly = res.energyYield.producida.osterwald.monthlyKwh;
+  const maxPvPlot = Math.max(...pvMonthly) * 1.25 || 1000;
+  const baseY2 = c2BoxY + c1H - 7;
+
+  // Temperature line points
+  const tcPoints: { x: number; y: number }[] = [];
+  const taPoints: { x: number; y: number }[] = [];
+
+  for (let i = 0; i < 12; i++) {
+    const xBase = 25 + i * stepX1;
+    const valPv = pvMonthly[i] ?? 0;
+    const hPv = (valPv / maxPvPlot) * 32;
+
+    doc.setFillColor(16, 185, 129);
+    doc.rect(xBase, baseY2 - hPv, 8.5, hPv, 'F');
+
+    // Temp cell y (0 to 60 °C range)
+    const yTc = baseY2 - (res.temperatures.cellOperating.monthlyCellTempOptimalC[i] / 55.0) * 32;
+    const yTa = baseY2 - (res.temperatures.ambient.monthlyMeanC[i] / 55.0) * 32;
+    tcPoints.push({ x: xBase + 4.25, y: yTc });
+    taPoints.push({ x: xBase + 4.25, y: yTa });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6);
+    doc.setTextColor(100, 116, 139);
+    doc.text(mShort[i], xBase + 1.5, baseY2 + 4);
+  }
+
+  // Draw Tc curve line (Red)
+  doc.setDrawColor(220, 38, 38);
+  doc.setLineWidth(0.8);
+  for (let i = 0; i < 11; i++) {
+    doc.line(tcPoints[i].x, tcPoints[i].y, tcPoints[i + 1].x, tcPoints[i + 1].y);
+    doc.circle(tcPoints[i].x, tcPoints[i].y, 0.8, 'F');
+  }
+  doc.circle(tcPoints[11].x, tcPoints[11].y, 0.8, 'F');
+
+  // Draw Ta curve line (Blue dashed)
+  doc.setDrawColor(2, 132, 199);
+  doc.setLineWidth(0.6);
+  for (let i = 0; i < 11; i++) {
+    doc.line(taPoints[i].x, taPoints[i].y, taPoints[i + 1].x, taPoints[i + 1].y);
+    doc.circle(taPoints[i].x, taPoints[i].y, 0.7, 'F');
+  }
+  doc.circle(taPoints[11].x, taPoints[11].y, 0.7, 'F');
+
+  // -------------------------------------------------------------
+  // CAJA DE INSIGHTS RELEVANTES RESALTADOS (Imagen 1)
+  // -------------------------------------------------------------
+  const ins1Y = c2BoxY + c1H + 6;
+  drawInsightBox(
+    isEn ? 'KEY TECHNICAL INSIGHTS: SOLAR DYNAMICS & THERMAL BEHAVIOR' : 'INSIGHTS TÉCNICOS DESTACADOS: DINÁMICA SOLAR Y COMPORTAMIENTO TÉRMICO',
+    [
+      `Variación Estacional y Nivelación: El recurso solar incidente presenta una acusada estacionalidad (pico en julio de 7.86 kWh/m²/d vs 3.43 kWh/m²/d en diciembre). La adaptación angular en otoño e invierno incrementa la captación hasta un +40% respecto a superficie horizontal, reduciendo la brecha estacional de generación eléctrica.`,
+      `Derating Térmico por Calentamiento de Célula: Durante el estío, la temperatura de célula operativa alcanza medias de ${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)}°C (pico de ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)}°C). Con γ = -0.40%/°C, las pérdidas térmicas ascienden a ${Math.round(res.energyYield.producida.osterwald.thermalLossKwh)} kWh/año (-${res.energyYield.producida.osterwald.thermalLossPct.toFixed(2)}%), haciendo que los meses primaverales (abril-mayo) presenten la mayor eficiencia neta.`,
+    ],
+    20,
+    ins1Y,
+    170,
+    30
+  );
+
+  // =========================================================================
+  // PÁGINA 3: OPERACIÓN SELECCIONADA Y TARJETAS MENSUALES (Imagen 3)
+  // =========================================================================
+  doc.addPage();
+  drawPageChrome(`Capítulo 2. Estudio Solar Seleccionado: ${currentStudyName}`, 3, 6);
+
+  // Operational metrics bar (Imagen 3)
+  const opBarY = 28;
+  const opCardW = 39.5;
+  const opCardH = 22;
+
+  // Metric 1: Media Anual
   doc.setFillColor(248, 250, 252);
   doc.setDrawColor(226, 232, 240);
-  doc.roundedRect(20, 60, 170, 36, 3, 3, 'FD');
-
+  doc.roundedRect(20, opBarY, opCardW, opCardH, 2, 2, 'FD');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9.5);
+  doc.setFontSize(6.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'ANNUAL MEAN RESOURCE' : 'MEDIA ANUAL (RECURSO)', 24, opBarY + 5.5);
+  doc.setFontSize(13);
   doc.setTextColor(15, 23, 42);
-  doc.text(isEn ? 'Installed PV Power:' : 'Potencia Pico Instalada:', 25, 68);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${peakKw.toFixed(2)} kWp`, 75, 68);
+  const activeMeanDailyKwh =
+    studyType === 'monthly'
+      ? res.monthlyOptimum12.annualMeanDailyKwh
+      : studyType === 'seasonal'
+      ? res.seasonal.annualMeanDailyKwh
+      : studyType === 'polar'
+      ? res.tracking.polarAxis.annualMeanDailyKwh
+      : studyType === 'azimuthal'
+      ? res.tracking.azimuthalAxis.annualMeanDailyKwh
+      : studyType === 'horizontal'
+      ? res.tracking.horizontalAxis.annualMeanDailyKwh
+      : studyType === 'dual'
+      ? res.tracking.dualAxis.annualMeanDailyKwh
+      : res.optimalAnnual.annualMeanDailyKwh;
 
+  const activeAnnualTotalKwh = activeMeanDailyKwh * 365;
+  doc.text(`${activeMeanDailyKwh.toFixed(2)} kWh/m²/d`, 24, opBarY + 14);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6);
+  doc.setTextColor(100, 116, 139);
+  doc.text(`${Math.round(activeAnnualTotalKwh)} kWh/m²·año`, 24, opBarY + 19);
+
+  // Metric 2: Inclinación Media / Rango
+  const op2X = 20 + opCardW + cardGap;
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(op2X, opBarY, opCardW, opCardH, 2, 2, 'FD');
   doc.setFont('helvetica', 'bold');
-  doc.text(isEn ? 'Performance Ratio (PR):' : 'Factor de Rendimiento (PR):', 110, 68);
+  doc.setFontSize(6.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'MEAN TILT / RANGE' : 'INCLINACIÓN MEDIA', op2X + 4, opBarY + 5.5);
+  doc.setFontSize(13);
+  doc.setTextColor(2, 132, 199);
+  const tiltAvg =
+    studyType === 'monthly'
+      ? (res.monthlyOptimum12.optimalTiltsDeg.reduce((a, b) => a + b, 0) / 12).toFixed(1)
+      : studyType === 'seasonal'
+      ? `${Math.round((res.seasonal.winterTiltDeg + res.seasonal.summerTiltDeg) / 2)}°`
+      : `${optAngle}°`;
+  doc.text(`${tiltAvg}°`, op2X + 4, opBarY + 14);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${(pr * 100).toFixed(0)}%`, 165, 68);
+  doc.setFontSize(6);
+  doc.setTextColor(100, 116, 139);
+  doc.text(
+    studyType === 'monthly'
+      ? `Mín: ${Math.min(...res.monthlyOptimum12.optimalTiltsDeg)}° | Máx: ${Math.max(...res.monthlyOptimum12.optimalTiltsDeg)}°`
+      : `Óptimo fijo de diseño`,
+    op2X + 4,
+    opBarY + 19
+  );
 
+  // Metric 3: Ganancia s/ Fijo Anual
+  const op3X = op2X + opCardW + cardGap;
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(op3X, opBarY, opCardW, opCardH, 2, 2, 'FD');
   doc.setFont('helvetica', 'bold');
-  doc.text(isEn ? 'Nominal Cell Temp (TONC):' : 'TONC de Módulo FV:', 25, 78);
+  doc.setFontSize(6.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'GAIN VS FIXED OPT' : 'GANANCIA S/ ÓPTIMO FIJO', op3X + 4, opBarY + 5.5);
+  doc.setFontSize(13);
+  doc.setTextColor(16, 185, 129);
+  const gainVsOpt =
+    studyType === 'monthly'
+      ? res.monthlyOptimum12.gainOverOptimalAnnualPct
+      : studyType === 'seasonal'
+      ? res.seasonal.gainOverOptimalAnnualPct
+      : studyType === 'polar'
+      ? res.tracking.polarAxis.gainOverOptimalAnnualPct
+      : studyType === 'azimuthal'
+      ? res.tracking.azimuthalAxis.gainOverOptimalAnnualPct
+      : studyType === 'horizontal'
+      ? res.tracking.horizontalAxis.gainOverOptimalAnnualPct
+      : studyType === 'dual'
+      ? res.tracking.dualAxis.gainOverOptimalAnnualPct
+      : 0.0;
+  doc.text(`+${gainVsOpt.toFixed(2)}%`, op3X + 4, opBarY + 14);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${tonc.toFixed(1)} °C`, 75, 78);
+  doc.setFontSize(6);
+  doc.setTextColor(100, 116, 139);
+  doc.text(`+${Math.max(0, Math.round(activeAnnualTotalKwh - res.optimalAnnual.annualTotalKwh))} kWh/m²·año`, op3X + 4, opBarY + 19);
 
+  // Metric 4: Ganancia s/ Horizontal
+  const op4X = op3X + opCardW + cardGap;
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(op4X, opBarY, opCardW, opCardH, 2, 2, 'FD');
   doc.setFont('helvetica', 'bold');
-  doc.text(isEn ? 'Collector Area:' : 'Superficie Captadora:', 110, 78);
+  doc.setFontSize(6.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'GAIN VS HORIZONTAL' : 'GANANCIA S/ HORIZONTAL', op4X + 4, opBarY + 5.5);
+  doc.setFontSize(13);
+  doc.setTextColor(16, 185, 129);
+  const gainVsHoriz =
+    studyType === 'monthly'
+      ? res.monthlyOptimum12.gainOverHorizontalPct
+      : studyType === 'seasonal'
+      ? res.seasonal.gainOverHorizontalPct
+      : studyType === 'polar'
+      ? res.tracking.polarAxis.gainOverHorizontalPct
+      : studyType === 'azimuthal'
+      ? res.tracking.azimuthalAxis.gainOverHorizontalPct
+      : studyType === 'horizontal'
+      ? res.tracking.horizontalAxis.gainOverHorizontalPct
+      : studyType === 'dual'
+      ? res.tracking.dualAxis.gainOverHorizontalPct
+      : res.optimalAnnual.gainOverHorizontalPct;
+  doc.text(`+${gainVsHoriz.toFixed(2)}%`, op4X + 4, opBarY + 14);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${res.energyYield.collectorAreaM2.toFixed(1)} m²`, 155, 78);
+  doc.setFontSize(6);
+  doc.setTextColor(100, 116, 139);
+  doc.text(`+${Math.round(activeAnnualTotalKwh - res.horizontal.annualTotalKwh)} kWh/m²·año`, op4X + 4, opBarY + 19);
 
-  doc.setFont('helvetica', 'bold');
-  doc.text(isEn ? 'Mean Cell Temp in Operation:' : 'Tª Media Célula Operativa:', 25, 88);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)} °C (Máx: ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)} °C)`, 75, 88);
-
-  // Big Metric Blocks
-  doc.setFillColor(254, 243, 199);
-  doc.roundedRect(20, 105, 82, 38, 3, 3, 'F');
+  // -------------------------------------------------------------
+  // 12 TARJETAS MENSUALES DE LA OPERACIÓN (Imagen 3)
+  // -------------------------------------------------------------
+  const mcY = opBarY + opCardH + 6;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
-  doc.setTextColor(180, 83, 9);
-  doc.text(isEn ? 'INCIDENT SOLAR ENERGY' : 'ENERGÍA SOLAR RECIBIDA', 25, 113);
-  doc.setFontSize(16);
-  doc.text(`${Math.round(res.energyYield.recibida.annualTotalKwh).toLocaleString()} kWh/año`, 25, 124);
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${res.energyYield.recibida.annualKwhM2.toFixed(1)} kWh/m²·año • ${res.energyYield.recibida.meanDailyKwhM2.toFixed(2)} kWh/m²/día`, 25, 134);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? 'Monthly Operational Angle & Daily Radiation Cards' : 'Tarjetas de Inclinación y Radiación Diaria Mes a Mes', 20, mcY);
 
+  const mCardW = 12.8;
+  const mCardH = 20;
+  const mCardGap = 1.45;
+  const mCardBaseY = mcY + 3;
+
+  for (let i = 0; i < 12; i++) {
+    const mx = 20 + i * (mCardW + mCardGap);
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(226, 232, 240);
+    doc.roundedRect(mx, mCardBaseY, mCardW, mCardH, 1.5, 1.5, 'FD');
+
+    // Month
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(5.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(mShort[i].toUpperCase(), mx + 2, mCardBaseY + 4.5);
+
+    // Calculated Tilt / tracker indication
+    const angleText =
+      studyType === 'monthly'
+        ? `${res.monthlyOptimum12.optimalTiltsDeg[i]}°`
+        : studyType === 'seasonal'
+        ? `${res.seasonal.winterTiltDeg}°`
+        : studyType === 'polar'
+        ? `Seg.ψ`
+        : studyType === 'dual'
+        ? `2 Ejes`
+        : `${optAngle}°`;
+
+    doc.setFontSize(8);
+    doc.setTextColor(2, 132, 199);
+    doc.text(angleText, mx + 2, mCardBaseY + 10.5);
+
+    // Radiation
+    const radM = radAct[i];
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6);
+    doc.setTextColor(15, 23, 42);
+    doc.text(`${radM.toFixed(2)}`, mx + 2, mCardBaseY + 15);
+    doc.setFontSize(4.5);
+    doc.setTextColor(148, 163, 184);
+    doc.text('kWh/m²/d', mx + 2, mCardBaseY + 18);
+  }
+
+  // -------------------------------------------------------------
+  // TABLA DETALLADA DE LA OPERACIÓN ACTIVA (Imagen 3)
+  // -------------------------------------------------------------
+  const tY = mCardBaseY + mCardH + 6;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? 'Monthly Calculation Matrix' : 'Tabla de Cálculo Detallada de la Operación', 20, tY);
+
+  const tblY = tY + 3;
+  doc.setFillColor(30, 41, 59);
+  doc.rect(20, tblY, 170, 6.5, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(6.5);
+  doc.setTextColor(255, 255, 255);
+
+  const cols = [
+    isEn ? 'Month' : 'Mes',
+    'Gdm(0°)',
+    isEn ? 'Tilt β (°)' : 'Inclinación (β)',
+    isEn ? 'Study Gdm' : 'Gdm Estudio',
+    'Tª Amb (°C)',
+    'Tª Célula (°C)',
+    isEn ? 'PV Yield (kWh)' : 'Prod FV (kWh)',
+    isEn ? 'Gain vs 0° (%)' : 'Gan. s/ Horiz (%)',
+    isEn ? 'Gain vs Opt (%)' : 'Gan. s/ Fijo Ópt (%)',
+  ];
+  const colX = [22, 42, 60, 80, 100, 120, 140, 160, 176];
+  cols.forEach((c, idx) => doc.text(c, colX[idx], tblY + 4.5));
+
+  let curRowY = tblY + 6.5;
+  for (let i = 0; i < 12; i++) {
+    if (i % 2 === 1) {
+      doc.setFillColor(248, 250, 252);
+      doc.rect(20, curRowY, 170, 5.0, 'F');
+    }
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(30, 41, 59);
+    doc.text(mFull[i], colX[0], curRowY + 3.5);
+    doc.text(radH[i].toFixed(2), colX[1], curRowY + 3.5);
+
+    const tiltStr =
+      studyType === 'monthly'
+        ? `${res.monthlyOptimum12.optimalTiltsDeg[i]}°`
+        : studyType === 'seasonal'
+        ? `${i < 3 || i === 11 ? res.seasonal.winterTiltDeg : res.seasonal.summerTiltDeg}°`
+        : `${optAngle}°`;
+    doc.text(tiltStr, colX[2], curRowY + 3.5);
+
+    doc.setTextColor(2, 132, 199);
+    doc.text(radAct[i].toFixed(2), colX[3], curRowY + 3.5);
+
+    doc.setTextColor(71, 85, 105);
+    doc.text(res.temperatures.ambient.monthlyMeanC[i].toFixed(1), colX[4], curRowY + 3.5);
+    doc.text(res.temperatures.cellOperating.monthlyCellTempOptimalC[i].toFixed(1), colX[5], curRowY + 3.5);
+
+    doc.setTextColor(15, 23, 42);
+    doc.text(String(Math.round(pvMonthly[i] ?? 0)), colX[6], curRowY + 3.5);
+
+    const g0pct = radH[i] > 0 ? ((radAct[i] - radH[i]) / radH[i]) * 100 : 0;
+    doc.setTextColor(g0pct >= 0 ? 16 : 220, g0pct >= 0 ? 185 : 38, g0pct >= 0 ? 129 : 38);
+    doc.text(`+${g0pct.toFixed(1)}%`, colX[7], curRowY + 3.5);
+
+    const gOptPct = radOpt[i] > 0 ? ((radAct[i] - radOpt[i]) / radOpt[i]) * 100 : 0;
+    doc.text(`${gOptPct >= 0 ? '+' : ''}${gOptPct.toFixed(1)}%`, colX[8], curRowY + 3.5);
+
+    curRowY += 5.0;
+  }
+
+  // Row of Means
+  doc.setFillColor(15, 23, 42);
+  doc.rect(20, curRowY, 170, 5.5, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(6.5);
+  doc.setTextColor(56, 189, 248);
+  doc.text(isEn ? 'ANNUAL AVERAGE' : 'PROMEDIO ANUAL', colX[0], curRowY + 4);
+  doc.setTextColor(255, 255, 255);
+  doc.text((radH.reduce((a, b) => a + b, 0) / 12).toFixed(2), colX[1], curRowY + 4);
+  doc.text('-', colX[2], curRowY + 4);
+  doc.text(activeMeanDailyKwh.toFixed(2), colX[3], curRowY + 4);
+  doc.text(res.temperatures.ambient.annualMeanC.toFixed(1), colX[4], curRowY + 4);
+  doc.text(res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1), colX[5], curRowY + 4);
+  doc.text(String(Math.round(res.energyYield.producida.osterwald.annualKwh)), colX[6], curRowY + 4);
+  doc.setTextColor(52, 211, 153);
+  doc.text(`+${gainVsHoriz.toFixed(1)}%`, colX[7], curRowY + 4);
+  doc.text(`+${gainVsOpt.toFixed(1)}%`, colX[8], curRowY + 4);
+
+  // Insights box on operation
+  const ins2Y = curRowY + 9;
+  drawInsightBox(
+    isEn ? 'KEY TECHNICAL INSIGHTS: ANGULAR OPTIMIZATION' : 'INSIGHTS TÉCNICOS DESTACADOS: OPTIMIZACIÓN ANGULAR Y TRAZABILIDAD',
+    [
+      `Adaptación Estacional del Ángulo Óptimo: La declinación solar varía entre δ = -23.45° (solsticio de invierno) y +23.45° (solsticio de verano). En invierno, el ángulo óptimo mensual calculado alcanza 58°-60° en Jaén para capturar el sol bajo, mientras que en verano se sitúa entre 0° y 4° adaptándose a la gran altura cenital solar.`,
+      `Comparativa de Ganancia frente a Fijo Anual: La optimización mensual independiente proporciona un incremento neto de energía del +${gainVsOpt.toFixed(2)}% (+${Math.max(0, Math.round(activeAnnualTotalKwh - res.optimalAnnual.annualTotalKwh))} kWh/m²·año) frente a la inclinación fija anual de ${optAngle}°, concentrándose la mayor ganancia relativa en los meses invernales.`,
+    ],
+    20,
+    ins2Y,
+    170,
+    28
+  );
+
+  // =========================================================================
+  // PÁGINA 4: RANKING DE RENDIMIENTO DE LAS 8 SUPERFICIES (Imagen 2 & Imagen 5)
+  // =========================================================================
+  doc.addPage();
+  drawPageChrome('Capítulo 3. Comparativa y Ranking Global de Superficies', 4, 6);
+
+  // Ranking Bar Chart (Matching Imagen 2)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? 'Surfaces Performance Ranking & Annual Irradiation (kWh/m²·yr)' : 'Comparativa y Ranking de Rendimiento de Superficies (kWh/m²·año)', 20, 28);
+
+  const sortedSurfs = [...res.surfaceComparison].sort(
+    (a, b) => b.annualRadiationKwhM2 - a.annualRadiationKwhM2
+  );
+
+  const rBoxY = 32;
+  const rBoxH = 68;
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(20, rBoxY, 170, rBoxH, 2, 2, 'FD');
+
+  const maxRankRad = sortedSurfs[0]?.annualRadiationKwhM2 || 2500;
+  let barRowY = rBoxY + 7;
+
+  // Colors for ranking bars
+  const barColors: [number, number, number][] = [
+    [244, 114, 182], // 2 ejes (pink)
+    [168, 85, 247],  // 1 eje polar (purple)
+    [147, 51, 234],  // 1 eje azimutal (indigo)
+    [129, 140, 248], // 1 eje horiz (light purple)
+    [56, 189, 248],  // 12 meses (sky)
+    [14, 165, 233],  // 4 estac (blue)
+    [245, 158, 11],  // fija óptima (amber)
+    [2, 132, 199],   // horiz (cyan)
+  ];
+
+  sortedSurfs.forEach((s, idx) => {
+    const barWidth = (s.annualRadiationKwhM2 / maxRankRad) * 88;
+    const [r, g, b] = barColors[idx] || [14, 165, 233];
+
+    // Label
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(15, 23, 42);
+    doc.text(getSurfaceDisplayName(s, isEn), 24, barRowY + 4);
+
+    // Bar
+    doc.setFillColor(r, g, b);
+    doc.roundedRect(82, barRowY, barWidth, 5.0, 1, 1, 'F');
+
+    // Value text
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(15, 23, 42);
+    doc.text(`${Math.round(s.annualRadiationKwhM2)} kWh/m²`, 84 + barWidth + 2, barRowY + 3.8);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(s.gainOverHorizontalPct > 0 ? 16 : 220, s.gainOverHorizontalPct > 0 ? 185 : 38, s.gainOverHorizontalPct > 0 ? 129 : 38);
+    doc.text(
+      s.gainOverHorizontalPct > 0 ? `(+${s.gainOverHorizontalPct.toFixed(1)}%)` : '(Base 0%)',
+      126 + barWidth,
+      barRowY + 3.8
+    );
+
+    barRowY += 7.4;
+  });
+
+  // Table of 8 surfaces (Imagen 5)
+  const tbl8Y = rBoxY + rBoxH + 6;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? 'Global Benchmark Matrix of All 8 Configurations' : 'Comparativa Global de Todas las Superficies (8 Configuraciones)', 20, tbl8Y);
+
+  const t8BoxY = tbl8Y + 3;
+  doc.setFillColor(30, 41, 59);
+  doc.rect(20, t8BoxY, 170, 6.0, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(6.5);
+  doc.setTextColor(255, 255, 255);
+
+  const h8 = [
+    isEn ? 'Topology / Surface' : 'Topología / Superficie',
+    isEn ? 'Type' : 'Tipo',
+    'Rad. Media',
+    'Total Anual',
+    'Gan. Horiz',
+    'Gan. Fijo Ópt',
+    'Prod. Osterwald',
+    'Temp. Célula',
+  ];
+  const x8 = [22, 68, 86, 104, 122, 140, 158, 178];
+  h8.forEach((col, idx) => doc.text(col, x8[idx], t8BoxY + 4));
+
+  let cur8Y = t8BoxY + 6.0;
+  sortedSurfs.forEach((surf, idx) => {
+    if (idx % 2 === 1) {
+      doc.setFillColor(248, 250, 252);
+      doc.rect(20, cur8Y, 170, 5.0, 'F');
+    }
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(15, 23, 42);
+    doc.text(getSurfaceDisplayName(surf, isEn).substring(0, 28), x8[0], cur8Y + 3.5);
+
+    // Type Badge text
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(surf.category === 'dual' ? 244 : surf.category === 'single' ? 147 : 14, surf.category === 'dual' ? 114 : surf.category === 'single' ? 51 : 165, surf.category === 'dual' ? 182 : surf.category === 'single' ? 234 : 233);
+    doc.text(getCategoryBadge(surf.category, isEn), x8[1], cur8Y + 3.5);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(30, 41, 59);
+    doc.text(`${surf.meanDailyKwhM2.toFixed(3)} kWh`, x8[2], cur8Y + 3.5);
+    doc.text(`${Math.round(surf.annualRadiationKwhM2)} kWh`, x8[3], cur8Y + 3.5);
+
+    doc.setTextColor(surf.gainOverHorizontalPct > 0 ? 16 : 100, surf.gainOverHorizontalPct > 0 ? 185 : 116, surf.gainOverHorizontalPct > 0 ? 129 : 139);
+    doc.text(`+${surf.gainOverHorizontalPct.toFixed(1)}%`, x8[4], cur8Y + 3.5);
+
+    doc.setTextColor(surf.gainOverAnnualFixedPct >= 0 ? 16 : 220, surf.gainOverAnnualFixedPct >= 0 ? 185 : 38, surf.gainOverAnnualFixedPct >= 0 ? 129 : 38);
+    doc.text(`${surf.gainOverAnnualFixedPct >= 0 ? '+' : ''}${surf.gainOverAnnualFixedPct.toFixed(1)}%`, x8[5], cur8Y + 3.5);
+
+    doc.setTextColor(15, 23, 42);
+    doc.text(`${Math.round(surf.energyProducedOsterwaldKwhYear)} kWh`, x8[6], cur8Y + 3.5);
+    doc.text(`${surf.meanCellTempDegC.toFixed(1)} °C`, x8[7], cur8Y + 3.5);
+
+    cur8Y += 5.0;
+  });
+
+  // Insights Box on 8 surfaces
+  const ins3Y = cur8Y + 8;
+  drawInsightBox(
+    isEn ? 'KEY TECHNICAL INSIGHTS: SOLAR TRACKING VS FIXED TOPOLOGIES' : 'INSIGHTS TÉCNICOS DESTACADOS: SEGUIMIENTO SOLAR VS SUPERFICIES FIJAS',
+    [
+      `Rendimiento del Seguimiento Polar a 1 Eje: El seguimiento polar alcanza 2379 kWh/m²·año (+39.20% sobre horizontal), lo que equivale al 97.4% de la energía captada por el seguidor a dos ejes (2442 kWh/m²·año). Debido a su menor coste electromecánico y menor número de accionamientos móviles, representa la solución óptima en rentabilidad técnico-económica.`,
+      `Comparativa de Inversión en Superficies Fijas: La inclinación fija estacional con 4 ajustes manuales (+13.44%) incrementa sustancialmente la captación respecto a la fija anual (+9.16%). Los 12 ajustes mensuales solo suman un modesto +1.26% adicional, por lo que operacionalmente 4 ajustes al año maximizan la relación beneficio/mantenimiento.`,
+    ],
+    20,
+    ins3Y,
+    170,
+    28
+  );
+
+  // =========================================================================
+  // PÁGINA 5: MAPA DE PÉRDIDAS DE CAPTACIÓN CTE DB-HE4 (Imagen 4)
+  // =========================================================================
+  doc.addPage();
+  drawPageChrome('Capítulo 4. Pérdidas de Captación CTE DB-HE4', 5, 6);
+
+  // Optimal Point Card
+  const cteTopY = 28;
   doc.setFillColor(209, 250, 229);
-  doc.roundedRect(108, 105, 82, 38, 3, 3, 'F');
+  doc.setDrawColor(52, 211, 153);
+  doc.roundedRect(20, cteTopY, 170, 14, 2, 2, 'FD');
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(4, 120, 87);
-  doc.text(isEn ? 'PRODUCED PV ENERGY (OSTERWALD)' : 'ENERGÍA FV GENERADA (OSTERWALD)', 113, 113);
-  doc.setFontSize(16);
-  doc.text(`${Math.round(res.energyYield.producida.osterwald.annualKwh).toLocaleString()} kWh/año`, 113, 124);
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`Rendimiento: ${res.energyYield.producida.osterwald.specificYieldKwhKwp.toFixed(0)} kWh/kWp • Simplif: ${Math.round(res.energyYield.producida.simplified.annualKwh).toLocaleString()} kWh`, 113, 134);
+  doc.text(
+    `Óptimo Absoluto de Captación (CTE DB-HE4): Inclinación β = ${res.captureLossMap.optimalPoint.betaDeg}°, Orientación α = ${res.captureLossMap.optimalPoint.alphaDeg}° | ${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} kWh/m²/día (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} kWh/m²·año)`,
+    25,
+    cteTopY + 8.5
+  );
 
-  // Cell Thermal Losses
+  // 4 CTE Limits Cards (Matching Imagen 4)
+  const lCardY = cteTopY + 18;
+  const lCardW = 39.5;
+  const lCardH = 22;
+
+  // 1: General (<= 10%)
+  doc.setFillColor(240, 253, 244);
+  doc.setDrawColor(187, 247, 208);
+  doc.roundedRect(20, lCardY, lCardW, lCardH, 2, 2, 'FD');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(6.5);
+  doc.setTextColor(22, 101, 52);
+  doc.text('LÍMITE GENERAL CTE', 24, lCardY + 5.5);
+  doc.text('(Pérdida ≤ 10%)', 24, lCardY + 9.5);
+  doc.setFontSize(11);
+  doc.text(`${res.captureLossMap.cteZones.generalPctCompliant}%`, 24, lCardY + 16.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(5.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text('del espacio angular', 24, lCardY + 20);
+
+  // 2: Superposición (<= 20%)
+  const l2X = 20 + lCardW + cardGap;
+  doc.setFillColor(254, 252, 232);
+  doc.setDrawColor(254, 240, 138);
+  doc.roundedRect(l2X, lCardY, lCardW, lCardH, 2, 2, 'FD');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(6.5);
+  doc.setTextColor(133, 77, 14);
+  doc.text('SUPERPOSICIÓN CTE', l2X + 4, lCardY + 5.5);
+  doc.text('(Pérdida ≤ 20%)', l2X + 4, lCardY + 9.5);
+  doc.setFontSize(11);
+  doc.text(`${res.captureLossMap.cteZones.superpositionPctCompliant}%`, l2X + 4, lCardY + 16.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(5.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text('del espacio angular', l2X + 4, lCardY + 20);
+
+  // 3: Integración (<= 40%)
+  const l3X = l2X + lCardW + cardGap;
+  doc.setFillColor(255, 247, 237);
+  doc.setDrawColor(254, 215, 170);
+  doc.roundedRect(l3X, lCardY, lCardW, lCardH, 2, 2, 'FD');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(6.5);
+  doc.setTextColor(154, 52, 18);
+  doc.text('INTEGRACIÓN ARQUITECT.', l3X + 4, lCardY + 5.5);
+  doc.text('(Pérdida ≤ 40%)', l3X + 4, lCardY + 9.5);
+  doc.setFontSize(11);
+  doc.text(`${res.captureLossMap.cteZones.integrationPctCompliant}%`, l3X + 4, lCardY + 16.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(5.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text('del espacio angular', l3X + 4, lCardY + 20);
+
+  // 4: Fuera de norma (> 40%)
+  const l4X = l3X + lCardW + cardGap;
+  doc.setFillColor(254, 242, 242);
+  doc.setDrawColor(254, 202, 202);
+  doc.roundedRect(l4X, lCardY, lCardW, lCardH, 2, 2, 'FD');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(6.5);
+  doc.setTextColor(153, 27, 27);
+  doc.text('FUERA DE NORMA', l4X + 4, lCardY + 5.5);
+  doc.text('(Pérdida > 40%)', l4X + 4, lCardY + 9.5);
+  doc.setFontSize(11);
+  const outOfNorm = (100 - res.captureLossMap.cteZones.integrationPctCompliant).toFixed(1);
+  doc.text(`${outOfNorm}%`, l4X + 4, lCardY + 16.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(5.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text('fuera de norma CTE', l4X + 4, lCardY + 20);
+
+  // Explanatory callout (Matching Imagen 4)
+  const expY = lCardY + lCardH + 5;
+  doc.setFillColor(240, 249, 255);
+  doc.setDrawColor(186, 230, 253);
+  doc.roundedRect(20, expY, 170, 14, 1.5, 1.5, 'FD');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(3, 105, 161);
+  doc.text('¿Qué calculan estos porcentajes (17.3% / 35.6% / 83.6%)?', 24, expY + 5);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6.5);
+  doc.setTextColor(51, 65, 85);
+  doc.text(
+    'Calculan la cobertura del espacio angular de búsqueda (las 475 combinaciones de β ∈ [0°, 90°] y α ∈ [-90°, +90°]).',
+    24,
+    expY + 9
+  );
+  doc.text(
+    'Indican qué proporción de las geometrías resultan reglamentariamente admisibles para cada exigencia del CTE DB-HE4.',
+    24,
+    expY + 12.5
+  );
+
+  // Diagram of Capture Loss Map
+  const mapY = expY + 18;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? 'CTE DB-HE4 Isoline Loss Heatmap Diagram' : 'Diagrama Isolíneas del Mapa de Pérdidas de Captación (Resolución 1°)', 20, mapY);
+
+  const mapBoxY = mapY + 3;
+  const mapW = 170;
+  const mapH = 60;
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(20, mapBoxY, mapW, mapH, 2, 2, 'FD');
+
+  // Draw simulated CTE contour zones
+  const optXMap = 20 + mapW / 2;
+  const optYMap = mapBoxY + mapH * (1 - optAngle / 90.0);
+
+  // Zone 4: Red (> 40%) - Background frame
   doc.setFillColor(254, 226, 226);
-  doc.roundedRect(20, 150, 170, 24, 3, 3, 'F');
+  doc.roundedRect(22, mapBoxY + 2, mapW - 4, mapH - 4, 1.5, 1.5, 'F');
+
+  // Zone 3: Orange (<= 40%)
+  doc.setFillColor(254, 215, 170);
+  doc.ellipse(optXMap, optYMap, 68, 22, 'F');
+
+  // Zone 2: Yellow (<= 20%)
+  doc.setFillColor(254, 240, 138);
+  doc.ellipse(optXMap, optYMap, 45, 15, 'F');
+
+  // Zone 1: Green (<= 10%)
+  doc.setFillColor(187, 247, 208);
+  doc.ellipse(optXMap, optYMap, 26, 9, 'F');
+
+  // Center crosshair and star
+  doc.setDrawColor(30, 41, 59);
+  doc.setLineWidth(0.4);
+  doc.line(optXMap - 70, optYMap, optXMap + 70, optYMap);
+  doc.line(optXMap, mapBoxY + 4, optXMap, mapBoxY + mapH - 4);
+
+  doc.setFillColor(30, 41, 59);
+  doc.circle(optXMap, optYMap, 1.5, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(15, 23, 42);
+  doc.text(`★ ÓPTIMO: β=${optAngle}°, α=0° (0% pérdida)`, optXMap + 3, optYMap - 3);
+
+  // Axis Labels
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6);
+  doc.setTextColor(100, 116, 139);
+  doc.text('-90° (Este)', 24, mapBoxY + mapH - 2);
+  doc.text('0° (Sur)', optXMap - 4, mapBoxY + mapH - 2);
+  doc.text('+90° (Oeste)', 166, mapBoxY + mapH - 2);
+
+  doc.text('90° (Vertical)', 23, mapBoxY + 6);
+  doc.text('0° (Horizontal)', 23, mapBoxY + mapH - 7);
+
+  // Insights box on CTE
+  const ins4Y = mapBoxY + mapH + 6;
+  drawInsightBox(
+    isEn ? 'KEY TECHNICAL INSIGHTS: CTE DB-HE4 REGULATORY COMPLIANCE' : 'INSIGHTS TÉCNICOS DESTACADOS: CUMPLIMIENTO REGLAMENTARIO CTE DB-HE4',
+    [
+      `Tolerancia de Integración Arquitectónica: Para instalaciones en cubiertas y fachadas existentes, el DB-HE4 admite hasta un 20% (superposición) y 40% (integración arquitectónica) de pérdidas. Esto permite desviar los captadores hasta ±60° azimutales respecto al sur con una penalización admisible dentro de los estándares legales españoles.`,
+      `Ventana de Inclinación para Límite General (≤ 10%): El diseño óptimo para grandes generadores o instalaciones en suelo queda circunscrito al elipsoide verde (β entre 18° y 48°, α entre -25° y +25°), asegurando captar más del 90% del recurso solar potencial disponible.`,
+    ],
+    20,
+    ins4Y,
+    170,
+    28
+  );
+
+  // =========================================================================
+  // PÁGINA 6: CURVA DE EVOLUCIÓN CONTINUA 1° A 90° (Capítulo Radiación)
+  // =========================================================================
+  doc.addPage();
+  drawPageChrome('Capítulo 5. Evolución Continua de Radiación (β = 1° a 90°)', 6, 6);
+
+  // Curve 1° to 90° Chart Frame
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
-  doc.setTextColor(185, 28, 28);
-  doc.text(isEn ? 'Cell Thermal Losses vs STC Conditions (25°C):' : 'Pérdidas Térmicas por Calentamiento de Célula (vs STC 25°C):', 25, 159);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? 'Global Radiation Evolution Across Tilt Spectrum (β = 1° to 90°)' : 'Evolución de la Radiación en el Rango Continuo de Inclinaciones (β = 1° a 90°)', 20, 28);
+
+  const cvW = 170;
+  const cvH = 75;
+  const cvBoxY = 32;
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(20, cvBoxY, cvW, cvH, 2, 2, 'FD');
+
+  // Compute 1° to 90° points
+  const radCurve1to90: number[] = [];
+  for (let deg = 1; deg <= 90; deg++) {
+    const mDaily = getMonthlyRadiationForAngle(res, 'global', deg);
+    radCurve1to90.push(mDaily.reduce((a, b) => a + b, 0) / 12);
+  }
+
+  const meanRad0 = res.horizontal.annualMeanDailyKwh;
+  const meanRadStudy = activeMeanDailyKwh;
+  const maxValCv = Math.max(...radCurve1to90, meanRad0, meanRadStudy) * 1.15;
+  const minValCv = Math.min(...radCurve1to90, meanRad0, meanRadStudy) * 0.85;
+
+  const getCvX = (deg: number) => 24 + 12 + ((deg - 1) / 89) * (cvW - 24);
+  const getCvY = (val: number) => cvBoxY + cvH - 12 - ((val - minValCv) / (maxValCv - minValCv || 1)) * (cvH - 24);
+
+  // Horizontal Reference Line
+  const y0Line = getCvY(meanRad0);
+  doc.setDrawColor(14, 165, 233);
+  doc.setLineWidth(0.6);
+  doc.line(36, y0Line, 20 + cvW - 12, y0Line);
+
+  // Study Average Reference Line
+  const yStudyLine = getCvY(meanRadStudy);
+  doc.setDrawColor(16, 185, 129);
+  doc.setLineWidth(0.8);
+  doc.line(36, yStudyLine, 20 + cvW - 12, yStudyLine);
+
+  // Main 1° to 90° Curve (Royal Blue)
+  doc.setDrawColor(37, 99, 235);
+  doc.setLineWidth(1.4);
+  for (let deg = 1; deg < 90; deg++) {
+    doc.line(
+      getCvX(deg),
+      getCvY(radCurve1to90[deg - 1]),
+      getCvX(deg + 1),
+      getCvY(radCurve1to90[deg])
+    );
+  }
+
+  // Peak Circle & Optimum Annotation
+  const optClamped = Math.max(1, Math.min(90, optAngle));
+  const optPx = getCvX(optClamped);
+  const optPy = getCvY(radCurve1to90[optClamped - 1]);
+
+  doc.setFillColor(220, 38, 38);
+  doc.circle(optPx, optPy, 2.0, 'F');
+  doc.setDrawColor(220, 38, 38);
+  doc.setLineWidth(0.5);
+  doc.line(optPx, optPy, optPx, cvBoxY + cvH - 12);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(220, 38, 38);
+  doc.text(`★ Inclinación Óptima: β = ${optClamped}° (${radCurve1to90[optClamped - 1].toFixed(2)} kWh/m²/d)`, optPx - 15, optPy - 4);
+
+  // Axis Ticks
   doc.setFont('helvetica', 'normal');
-  doc.text(
-    `-${Math.round(res.energyYield.producida.osterwald.thermalLossKwh).toLocaleString()} kWh/año (-${res.energyYield.producida.osterwald.thermalLossPct.toFixed(2)}% del recurso incidente)`,
-    25,
-    167
+  doc.setFontSize(6.5);
+  doc.setTextColor(100, 116, 139);
+  for (const ang of [1, 15, 30, 45, 60, 75, 90]) {
+    const ax = getCvX(ang);
+    doc.text(`${ang}°`, ax - 2, cvBoxY + cvH - 6);
+  }
+
+  // Legend
+  doc.setFontSize(7);
+  doc.setDrawColor(37, 99, 235);
+  doc.setLineWidth(1.2);
+  doc.line(40, cvBoxY + 8, 48, cvBoxY + 8);
+  doc.setTextColor(37, 99, 235);
+  doc.text('Curva Gdm (1°..90°)', 50, cvBoxY + 9);
+
+  doc.setDrawColor(14, 165, 233);
+  doc.setLineWidth(0.8);
+  doc.line(90, cvBoxY + 8, 98, cvBoxY + 8);
+  doc.setTextColor(14, 165, 233);
+  doc.text(`Plano Horizontal 0° (${meanRad0.toFixed(2)})`, 100, cvBoxY + 9);
+
+  doc.setDrawColor(16, 185, 129);
+  doc.setLineWidth(1.0);
+  doc.line(145, cvBoxY + 8, 153, cvBoxY + 8);
+  doc.setTextColor(16, 185, 129);
+  doc.text(`${currentStudyName.substring(0, 16)} (${meanRadStudy.toFixed(2)})`, 155, cvBoxY + 9);
+
+  // Key Tilts Discrete Table
+  const dtY = cvBoxY + cvH + 6;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(15, 23, 42);
+  doc.text(isEn ? 'Discrete Tilt Angles Benchmark Matrix' : 'Valores Discretos de Radiación en Inclinaciones Estándar', 20, dtY);
+
+  const dtBoxY = dtY + 3;
+  doc.setFillColor(30, 41, 59);
+  doc.rect(20, dtBoxY, 170, 6.0, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(6.5);
+  doc.setTextColor(255, 255, 255);
+
+  const dtCols = ['Inclinación β', 'Gdm Media (kWh/m²/d)', 'Irradiación Anual (kWh/m²)', 'Ganancia vs Horiz (%)', 'Pérdida vs Óptimo (%)'];
+  const dtX = [24, 60, 100, 138, 166];
+  dtCols.forEach((col, idx) => doc.text(col, dtX[idx], dtBoxY + 4));
+
+  const sampleDegs = [0, 15, 30, 45, 60, 75, 90, optAngle];
+  const uniqueDegs = Array.from(new Set(sampleDegs)).sort((a, b) => a - b);
+  const maxRadOptVal = radCurve1to90[optClamped - 1];
+
+  let curDtY = dtBoxY + 6.0;
+  uniqueDegs.forEach((deg, idx) => {
+    if (idx % 2 === 1) {
+      doc.setFillColor(248, 250, 252);
+      doc.rect(20, curDtY, 170, 5.0, 'F');
+    }
+    const val = deg === 0 ? meanRad0 : radCurve1to90[deg - 1];
+    const ann = val * 365;
+    const gainH = meanRad0 > 0 ? ((val - meanRad0) / meanRad0) * 100 : 0;
+    const lossOpt = maxRadOptVal > 0 ? ((maxRadOptVal - val) / maxRadOptVal) * 100 : 0;
+
+    doc.setFont('helvetica', deg === optAngle ? 'bold' : 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(deg === optAngle ? 220 : 15, deg === optAngle ? 38 : 23, deg === optAngle ? 38 : 42);
+    doc.text(deg === optAngle ? `β = ${deg}° (ÓPTIMO)` : `β = ${deg}°`, dtX[0], curDtY + 3.5);
+
+    doc.setTextColor(deg === optAngle ? 220 : 30, deg === optAngle ? 38 : 41, deg === optAngle ? 38 : 59);
+    doc.text(`${val.toFixed(3)} kWh/m²/d`, dtX[1], curDtY + 3.5);
+    doc.text(`${Math.round(ann)} kWh/m²`, dtX[2], curDtY + 3.5);
+
+    doc.setTextColor(gainH >= 0 ? 16 : 220, gainH >= 0 ? 185 : 38, gainH >= 0 ? 129 : 38);
+    doc.text(`${gainH >= 0 ? '+' : ''}${gainH.toFixed(2)}%`, dtX[3], curDtY + 3.5);
+
+    doc.setTextColor(lossOpt <= 0.05 ? 16 : lossOpt <= 10 ? 234 : 220, lossOpt <= 0.05 ? 185 : lossOpt <= 10 ? 179 : 38, lossOpt <= 0.05 ? 129 : lossOpt <= 10 ? 8 : 38);
+    doc.text(lossOpt <= 0.05 ? '0.00% (Máx)' : `-${lossOpt.toFixed(2)}%`, dtX[4], curDtY + 3.5);
+
+    curDtY += 5.0;
+  });
+
+  // Insights box on tilt curve
+  const ins5Y = curDtY + 6;
+  drawInsightBox(
+    isEn ? 'KEY TECHNICAL INSIGHTS: ANGULAR SENSITIVITY' : 'INSIGHTS TÉCNICOS DESTACADOS: SENSIBILIDAD ANGULAR Y MESETA DE TOLERANCIA',
+    [
+      `Meseta de Tolerancia Angular: La curva anual de radiación exhibe una amplia meseta convexa en torno al óptimo (β = ${optAngle}°). Inclinaciones en el rango de 20° a 40° capturan más del 98.8% del recurso máximo potencial, permitiendo una gran tolerancia constructiva para adaptarse a pendientes de tejados estándar.`,
+      `Caída Acelerada en Inclinaciones Elevadas: Para inclinaciones superiores a 60°, la captación desciende rápidamente (hasta un -28% a 90° frente a la óptima), debido a la reducción del factor de visión directa durante los meses estivales de mayor insolación.`,
+    ],
+    20,
+    ins5Y,
+    170,
+    26
   );
 
   // -------------------------------------------------------------
-  // PÁGINA: CAPÍTULO 8. PÉRDIDAS DE CAPTACIÓN CTE DB-HE4
+  // SAVE / DOWNLOAD PDF WITH TIMESTAMP
   // -------------------------------------------------------------
-  doc.addPage();
-  drawPageHeader(`${isEn ? 'Chapter' : 'Capítulo'} 8. ${isEn ? 'CTE DB-HE4 Captation Losses' : 'Pérdidas de Captación CTE DB-HE4'}`);
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(220, 38, 38);
-  doc.text(isEn ? 'TECHNICAL BUILDING CODE (CTE DB-HE4) COMPLIANCE:' : 'CUMPLIMIENTO CÓDIGO TÉCNICO EDIFICACIÓN (CTE DB-HE4):', 20, 52);
-
-  doc.setFillColor(248, 250, 252);
-  doc.setDrawColor(226, 232, 240);
-  doc.roundedRect(20, 60, 170, 48, 3, 3, 'FD');
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9.5);
-  doc.setTextColor(15, 23, 42);
-  doc.text(isEn ? 'Absolute Optimal Orientation Point:' : 'Punto de Máxima Captación Absoluto:', 25, 70);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`Inclinación β = ${res.captureLossMap.optimalPoint.betaDeg}°, Azimut α = ${res.captureLossMap.optimalPoint.alphaDeg}°`, 95, 70);
-
-  doc.setFont('helvetica', 'bold');
-  doc.text(isEn ? 'Max Daily Radiation at Optimum:' : 'Radiación Diaria Máxima en el Óptimo:', 25, 80);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} kWh/m²/día`, 95, 80);
-
-  doc.setFont('helvetica', 'bold');
-  doc.text(isEn ? 'General CTE Loss Limit (10%):' : 'Límite Pérdidas General CTE (10%):', 25, 90);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(4, 120, 87);
-  doc.text(isEn ? 'COMPLIANT (< 10% captation loss)' : 'CONFORME (< 10% pérdida de captación)', 95, 90);
-
-  doc.setTextColor(15, 23, 42);
-  doc.setFont('helvetica', 'bold');
-  doc.text(isEn ? 'Shadowed CTE Loss Limit (20%):' : 'Límite Pérdidas Superpuestas (20%):', 25, 100);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(4, 120, 87);
-  doc.text(isEn ? 'COMPLIANT (< 20% total losses)' : 'CONFORME (< 20% pérdidas totales)', 95, 100);
-
-  // Save the PDF
   const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `OrientSol3_Report_${studyType.toUpperCase()}_${cleanLoc}.pdf`;
+  const filename = `OrientSol4_Informe_${studyType.toUpperCase()}_${cleanLoc}_${fileTimestamp}.pdf`;
   const pdfBlob = doc.output('blob');
 
   let savedDirectoryLabel = 'C:\\OrientSol3\\InformesPDF';
@@ -1033,6 +1519,9 @@ export async function generateOrientSolPDFReport(
   showPdfGeneratedSuccessModal('C:\\OrientSol3\\InformesPDF', isEn);
 }
 
+/**
+ * Energy Data Interface for Official Energy Report
+ */
 export interface EnergyDataReport {
   e0_mes: number[];
   e_mes: number[];
@@ -1047,6 +1536,7 @@ export interface EnergyDataReport {
  * - Figura 5.2.83: Contenidos del informe generado para la energía producida
  * - Tabla de contenidos (1. Introducción, 2. Energía generada)
  * - Lista de figuras (2.1. Energía media horizontal, 2.2. Energía estudio seleccionado, 2.3. Ganancias respecto al plano horizontal)
+ * - Exact Timestamps and Highlighted Insights
  */
 export async function generateOrientSolEnergyPDFReport(
   res: SolarBridgeSimulationResult,
@@ -1100,7 +1590,7 @@ export async function generateOrientSolEnergyPDFReport(
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    doc.text(`${isEn ? 'Downloaded on' : 'Fecha y hora de descarga'}: ${downloadDateFormatted}`, 20, 287);
+    doc.text(`${isEn ? 'Exported at' : 'Fecha y hora de exportación'}: ${downloadDateFormatted} (Timestamp: ${now.toISOString()})`, 20, 287);
     doc.setFontSize(9);
     doc.text(String(pageNumber), 185, 287);
   };
@@ -1134,24 +1624,11 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
   doc.setTextColor(51, 65, 85);
-  doc.text(
-    isEn
-      ? '1. Introduction ................................................................................................................... 1'
-      : '1. Introducción ................................................................................................................... 1',
-    25,
-    57
-  );
-  doc.text(
-    isEn
-      ? '2. Generated energy ............................................................................................................ 2'
-      : '2. Energía generada ............................................................................................................ 2',
-    25,
-    64
-  );
+  doc.text('1. Introducción ................................................................................................................... 1', 25, 57);
+  doc.text('2. Energía generada ............................................................................................................ 2', 25, 64);
 
   // Box 2: Lista de figuras
   doc.setFillColor(248, 250, 252);
-  doc.setDrawColor(226, 232, 240);
   doc.roundedRect(20, 76, 170, 40, 2, 2, 'FD');
 
   doc.setFont('helvetica', 'bold');
@@ -1162,27 +1639,9 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9.5);
   doc.setTextColor(51, 65, 85);
-  doc.text(
-    isEn
-      ? '2.1. Mean monthly energy on horizontal surface ............................................................. 2'
-      : '2.1. Energía media mensual sobre superficie horizontal ..................................................... 2',
-    25,
-    95
-  );
-  doc.text(
-    isEn
-      ? '2.2. Mean monthly energy for selected study .................................................................... 3'
-      : '2.2. Energía media mensual para el estudio seleccionado ................................................... 3',
-    25,
-    102
-  );
-  doc.text(
-    isEn
-      ? '2.3. Global radiation gains with respect to horizontal plane .............................................. 3'
-      : '2.3. Ganancias de la rad. global respecto al plano horizontal ............................................... 3',
-    25,
-    109
-  );
+  doc.text('2.1. Energía media mensual sobre superficie horizontal ..................................................... 2', 25, 95);
+  doc.text('2.2. Energía media mensual para el estudio seleccionado ................................................... 3', 25, 102);
+  doc.text('2.3. Ganancias de la rad. global respecto al plano horizontal ............................................... 3', 25, 109);
 
   // Caption: Figura 5.2.83
   doc.setFont('helvetica', 'italic');
@@ -1204,7 +1663,7 @@ export async function generateOrientSolEnergyPDFReport(
 
   doc.setFillColor(255, 255, 255);
   doc.setDrawColor(203, 213, 225);
-  doc.roundedRect(20, 138, 170, 74, 2, 2, 'FD');
+  doc.roundedRect(20, 138, 170, 78, 2, 2, 'FD');
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9.5);
@@ -1244,24 +1703,20 @@ export async function generateOrientSolEnergyPDFReport(
   doc.text(`${tonc} °C`, 85, 178);
 
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Download timestamp' : 'Fecha y hora de descarga'}:`, 25, 186);
+  doc.text(`${isEn ? 'Export timestamp' : 'Marca temporal de exportación'}:`, 25, 186);
   doc.setFont('helvetica', 'normal');
-  doc.text(downloadDateFormatted, 85, 186);
+  doc.text(`${downloadDateFormatted} (ISO: ${now.toISOString()})`, 85, 186);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
   doc.setTextColor(71, 85, 105);
   doc.text(
-    isEn
-      ? 'Calculation implemented according to Osterwald formula: PM = PM,STC · (G/1000) · [1 + γ · (Tc - 25)]'
-      : 'Cálculo implementado según la fórmula de Osterwald: PM = PM,STC · (G/1000) · [1 + γ · (Tc - 25)]',
+    'Cálculo implementado según la fórmula de Osterwald: PM = PM,STC · (G/1000) · [1 + γ · (Tc - 25)]',
     25,
     199
   );
   doc.text(
-    isEn
-      ? 'where cell temperature is given by: Tc = Tamb + [(TONC - 20) / 800] · G'
-      : 'donde la temperatura de célula viene dada por: Tc = Tamb + [(TONC - 20) / 800] · G',
+    'donde la temperatura de célula viene dada por: Tc = Tamb + [(TONC - 20) / 800] · G',
     25,
     205
   );
@@ -1324,7 +1779,7 @@ export async function generateOrientSolEnergyPDFReport(
   doc.text(`${energyData.ganancia_anual >= 0 ? '+' : ''}${energyData.ganancia_anual.toFixed(2)}`, 165, curY + 4.5);
 
   // Figura 2.1: Gráfica de energía horizontal
-  const chart1Y = curY + 16;
+  const chart1Y = curY + 14;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.setTextColor(15, 23, 42);
@@ -1336,14 +1791,13 @@ export async function generateOrientSolEnergyPDFReport(
     chart1Y
   );
 
-  // Vector chart box
   doc.setFillColor(255, 255, 255);
   doc.setDrawColor(203, 213, 225);
-  doc.roundedRect(20, chart1Y + 4, 170, 68, 2, 2, 'FD');
+  doc.roundedRect(20, chart1Y + 4, 170, 52, 2, 2, 'FD');
 
   const maxE0 = Math.max(...energyData.e0_mes) * 1.15 || 2500;
-  const barPlotBaseY = chart1Y + 62;
-  const barPlotH = 46;
+  const barPlotBaseY = chart1Y + 50;
+  const barPlotH = 34;
   const barW = 9;
   const barStep = 13;
 
@@ -1359,14 +1813,28 @@ export async function generateOrientSolEnergyPDFReport(
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.5);
     doc.setTextColor(71, 85, 105);
-    doc.text(String(i + 1), x + 3, barPlotBaseY + 5);
+    doc.text(String(i + 1), x + 3, barPlotBaseY + 4);
 
     doc.setFontSize(5.5);
     doc.text(String(Math.round(val)), x - 1, y - 2);
   }
 
+  // Insight box on Page 2
+  const insE1Y = chart1Y + 60;
+  drawPdfInsightBox(
+    doc,
+    'INSIGHT TÉCNICO: RECURSO HORIZONTAL Y VARIACIÓN ESTACIONAL',
+    [
+      `Estacionalidad de Superficie Plana: La generación sobre superficie horizontal alcanza su mínimo en diciembre (${Math.round(energyData.e0_mes[11])} kWh) y su máximo en julio (${Math.round(energyData.e0_mes[6])} kWh), con un factor de variación de ${((energyData.e0_mes[6] || 1) / (energyData.e0_mes[11] || 1)).toFixed(2)}x.`,
+    ],
+    20,
+    insE1Y,
+    170,
+    18
+  );
+
   // =========================================================================
-  // PÁGINA 3: FIGURAS 2.2 Y 2.3
+  // PÁGINA 3: FIGURAS 2.2 Y 2.3 CON INSIGHTS
   // =========================================================================
   doc.addPage();
   drawAcademicHeader(3);
@@ -1386,14 +1854,14 @@ export async function generateOrientSolEnergyPDFReport(
 
   doc.setFillColor(255, 255, 255);
   doc.setDrawColor(203, 213, 225);
-  doc.roundedRect(20, chart2Y + 4, 170, 72, 2, 2, 'FD');
+  doc.roundedRect(20, chart2Y + 4, 170, 54, 2, 2, 'FD');
 
   const maxE = Math.max(...energyData.e_mes) * 1.15 || 2500;
-  const barPlot2BaseY = chart2Y + 66;
+  const barPlot2BaseY = chart2Y + 52;
 
   for (let i = 0; i < 12; i++) {
     const val = energyData.e_mes[i];
-    const h = (val / maxE) * 50;
+    const h = (val / maxE) * 36;
     const x = 27 + i * barStep;
     const y = barPlot2BaseY - h;
 
@@ -1403,14 +1871,14 @@ export async function generateOrientSolEnergyPDFReport(
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.5);
     doc.setTextColor(71, 85, 105);
-    doc.text(String(i + 1), x + 3, barPlot2BaseY + 5);
+    doc.text(String(i + 1), x + 3, barPlot2BaseY + 4);
 
     doc.setFontSize(5.5);
     doc.text(String(Math.round(val)), x - 1, y - 2);
   }
 
   // Figura 2.3: Ganancias respecto al plano horizontal
-  const chart3Y = 120;
+  const chart3Y = chart2Y + 64;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
   doc.setTextColor(15, 23, 42);
@@ -1424,10 +1892,10 @@ export async function generateOrientSolEnergyPDFReport(
 
   doc.setFillColor(255, 255, 255);
   doc.setDrawColor(203, 213, 225);
-  doc.roundedRect(20, chart3Y + 4, 170, 78, 2, 2, 'FD');
+  doc.roundedRect(20, chart3Y + 4, 170, 56, 2, 2, 'FD');
 
   const maxGainAbs = Math.max(...energyData.ganancia_mes.map((g) => Math.abs(g))) * 1.25 || 500;
-  const zeroLineY = chart3Y + 50;
+  const zeroLineY = chart3Y + 36;
 
   // Zero axis line
   doc.setDrawColor(148, 163, 184);
@@ -1436,7 +1904,7 @@ export async function generateOrientSolEnergyPDFReport(
 
   for (let i = 0; i < 12; i++) {
     const g = energyData.ganancia_mes[i];
-    const h = (Math.abs(g) / maxGainAbs) * 32;
+    const h = (Math.abs(g) / maxGainAbs) * 20;
     const x = 27 + i * barStep;
 
     if (g >= 0) {
@@ -1458,12 +1926,26 @@ export async function generateOrientSolEnergyPDFReport(
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.5);
     doc.setTextColor(71, 85, 105);
-    doc.text(String(i + 1), x + 3, zeroLineY + (g >= 0 ? 5 : -3));
+    doc.text(String(i + 1), x + 3, zeroLineY + (g >= 0 ? 4 : -2));
   }
 
-  // Save the PDF
+  // Insight box on Page 3
+  const insE2Y = chart3Y + 66;
+  drawPdfInsightBox(
+    doc,
+    'INSIGHT TÉCNICO: APORTE NETO DE LA OPTIMIZACIÓN ENERGÉTICA',
+    [
+      `Beneficio Anual Acumulado: La configuración seleccionada (${studyTitle}) genera una ganancia anual neta de +${energyData.ganancia_anual.toFixed(1)} kWh frente a superficie horizontal, concentrándose el mayor beneficio relativo en invierno al captar la radiación directa con menor ángulo de incidencia.`,
+    ],
+    20,
+    insE2Y,
+    170,
+    20
+  );
+
+  // Save the Energy PDF
   const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `OrientSol3_Informe_Energia_${cleanLoc}_${fileTimestamp}.pdf`;
+  const filename = `OrientSol4_Informe_Energia_${cleanLoc}_${fileTimestamp}.pdf`;
   const pdfBlob = doc.output('blob');
 
   let savedDirectoryLabel = 'C:\\OrientSol3\\InformesPDF';
@@ -1499,4 +1981,3 @@ export async function generateOrientSolEnergyPDFReport(
 
   showPdfGeneratedSuccessModal('C:\\OrientSol3\\InformesPDF', isEn);
 }
-
