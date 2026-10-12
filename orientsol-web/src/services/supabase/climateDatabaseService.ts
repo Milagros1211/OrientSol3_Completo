@@ -83,6 +83,74 @@ export function calculateStringSimilarity(str1: string, str2: string): number {
 }
 
 /**
+ * Intelligently resolves the country for a given location, avoiding falsely defaulting to 'España'.
+ * 1. If explicitCountry is provided and not a falsely forced 'España' when coordinates are outside Spain, uses it.
+ * 2. If name contains a country or region in parentheses, e.g. "Lima (Perú)", "Quito (Ecuador)", extracts it.
+ * 3. Checks geographic coordinates bounding box: if coordinates are inside Spain [lat 27.0..44.5, lon -19.0..5.0], defaults to 'España'.
+ * 4. If coordinates are outside Spain or unknown, returns '' or the extracted country, never forcing 'España'.
+ */
+export function resolveLocationCountry(
+  name: string,
+  lat?: number,
+  lon?: number,
+  explicitCountry?: any
+): string {
+  const explicit = (explicitCountry || '').toString().trim();
+
+  // 1. Extract from parentheses in locationName if present: e.g. "Lima (Perú)"
+  const parenMatch = (name || '').match(/\(([^)]+)\)$/);
+  if (parenMatch) {
+    const inside = parenMatch[1].trim();
+    if (inside) return inside;
+  }
+
+  const validLat = lat !== undefined && lat !== null && !isNaN(Number(lat));
+  const validLon = lon !== undefined && lon !== null && !isNaN(Number(lon));
+  const nLat = validLat ? Number(lat) : 0;
+  const nLon = validLon ? Number(lon) : 0;
+
+  // 2. Check if coordinates are provided
+  if (validLat && validLon && (nLat !== 0 || nLon !== 0)) {
+    const isInsideSpain = nLat >= 27.0 && nLat <= 44.5 && nLon >= -19.0 && nLon <= 5.0;
+    if (isInsideSpain) {
+      return explicit || 'España';
+    }
+    // Outside Spain: if explicit was 'España' or 'Spain', ignore it!
+    if (explicit && explicit.toLowerCase() !== 'españa' && explicit.toLowerCase() !== 'spain') {
+      return explicit;
+    }
+    return '';
+  }
+
+  // 3. If no coordinates, only use explicit if not generic España
+  return explicit && explicit.toLowerCase() !== 'españa' ? explicit : '';
+}
+
+/**
+ * Formats a location name with its country safely without duplicating parenthetical countries.
+ * e.g.:
+ * - "Lima (Perú)", "Perú" -> "Lima (Perú)"
+ * - "Lima (Perú)", "España" -> "Lima (Perú)"
+ * - "Madrid", "España" -> "Madrid (España)"
+ * - "Paris", "" -> "Paris"
+ */
+export function formatLocationWithCountry(name: string, country?: string): string {
+  const cleanName = (name || '').trim();
+  const c = (country || '').trim();
+  if (!c) return cleanName;
+  const nLower = cleanName.toLowerCase();
+  const cLower = c.toLowerCase();
+  if (nLower.includes(cLower)) {
+    return cleanName;
+  }
+  // If name already ends with parentheses containing text, do not append another set of parentheses
+  if (/\([^)]+\)$/.test(cleanName)) {
+    return cleanName;
+  }
+  return `${cleanName} (${c})`;
+}
+
+/**
  * Validates that all fields of a climate record are non-empty, physically valid,
  * and complete before attempting upload to Supabase.
  */
@@ -407,7 +475,7 @@ export class ClimateDatabaseService {
                 id: `supabase-${locName.toLowerCase().replace(/\s+/g, '-')}`,
                 source: 'supabase',
                 locationName: locName,
-                country: first.country || first.pais || 'España',
+                country: resolveLocationCountry(locName, lat, lon, first.country || first.pais),
                 latitude: lat,
                 longitude: lon,
                 monthlyGdm0,
@@ -437,19 +505,24 @@ export class ClimateDatabaseService {
             });
           } else {
             // Fallback for wide format
-            records = data.map((row: any) => ({
-              id: row.id ? String(row.id) : `supabase-${(row.name || row.nombre || 'loc').toLowerCase().replace(/\s+/g, '-')}`,
-              source: 'supabase',
-              locationName: row.name || row.nombre || 'Ubicación Supabase',
-              country: row.country || row.pais || 'España',
-              latitude: Number(row.latitude ?? row.latitud ?? 0),
-              longitude: Number(row.longitude ?? row.longitud ?? 0),
-              elevationM: row.elevation_m != null ? Number(row.elevation_m) : undefined,
-              monthlyGdm0: (row.monthly_gdm0 || row.gdm0 || []).map(Number),
-              monthlyTemperature: (row.monthly_temperature || row.temperatura || []).map(Number),
-              fetchedAt: row.created_at || new Date().toISOString(),
-              metadata: { notes: row.notes, tonc: row.tonc },
-            }));
+            records = data.map((row: any) => {
+              const rowName = row.name || row.nombre || 'Ubicación Supabase';
+              const rowLat = Number(row.latitude ?? row.latitud ?? 0);
+              const rowLon = Number(row.longitude ?? row.longitud ?? 0);
+              return {
+                id: row.id ? String(row.id) : `supabase-${rowName.toLowerCase().replace(/\s+/g, '-')}`,
+                source: 'supabase',
+                locationName: rowName,
+                country: resolveLocationCountry(rowName, rowLat, rowLon, row.country || row.pais),
+                latitude: rowLat,
+                longitude: rowLon,
+                elevationM: row.elevation_m != null ? Number(row.elevation_m) : undefined,
+                monthlyGdm0: (row.monthly_gdm0 || row.gdm0 || []).map(Number),
+                monthlyTemperature: (row.monthly_temperature || row.temperatura || []).map(Number),
+                fetchedAt: row.created_at || new Date().toISOString(),
+                metadata: { notes: row.notes, tonc: row.tonc },
+              };
+            });
           }
 
           if (records.length > 0) {
@@ -827,7 +900,15 @@ export class ClimateDatabaseService {
   private getFromCache(): ClimateDataRecord[] | null {
     try {
       const raw = localStorage.getItem(LOCAL_STORAGE_CACHE_KEY);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          return parsed.map((r: any) => ({
+            ...r,
+            country: resolveLocationCountry(r.locationName, r.latitude, r.longitude, r.country),
+          }));
+        }
+      }
     } catch {}
     return null;
   }

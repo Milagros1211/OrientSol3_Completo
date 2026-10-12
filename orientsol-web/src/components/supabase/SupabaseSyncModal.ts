@@ -1,5 +1,6 @@
 import {
   climateDatabaseService,
+  formatLocationWithCountry,
   type SyncSummary,
 } from '@/services/supabase/climateDatabaseService';
 import { i18n } from '@/i18n';
@@ -218,7 +219,7 @@ function renderQueueItemsMarkup(queue: any[], isEn: boolean): string {
           return `
           <div class="queue-item-card">
             <div class="queue-item-info">
-              <strong>${idx + 1}. ${item.locationName} (${item.country || 'España'})</strong>
+              <strong>${idx + 1}. ${formatLocationWithCountry(item.locationName, item.country)}</strong>
               <span class="queue-item-meta">
                 Lat: ${item.latitude.toFixed(3)}°, Lon: ${item.longitude.toFixed(3)}° | Gdm(0): ${annualG.toFixed(2)} kWh/m²/d
               </span>

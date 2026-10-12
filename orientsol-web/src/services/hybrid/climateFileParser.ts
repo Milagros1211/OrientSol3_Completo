@@ -1,4 +1,5 @@
 import type { ClimateDataRecord } from '@/types/climate';
+import { resolveLocationCountry } from '@/services/supabase';
 
 export interface ClimateParseResult {
   success: boolean;
@@ -63,7 +64,7 @@ function parseSingleJsonObject(data: any, fileName: string, idx = 0, warnings: s
     id: `json-import-${Date.now()}-${idx}`,
     source: 'file_upload',
     locationName: String(locationName).trim(),
-    country: data.country || data.pais || 'España',
+    country: resolveLocationCountry(String(locationName).trim(), lat, lon, data.country || data.pais),
     latitude: isNaN(lat) ? 40.0 : lat,
     longitude: isNaN(lon) ? 0.0 : lon,
     elevationM: isNaN(elev) ? 500 : elev,
@@ -316,7 +317,7 @@ export function parseClimateCSV(csvString: string, fileName = 'documento.csv'): 
         id: `batch-csv-${Date.now()}-${records.length}`,
         source: 'file_upload',
         locationName: name,
-        country: rPais,
+        country: resolveLocationCountry(name, rLat, rLon, rPais),
         latitude: rLat,
         longitude: rLon,
         elevationM: 500,
