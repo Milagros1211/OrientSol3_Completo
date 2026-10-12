@@ -576,6 +576,13 @@ body.theme-dark .lang-btn:hover {
   color: var(--solar-amber);
 }
 
+[data-theme="light"] .panel-icon,
+body.theme-light .panel-icon {
+  background: #fef3c7 !important;
+  border-color: #fde68a !important;
+  color: #b45309 !important;
+}
+
 .panel-icon.python-icon {
   color: #38bdf8;
   background: rgba(56, 189, 248, 0.1);
@@ -1202,7 +1209,7 @@ body.theme-dark #btn-save-api-to-supabase:disabled {
 }
 
 /* ==========================================================================
-   Architecture Overview Grid
+   Architecture Overview Grid & High-Contrast Cards
    ========================================================================== */
 .architecture-grid {
   display: grid;
@@ -1211,81 +1218,181 @@ body.theme-dark #btn-save-api-to-supabase:disabled {
 }
 
 .arch-card {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 1.4rem;
   transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
 }
 
 .arch-card:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--bg-card-hover);
   border-color: var(--border-highlight);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .arch-card-header {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
 .arch-tag {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.22rem 0.55rem;
+  border-radius: 5px;
   display: inline-block;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.5rem;
 }
 
+/* Default / Dark Theme Tags */
 .python-tag {
   background: rgba(56, 189, 248, 0.15);
   color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  border: 1px solid rgba(56, 189, 248, 0.35);
 }
 
 .ui-tag {
   background: rgba(168, 85, 247, 0.15);
   color: #c084fc;
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  border: 1px solid rgba(168, 85, 247, 0.35);
 }
 
 .db-tag {
   background: rgba(16, 185, 129, 0.15);
   color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+/* Light Theme Tags: Vivid, high contrast WCAG AAA */
+[data-theme="light"] .python-tag,
+body.theme-light .python-tag {
+  background: #e0f2fe !important;
+  color: #0369a1 !important;
+  border: 1.5px solid #7dd3fc !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .ui-tag,
+body.theme-light .ui-tag {
+  background: #f3e8ff !important;
+  color: #7e22ce !important;
+  border: 1.5px solid #d8b4fe !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .db-tag,
+body.theme-light .db-tag {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  border: 1.5px solid #86efac !important;
+  font-weight: 700 !important;
 }
 
 .arch-card-header h4 {
   font-size: 1.05rem;
-  font-weight: 600;
-  color: #fff;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0.35rem 0 0 0;
+  line-height: 1.35;
+}
+
+[data-theme="light"] .arch-card-header h4,
+body.theme-light .arch-card-header h4 {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="dark"] .arch-card-header h4,
+body.theme-dark .arch-card-header h4 {
+  color: #f8fafc !important;
 }
 
 .arch-card-desc {
-  font-size: 0.84rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
   margin-bottom: 0.85rem;
+  line-height: 1.5;
+}
+
+[data-theme="light"] .arch-card-desc,
+body.theme-light .arch-card-desc {
+  color: #1e293b !important;
+  font-weight: 500 !important;
+}
+
+.arch-card-desc code {
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  color: #38bdf8;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-weight: 600;
+}
+
+[data-theme="light"] .arch-card-desc code,
+body.theme-light .arch-card-desc code {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  font-weight: 700 !important;
 }
 
 .arch-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.5rem;
 }
 
 .arch-list li {
-  font-size: 0.82rem;
+  font-size: 0.83rem;
   color: var(--text-muted);
-  line-height: 1.4;
+  line-height: 1.45;
+}
+
+[data-theme="light"] .arch-list li,
+body.theme-light .arch-list li {
+  color: #1e293b !important;
+  font-weight: 500 !important;
 }
 
 .arch-list code {
   font-family: var(--font-mono);
-  background: rgba(255, 255, 255, 0.06);
-  padding: 0.15rem 0.35rem;
-  border-radius: 3px;
-  color: #e2e8f0;
+  background: rgba(56, 189, 248, 0.12);
+  padding: 0.18rem 0.45rem;
+  border-radius: 4px;
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  font-weight: 700;
+  display: inline-block;
+  margin-right: 0.25rem;
+}
+
+[data-theme="light"] .arch-list code,
+body.theme-light .arch-list code {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .arch-card,
+body.theme-light .arch-card {
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .arch-card:hover,
+body.theme-light .arch-card:hover {
+  background: #f8fafc !important;
+  border-color: #94a3b8 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
 }
 
 /* ==========================================================================
@@ -1710,6 +1817,38 @@ body.theme-light .badge-success {
   border-radius: 9999px;
   font-size: 0.75rem;
   font-family: var(--font-mono);
+}
+
+[data-theme="light"] .badge-neutral,
+body.theme-light .badge-neutral {
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+  border: 1px solid #cbd5e1 !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .badge-primary,
+body.theme-light .badge-primary {
+  background: #e0f2fe !important;
+  color: #0369a1 !important;
+  border: 1px solid #7dd3fc !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .badge-warning,
+body.theme-light .badge-warning {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+  border: 1px solid #fcd34d !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .badge-source,
+body.theme-light .badge-source {
+  background: #ede9fe !important;
+  color: #5b21b6 !important;
+  border: 1px solid #c4b5fd !important;
+  font-weight: 700 !important;
 }
 
 .results-header h3 {
