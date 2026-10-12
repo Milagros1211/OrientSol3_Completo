@@ -7,6 +7,7 @@ import {
 import { renderOptimalAnnualGraphsWindow } from '@/components/charts/OptimalAnnualGraphsWindow';
 import { renderEnergyCalculationPanel } from '@/components/energy/EnergyCalculationPanel';
 import * as XLSX from 'xlsx';
+import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
 import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
@@ -427,6 +428,15 @@ async function exportOptimalAnnualToExcel(
     if (sheetName.length > 31) sheetName = sheetName.substring(0, 31);
     XLSX.utils.book_append_sheet(wb, ws, sheetName);
   }
+
+  // Pestaña dedicada a la Energía Generada estrictamente según Figura 5.2.82 de OrientSol 3.0
+  const energyWs = createEnergyWorksheet(res, {
+    studyTitle: isEn ? 'Annual optimal tilt' : 'Inclinación óptima anual',
+    studyDailyRad: res.optimalAnnual.monthlyDailyKwh,
+    isEn,
+  });
+  const energySheetName = isEn ? 'Energy' : 'Energia';
+  XLSX.utils.book_append_sheet(wb, energyWs, energySheetName);
 
   const excelBuf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
   const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');

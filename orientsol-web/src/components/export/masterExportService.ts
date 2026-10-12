@@ -2,6 +2,7 @@ import * as XLSX from 'xlsx';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { getMonthlyRadiationForAngle } from '@/components/climate/OptimalAnnualStudyPanel';
 import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslations';
+import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
 
 const MONTHS_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -554,6 +555,33 @@ export function exportOrientSolMasterExcel(
 
   const wsAngles = XLSX.utils.aoa_to_sheet(anglesSheetData);
   XLSX.utils.book_append_sheet(wb, wsAngles, isEn ? 'Tilt_Curves_1_to_90' : 'Curvas_Angulos_1_a_90');
+
+  // =========================================================================
+  // HOJA 6: ENERGÍA MEDIA MENSUAL Y GENERADA (Figura 5.2.82 OrientSol 3.0)
+  // =========================================================================
+  const activeStudyDailyRad =
+    activeOp === 'annual'
+      ? res.optimalAnnual.monthlyDailyKwh
+      : activeOp === 'monthly'
+      ? res.monthlyOptimum12.monthlyDailyKwh
+      : activeOp === 'seasonal'
+      ? res.seasonal.monthlyDailyKwh
+      : activeOp === 'polar'
+      ? res.tracking.polarAxis.monthlyDailyKwh
+      : activeOp === 'azimuthal'
+      ? res.tracking.azimuthalAxis.monthlyDailyKwh
+      : activeOp === 'horizontal'
+      ? res.tracking.horizontalAxis.monthlyDailyKwh
+      : res.tracking.dualAxis.monthlyDailyKwh;
+
+  const wsEnergy = createEnergyWorksheet(res, {
+    studyTitle: currentStudyTitle,
+    studyDailyRad: activeStudyDailyRad,
+    isEn,
+    peakPowerKw: peakKw,
+    tonc,
+  });
+  XLSX.utils.book_append_sheet(wb, wsEnergy, isEn ? 'Energy_Yield' : 'Energia_Generada');
 
   // Download File with Full Timestamp in Filename
   const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');

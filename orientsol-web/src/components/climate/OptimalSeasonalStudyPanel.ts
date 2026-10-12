@@ -14,6 +14,7 @@ import { renderOptimalSeasonalGraphsWindow } from '@/components/charts/OptimalSe
 import { renderCaptureLossMapSection } from '@/components/climate/CaptureLossMapSection';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import * as XLSX from 'xlsx';
+import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
 
 export type SeasonalRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -525,6 +526,15 @@ async function exportSeasonalExcelFile(
     const ws = XLSX.utils.aoa_to_sheet(data);
     XLSX.utils.book_append_sheet(wb, ws, isEn ? 'Sheet1' : 'Hoja1');
   }
+
+  // Pestaña dedicada a la Energía Generada estrictamente según Figura 5.2.82 de OrientSol 3.0
+  const energyWs = createEnergyWorksheet(res, {
+    studyTitle: isEn ? 'Seasonal optimal tilt' : 'Inclinación óptima estacional',
+    studyDailyRad: res.seasonal.monthlyDailyKwh,
+    isEn,
+  });
+  const energySheetName = isEn ? 'Energy' : 'Energia';
+  XLSX.utils.book_append_sheet(wb, energyWs, energySheetName);
 
   const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
   const filename = `OrientSol3_OptEstacional_${cleanLoc}.xlsx`;
