@@ -246,8 +246,8 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
       studyBadge = isEn ? '12 Monthly Angles' : '12 Inclinaciones';
     } else if (isSeasonal && seasonalData) {
       studyColTitle = isEn
-        ? `Performed study (Inv: ${seasonalData.winterTiltDeg}° / P-O: ${seasonalData.springTiltDeg}° / Ver: ${seasonalData.summerTiltDeg}°)`
-        : `Estudio realizado (Inv: ${seasonalData.winterTiltDeg}° / P-O: ${seasonalData.springTiltDeg}° / Ver: ${seasonalData.summerTiltDeg}°)`;
+        ? `Performed study (Seasonal: ${seasonalData.winterTiltDeg.toFixed(1)}° / ${seasonalData.springTiltDeg.toFixed(1)}° / ${seasonalData.summerTiltDeg.toFixed(1)}° / ${seasonalData.autumnTiltDeg.toFixed(1)}°)`
+        : `Estudio realizado (Estacional: ${seasonalData.winterTiltDeg.toFixed(1)}° / ${seasonalData.springTiltDeg.toFixed(1)}° / ${seasonalData.summerTiltDeg.toFixed(1)}° / ${seasonalData.autumnTiltDeg.toFixed(1)}°)`;
       studyBadge = isEn ? 'Seasonal Tilts' : 'Inclinación Estacional';
     } else if (studyType === 'polar') {
       studyColTitle = isEn
@@ -464,10 +464,16 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                           const fixedOri = latitude >= 0 ? 0.0 : 180.0;
                           const avgDualAzim = months.reduce((acc, _, idx) => acc + getNoonAzimuthDeg(latitude, idx), 0) / 12;
                           if (studyType === 'monthly') {
-                            return isEn ? `Var (12 tilts) | Ori: ${fixedOri.toFixed(1)}°` : `Var (12 incl.) | Ori: ${fixedOri.toFixed(1)}°`;
+                            const avgMonthlyTilt = res.monthlyOptimum12?.optimalTiltsDeg
+                              ? res.monthlyOptimum12.optimalTiltsDeg.reduce((a, b) => a + b, 0) / 12
+                              : optTiltAnnual;
+                            return `Inc: ${avgMonthlyTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                           }
                           if (isSeasonal) {
-                            return isEn ? `Var (4 seasons) | Ori: ${fixedOri.toFixed(1)}°` : `Var (4 estac.) | Ori: ${fixedOri.toFixed(1)}°`;
+                            const avgSeasonalTilt = seasonalData
+                              ? (seasonalData.winterTiltDeg * 3 + seasonalData.springTiltDeg * 3 + seasonalData.summerTiltDeg * 3 + seasonalData.autumnTiltDeg * 3) / 12
+                              : 30.0;
+                            return `Inc: ${avgSeasonalTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                           }
                           if (studyType === 'polar') {
                             return `Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
@@ -490,7 +496,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                     <td class="td-num"><strong>${energyData.e0_anual.toFixed(1)}</strong></td>
                     <td class="td-num td-ener-study-val"><strong>${energyData.e_anual.toFixed(1)}</strong></td>
                     <td class="td-num td-ener-gain-val ${energyData.ganancia_anual >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                      <strong>${energyData.ganancia_anual.toFixed(2)}</strong>
+                      <strong>${energyData.ganancia_anual >= 0 ? '+' : ''}${energyData.ganancia_anual.toFixed(2)}</strong>
                     </td>
                   </tr>
                   <tr class="table-media-row energy-media-row">
@@ -501,10 +507,16 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                           const fixedOri = latitude >= 0 ? 0.0 : 180.0;
                           const avgDualAzim = months.reduce((acc, _, idx) => acc + getNoonAzimuthDeg(latitude, idx), 0) / 12;
                           if (studyType === 'monthly') {
-                            return isEn ? `Var (12) | Ori: ${fixedOri.toFixed(1)}°` : `Var (12) | Ori: ${fixedOri.toFixed(1)}°`;
+                            const avgMonthlyTilt = res.monthlyOptimum12?.optimalTiltsDeg
+                              ? res.monthlyOptimum12.optimalTiltsDeg.reduce((a, b) => a + b, 0) / 12
+                              : optTiltAnnual;
+                            return `Inc: ${avgMonthlyTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                           }
                           if (isSeasonal) {
-                            return isEn ? `Var (4) | Ori: ${fixedOri.toFixed(1)}°` : `Var (4) | Ori: ${fixedOri.toFixed(1)}°`;
+                            const avgSeasonalTilt = seasonalData
+                              ? (seasonalData.winterTiltDeg * 3 + seasonalData.springTiltDeg * 3 + seasonalData.summerTiltDeg * 3 + seasonalData.autumnTiltDeg * 3) / 12
+                              : 30.0;
+                            return `Inc: ${avgSeasonalTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
                           }
                           if (studyType === 'polar') {
                             return `Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
@@ -526,8 +538,8 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                     </td>
                     <td class="td-num"><strong>${(energyData.e0_anual / 12).toFixed(1)}</strong></td>
                     <td class="td-num td-ener-study-val"><strong>${(energyData.e_anual / 12).toFixed(1)}</strong></td>
-                    <td class="td-num td-ener-gain-val ${energyData.ganancia_anual >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                      <strong>${energyData.ganancia_anual >= 0 ? '+' : ''}${energyData.ganancia_anual.toFixed(2)}%</strong>
+                    <td class="td-num td-ener-gain-val ${(energyData.ganancia_anual / 12) >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
+                      <strong>${(energyData.ganancia_anual / 12) >= 0 ? '+' : ''}${(energyData.ganancia_anual / 12).toFixed(2)}</strong>
                     </td>
                   </tr>
                 </tfoot>
