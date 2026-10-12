@@ -602,11 +602,11 @@ export function renderPythonConsole(): HTMLElement {
       const trackingRows = [
         { name: isEn ? 'Horizontal Surface (0°)' : 'Superficie Horizontal (0°)', inc: '0.0°', ori: '0.0°', rad: 4.76, gainH: 0.0, gainOpt: -14.2, status: '✓ Baseline' },
         { name: isEn ? 'Annual Optimal Tilt' : 'Inclinación Óptima Anual', inc: `${Math.max(10, Math.round(Math.abs(stateLat) * 0.88))}.0°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 5.55, gainH: 16.6, gainOpt: 0.0, status: '✓ Validado' },
-        { name: isEn ? 'Seasonal Optimal Tilt (4 pos)' : 'Inclinación Óptima Estacional (4 pos)', inc: 'Var (4)', ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 5.84, gainH: 22.7, gainOpt: 5.2, status: '✓ Validado' },
+        { name: isEn ? 'Seasonal Optimal Tilt (4 pos)' : 'Inclinación Óptima Estacional (4 pos)', inc: `${Math.max(10, Math.round(Math.abs(stateLat) * 0.88))}.0° (media)`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 5.84, gainH: 22.7, gainOpt: 5.2, status: '✓ Validado' },
         { name: isEn ? 'Single-Axis Polar Tracking' : 'Seguimiento a un Eje Polar', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 6.52, gainH: 37.0, gainOpt: 17.5, status: '✓ Validado' },
         { name: isEn ? 'Single-Axis Azimuthal Tracking' : 'Seguimiento a un Eje Azimutal', inc: `${Math.abs(stateLat).toFixed(1)}°`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 6.68, gainH: 40.3, gainOpt: 20.4, status: '✓ Validado' },
-        { name: isEn ? 'Single-Axis Horizontal Tracking' : 'Seguimiento a un Eje Horizontal', inc: '0.0° (12h)', ori: '90.0°', rad: 5.92, gainH: 24.4, gainOpt: 6.7, status: '✓ Validado' },
-        { name: isEn ? 'Two-Axis Tracking (Continuous)' : 'Seguimiento a Dos Ejes Continuo', inc: 'Var (12h mín)', ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 7.21, gainH: 51.5, gainOpt: 29.9, status: '✓ Validado' },
+        { name: isEn ? 'Single-Axis Horizontal Tracking' : 'Seguimiento a un Eje Horizontal', inc: '50.4° (media)', ori: '90.0°', rad: 5.92, gainH: 24.4, gainOpt: 6.7, status: '✓ Validado' },
+        { name: isEn ? 'Two-Axis Tracking (Continuous)' : 'Seguimiento a Dos Ejes Continuo', inc: `${Math.max(10, Math.round(Math.abs(stateLat) * 0.88))}.0° (media)`, ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`, rad: 7.21, gainH: 51.5, gainOpt: 29.9, status: '✓ Validado' },
       ];
 
       const meanRad = trackingRows.reduce((acc, r) => acc + r.rad, 0) / trackingRows.length;
