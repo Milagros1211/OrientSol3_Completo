@@ -188,58 +188,6 @@ Para facilitar la creación de tus archivos, la plataforma cuenta con botones de
 
 ---
 
-## Estado de Cumplimiento de los Objetivos del TFM
-
-En base al documento oficial aprobado: **`[Master EERR] FormatoPropuestaTFMKarinaBaldeon.pdf`**
-
-### 1. Matriz de Objetivos de la Propuesta
-
-| Objetivo / Requisito | Estado | Nivel | Detalle de Implementación |
-|---|:---:|:---:|---|
-| **Objetivo Principal:** Entorno web para adaptar y perfeccionar OrientSol 3.0 | ✅ Cumplido | 100% | Aplicación SPA/PWA con Vite, TypeScript, Pyodide (Python WASM) y diseño responsive. |
-| **Obj. Sec. 1:** Ampliar y actualizar base de datos del programa | ✅ Cumplido | 90% | BBDD en `locations.ts`, `albedo.ts`, tablas IDAE y soporte para más de 50 estaciones. |
-| **Obj. Sec. 2:** Arquitectura híbrida (APIs internacionales + BBDD local) | ✅ Cumplido | 100% | Conectores para NASA POWER, PVGIS y Open-Meteo con fallback a BBDD local. |
-| **Obj. Sec. 3:** Carga dual (Manual + Subida de documentos externos) | ✅ Cumplido | 100% | Formulario de entrada manual de 12 meses y subida de archivos CSV/JSON con plantillas. |
-| **Obj. Sec. 4.a:** Cálculo de Temperaturas (Máx, Mín, Medias y de Célula $T_c$) | ✅ Cumplido | 100% | Implementado en `temperatures.py` y visualizado en tarjetas métricas en tiempo real. |
-| **Obj. Sec. 4.b:** Cálculo de Energía Recibida ($kWh/m^2$ y total) | ✅ Cumplido | 100% | Radiación global sobre superficie fija y seguidores en `energy_yield.py`. |
-| **Obj. Sec. 4.c:** Cálculo de Energía Producida (Modelo Osterwald) | ✅ Cumplido | 100% | Modelo de Osterwald en `osterwald.py` con coeficientes $\gamma$, $T_{NOCT}$ y PR. |
-| **Obj. Sec. 4.d:** Mapas de Pérdidas de Captación (Normativa CTE) | ✅ Cumplido | 100% | Matriz de inclinación y orientación con clasificación de zonas según CTE DB-HE4. |
-| **Obj. Sec. 5:** Ejecutable multiplataforma (Windows y Android) | 🟡 Configurado | 85% | Código base listo en `electron/` (Windows) y `android/` (Capacitor). |
-| **Obj. Sec. 6:** Interfaz web única sin requerir instalación | ✅ Cumplido | 100% | Funciona 100% en el navegador y alojada en GitHub Pages. |
-| **Obj. Sec. 7:** Sistema bilingüe (Español e Inglés) | ✅ Cumplido | 100% | Soporte multilingüe en `src/i18n/` con selector reactivo y persistencia local. |
-
----
-
-### 2. Tareas Pendientes para Completar el TFM (Checklist)
-
-Para la finalización exitosa del Máster y la defensa ante el tribunal evaluador, restan las siguientes tareas:
-
-```mermaid
-graph LR
-    T1["1. Hostear en Pages<br/>(1 clic en Settings)"] --> T2["2. Validación Cruzada<br/>(.m vs Web)"]
-    T2 --> T3["3. Comparativa Externa<br/>(vs PVGIS / PVsyst)"]
-    T3 --> T4["4. Binarios Release<br/>(.exe y .apk)"]
-    T4 --> T5["5. Manual de Usuario"]
-    T5 --> T6["6. Memoria Técnica UJA"]
-```
-
-1. [x] **Configurar Hosting Permanente:** Activar `gh-pages` en **Settings > Pages** de GitHub.
-2. [ ] **Validación Numérica Cruzada (OrientSol .m vs. Web):**
-   - Ejecutar los mismos casos de prueba en MATLAB (`Principal.m`) y en la aplicación Web.
-   - Demostrar que los resultados de inclinación óptima y radiación coinciden cuantitativamente.
-3. [ ] **Estudio Comparativo con Softwares Comercializados (Metodología Punto 4):**
-   - Comparar los resultados de captación de OrientSol 3.0 frente a **PVGIS** y/o **PVsyst** para 2 o 3 ubicaciones (ej. Jaén, Madrid y una ubicación del hemisferio sur como Lima).
-   - Elaborar la tabla de desviaciones para la memoria técnica.
-4. [ ] **Generación de Binarios Release (Windows & Android):**
-   - Generar el instalador `.exe` (`npm run build:win`) y el paquete `.apk` (`npm run build:apk`).
-   - Publicar los archivos en la sección **Releases** del repositorio de GitHub.
-5. [ ] **Manual de Usuario e Instalación (Metodología Punto 5):**
-   - Redactar un manual con capturas de pantalla de la interfaz web, explicando el uso del simulador, la conexión satelital y la interpretación de los mapas de pérdidas CTE.
-6. [ ] **Redacción de la Memoria Técnica Final (Metodología Punto 6):**
-   - Redactar el documento final formal según la plantilla oficial del Máster en Energías Renovables de la Universidad de Jaén.
-
----
-
 ## Ejecución y Desarrollo Local
 
 ### Requisitos previos:
