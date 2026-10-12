@@ -71,6 +71,20 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
 
     const radOptAnnual = getMonthlyRadiationForAngle(res, compActual, res.optimalAnnual.optimalTiltDeg);
     const radOptSeasonal = compActual === 'global' ? res.seasonal.monthlyDailyKwh : getMonthlyRadiationForAngle(res, compActual, Math.round((res.seasonal.winterTiltDeg + res.seasonal.summerTiltDeg) / 2));
+    
+    // Monthly optimal (12 independent positions)
+    const monthlyOptTilts = res.monthlyOptimum12?.optimalTiltsDeg ?? [];
+    const radOptMonthly: number[] = [];
+    for (let m = 0; m < 12; m++) {
+      if (compActual === 'global') {
+        radOptMonthly.push(res.monthlyOptimum12?.monthlyDailyKwh?.[m] ?? res.horizontal.gdm0[m]);
+      } else {
+        const tiltM = monthlyOptTilts[m] ?? res.optimalAnnual.optimalTiltDeg;
+        const radMonth = getMonthlyRadiationForAngle(res, compActual, tiltM);
+        radOptMonthly.push(radMonth[m]);
+      }
+    }
+
     const radPolar = getComp(res.tracking.polarAxis.components, res.tracking.polarAxis.monthlyDailyKwh);
     const radAzim = getComp(res.tracking.azimuthalAxis.components, res.tracking.azimuthalAxis.monthlyDailyKwh);
     const radHorizTrack = getComp(res.tracking.horizontalAxis.components, res.tracking.horizontalAxis.monthlyDailyKwh);
@@ -82,11 +96,31 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
     const m0 = avg(rad0);
     const mOptAnnual = avg(radOptAnnual);
     const mOptSeasonal = avg(radOptSeasonal);
+    const mOptMonthly = avg(radOptMonthly);
     const mPolar = avg(radPolar);
     const mAzim = avg(radAzim);
     const mHorizTrack = avg(radHorizTrack);
     const mDual = avg(radDual);
     const mTemp = res.temperatures.ambient.annualMeanC;
+
+    // Exact average angles considered for each study mode
+    const seasonTilts = months.map((_, i) => {
+      if (i === 11 || i === 0 || i === 1) {
+        return res.seasonal?.winterTiltDeg ?? 60;
+      } else if (i === 2 || i === 3 || i === 4) {
+        return res.seasonal?.springTiltDeg ?? 35;
+      } else if (i === 5 || i === 6 || i === 7) {
+        return res.seasonal?.summerTiltDeg ?? 15;
+      }
+      return res.seasonal?.autumnTiltDeg ?? 35;
+    });
+    const avgSeasonalTilt = avg(seasonTilts);
+    const avgMonthlyTilt = monthlyOptTilts.length ? avg(monthlyOptTilts) : 0;
+    const noonDualTilts = months.map((_, i) => getDualAxisNoonTiltDeg(latitude, i));
+    const noonAzims = months.map((_, i) => getNoonAzimuthDeg(latitude, i));
+    const avgDualTilt = avg(noonDualTilts);
+    const avgDualAzim = avg(noonAzims);
+    const fixedOri = latitude >= 0 ? 0.0 : 180.0;
 
     container.innerHTML = `
       <div class="opt-tracking-window-frame">
@@ -147,7 +181,7 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
           ${compTitle} (kWh/m²/día)
         </div>
 
-        <!-- 4. 9-Column Comparative Table Matching Figura 5.2.98 -->
+        <!-- 4. 10-Column Comparative Table Matching Figura 5.2.98 including Monthly Optimum -->
         <div class="opt-tracking-table-wrap">
           <table class="opt-tracking-table comparative-results-table">
             <thead>
@@ -156,6 +190,7 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
                 <th>${compSym} (0°)</th>
                 <th>${compSym} (${isEn ? 'Annual Optimum' : 'Inclinación óptima anual'})</th>
                 <th>${compSym} (${isEn ? 'Seasonal Optimum' : 'Inclinación óptima estacional'})</th>
+                <th>${compSym} (${isEn ? 'Monthly Optimum (12 pos)' : 'Inclinación óptima mensual'})</th>
                 <th>${compSym} (${isEn ? 'Polar 1-axis' : 'Seguim. a un eje polar'})</th>
                 <th>${compSym} (${isEn ? 'Azimuthal 1-axis' : 'Seguim. a un eje azimutal'})</th>
                 <th>${compSym} (${isEn ? 'Horizontal 1-axis' : 'Seguim. a un eje horizontal'})</th>
@@ -165,20 +200,7 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
             </thead>
             <tbody>
               ${months.map((mName, i) => {
-                let seasonTilt = res.seasonal?.autumnTiltDeg ?? 35;
-                if (i === 11 || i === 0 || i === 1) {
-                  seasonTilt = res.seasonal?.winterTiltDeg ?? 60;
-                } else if (i === 2 || i === 3 || i === 4) {
-                  seasonTilt = res.seasonal?.springTiltDeg ?? 35;
-                } else if (i === 5 || i === 6 || i === 7) {
-                  seasonTilt = res.seasonal?.summerTiltDeg ?? 15;
-                }
-
-                const fixedOri = latitude >= 0 ? 0.0 : 180.0;
-                const noonAzim = getNoonAzimuthDeg(latitude, i);
-                const noonDualTilt = getDualAxisNoonTiltDeg(latitude, i);
                 const optTiltAnn = res.optimalAnnual.optimalTiltDeg;
-
                 return `
                 <tr>
                   <td class="td-track-month"><strong>${mName}</strong></td>
@@ -197,7 +219,13 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
                   <td class="td-comp-val-cell">
                     <div class="comp-cell-flex">
                       <span class="comp-val-main">${radOptSeasonal[i].toFixed(2)}</span>
-                      <span class="comp-angle-chip">Inc: ${seasonTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                      <span class="comp-angle-chip">Inc: ${seasonTilts[i].toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                    </div>
+                  </td>
+                  <td class="td-comp-val-cell">
+                    <div class="comp-cell-flex">
+                      <span class="comp-val-main">${radOptMonthly[i].toFixed(2)}</span>
+                      <span class="comp-angle-chip">Inc: ${(monthlyOptTilts[i] ?? 0).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
                     </div>
                   </td>
                   <td class="td-comp-val-cell">
@@ -209,7 +237,7 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
                   <td class="td-comp-val-cell">
                     <div class="comp-cell-flex">
                       <span class="comp-val-main">${radAzim[i].toFixed(2)}</span>
-                      <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${noonAzim.toFixed(1)}°</span>
+                      <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${noonAzims[i].toFixed(1)}°</span>
                     </div>
                   </td>
                   <td class="td-comp-val-cell">
@@ -221,7 +249,7 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
                   <td class="td-track-dual td-comp-val-cell">
                     <div class="comp-cell-flex">
                       <span class="comp-val-main"><strong>${radDual[i].toFixed(2)}</strong></span>
-                      <span class="comp-angle-chip chip-dual">Inc: ${noonDualTilt.toFixed(1)}° | Ori: ${noonAzim.toFixed(1)}°</span>
+                      <span class="comp-angle-chip chip-dual">Inc: ${noonDualTilts[i].toFixed(1)}° | Ori: ${noonAzims[i].toFixed(1)}°</span>
                     </div>
                   </td>
                   <td class="td-track-temp-val"><strong>${tempMean[i].toFixed(1)}</strong></td>
@@ -241,25 +269,31 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
                     <span class="comp-val-main"><strong>${mOptAnnual.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: ${res.optimalAnnual.optimalTiltDeg.toFixed(1)}° | Ori: ${(latitude >= 0 ? 0.0 : 180.0).toFixed(1)}°</span>
+                    <span class="comp-angle-chip">Inc: ${res.optimalAnnual.optimalTiltDeg.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
                   </div>
                 </td>
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
                     <span class="comp-val-main"><strong>${mOptSeasonal.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: Var (4) | Ori: ${(latitude >= 0 ? 0.0 : 180.0).toFixed(1)}°</span>
+                    <span class="comp-angle-chip">Inc: ${avgSeasonalTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                  </div>
+                </td>
+                <td class="td-comp-val-cell">
+                  <div class="comp-cell-flex">
+                    <span class="comp-val-main"><strong>${mOptMonthly.toFixed(2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: ${avgMonthlyTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
                   </div>
                 </td>
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
                     <span class="comp-val-main"><strong>${mPolar.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${(latitude >= 0 ? 0.0 : 180.0).toFixed(1)}°</span>
+                    <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
                   </div>
                 </td>
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
                     <span class="comp-val-main"><strong>${mAzim.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: Var</span>
+                    <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°</span>
                   </div>
                 </td>
                 <td class="td-comp-val-cell">
@@ -271,7 +305,7 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
                 <td class="td-track-dual td-comp-val-cell">
                   <div class="comp-cell-flex">
                     <span class="comp-val-main"><strong>${mDual.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip chip-dual">Inc: Var | Ori: Var</span>
+                    <span class="comp-angle-chip chip-dual">Inc: ${avgDualTilt.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°</span>
                   </div>
                 </td>
                 <td class="td-track-temp-val"><strong>${mTemp.toFixed(1)}</strong></td>

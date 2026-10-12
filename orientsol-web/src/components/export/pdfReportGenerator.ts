@@ -441,6 +441,7 @@ export async function generateOrientSolPDFReport(
         `${comp.sym}(0°)`,
         'Ópt.Anu',
         'Ópt.Est',
+        'Ópt.Men',
         'Seg.Pol',
         'Seg.Azi',
         'Seg.Hor',
@@ -448,12 +449,12 @@ export async function generateOrientSolPDFReport(
         'Tª(°C)'
       ];
 
-      const cX = [20, 42, 60, 78, 96, 114, 132, 150, 168];
+      const cX = [20, 38, 55, 72, 89, 106, 123, 140, 157, 174];
       let tY = 70;
 
       // Table Header row
       doc.setFillColor(37, 99, 235);
-      doc.rect(20, tY - 5, 168, 8, 'F');
+      doc.rect(20, tY - 5, 170, 8, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(7.5);
       doc.setTextColor(255, 255, 255);
@@ -469,6 +470,7 @@ export async function generateOrientSolPDFReport(
       const r0 = comp.code === 'global' ? res.horizontal.gdm0 : comp.code === 'beam' ? res.horizontal.bdm0 : comp.code === 'diffuse' ? res.horizontal.ddm0 : new Array(12).fill(0.0);
       const rAnu = getMonthlyRadiationForAngle(res, comp.code, optAngle);
       const rEst = comp.code === 'global' ? res.seasonal.monthlyDailyKwh : getMonthlyRadiationForAngle(res, comp.code, Math.round((res.seasonal.winterTiltDeg + res.seasonal.summerTiltDeg) / 2));
+      const rMen = comp.code === 'global' ? res.monthlyOptimum12.monthlyDailyKwh : (res.monthlyOptimum12.optimalTiltsDeg || []).map((tilt, mIdx) => getMonthlyRadiationForAngle(res, comp.code, tilt)[mIdx]);
       const rPol = res.tracking.polarAxis.components?.[comp.code] || res.tracking.polarAxis.monthlyDailyKwh;
       const rAzi = res.tracking.azimuthalAxis.components?.[comp.code] || res.tracking.azimuthalAxis.monthlyDailyKwh;
       const rHor = res.tracking.horizontalAxis.components?.[comp.code] || res.tracking.horizontalAxis.monthlyDailyKwh;
@@ -480,24 +482,25 @@ export async function generateOrientSolPDFReport(
       for (let i = 0; i < 12; i++) {
         if (i % 2 === 0) {
           doc.setFillColor(248, 250, 252);
-          doc.rect(20, tY - 4, 168, 6.5, 'F');
+          doc.rect(20, tY - 4, 170, 6.5, 'F');
         }
         doc.setTextColor(30, 41, 59);
         doc.text(mNames[i], cX[0], tY);
         doc.text(r0[i].toFixed(2), cX[1], tY);
         doc.text(rAnu[i].toFixed(2), cX[2], tY);
         doc.text(rEst[i].toFixed(2), cX[3], tY);
-        doc.text(rPol[i].toFixed(2), cX[4], tY);
-        doc.text(rAzi[i].toFixed(2), cX[5], tY);
-        doc.text(rHor[i].toFixed(2), cX[6], tY);
-        doc.text(r2E[i].toFixed(2), cX[7], tY);
-        doc.text(tempM[i].toFixed(1), cX[8], tY);
+        doc.text(rMen[i].toFixed(2), cX[4], tY);
+        doc.text(rPol[i].toFixed(2), cX[5], tY);
+        doc.text(rAzi[i].toFixed(2), cX[6], tY);
+        doc.text(rHor[i].toFixed(2), cX[7], tY);
+        doc.text(r2E[i].toFixed(2), cX[8], tY);
+        doc.text(tempM[i].toFixed(1), cX[9], tY);
         tY += 6.5;
       }
 
       // MEDIA row
       doc.setFillColor(15, 23, 42);
-      doc.rect(20, tY - 4, 168, 7.5, 'F');
+      doc.rect(20, tY - 4, 170, 7.5, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(56, 189, 248);
       doc.text(isEn ? 'MEAN' : 'MEDIA', cX[0], tY + 1);
@@ -506,13 +509,14 @@ export async function generateOrientSolPDFReport(
       doc.text(avg(r0).toFixed(2), cX[1], tY + 1);
       doc.text(avg(rAnu).toFixed(2), cX[2], tY + 1);
       doc.text(avg(rEst).toFixed(2), cX[3], tY + 1);
-      doc.text(avg(rPol).toFixed(2), cX[4], tY + 1);
-      doc.text(avg(rAzi).toFixed(2), cX[5], tY + 1);
-      doc.text(avg(rHor).toFixed(2), cX[6], tY + 1);
+      doc.text(avg(rMen).toFixed(2), cX[4], tY + 1);
+      doc.text(avg(rPol).toFixed(2), cX[5], tY + 1);
+      doc.text(avg(rAzi).toFixed(2), cX[6], tY + 1);
+      doc.text(avg(rHor).toFixed(2), cX[7], tY + 1);
       doc.setTextColor(56, 189, 248);
-      doc.text(avg(r2E).toFixed(2), cX[7], tY + 1);
+      doc.text(avg(r2E).toFixed(2), cX[8], tY + 1);
       doc.setTextColor(251, 191, 36);
-      doc.text(res.temperatures.ambient.annualMeanC.toFixed(1), cX[8], tY + 1);
+      doc.text(res.temperatures.ambient.annualMeanC.toFixed(1), cX[9], tY + 1);
 
       return;
     }
