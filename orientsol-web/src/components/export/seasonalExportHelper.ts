@@ -97,11 +97,17 @@ export function buildSeasonalComponentSheet(
   // =========================================================================
   // PARTE I: FIGURA 5.2.90 (Rows 1 to 25, Index 0 to 24)
   // =========================================================================
-  // Row 1 (Index 0): Jaén | Latitud | 37.7655556 | | Inclinación óptima estacional
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const formattedDateTime = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+  // Row 1 (Index 0): Jaén | Latitud | 37.7655556 | | Inclinación óptima estacional | | Timestamp
   grid[0][0] = res.locationName;
   grid[0][1] = isEn ? 'Latitude' : 'Latitud';
   grid[0][2] = Number(res.latitude.toFixed(7));
   grid[0][4] = isEn ? 'Seasonal optimal tilt' : 'Inclinación óptima estacional';
+  grid[0][6] = isEn ? 'Export Timestamp:' : 'Marca temporal:';
+  grid[0][7] = formattedDateTime;
 
   // Row 3 (Index 2): RADIACIÓN GLOBAL DIARIA (kWh/m²/dia)
   grid[2][1] = isEn
