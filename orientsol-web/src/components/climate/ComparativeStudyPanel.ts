@@ -5,6 +5,7 @@ import { getMonthlyRadiationForAngle } from '@/components/climate/OptimalAnnualS
 import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
+  showExportComponentChoiceModal,
 } from '@/components/export/pdfReportGenerator';
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
@@ -401,23 +402,40 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
     });
 
     container.querySelector('#btn-comp-excel')?.addEventListener('click', () => {
-      exportOrientSolMasterExcel(res, {
-        activeStudyOp: 'comparative',
+      showExportComponentChoiceModal({
+        exportType: 'excel',
         activeComponent: stateCompComponent,
         isEn,
-        peakPowerKw: solarSyncState.getPeakPowerKw(),
-        performanceRatio: solarSyncState.getPerformanceRatio(),
-        tonc: solarSyncState.getTonc(),
+        onConfirm: (mode) => {
+          exportOrientSolMasterExcel(res, {
+            activeStudyOp: 'comparative',
+            activeComponent: stateCompComponent,
+            exportMode: mode,
+            isEn,
+            peakPowerKw: solarSyncState.getPeakPowerKw(),
+            performanceRatio: solarSyncState.getPerformanceRatio(),
+            tonc: solarSyncState.getTonc(),
+          });
+        },
       });
     });
 
     container.querySelector('#btn-comp-pdf')?.addEventListener('click', () => {
-      showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn, 'comparative', {
-          peakPowerKw: solarSyncState.getPeakPowerKw(),
-          performanceRatio: solarSyncState.getPerformanceRatio(),
-          tonc: solarSyncState.getTonc(),
-        });
+      showExportComponentChoiceModal({
+        exportType: 'pdf',
+        activeComponent: stateCompComponent,
+        isEn,
+        onConfirm: (mode) => {
+          showPdfGenerationNoticeModal(isEn, () => {
+            generateOrientSolPDFReport(res, isEn, 'comparative', {
+              peakPowerKw: solarSyncState.getPeakPowerKw(),
+              performanceRatio: solarSyncState.getPerformanceRatio(),
+              tonc: solarSyncState.getTonc(),
+              componentsMode: mode,
+              activeComponent: stateCompComponent,
+            });
+          });
+        },
       });
     });
   }

@@ -5,6 +5,7 @@ import { renderTrackingPolarGraphsWindow } from '@/components/charts/TrackingPol
 import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
+  showExportComponentChoiceModal,
 } from '@/components/export/pdfReportGenerator';
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
@@ -376,24 +377,43 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
       else window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
+    const activeCompPolar = statePolarComponent === 'all' ? 'global' : statePolarComponent;
+
     container.querySelector<HTMLButtonElement>('#btn-polar-export-excel')?.addEventListener('click', () => {
-      exportOrientSolMasterExcel(res, {
-        activeStudyOp: 'polar',
-        activeComponent: statePolarComponent,
+      showExportComponentChoiceModal({
+        exportType: 'excel',
+        activeComponent: activeCompPolar,
         isEn,
-        peakPowerKw: solarSyncState.getPeakPowerKw(),
-        performanceRatio: solarSyncState.getPerformanceRatio(),
-        tonc: solarSyncState.getTonc(),
+        onConfirm: (mode) => {
+          exportOrientSolMasterExcel(res, {
+            activeStudyOp: 'polar',
+            activeComponent: activeCompPolar,
+            exportMode: mode,
+            isEn,
+            peakPowerKw: solarSyncState.getPeakPowerKw(),
+            performanceRatio: solarSyncState.getPerformanceRatio(),
+            tonc: solarSyncState.getTonc(),
+          });
+        },
       });
     });
 
     container.querySelector<HTMLButtonElement>('#btn-polar-export-report')?.addEventListener('click', () => {
-      showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn, 'polar', {
-          peakPowerKw: solarSyncState.getPeakPowerKw(),
-          performanceRatio: solarSyncState.getPerformanceRatio(),
-          tonc: solarSyncState.getTonc(),
-        });
+      showExportComponentChoiceModal({
+        exportType: 'pdf',
+        activeComponent: activeCompPolar,
+        isEn,
+        onConfirm: (mode) => {
+          showPdfGenerationNoticeModal(isEn, () => {
+            generateOrientSolPDFReport(res, isEn, 'polar', {
+              peakPowerKw: solarSyncState.getPeakPowerKw(),
+              performanceRatio: solarSyncState.getPerformanceRatio(),
+              tonc: solarSyncState.getTonc(),
+              componentsMode: mode,
+              activeComponent: activeCompPolar,
+            });
+          });
+        },
       });
     });
   }

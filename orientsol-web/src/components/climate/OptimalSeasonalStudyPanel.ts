@@ -7,6 +7,7 @@ import {
 import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
+  showExportComponentChoiceModal,
 } from '@/components/export/pdfReportGenerator';
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { renderEnergyCalculationPanel } from '@/components/energy/EnergyCalculationPanel';
@@ -1004,25 +1005,42 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
     // 6. Export to Excel (Figures 5.2.90 & 5.2.91)
     const btnExportExcel = container.querySelector<HTMLButtonElement>('#btn-seasonal-export-excel');
     btnExportExcel?.addEventListener('click', () => {
-      exportOrientSolMasterExcel(res, {
-        activeStudyOp: 'seasonal',
-        activeComponent: stateSeasonalComponent,
+      showExportComponentChoiceModal({
+        exportType: 'excel',
+        activeComponent: compActual,
         isEn,
-        peakPowerKw: solarSyncState.getPeakPowerKw(),
-        performanceRatio: solarSyncState.getPerformanceRatio(),
-        tonc: solarSyncState.getTonc(),
+        onConfirm: (mode) => {
+          exportOrientSolMasterExcel(res, {
+            activeStudyOp: 'seasonal',
+            activeComponent: compActual,
+            exportMode: mode,
+            isEn,
+            peakPowerKw: solarSyncState.getPeakPowerKw(),
+            performanceRatio: solarSyncState.getPerformanceRatio(),
+            tonc: solarSyncState.getTonc(),
+          });
+        },
       });
     });
 
     // 7. Generate PDF Report (Figures 5.2.70, 5.2.71, 5.2.72, 5.2.74, 5.2.75)
     const btnExportReport = container.querySelector<HTMLButtonElement>('#btn-seasonal-export-report');
     btnExportReport?.addEventListener('click', () => {
-      showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn, 'seasonal', {
-          peakPowerKw: solarSyncState.getPeakPowerKw(),
-          performanceRatio: solarSyncState.getPerformanceRatio(),
-          tonc: solarSyncState.getTonc(),
-        });
+      showExportComponentChoiceModal({
+        exportType: 'pdf',
+        activeComponent: compActual,
+        isEn,
+        onConfirm: (mode) => {
+          showPdfGenerationNoticeModal(isEn, () => {
+            generateOrientSolPDFReport(res, isEn, 'seasonal', {
+              peakPowerKw: solarSyncState.getPeakPowerKw(),
+              performanceRatio: solarSyncState.getPerformanceRatio(),
+              tonc: solarSyncState.getTonc(),
+              componentsMode: mode,
+              activeComponent: compActual,
+            });
+          });
+        },
       });
     });
   }

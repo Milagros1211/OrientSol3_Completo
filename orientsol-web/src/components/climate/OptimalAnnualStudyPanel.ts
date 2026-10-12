@@ -11,6 +11,7 @@ import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
 import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
+  showExportComponentChoiceModal,
 } from '@/components/export/pdfReportGenerator';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { renderCaptureLossMapSection } from '@/components/climate/CaptureLossMapSection';
@@ -1328,12 +1329,21 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
     // 8. Generate Report (PDF)
     const btnExportReport = container.querySelector<HTMLButtonElement>('#btn-export-opt-report');
     btnExportReport?.addEventListener('click', () => {
-      showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn, 'annual', {
-          peakPowerKw: solarSyncState.getPeakPowerKw(),
-          performanceRatio: solarSyncState.getPerformanceRatio(),
-          tonc: solarSyncState.getTonc(),
-        });
+      showExportComponentChoiceModal({
+        exportType: 'pdf',
+        activeComponent: stateTableComponent,
+        isEn,
+        onConfirm: (mode) => {
+          showPdfGenerationNoticeModal(isEn, () => {
+            generateOrientSolPDFReport(res, isEn, 'annual', {
+              peakPowerKw: solarSyncState.getPeakPowerKw(),
+              performanceRatio: solarSyncState.getPerformanceRatio(),
+              tonc: solarSyncState.getTonc(),
+              componentsMode: mode,
+              activeComponent: stateTableComponent,
+            });
+          });
+        },
       });
     });
 

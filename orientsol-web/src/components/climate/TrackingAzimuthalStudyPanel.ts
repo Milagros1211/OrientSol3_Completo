@@ -5,6 +5,7 @@ import { renderTrackingAzimuthalGraphsWindow } from '@/components/charts/Trackin
 import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
+  showExportComponentChoiceModal,
 } from '@/components/export/pdfReportGenerator';
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
@@ -369,24 +370,43 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
       else window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
+    const activeCompAzim = stateAzimComponent === 'all' ? 'global' : stateAzimComponent;
+
     container.querySelector<HTMLButtonElement>('#btn-azim-export-excel')?.addEventListener('click', () => {
-      exportOrientSolMasterExcel(res, {
-        activeStudyOp: 'azimuthal',
-        activeComponent: stateAzimComponent,
+      showExportComponentChoiceModal({
+        exportType: 'excel',
+        activeComponent: activeCompAzim,
         isEn,
-        peakPowerKw: solarSyncState.getPeakPowerKw(),
-        performanceRatio: solarSyncState.getPerformanceRatio(),
-        tonc: solarSyncState.getTonc(),
+        onConfirm: (mode) => {
+          exportOrientSolMasterExcel(res, {
+            activeStudyOp: 'azimuthal',
+            activeComponent: activeCompAzim,
+            exportMode: mode,
+            isEn,
+            peakPowerKw: solarSyncState.getPeakPowerKw(),
+            performanceRatio: solarSyncState.getPerformanceRatio(),
+            tonc: solarSyncState.getTonc(),
+          });
+        },
       });
     });
 
     container.querySelector<HTMLButtonElement>('#btn-azim-export-report')?.addEventListener('click', () => {
-      showPdfGenerationNoticeModal(isEn, () => {
-        generateOrientSolPDFReport(res, isEn, 'azimuthal', {
-          peakPowerKw: solarSyncState.getPeakPowerKw(),
-          performanceRatio: solarSyncState.getPerformanceRatio(),
-          tonc: solarSyncState.getTonc(),
-        });
+      showExportComponentChoiceModal({
+        exportType: 'pdf',
+        activeComponent: activeCompAzim,
+        isEn,
+        onConfirm: (mode) => {
+          showPdfGenerationNoticeModal(isEn, () => {
+            generateOrientSolPDFReport(res, isEn, 'azimuthal', {
+              peakPowerKw: solarSyncState.getPeakPowerKw(),
+              performanceRatio: solarSyncState.getPerformanceRatio(),
+              tonc: solarSyncState.getTonc(),
+              componentsMode: mode,
+              activeComponent: activeCompAzim,
+            });
+          });
+        },
       });
     });
   }
