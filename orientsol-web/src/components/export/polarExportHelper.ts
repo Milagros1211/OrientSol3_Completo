@@ -113,11 +113,17 @@ export function buildPolarComponentSheet(
   // =========================================================================
   // PARTE I: FIGURA 5.2.96 (Rows 1 to 17, Index 0 to 16)
   // =========================================================================
-  // Row 1 (Index 0): Jaén | Latitud | 37,7655556 | | Seguimiento a un eje polar
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const formattedDateTime = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+  // Row 1 (Index 0): Jaén | Latitud | 37,7655556 | | Seguimiento a un eje polar | | Timestamp
   grid[0][0] = res.locationName || (isEn ? 'Location' : 'Localidad');
   grid[0][1] = isEn ? 'Latitude' : 'Latitud';
   grid[0][2] = res.latitude != null ? res.latitude : 0;
   grid[0][4] = isEn ? 'Polar single-axis tracking' : 'Seguimiento a un eje polar';
+  grid[0][6] = isEn ? 'Export Timestamp:' : 'Marca temporal:';
+  grid[0][7] = formattedDateTime;
 
   // Row 3 (Index 2): RADIACIÓN GLOBAL DIARIA (kWh/m²/día) | TEMPERATURA
   grid[2][1] = isEn

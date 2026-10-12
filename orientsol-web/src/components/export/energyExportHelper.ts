@@ -78,13 +78,20 @@ export function buildEnergySheetData(
 
   const sheetData: (string | number)[][] = [];
 
-  // Fila 1: Cabecera con emplazamiento, latitud y tipo de estudio
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const formattedDateTime = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+  // Fila 1: Cabecera con emplazamiento, latitud, tipo de estudio y marca temporal
   sheetData.push([
     res.locationName,
     isEn ? 'Latitude' : 'Latitud',
     Number(res.latitude.toFixed(7)),
     '',
     studyTitle,
+    '',
+    isEn ? 'Export Timestamp:' : 'Marca temporal:',
+    formattedDateTime,
   ]);
 
   // Fila 2: Vacía

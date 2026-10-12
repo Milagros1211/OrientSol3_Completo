@@ -496,8 +496,13 @@ export async function generateOrientSolPDFReport(
         })();
 
   const numCompPages = componentsToRender.length;
-  const totalPagesDyn = 5 + numCompPages + extraMapPages;
-  const chapter5Page = 5 + numCompPages + extraMapPages;
+  const pageChap1 = 2;
+  const pageChap2 = 3;
+  const pageChap3 = 3 + numCompPages;
+  const pageChap4 = 4 + numCompPages;
+  const pageChap5 = 5 + numCompPages + extraMapPages;
+  const totalPagesDyn = pageChap5;
+  const chapter5Page = pageChap5;
 
   // Header & Footer helper
   const drawPageChrome = (chapterTitle: string, pageNum: number, totalPages: number) => {
@@ -654,59 +659,134 @@ export async function generateOrientSolPDFReport(
   doc.setLineWidth(0.8);
   doc.line(20, tocY + 2, 65, tocY + 2);
 
-  const tocList = [
-    { num: '1', title: isEn ? 'Energy Yield Balance & Thermal Derating (Osterwald vs Simplified)' : 'Balance Energético y Comportamiento Térmico Fotovoltaico (Osterwald vs Simplificado)', page: '2' },
-    { num: '2', title: isEn ? `Selected Operation Study: ${cleanStudyName}` : `Estudio Solar Seleccionado: ${cleanStudyName}`, page: '3' },
-    { num: '3', title: isEn ? 'Global Benchmark & Ranking of All 8 Solar Collector Topologies' : 'Comparativa y Ranking Global de las 8 Topologías de Captación', page: '4' },
-    { num: '4', title: isEn ? 'Technical Building Code (CTE DB-HE4) Captation Losses Matrix' : extraMapPages > 0 ? (studyType === 'monthly' ? 'Mapas de Pérdidas de Captación CTE DB-HE4 (Anual + 12 Mensuales)' : 'Mapas de Pérdidas de Captación CTE DB-HE4 (Anual + 4 Estacionales)') : 'Mapa de Pérdidas de Captación y Cumplimiento CTE DB-HE4', page: '5' },
-    { num: '5', title: isEn ? 'Continuous Radiation Evolution Curve (Tilt Spectrum 1° to 90°)' : 'Evolución Continua de Radiación en el Rango de Inclinaciones (1° a 90°)', page: String(chapter5Page) },
+  interface TocEntry {
+    num: string;
+    title: string;
+    page: number;
+    isSub?: boolean;
+  }
+
+  const tocList: TocEntry[] = [
+    {
+      num: '1',
+      title: isEn
+        ? 'Energy Yield Balance & Thermal Derating (Osterwald vs Simplified)'
+        : 'Balance Energético y Comportamiento Térmico Fotovoltaico (Osterwald vs Simplificado)',
+      page: pageChap1,
+    },
+    {
+      num: '2',
+      title: isEn
+        ? `Selected Operation Study: ${cleanStudyName}`
+        : `Estudio Solar Seleccionado: ${cleanStudyName}`,
+      page: pageChap2,
+    },
   ];
 
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8.5);
-  let curTocY = tocY + 10;
-  tocList.forEach((item) => {
-    const targetPage = parseInt(item.page, 10);
+  // List component analysis pages in the index when multiple components are rendered
+  if (componentsToRender.length > 1) {
+    componentsToRender.forEach((cItem, cIdx) => {
+      const compTargetPage = 3 + cIdx;
+      const compTitle = isEn
+        ? `${cItem.nameEn} (${cItem.label}) • Monthly radiation & thermal performance`
+        : `${cItem.nameEs} (${cItem.label}) • Radiación mensual y comportamiento térmico`;
+      tocList.push({
+        num: `2.${cIdx + 1}`,
+        title: compTitle,
+        page: compTargetPage,
+        isSub: true,
+      });
+    });
+  }
 
-    // Clickable interactive row background
-    doc.setFillColor(248, 250, 252);
-    doc.roundedRect(20, curTocY - 4.5, 170, 7.5, 1.5, 1.5, 'F');
+  tocList.push(
+    {
+      num: '3',
+      title: isEn
+        ? 'Global Benchmark & Ranking of All 8 Solar Collector Topologies'
+        : 'Comparativa y Ranking Global de las 8 Topologías de Captación',
+      page: pageChap3,
+    },
+    {
+      num: '4',
+      title: isEn
+        ? 'Technical Building Code (CTE DB-HE4) Captation Losses Matrix'
+        : extraMapPages > 0
+        ? (studyType === 'monthly'
+            ? 'Mapas de Pérdidas de Captación CTE DB-HE4 (Anual + 12 Mensuales)'
+            : 'Mapas de Pérdidas de Captación CTE DB-HE4 (Anual + 4 Estacionales)')
+        : 'Mapa de Pérdidas de Captación y Cumplimiento CTE DB-HE4',
+      page: pageChap4,
+    },
+    {
+      num: '5',
+      title: isEn
+        ? 'Continuous Radiation Evolution Curve (Tilt Spectrum 1° to 90°)'
+        : 'Evolución Continua de Radiación en el Rango de Inclinaciones (1° a 90°)',
+      page: pageChap5,
+    }
+  );
+
+  doc.setFont('helvetica', 'normal');
+  const isMultiComp = componentsToRender.length > 1;
+  const rowH = isMultiComp ? 6.2 : 7.2;
+  const rowGap = isMultiComp ? 7.0 : 8.2;
+  let curTocY = tocY + 9;
+
+  tocList.forEach((item) => {
+    const targetPage = item.page;
+    const isSub = !!item.isSub;
+
+    // Interactive row background with indentation for sub-items
+    const rowX = isSub ? 24 : 20;
+    const rowW = isSub ? 166 : 170;
+    doc.setFillColor(isSub ? 241 : 248, isSub ? 245 : 250, isSub ? 249 : 252);
+    doc.roundedRect(rowX, curTocY - 4.2, rowW, rowH, 1.2, 1.2, 'F');
 
     // Number badge
-    doc.setFillColor(3, 105, 161);
-    doc.roundedRect(22, curTocY - 3.5, 5, 5, 1, 1, 'F');
+    const badgeW = isSub ? 7.5 : 5.5;
+    const badgeX = isSub ? 25.5 : 22;
+    if (isSub) {
+      doc.setFillColor(2, 132, 199); // Sky/cyan badge for sub-items
+    } else {
+      doc.setFillColor(3, 105, 161); // Deep Navy badge for chapters
+    }
+    doc.roundedRect(badgeX, curTocY - 3.2, badgeW, 4.6, 1, 1, 'F');
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7);
+    doc.setFontSize(isSub ? 6.2 : 7);
     doc.setTextColor(255, 255, 255);
-    doc.text(item.num, 23.8, curTocY);
+    const numW = doc.getTextWidth(item.num);
+    doc.text(item.num, badgeX + (badgeW - numW) / 2, curTocY);
 
-    // Chapter Title (clickable)
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.setTextColor(30, 41, 59);
+    // Chapter / Component Title (clickable)
+    const titleX = badgeX + badgeW + 3;
+    doc.setFont('helvetica', isSub ? 'normal' : 'bold');
+    doc.setFontSize(isSub ? 7.5 : 8);
+    doc.setTextColor(isSub ? 51 : 30, isSub ? 65 : 41, isSub ? 85 : 59);
     const leftText = item.title;
-    doc.text(leftText, 30, curTocY);
+    doc.text(leftText, titleX, curTocY);
 
-    // Dotted guide
+    // Dotted guide line
     const txtW = doc.getTextWidth(leftText);
-    let dotX = 30 + txtW + 3;
+    let dotX = titleX + txtW + 3;
     doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
     doc.setTextColor(203, 213, 225);
     while (dotX < 172) {
       doc.text('.', dotX, curTocY);
       dotX += 2.8;
     }
 
-    // Page badge pill
-    doc.setFillColor(224, 242, 254);
-    doc.roundedRect(174, curTocY - 3.5, 14, 5, 1, 1, 'F');
+    // Page badge pill with EXACT dynamic page number
+    doc.setFillColor(isSub ? 240 : 224, isSub ? 249 : 242, isSub ? 255 : 254);
+    doc.roundedRect(174, curTocY - 3.2, 14, 4.6, 1, 1, 'F');
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
+    doc.setFontSize(7);
     doc.setTextColor(2, 132, 199);
-    doc.text(`${isEn ? 'p.' : 'Pág.'} ${item.page}`, 175.2, curTocY);
+    doc.text(`${isEn ? 'p.' : 'Pág.'} ${targetPage}`, 175.2, curTocY);
 
-    // Register Clickable Hyperlink for entire row
-    doc.link(20, curTocY - 4.5, 170, 7.5, { pageNumber: targetPage });
+    // Register Clickable Hyperlink to the EXACT target page
+    doc.link(rowX, curTocY - 4.2, rowW, rowH, { pageNumber: targetPage });
 
     // Register PDF document outline bookmark
     try {
@@ -717,11 +797,11 @@ export async function generateOrientSolPDFReport(
       // Outline is optional
     }
 
-    curTocY += 8.2;
+    curTocY += rowGap;
   });
 
   // Project Parameters Summary Box (Balanced 2-column layout to avoid text collisions)
-  const paramsY = curTocY + 6;
+  const paramsY = curTocY + (isMultiComp ? 4 : 6);
   doc.setFillColor(248, 250, 252);
   doc.setDrawColor(226, 232, 240);
   doc.roundedRect(20, paramsY, 170, 44, 2, 2, 'FD');
@@ -1767,15 +1847,21 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(15, 23, 42);
+  const extraStartPage = pageChap4 + 1;
+  const extraEndPage = pageChap4 + extraMapPages;
+  const extraPageText = extraMapPages > 1
+    ? (isEn ? `Pages ${extraStartPage}-${extraEndPage}` : `Págs. ${extraStartPage} y ${extraEndPage}`)
+    : (isEn ? `Page ${extraStartPage}` : `Pág. ${extraStartPage}`);
+
   const mapTitle =
     studyType === 'monthly'
       ? isEn
-        ? 'Capture Loss Isoline Diagram (Annual Global Benchmark • 12 Monthly Maps on Pages 6-7)'
-        : 'Diagrama Isolíneas del Mapa de Pérdidas (Referencia Anual • 12 Mapas Mensuales en Págs. 6 y 7)'
+        ? `Capture Loss Isoline Diagram (Annual Global Benchmark • 12 Monthly Maps on ${extraPageText})`
+        : `Diagrama Isolíneas del Mapa de Pérdidas (Referencia Anual • 12 Mapas Mensuales en ${extraPageText})`
       : studyType === 'seasonal'
       ? isEn
-        ? 'Capture Loss Isoline Diagram (Annual Global Benchmark • 4 Seasonal Maps on Page 6)'
-        : 'Diagrama Isolíneas del Mapa de Pérdidas (Referencia Anual • 4 Mapas Estacionales en Pág. 6)'
+        ? `Capture Loss Isoline Diagram (Annual Global Benchmark • 4 Seasonal Maps on ${extraPageText})`
+        : `Diagrama Isolíneas del Mapa de Pérdidas (Referencia Anual • 4 Mapas Estacionales en ${extraPageText})`
       : isEn
       ? 'CTE DB-HE4 Isoline Loss Heatmap Diagram (1° Resolution)'
       : 'Diagrama Isolíneas del Mapa de Pérdidas de Captación (Resolución 1°)';
