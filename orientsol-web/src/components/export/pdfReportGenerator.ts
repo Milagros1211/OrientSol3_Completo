@@ -125,7 +125,30 @@ export interface PDFReportOptions {
 }
 
 /**
- * Renders an elegant highlighted insights callout card with icon, title, and bullet points.
+ * Sanitizes Greek and non-Latin1 symbols to prevent encoding corruption and character spacing bugs in jsPDF Helvetica.
+ */
+function sanitizePdfText(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/β/g, 'Inc')
+    .replace(/γ/g, 'gamma')
+    .replace(/δ/g, 'delta')
+    .replace(/α/g, 'alfa')
+    .replace(/ψ/g, 'psi')
+    .replace(/λ/g, 'lambda')
+    .replace(/θ/g, 'theta')
+    .replace(/±/g, '+/-')
+    .replace(/≤/g, '<=')
+    .replace(/≥/g, '>=')
+    .replace(/∈/g, 'en')
+    .replace(/★/g, '*')
+    .replace(/²/g, '^2')
+    .replace(/³/g, '^3');
+}
+
+/**
+ * Renders an elegant highlighted insights callout card with icon, title, and bullet points,
+ * calculating dynamic height to strictly prevent bottom border clipping.
  */
 function drawPdfInsightBox(
   doc: jsPDF,
@@ -134,32 +157,44 @@ function drawPdfInsightBox(
   x: number,
   y: number,
   w: number,
-  h: number
-): void {
+  minH: number = 28
+): number {
+  const cleanTitle = sanitizePdfText(title);
+  const cleanPoints = points.map((p) => sanitizePdfText(p));
+
+  // Pre-calculate line wrapping
+  const wrappedList: string[][] = cleanPoints.map((pt) => {
+    const bulletText = `- ${pt}`;
+    return doc.splitTextToSize(bulletText, w - 16);
+  });
+
+  const totalLines = wrappedList.reduce((acc, lines) => acc + lines.length, 0);
+  const calculatedH = Math.max(minH, 12 + totalLines * 3.6 + (cleanPoints.length - 1) * 2 + 5);
+
   doc.setFillColor(240, 249, 255);
   doc.setDrawColor(56, 189, 248);
   doc.setLineWidth(0.6);
-  doc.roundedRect(x, y, w, h, 2, 2, 'FD');
+  doc.roundedRect(x, y, w, calculatedH, 2, 2, 'FD');
 
   doc.setFillColor(2, 132, 199);
-  doc.roundedRect(x + 3, y + 3, 4, h - 6, 1, 1, 'F');
+  doc.roundedRect(x + 3, y + 3, 3.5, calculatedH - 6, 1, 1, 'F');
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
+  doc.setFontSize(8);
   doc.setTextColor(3, 105, 161);
-  doc.text(title, x + 10, y + 8);
+  doc.text(cleanTitle, x + 9, y + 7.5);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
+  doc.setFontSize(7);
   doc.setTextColor(30, 41, 59);
 
-  let textY = y + 14;
-  for (const pt of points) {
-    const bullet = `• ${pt}`;
-    const splitLines = doc.splitTextToSize(bullet, w - 14);
-    doc.text(splitLines, x + 10, textY);
-    textY += splitLines.length * 4.0;
+  let textY = y + 13;
+  for (const lines of wrappedList) {
+    doc.text(lines, x + 9, textY);
+    textY += lines.length * 3.6 + 2;
   }
+
+  return calculatedH;
 }
 
 /**
@@ -226,36 +261,41 @@ export async function generateOrientSolPDFReport(
   };
 
   const currentStudyName = isEn ? studyNames[studyType].en : studyNames[studyType].es;
+  const cleanStudyName = sanitizePdfText(currentStudyName);
 
   // Header & Footer helper
   const drawPageChrome = (chapterTitle: string, pageNum: number, totalPages: number) => {
-    // Header
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
-    doc.setTextColor(15, 23, 42);
-    doc.text(chapterTitle, 20, 15);
+    // Only draw running header on pages > 1 (Page 1 has its own dedicated title banner)
+    if (pageNum > 1) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.setTextColor(15, 23, 42);
+      doc.text(sanitizePdfText(chapterTitle), 20, 15);
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
-    doc.text(`OrientSol 4.0 • ${currentStudyName} • ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`, 20, 20);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`OrientSol 4.0 • ${cleanStudyName} • ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`, 20, 20);
 
-    // University badge text
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.setTextColor(180, 83, 9);
-    doc.text('UNIVERSIDAD DE JAÉN', 152, 15);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100, 116, 139);
-    doc.setFontSize(7.5);
-    doc.text(`Exportado: ${formattedDateTime}`, 142, 20);
+      // University badge text
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(180, 83, 9);
+      doc.text('UNIVERSIDAD DE JAÉN', 152, 15);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 116, 139);
+      doc.setFontSize(7.5);
+      doc.text(`Exportado: ${formattedDateTime}`, 142, 20);
 
-    // Divider
+      // Divider
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.4);
+      doc.line(20, 23, 190, 23);
+    }
+
+    // Running Footer on every page
     doc.setDrawColor(226, 232, 240);
     doc.setLineWidth(0.4);
-    doc.line(20, 23, 190, 23);
-
-    // Footer
     doc.line(20, pageHeight - 12, 190, pageHeight - 12);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
@@ -278,9 +318,9 @@ export async function generateOrientSolPDFReport(
     x: number,
     y: number,
     w: number,
-    h: number
+    minH?: number
   ) => {
-    drawPdfInsightBox(doc, title, points, x, y, w, h);
+    return drawPdfInsightBox(doc, title, points, x, y, w, minH);
   };
 
   // =========================================================================
@@ -407,37 +447,71 @@ export async function generateOrientSolPDFReport(
 
   const tocList = [
     { num: '1', title: isEn ? 'Energy Yield Balance & Thermal Derating (Osterwald vs Simplified)' : 'Balance Energético y Comportamiento Térmico Fotovoltaico (Osterwald vs Simplificado)', page: '2' },
-    { num: '2', title: isEn ? `Selected Operation Study: ${currentStudyName}` : `Estudio Solar Seleccionado: ${currentStudyName}`, page: '3' },
+    { num: '2', title: isEn ? `Selected Operation Study: ${cleanStudyName}` : `Estudio Solar Seleccionado: ${cleanStudyName}`, page: '3' },
     { num: '3', title: isEn ? 'Global Benchmark & Ranking of All 8 Solar Collector Topologies' : 'Comparativa y Ranking Global de las 8 Topologías de Captación', page: '4' },
     { num: '4', title: isEn ? 'Technical Building Code (CTE DB-HE4) Captation Losses Matrix' : 'Mapa de Pérdidas de Captación y Cumplimiento CTE DB-HE4', page: '5' },
-    { num: '5', title: isEn ? 'Continuous Radiation Evolution Curve (Tilt Spectrum β = 1° to 90°)' : 'Evolución Continua de Radiación en el Rango de Inclinaciones (β = 1° a 90°)', page: '6' },
+    { num: '5', title: isEn ? 'Continuous Radiation Evolution Curve (Tilt Spectrum 1° to 90°)' : 'Evolución Continua de Radiación en el Rango de Inclinaciones (1° a 90°)', page: '6' },
   ];
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   let curTocY = tocY + 10;
   tocList.forEach((item) => {
-    const leftText = `${item.num}. ${item.title}`;
-    doc.setTextColor(30, 41, 59);
-    doc.text(leftText, 20, curTocY);
+    const targetPage = parseInt(item.page, 10);
 
+    // Clickable interactive row background
+    doc.setFillColor(248, 250, 252);
+    doc.roundedRect(20, curTocY - 4.5, 170, 7.5, 1.5, 1.5, 'F');
+
+    // Number badge
+    doc.setFillColor(3, 105, 161);
+    doc.roundedRect(22, curTocY - 3.5, 5, 5, 1, 1, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7);
+    doc.setTextColor(255, 255, 255);
+    doc.text(item.num, 23.8, curTocY);
+
+    // Chapter Title (clickable)
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(30, 41, 59);
+    const leftText = item.title;
+    doc.text(leftText, 30, curTocY);
+
+    // Dotted guide
     const txtW = doc.getTextWidth(leftText);
-    let dotX = 20 + txtW + 3;
+    let dotX = 30 + txtW + 3;
+    doc.setFont('helvetica', 'normal');
     doc.setTextColor(203, 213, 225);
-    while (dotX < 180) {
+    while (dotX < 172) {
       doc.text('.', dotX, curTocY);
-      dotX += 3;
+      dotX += 2.8;
     }
 
+    // Page badge pill
+    doc.setFillColor(224, 242, 254);
+    doc.roundedRect(174, curTocY - 3.5, 14, 5, 1, 1, 'F');
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(15, 23, 42);
-    doc.text(item.page, 184, curTocY);
-    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(2, 132, 199);
+    doc.text(`Pág. ${item.page}`, 175.2, curTocY);
 
-    curTocY += 8;
+    // Register Clickable Hyperlink for entire row
+    doc.link(20, curTocY - 4.5, 170, 7.5, { pageNumber: targetPage });
+
+    // Register PDF document outline bookmark
+    try {
+      if ((doc as any).outline?.add) {
+        (doc as any).outline.add(null, `${item.num}. ${item.title}`, { pageNumber: targetPage });
+      }
+    } catch {
+      // Outline is optional
+    }
+
+    curTocY += 8.2;
   });
 
-  // Project Parameters Summary Box
+  // Project Parameters Summary Box (Balanced 2-column layout to avoid text collisions)
   const paramsY = curTocY + 6;
   doc.setFillColor(248, 250, 252);
   doc.setDrawColor(226, 232, 240);
@@ -446,49 +520,61 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(15, 23, 42);
-  doc.text(isEn ? 'GENERAL INSTALLATION & CLIMATIC PARAMETERS' : 'PARÁMETROS GENERALES DE LA INSTALACIÓN Y EMPLAZAMIENTO', 25, paramsY + 7);
+  doc.text(isEn ? 'GENERAL INSTALLATION & CLIMATIC PARAMETERS' : 'PARÁMETROS GENERALES DE LA INSTALACIÓN Y EMPLAZAMIENTO', 24, paramsY + 7);
 
-  doc.setFontSize(8);
-  doc.text(`${isEn ? 'Location' : 'Localidad'}:`, 25, paramsY + 15);
+  const c1LabX = 24;
+  const c1ValX = 62;
+  const c2LabX = 112;
+  const c2ValX = 152;
+
+  doc.setFontSize(7.5);
+
+  // Row 1
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Location' : 'Localidad'}:`, c1LabX, paramsY + 15);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${res.locationName} (${res.latitude.toFixed(4)}° N, ${res.longitude.toFixed(4)}° O)`, 55, paramsY + 15);
+  doc.text(`${res.locationName} (${res.latitude.toFixed(2)}° N)`, c1ValX, paramsY + 15);
 
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Data Source' : 'Fuente de Datos'}:`, 115, paramsY + 15);
+  doc.text(`${isEn ? 'Data Source' : 'Fuente de Datos'}:`, c2LabX, paramsY + 15);
   doc.setFont('helvetica', 'normal');
-  doc.text(res.source.toUpperCase(), 150, paramsY + 15);
+  doc.text(res.source.toUpperCase(), c2ValX, paramsY + 15);
+
+  // Row 2
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Peak Power' : 'Potencia Pico'}:`, c1LabX, paramsY + 23);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${peakKw.toFixed(2)} kWp`, c1ValX, paramsY + 23);
 
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Installed Peak Power' : 'Potencia Pico Instalada'}:`, 25, paramsY + 23);
+  doc.text(`${isEn ? 'Performance Ratio' : 'Rendimiento (PR)'}:`, c2LabX, paramsY + 23);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${peakKw.toFixed(2)} kWp`, 70, paramsY + 23);
+  doc.text(`${(pr * 100).toFixed(0)}%`, c2ValX, paramsY + 23);
+
+  // Row 3
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Module NOCT' : 'TONC Módulos'}:`, c1LabX, paramsY + 31);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${tonc.toFixed(1)} °C (g: -0.40%/°C)`, c1ValX, paramsY + 31);
 
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Performance Ratio (PR)' : 'Factor de Rendimiento (PR)'}:`, 115, paramsY + 23);
+  doc.text(`${isEn ? 'Collector Area' : 'Sup. Captación'}:`, c2LabX, paramsY + 31);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${(pr * 100).toFixed(0)}%`, 160, paramsY + 23);
+  doc.text(`${res.energyYield.collectorAreaM2.toFixed(1)} m²`, c2ValX, paramsY + 31);
+
+  // Row 4
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${isEn ? 'Fixed Optimal Tilt' : 'Inclinación Óptima'}:`, c1LabX, paramsY + 39);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`${optAngle}° (+${res.optimalAnnual.gainOverHorizontalPct.toFixed(1)}% vs Horiz)`, c1ValX, paramsY + 39);
 
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Module NOCT / TONC' : 'TONC de Módulos FV'}:`, 25, paramsY + 31);
+  doc.text(`${isEn ? 'Study' : 'Estudio'}:`, c2LabX, paramsY + 39);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${tonc.toFixed(1)} °C (γ = -0.40%/°C)`, 70, paramsY + 31);
+  const shortStudyName = cleanStudyName.length > 22 ? cleanStudyName.substring(0, 22) + '...' : cleanStudyName;
+  doc.text(shortStudyName, c2ValX, paramsY + 39);
 
-  doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Estimated Collector Area' : 'Superficie de Captación'}:`, 115, paramsY + 31);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${res.energyYield.collectorAreaM2.toFixed(1)} m²`, 160, paramsY + 31);
-
-  doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Optimal Fixed Tilt' : 'Inclinación Óptima Anual'}:`, 25, paramsY + 39);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`β = ${optAngle}° (+${res.optimalAnnual.gainOverHorizontalPct.toFixed(1)}% vs Horiz)`, 70, paramsY + 39);
-
-  doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Selected Study' : 'Estudio Seleccionado'}:`, 115, paramsY + 39);
-  doc.setFont('helvetica', 'normal');
-  doc.text(currentStudyName, 150, paramsY + 39);
-
-  drawPageChrome('OrientSol 4.0 • Resultados Generales', 1, 6);
+  drawPageChrome('', 1, 6);
 
   // =========================================================================
   // PÁGINA 2: GRÁFICOS DE RADIACIÓN Y PRODUCCIÓN FV CON INSIGHTS (Imagen 1)
@@ -746,11 +832,11 @@ export async function generateOrientSolPDFReport(
   doc.setTextColor(2, 132, 199);
   const tiltAvg =
     studyType === 'monthly'
-      ? (res.monthlyOptimum12.optimalTiltsDeg.reduce((a, b) => a + b, 0) / 12).toFixed(1)
+      ? `${(res.monthlyOptimum12.optimalTiltsDeg.reduce((a, b) => a + b, 0) / 12).toFixed(1)}°`
       : studyType === 'seasonal'
       ? `${Math.round((res.seasonal.winterTiltDeg + res.seasonal.summerTiltDeg) / 2)}°`
       : `${optAngle}°`;
-  doc.text(`${tiltAvg}°`, op2X + 4, opBarY + 14);
+  doc.text(tiltAvg, op2X + 4, opBarY + 14);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6);
   doc.setTextColor(100, 116, 139);
@@ -894,15 +980,15 @@ export async function generateOrientSolPDFReport(
   const cols = [
     isEn ? 'Month' : 'Mes',
     'Gdm(0°)',
-    isEn ? 'Tilt β (°)' : 'Inclinación (β)',
-    isEn ? 'Study Gdm' : 'Gdm Estudio',
-    'Tª Amb (°C)',
-    'Tª Célula (°C)',
-    isEn ? 'PV Yield (kWh)' : 'Prod FV (kWh)',
-    isEn ? 'Gain vs 0° (%)' : 'Gan. s/ Horiz (%)',
-    isEn ? 'Gain vs Opt (%)' : 'Gan. s/ Fijo Ópt (%)',
+    isEn ? 'Tilt (°)' : 'Inc (°)',
+    isEn ? 'Study Gdm' : 'Gdm Est.',
+    'Tª Amb',
+    'Tª Cél.',
+    isEn ? 'PV Yield' : 'Prod (kWh)',
+    isEn ? 'Gain vs 0°' : 'Gan. s/ 0°',
+    isEn ? 'Gain vs Opt' : 'Gan. s/ Ópt',
   ];
-  const colX = [22, 42, 60, 80, 100, 120, 140, 160, 176];
+  const colX = [22, 40, 56, 70, 88, 104, 124, 144, 168];
   cols.forEach((c, idx) => doc.text(c, colX[idx], tblY + 4.5));
 
   let curRowY = tblY + 6.5;
@@ -951,7 +1037,7 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(6.5);
   doc.setTextColor(56, 189, 248);
-  doc.text(isEn ? 'ANNUAL AVERAGE' : 'PROMEDIO ANUAL', colX[0], curRowY + 4);
+  doc.text(isEn ? 'AVERAGE' : 'PROMEDIO', colX[0], curRowY + 4);
   doc.setTextColor(255, 255, 255);
   doc.text((radH.reduce((a, b) => a + b, 0) / 12).toFixed(2), colX[1], curRowY + 4);
   doc.text('-', colX[2], curRowY + 4);
@@ -968,13 +1054,13 @@ export async function generateOrientSolPDFReport(
   drawInsightBox(
     isEn ? 'KEY TECHNICAL INSIGHTS: ANGULAR OPTIMIZATION' : 'INSIGHTS TÉCNICOS DESTACADOS: OPTIMIZACIÓN ANGULAR Y TRAZABILIDAD',
     [
-      `Adaptación Estacional del Ángulo Óptimo: La declinación solar varía entre δ = -23.45° (solsticio de invierno) y +23.45° (solsticio de verano). En invierno, el ángulo óptimo mensual calculado alcanza 58°-60° en Jaén para capturar el sol bajo, mientras que en verano se sitúa entre 0° y 4° adaptándose a la gran altura cenital solar.`,
+      `Adaptación Estacional del Ángulo Óptimo: La declinación solar varía entre delta = -23.45° (solsticio de invierno) y +23.45° (solsticio de verano). En invierno, el ángulo óptimo mensual calculado alcanza 58°-60° en Jaén para capturar el sol bajo, mientras que en verano se sitúa entre 0° y 4° adaptándose a la gran altura cenital solar.`,
       `Comparativa de Ganancia frente a Fijo Anual: La optimización mensual independiente proporciona un incremento neto de energía del +${gainVsOpt.toFixed(2)}% (+${Math.max(0, Math.round(activeAnnualTotalKwh - res.optimalAnnual.annualTotalKwh))} kWh/m²·año) frente a la inclinación fija anual de ${optAngle}°, concentrándose la mayor ganancia relativa en los meses invernales.`,
     ],
     20,
     ins2Y,
     170,
-    28
+    30
   );
 
   // =========================================================================
@@ -1135,8 +1221,8 @@ export async function generateOrientSolPDFReport(
   doc.setFontSize(8.5);
   doc.setTextColor(4, 120, 87);
   doc.text(
-    `Óptimo Absoluto de Captación (CTE DB-HE4): Inclinación β = ${res.captureLossMap.optimalPoint.betaDeg}°, Orientación α = ${res.captureLossMap.optimalPoint.alphaDeg}° | ${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} kWh/m²/día (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} kWh/m²·año)`,
-    25,
+    `Óptimo Absoluto de Captación (CTE DB-HE4): Inclinación: ${res.captureLossMap.optimalPoint.betaDeg}°, Orientación: ${res.captureLossMap.optimalPoint.alphaDeg}° | ${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} kWh/m²/día (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} kWh/m²·año)`,
+    24,
     cteTopY + 8.5
   );
 
@@ -1153,7 +1239,7 @@ export async function generateOrientSolPDFReport(
   doc.setFontSize(6.5);
   doc.setTextColor(22, 101, 52);
   doc.text('LÍMITE GENERAL CTE', 24, lCardY + 5.5);
-  doc.text('(Pérdida ≤ 10%)', 24, lCardY + 9.5);
+  doc.text('(Pérdida <= 10%)', 24, lCardY + 9.5);
   doc.setFontSize(11);
   doc.text(`${res.captureLossMap.cteZones.generalPctCompliant}%`, 24, lCardY + 16.5);
   doc.setFont('helvetica', 'normal');
@@ -1170,7 +1256,7 @@ export async function generateOrientSolPDFReport(
   doc.setFontSize(6.5);
   doc.setTextColor(133, 77, 14);
   doc.text('SUPERPOSICIÓN CTE', l2X + 4, lCardY + 5.5);
-  doc.text('(Pérdida ≤ 20%)', l2X + 4, lCardY + 9.5);
+  doc.text('(Pérdida <= 20%)', l2X + 4, lCardY + 9.5);
   doc.setFontSize(11);
   doc.text(`${res.captureLossMap.cteZones.superpositionPctCompliant}%`, l2X + 4, lCardY + 16.5);
   doc.setFont('helvetica', 'normal');
@@ -1187,7 +1273,7 @@ export async function generateOrientSolPDFReport(
   doc.setFontSize(6.5);
   doc.setTextColor(154, 52, 18);
   doc.text('INTEGRACIÓN ARQUITECT.', l3X + 4, lCardY + 5.5);
-  doc.text('(Pérdida ≤ 40%)', l3X + 4, lCardY + 9.5);
+  doc.text('(Pérdida <= 40%)', l3X + 4, lCardY + 9.5);
   doc.setFontSize(11);
   doc.text(`${res.captureLossMap.cteZones.integrationPctCompliant}%`, l3X + 4, lCardY + 16.5);
   doc.setFont('helvetica', 'normal');
@@ -1226,7 +1312,7 @@ export async function generateOrientSolPDFReport(
   doc.setFontSize(6.5);
   doc.setTextColor(51, 65, 85);
   doc.text(
-    'Calculan la cobertura del espacio angular de búsqueda (las 475 combinaciones de β ∈ [0°, 90°] y α ∈ [-90°, +90°]).',
+    'Calculan la cobertura del espacio angular de búsqueda (475 combinaciones de Inclinación [0°, 90°] y Orientación [-90°, +90°]).',
     24,
     expY + 9
   );
@@ -1281,7 +1367,7 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7);
   doc.setTextColor(15, 23, 42);
-  doc.text(`★ ÓPTIMO: β=${optAngle}°, α=0° (0% pérdida)`, optXMap + 3, optYMap - 3);
+  doc.text(`* ÓPTIMO: Inc = ${optAngle}°, Ori = 0° (0% pérdida)`, optXMap + 3, optYMap - 3);
 
   // Axis Labels
   doc.setFont('helvetica', 'normal');
@@ -1299,26 +1385,26 @@ export async function generateOrientSolPDFReport(
   drawInsightBox(
     isEn ? 'KEY TECHNICAL INSIGHTS: CTE DB-HE4 REGULATORY COMPLIANCE' : 'INSIGHTS TÉCNICOS DESTACADOS: CUMPLIMIENTO REGLAMENTARIO CTE DB-HE4',
     [
-      `Tolerancia de Integración Arquitectónica: Para instalaciones en cubiertas y fachadas existentes, el DB-HE4 admite hasta un 20% (superposición) y 40% (integración arquitectónica) de pérdidas. Esto permite desviar los captadores hasta ±60° azimutales respecto al sur con una penalización admisible dentro de los estándares legales españoles.`,
-      `Ventana de Inclinación para Límite General (≤ 10%): El diseño óptimo para grandes generadores o instalaciones en suelo queda circunscrito al elipsoide verde (β entre 18° y 48°, α entre -25° y +25°), asegurando captar más del 90% del recurso solar potencial disponible.`,
+      `Tolerancia de Integración Arquitectónica: Para instalaciones en cubiertas y fachadas existentes, el DB-HE4 admite hasta un 20% (superposición) y 40% (integración arquitectónica) de pérdidas. Esto permite desviar los captadores hasta +/-60° azimutales respecto al sur con una penalización admisible dentro de los estándares legales españoles.`,
+      `Ventana de Inclinación para Límite General (Pérdida <= 10%): El diseño óptimo para grandes generadores o instalaciones en suelo queda circunscrito al elipsoide verde (Inclinación entre 18° y 48°, Orientación entre -25° y +25°), asegurando captar más del 90% del recurso solar potencial disponible.`,
     ],
     20,
     ins4Y,
     170,
-    28
+    32
   );
 
   // =========================================================================
   // PÁGINA 6: CURVA DE EVOLUCIÓN CONTINUA 1° A 90° (Capítulo Radiación)
   // =========================================================================
   doc.addPage();
-  drawPageChrome('Capítulo 5. Evolución Continua de Radiación (β = 1° a 90°)', 6, 6);
+  drawPageChrome('Capítulo 5. Evolución Continua de Radiación (Inclinación 1° a 90°)', 6, 6);
 
   // Curve 1° to 90° Chart Frame
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.setTextColor(15, 23, 42);
-  doc.text(isEn ? 'Global Radiation Evolution Across Tilt Spectrum (β = 1° to 90°)' : 'Evolución de la Radiación en el Rango Continuo de Inclinaciones (β = 1° a 90°)', 20, 28);
+  doc.text(isEn ? 'Global Radiation Evolution Across Tilt Spectrum (Tilt 1° to 90°)' : 'Evolución de la Radiación en el Rango Continuo de Inclinaciones (Inclinación 1° a 90°)', 20, 28);
 
   const cvW = 170;
   const cvH = 75;
@@ -1380,7 +1466,7 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(7.5);
   doc.setTextColor(220, 38, 38);
-  doc.text(`★ Inclinación Óptima: β = ${optClamped}° (${radCurve1to90[optClamped - 1].toFixed(2)} kWh/m²/d)`, optPx - 15, optPy - 4);
+  doc.text(`* Inclinación Óptima: Inc = ${optClamped}° (${radCurve1to90[optClamped - 1].toFixed(2)} kWh/m²/d)`, optPx - 15, optPy - 4);
 
   // Axis Ticks
   doc.setFont('helvetica', 'normal');
@@ -1409,7 +1495,7 @@ export async function generateOrientSolPDFReport(
   doc.setLineWidth(1.0);
   doc.line(145, cvBoxY + 8, 153, cvBoxY + 8);
   doc.setTextColor(16, 185, 129);
-  doc.text(`${currentStudyName.substring(0, 16)} (${meanRadStudy.toFixed(2)})`, 155, cvBoxY + 9);
+  doc.text(`${cleanStudyName.substring(0, 16)} (${meanRadStudy.toFixed(2)})`, 155, cvBoxY + 9);
 
   // Key Tilts Discrete Table
   const dtY = cvBoxY + cvH + 6;
@@ -1425,7 +1511,7 @@ export async function generateOrientSolPDFReport(
   doc.setFontSize(6.5);
   doc.setTextColor(255, 255, 255);
 
-  const dtCols = ['Inclinación β', 'Gdm Media (kWh/m²/d)', 'Irradiación Anual (kWh/m²)', 'Ganancia vs Horiz (%)', 'Pérdida vs Óptimo (%)'];
+  const dtCols = ['Inclinación', 'Gdm Media (kWh/m²/d)', 'Irradiación Anual (kWh/m²)', 'Ganancia vs Horiz (%)', 'Pérdida vs Óptimo (%)'];
   const dtX = [24, 60, 100, 138, 166];
   dtCols.forEach((col, idx) => doc.text(col, dtX[idx], dtBoxY + 4));
 
@@ -1447,7 +1533,7 @@ export async function generateOrientSolPDFReport(
     doc.setFont('helvetica', deg === optAngle ? 'bold' : 'normal');
     doc.setFontSize(6.5);
     doc.setTextColor(deg === optAngle ? 220 : 15, deg === optAngle ? 38 : 23, deg === optAngle ? 38 : 42);
-    doc.text(deg === optAngle ? `β = ${deg}° (ÓPTIMO)` : `β = ${deg}°`, dtX[0], curDtY + 3.5);
+    doc.text(deg === optAngle ? `Inc = ${deg}° (ÓPTIMO)` : `Inc = ${deg}°`, dtX[0], curDtY + 3.5);
 
     doc.setTextColor(deg === optAngle ? 220 : 30, deg === optAngle ? 38 : 41, deg === optAngle ? 38 : 59);
     doc.text(`${val.toFixed(3)} kWh/m²/d`, dtX[1], curDtY + 3.5);
@@ -1467,13 +1553,13 @@ export async function generateOrientSolPDFReport(
   drawInsightBox(
     isEn ? 'KEY TECHNICAL INSIGHTS: ANGULAR SENSITIVITY' : 'INSIGHTS TÉCNICOS DESTACADOS: SENSIBILIDAD ANGULAR Y MESETA DE TOLERANCIA',
     [
-      `Meseta de Tolerancia Angular: La curva anual de radiación exhibe una amplia meseta convexa en torno al óptimo (β = ${optAngle}°). Inclinaciones en el rango de 20° a 40° capturan más del 98.8% del recurso máximo potencial, permitiendo una gran tolerancia constructiva para adaptarse a pendientes de tejados estándar.`,
+      `Meseta de Tolerancia Angular: La curva anual de radiación exhibe una amplia meseta convexa en torno al óptimo (Inclinación = ${optAngle}°). Inclinaciones en el rango de 20° a 40° capturan más del 98.8% del recurso máximo potencial, permitiendo una gran tolerancia constructiva para adaptarse a pendientes de tejados estándar.`,
       `Caída Acelerada en Inclinaciones Elevadas: Para inclinaciones superiores a 60°, la captación desciende rápidamente (hasta un -28% a 90° frente a la óptima), debido a la reducción del factor de visión directa durante los meses estivales de mayor insolación.`,
     ],
     20,
     ins5Y,
     170,
-    26
+    30
   );
 
   // -------------------------------------------------------------
