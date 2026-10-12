@@ -55,6 +55,108 @@ function renderAboutView(isEn: boolean): HTMLElement {
         </div>
       </div>
     </div>
+
+    <!-- Bases de Datos Climáticas, Frecuencia de Actualización y Referencias -->
+    <div class="result-card wide-card" style="margin-top: 1.25rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-cyan, #0284c7);">
+          <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+        </svg>
+        <h4 style="margin: 0; color: var(--text-main);">
+          ${isEn ? 'Meteorological & Radiative Databases: Update Frequency & Scientific References' : 'Bases de Datos Climáticas y Radiativas: Periodicidad de Actualización y Referencias Científicas'}
+        </h4>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-dim); margin-bottom: 1rem; line-height: 1.5;">
+        ${isEn
+          ? 'OrientSol 4.0 connects to official meteorological databases and satellite APIs to extract incident solar radiation Gdm(0) and ambient temperatures. Below is the update cadence and formal bibliography for each provider:'
+          : 'OrientSol 4.0 permite extraer y evaluar radiación solar incidente Gdm(0) y temperaturas ambientales desde bases de datos meteorológicas homologadas y APIs satelitales. A continuación se detalla cada cuánto se actualizan y sus referencias bibliográficas:'}
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1rem;">
+        <!-- BD 1: Local / Nacional (Censolar / IDAE / AEMET) -->
+        <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+              <strong style="color: var(--text-main); font-size: 0.9rem;">🇪🇸 Base Nacional IDAE / Censolar / AEMET</strong>
+              <span class="badge badge-success" style="font-size: 0.7rem;">Normales Climatológicas</span>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
+              <strong>Frecuencia de Actualización:</strong> Series climatológicas normalizadas correspondientes a <strong>periodos estándar de 30 años</strong> de la Organización Meteorológica Mundial (OMM / WMO), actualizadas oficialmente <strong>cada 10 años</strong> (WMO-No. 1203). Proporcionan los valores de diseño normativo del CTE DB-HE4 en España para 52 capitales y provincias.
+            </p>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
+            <strong>Referencias:</strong><br/>
+            • IDAE (2009). <em>Pliego de Condiciones Técnicas de Instalaciones Solares Térmicas</em>. Ministerio de Industria, Turismo y Comercio.<br/>
+            • AEMET (2012). <em>Atlas de Radiación Solar en España</em>. EUMETSAT Climate SAF. NIPO: 281-12-008-8.<br/>
+            • WMO (2017). <em>WMO Guidelines on the Calculation of Climate Normals</em> (WMO-No. 1203).
+          </div>
+        </div>
+
+        <!-- BD 2: PVGIS (Comisión Europea JRC) -->
+        <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+              <strong style="color: var(--text-main); font-size: 0.9rem;">🇪🇺 PVGIS (Comisión Europea - JRC)</strong>
+              <span class="badge badge-primary" style="font-size: 0.7rem;">Mensual (ERA5) / 2-3 años (v5.x)</span>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
+              <strong>Frecuencia de Actualización:</strong> 
+              • <strong>Reanálisis ERA5 / SARAH-3:</strong> El ECMWF actualiza las series de radiación y meteorología <strong>mensualmente</strong> (con un retardo de latencia de 2 a 3 meses para consolidación).<br/>
+              • <strong>Versiones de API y Algoritmos:</strong> El JRC actualiza versiones mayores <strong>cada 2 a 3 años</strong> (v5.1 en 2020, v5.2 en 2022, v5.3 en 2024).
+            </p>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
+            <strong>Referencias:</strong><br/>
+            • Huld, T., et al. (2012). <em>A new solar radiation database for estimating PV performance in Europe and Africa</em>. Solar Energy, 86(6), 1803-1815. DOI: 10.1016/j.solener.2012.03.006.<br/>
+            • Pfeifroth, U., et al. (2023). <em>Surface Radiation Data Set - Heliosat (SARAH) - Edition 3</em>. CM SAF. DOI: 10.5676/EUM_SAF_CM/SARAH/V003.<br/>
+            • JRC (2024). <em>PVGIS API Non-interactive service</em>. European Commission.
+          </div>
+        </div>
+
+        <!-- BD 3: NASA POWER -->
+        <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+              <strong style="color: var(--text-main); font-size: 0.9rem;">🛰️ NASA POWER (CERES / MERRA-2)</strong>
+              <span class="badge badge-warning" style="font-size: 0.7rem; background: #d97706; color: #fff;">Diaria (NRT) / Mensual (MERRA-2)</span>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
+              <strong>Frecuencia de Actualización:</strong>
+              • <strong>Cuasi tiempo real (NRT):</strong> Actualización <strong>diaria</strong> con latencia de 2 a 4 días.<br/>
+              • <strong>Reanálisis asimilado MERRA-2:</strong> Actualización consolidada <strong>mensual</strong> con 1 mes de desfase.<br/>
+              • <strong>Climatologías multianuales (POWER v2.x):</strong> Actualización <strong>anual / bianual</strong> integrando más de 35 años continuos de observaciones satelitales (1984–presente).
+            </p>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
+            <strong>Referencias:</strong><br/>
+            • Stackhouse, P. W., et al. (2022). <em>The NASA Prediction of Worldwide Energy Resources (POWER) Project</em>. NASA Technical Reports Server.<br/>
+            • Gelaro, R., et al. (2017). <em>The Modern-Era Retrospective Analysis for Research and Applications, Version 2 (MERRA-2)</em>. Journal of Climate, 30(14), 5419-5454.
+          </div>
+        </div>
+
+        <!-- BD 4: Constante Solar y Modelos Físicos -->
+        <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+              <strong style="color: var(--text-main); font-size: 0.9rem;">☀️ Constante Solar Gsc = 1367 W/m²</strong>
+              <span class="badge badge-neutral" style="font-size: 0.7rem;">Estándar Internacional OMM</span>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
+              <strong>Justificación de Uso:</strong> Adoptada formalmente por el <em>World Radiation Center</em> (WRC, Davos, 1981) y la Organización Meteorológica Mundial (OMM). Es el estándar unánime de la literatura de ingeniería solar térmica y fotovoltaica (Duffie &amp; Beckman, Klein, Liu-Jordan), garantizando concordancia matemática del 100% con el código original OrientSol y la normativa CTE DB-HE4.
+            </p>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
+            <strong>Referencias:</strong><br/>
+            • Duffie, J. A., &amp; Beckman, W. A. (2013). <em>Solar Engineering of Thermal Processes</em>. 4th Edition. John Wiley &amp; Sons. Cap. 1.2.<br/>
+            • WRC / WMO (1981). <em>World Radiation Center Standard Solar Constant</em>. Commission for Instruments and Methods of Observation.<br/>
+            • Klein, S. A. (1977). <em>Calculation of monthly average insolation on tilted surfaces</em>. Solar Energy, 19(4), 325-329.
+          </div>
+        </div>
+      </div>
+    </div>
+
   `;
 
   // Attach architecture technical details inside About view

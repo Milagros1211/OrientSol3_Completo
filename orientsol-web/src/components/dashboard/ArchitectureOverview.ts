@@ -44,7 +44,7 @@ export function renderArchitectureOverview(): HTMLElement {
         <ul class="arch-list">
           <li><code>layout/</code>: Header, navegación lateral y barra de estado reactiva</li>
           <li><code>location/</code>: Selector de provincias españolas, ciudades y albedo</li>
-          <li><code>console/</code>: Terminal interactiva en vivo conectada al motor WASM</li>
+          <li><code>console/</code>: Suite interactiva de verificación y validación matemática de motores</li>
           <li><code>solar/</code>: Paneles de cálculo de radiación, ganancias y curvas solares</li>
           <li><code>common/</code>: Botones, insignias, tarjetas y diálogos de configuración</li>
         </ul>
@@ -57,9 +57,9 @@ export function renderArchitectureOverview(): HTMLElement {
         </div>
         <p class="arch-card-desc">Migración y tipado de los datos de <code>BBDD.xlsx</code>:</p>
         <ul class="arch-list">
-          <li><code>locations.ts</code>: Catálogo de localidades con radiación Gdm(0) y temperaturas</li>
+          <li><code>locations.ts</code>: Catálogo de localidades con radiación Gdm(0) y temperaturas (BBDD IDAE / AEMET)</li>
           <li><code>albedo.ts</code>: Coeficientes de reflectancia según normativa IDAE</li>
-          <li><code>solarConstants.ts</code>: Constante solar (1367 W/m²) y días característicos</li>
+          <li><code>solarConstants.ts</code>: Constante solar (1367 W/m², estándar OMM/WRC) y días característicos</li>
           <li><code>pvModules.ts</code>: Especificaciones de módulos fotovoltaicos comerciales</li>
         </ul>
       </div>
