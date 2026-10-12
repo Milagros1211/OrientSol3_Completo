@@ -78,9 +78,9 @@ function renderAboutView(isEn: boolean): HTMLElement {
         <!-- BD 1: Local / Nacional (Censolar / IDAE / AEMET) -->
         <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
               <strong style="color: var(--text-main); font-size: 0.9rem;">🇪🇸 Base Nacional IDAE / Censolar / AEMET</strong>
-              <span class="badge badge-success" style="font-size: 0.7rem;">Normales Climatológicas</span>
+              <span class="badge badge-success" style="font-size: 0.7rem; white-space: nowrap;">Normales Climatológicas</span>
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
               <strong>Frecuencia de Actualización:</strong> Series climatológicas normalizadas correspondientes a <strong>periodos estándar de 30 años</strong> de la Organización Meteorológica Mundial (OMM / WMO), actualizadas oficialmente <strong>cada 10 años</strong> (WMO-No. 1203). Proporcionan los valores de diseño normativo del CTE DB-HE4 en España para 52 capitales y provincias.
@@ -97,9 +97,9 @@ function renderAboutView(isEn: boolean): HTMLElement {
         <!-- BD 2: PVGIS (Comisión Europea JRC) -->
         <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
               <strong style="color: var(--text-main); font-size: 0.9rem;">🇪🇺 PVGIS (Comisión Europea - JRC)</strong>
-              <span class="badge badge-primary" style="font-size: 0.7rem;">Mensual (ERA5) / 2-3 años (v5.x)</span>
+              <span class="badge badge-primary" style="font-size: 0.7rem; white-space: nowrap;">Mensual / 2-3 años (v5.x)</span>
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
               <strong>Frecuencia de Actualización:</strong> 
@@ -118,30 +118,54 @@ function renderAboutView(isEn: boolean): HTMLElement {
         <!-- BD 3: NASA POWER -->
         <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
               <strong style="color: var(--text-main); font-size: 0.9rem;">🛰️ NASA POWER (CERES / MERRA-2)</strong>
-              <span class="badge badge-warning" style="font-size: 0.7rem; background: #d97706; color: #fff;">Diaria (NRT) / Mensual (MERRA-2)</span>
+              <span class="badge badge-warning" style="font-size: 0.7rem; white-space: nowrap;">Diaria (NRT) / Mensual</span>
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
               <strong>Frecuencia de Actualización:</strong>
-              • <strong>Cuasi tiempo real (NRT):</strong> Actualización <strong>diaria</strong> con latencia de 2 a 4 días.<br/>
-              • <strong>Reanálisis asimilado MERRA-2:</strong> Actualización consolidada <strong>mensual</strong> con 1 mes de desfase.<br/>
-              • <strong>Climatologías multianuales (POWER v2.x):</strong> Actualización <strong>anual / bianual</strong> integrando más de 35 años continuos de observaciones satelitales (1984–presente).
+              • <strong>Cuasi tiempo real (NRT):</strong> Actualización <strong>diaria</strong> (latencia 2-4 días).<br/>
+              • <strong>Reanálisis asimilado MERRA-2:</strong> Consolidación <strong>mensual</strong> con 1 mes de desfase.<br/>
+              • <strong>Climatologías satelitales (POWER v2.x):</strong> Actualización <strong>anual</strong> integrando &gt;35 años (1984–presente).<br/>
+              • <strong>Variables extraídas:</strong> Radiación global horizontal diaria <code>ALLSKY_SFC_SW_DWN</code> (kWh/m²/día) y temperatura a 2m <code>T2M</code> (°C).
             </p>
           </div>
           <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
             <strong>Referencias:</strong><br/>
-            • Stackhouse, P. W., et al. (2022). <em>The NASA Prediction of Worldwide Energy Resources (POWER) Project</em>. NASA Technical Reports Server.<br/>
-            • Gelaro, R., et al. (2017). <em>The Modern-Era Retrospective Analysis for Research and Applications, Version 2 (MERRA-2)</em>. Journal of Climate, 30(14), 5419-5454.
+            • Stackhouse, P. W., et al. (2022). <em>The NASA Prediction of Worldwide Energy Resources (POWER) Project</em>. NASA Technical Reports.<br/>
+            • Gelaro, R., et al. (2017). <em>The Modern-Era Retrospective Analysis for Research and Applications, Version 2 (MERRA-2)</em>. J. Climate, 30(14), 5419-5454.
           </div>
         </div>
 
-        <!-- BD 4: Constante Solar y Modelos Físicos -->
+        <!-- BD 4: Open-Meteo Historical Archive / ERA5 Reanalysis -->
         <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
+              <strong style="color: var(--text-main); font-size: 0.9rem;">🌐 Open-Meteo / ECMWF ERA5 (Reanálisis)</strong>
+              <span class="badge badge-primary" style="font-size: 0.7rem; white-space: nowrap;">Diaria / ERA5T (5 días)</span>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
+              <strong>API Real Consultada:</strong> <code>archive-api.open-meteo.com</code> (modelo reanálisis global ECMWF ERA5 / ERA5-Land, resolución espacial 9–25 km).<br/>
+              • <strong>Frecuencia de Actualización:</strong> Serie histórica <strong>ERA5T</strong> actualizada <strong>diariamente con 5 días de latencia</strong>. Archivo consolidado ERA5 definitivo actualizado <strong>mensualmente</strong> (desfase 2 a 3 meses).<br/>
+              • <strong>Variables extraídas y conversión:</strong>
+                Radiación diaria incidente <code>shortwave_radiation_sum</code> (en MJ/m²/día, convertida a kWh/m²/día dividiendo por 3.6 y promediada a 12 meses para $G_{dm}(0)$) y temperatura a 2m <code>temperature_2m_mean</code> (°C), además de altitud (m).<br/>
+              • <em>Nota técnica:</em> Sustituye la API comercial con licencia cerrada de Meteonorm utilizando la misma base de reanálisis global que utiliza dicho software.
+            </p>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
+            <strong>Referencias:</strong><br/>
+            • Hersbach, H., et al. (2020). <em>The ERA5 global reanalysis</em>. Quarterly Journal of the Royal Meteorological Society, 146(730), 1999-2049. DOI: 10.1002/qj.3803.<br/>
+            • Zippenfenig, P. (2023). <em>Open-Meteo: Open-Source Weather API</em>. DOI: 10.5281/zenodo.7970649.<br/>
+            • Muñoz-Sabater, J., et al. (2021). <em>ERA5-Land: a state-of-the-art global land surface dataset</em>. Earth System Science Data, 13(9), 4349-4383.
+          </div>
+        </div>
+
+        <!-- BD 5: Constante Solar y Modelos Físicos -->
+        <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
               <strong style="color: var(--text-main); font-size: 0.9rem;">☀️ Constante Solar Gsc = 1367 W/m²</strong>
-              <span class="badge badge-neutral" style="font-size: 0.7rem;">Estándar Internacional OMM</span>
+              <span class="badge badge-success" style="font-size: 0.7rem; white-space: nowrap;">Estándar OMM / WRC</span>
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
               <strong>Justificación de Uso:</strong> Adoptada formalmente por el <em>World Radiation Center</em> (WRC, Davos, 1981) y la Organización Meteorológica Mundial (OMM). Es el estándar unánime de la literatura de ingeniería solar térmica y fotovoltaica (Duffie &amp; Beckman, Klein, Liu-Jordan), garantizando concordancia matemática del 100% con el código original OrientSol y la normativa CTE DB-HE4.
