@@ -200,12 +200,12 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       </div>
 
       <div class="manual-table-container">
-        <label class="form-label">Valores Mensuales: G<sub>dm</sub>(0) [kWh/m²/día] &amp; T<sub>amb</sub> [°C]</label>
+        <label class="form-label">${isEn ? 'Monthly Values: G<sub>dm</sub>(0) [kWh/m²/day] &amp; T<sub>amb</sub> [°C]' : 'Valores Mensuales: G<sub>dm</sub>(0) [kWh/m²/día] &amp; T<sub>amb</sub> [°C]'}</label>
         <div class="monthly-inputs-table-wrapper">
           <table class="manual-monthly-table">
             <thead>
               <tr>
-                <th>Variable</th>
+                <th>${isEn ? 'Variable' : 'Variable'}</th>
                 ${MONTH_NAMES.map((m) => `<th>${m}</th>`).join('')}
               </tr>
             </thead>
@@ -290,7 +290,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <select id="api-source-select" class="form-select">
             <option value="pvgis">${isEn ? 'PVGIS 5.3 API (European Commission JRC)' : 'PVGIS 5.3 API (Comisión Europea JRC)'}</option>
             <option value="nasa">${isEn ? 'NASA POWER API (Global Satellite Climatology)' : 'NASA POWER API (Climatología Satelital Global)'}</option>
-            <option value="meteonorm">${isEn ? 'Open-Meteo API (ECMWF ERA5 Reanálisis)' : 'Open-Meteo API (ECMWF ERA5 Reanálisis)'}</option>
+            <option value="meteonorm">${isEn ? 'Open-Meteo API (ECMWF ERA5 Reanalysis)' : 'Open-Meteo API (ECMWF ERA5 Reanálisis)'}</option>
           </select>
         </div>
 
@@ -599,11 +599,11 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         await updateSearchableStations();
         const uploadPermissionStatus = reg.isOffline
           ? (isEn ? '🔴 Online upload NOT permitted (Offline Mode) → Stored in local cache.' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Guardado en caché local para sincronizar después.')
-          : (isEn ? '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.');
+          : (isEn ? '🟢 Online upload to Supabase: PERMITTED → Emplacement successfully registered in datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.');
         setStatus(`${uploadPermissionStatus} ${reg.message}`, 'success');
       }
     } catch (err: any) {
-      setStatus(`Error al guardar en Supabase: ${err.message || String(err)}`, 'error');
+      setStatus(`${isEn ? 'Error saving to Supabase:' : 'Error al guardar en Supabase:'} ${err.message || String(err)}`, 'error');
     } finally {
       apiSaveBtn.disabled = false;
     }
@@ -1254,11 +1254,11 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         await updateSearchableStations();
         const uploadPermissionStatus = reg.isOffline
           ? (isEn ? '🔴 Online upload NOT permitted (Offline Mode) → Stored in local cache.' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Guardado en caché local para sincronizar después.')
-          : (isEn ? '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.');
+          : (isEn ? '🟢 Online upload to Supabase: PERMITTED → Emplacement successfully registered in datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.');
         setStatus(`${uploadPermissionStatus} ${reg.message}`, 'success');
       }
     } catch (err: any) {
-      setStatus(`Error: ${err.message}`, 'error');
+      setStatus(`${isEn ? 'Error:' : 'Error:'} ${err.message}`, 'error');
     } finally {
       saveManualBtn.disabled = false;
     }
