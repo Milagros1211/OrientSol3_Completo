@@ -372,15 +372,19 @@ export async function generateOrientSolPDFReport(
   const lossMapRes = res.captureLossMap;
   const monthlyMapsList: MiniLossMap[] =
     lossMapRes?.monthlyMaps && lossMapRes.monthlyMaps.length === 12
-      ? lossMapRes.monthlyMaps.map((m, i) => ({
-          label: mFull[i],
-          sub: isEn ? 'Monthly map' : 'Mapa mensual',
-          betaDeg: Number(m.optimalPoint.betaDeg),
-          alphaDeg: Number(m.optimalPoint.alphaDeg),
-          maxDaily: Number(m.optimalPoint.maxDailyRadiationKwh),
-          zones: m.cteZones,
-          lossMatrix: m.lossPercentageMatrix,
-        }))
+      ? lossMapRes.monthlyMaps.map((m, i) => {
+          const bDeg = Number(m.optimalPoint.betaDeg);
+          const aDeg = Math.abs(bDeg) < 0.01 ? 0 : Number(m.optimalPoint.alphaDeg);
+          return {
+            label: mFull[i],
+            sub: isEn ? 'Monthly map' : 'Mapa mensual',
+            betaDeg: bDeg,
+            alphaDeg: aDeg,
+            maxDaily: Number(m.optimalPoint.maxDailyRadiationKwh),
+            zones: m.cteZones,
+            lossMatrix: m.lossPercentageMatrix,
+          };
+        })
       : [];
 
   const buildSeasonalMaps = (): MiniLossMap[] => {
@@ -389,15 +393,19 @@ export async function generateOrientSolPDFReport(
     const monthsEs = ['Dic - Ene - Feb', 'Mar - Abr - May', 'Jun - Jul - Ago', 'Sep - Oct - Nov'];
     const monthsEn = ['Dec - Jan - Feb', 'Mar - Apr - May', 'Jun - Jul - Aug', 'Sep - Oct - Nov'];
     if (lossMapRes?.seasonalMaps && lossMapRes.seasonalMaps.length === 4) {
-      return lossMapRes.seasonalMaps.map((s, i) => ({
-        label: isEn ? s.seasonNameEn || namesEn[i] : s.seasonName || namesEs[i],
-        sub: isEn ? s.monthsIncludedEn || monthsEn[i] : s.monthsIncluded || monthsEs[i],
-        betaDeg: Number(s.optimalPoint.betaDeg),
-        alphaDeg: Number(s.optimalPoint.alphaDeg),
-        maxDaily: Number(s.optimalPoint.maxDailyRadiationKwh),
-        zones: s.cteZones,
-        lossMatrix: s.lossPercentageMatrix,
-      }));
+      return lossMapRes.seasonalMaps.map((s, i) => {
+        const bDeg = Number(s.optimalPoint.betaDeg);
+        const aDeg = Math.abs(bDeg) < 0.01 ? 0 : Number(s.optimalPoint.alphaDeg);
+        return {
+          label: isEn ? s.seasonNameEn || namesEn[i] : s.seasonName || namesEs[i],
+          sub: isEn ? s.monthsIncludedEn || monthsEn[i] : s.monthsIncluded || monthsEs[i],
+          betaDeg: bDeg,
+          alphaDeg: aDeg,
+          maxDaily: Number(s.optimalPoint.maxDailyRadiationKwh),
+          zones: s.cteZones,
+          lossMatrix: s.lossPercentageMatrix,
+        };
+      });
     }
     const mm = lossMapRes?.monthlyMaps;
     if (!mm || mm.length !== 12) return [];
@@ -417,10 +425,13 @@ export async function generateOrientSolPDFReport(
           for (const mi of g) sum += mm[mi].radiationMatrixKwhM2Day[r][c];
           const avg = sum / g.length;
           rad[r][c] = avg;
-          if (avg > maxRad) {
+          const isBetter =
+            avg > maxRad + 1e-4 ||
+            (Math.abs(avg - maxRad) <= 1e-4 && (Math.abs(alphas[c]) < Math.abs(bA) || (Math.abs(alphas[c]) === Math.abs(bA) && betas[r] < bB)));
+          if (isBetter) {
             maxRad = avg;
             bB = betas[r];
-            bA = alphas[c];
+            bA = Math.abs(betas[r]) < 0.01 ? 0 : alphas[c];
           }
         }
       }
