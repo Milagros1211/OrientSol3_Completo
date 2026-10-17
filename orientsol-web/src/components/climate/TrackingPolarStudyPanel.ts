@@ -9,6 +9,7 @@ import {
 } from '@/components/export/pdfReportGenerator';
 import { exportPolarExcelWorkbook } from '@/components/export/polarExportHelper';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
+import { formatNum } from '@/utils/formatters';
 
 export type TrackingRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -130,7 +131,7 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
               <span class="meta-label"><strong>${isEn ? 'City:' : 'Ciudad:'}</strong> ${locationName}</span>
               <span class="meta-label" style="margin-left: 2rem;">
                 <strong>${isEn ? 'Latitude (°):' : 'Latitud (°):'}</strong>
-                <span style="color: #38bdf8; font-weight: 700;">${latitude.toFixed(2)}</span>
+                <span style="color: #38bdf8; font-weight: 700;">${formatNum(latitude, 2)}</span>
               </span>
             </div>
             <div class="opt-tracking-study-title-row">
@@ -187,7 +188,7 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
                   <th rowspan="2" class="th-track-month">${isEn ? 'Month' : 'Mes'}</th>
                   <th rowspan="2" class="th-track-angles" style="min-width: 140px;">
                     <div>${isEn ? 'Considered Angles' : 'Ángulos considerados'}</div>
-                    <div style="font-size: 0.72rem; font-weight: 600; color: #38bdf8;">Inc: ${res.latitude.toFixed(1)}° | Ori: ${res.latitude >= 0 ? '0.0°' : '180.0°'}</div>
+                    <div style="font-size: 0.72rem; font-weight: 600; color: #38bdf8;">Inc: ${formatNum(res.latitude, 1)}° | Ori: ${res.latitude >= 0 ? '0,0°' : '180,0°'}</div>
                   </th>
                   <th rowspan="2" class="th-track-h0">${compSym} (0°)</th>
                   <th rowspan="2" class="th-track-opt">${compSym}</th>
@@ -207,16 +208,16 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
                   <tr>
                     <td class="td-track-month"><strong>${mName}</strong></td>
                     <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 600; white-space: nowrap; text-align: center;">
-                      <span style="color: #38bdf8;">Inc: ${res.latitude.toFixed(1)}°</span> <span style="opacity: 0.4;">|</span> <span style="color: var(--text-muted);">Ori: ${res.latitude >= 0 ? '0.0°' : '180.0°'}</span>
+                      <span style="color: #38bdf8;">Inc: ${formatNum(res.latitude, 1)}°</span> <span style="opacity: 0.4;">|</span> <span style="color: var(--text-muted);">Ori: ${res.latitude >= 0 ? '0,0°' : '180,0°'}</span>
                     </td>
-                    <td class="td-num">${radHoriz[i].toFixed(2)}</td>
-                    <td class="td-num td-track-val"><strong>${radPolar[i].toFixed(2)}</strong></td>
-                    <td class="td-num td-track-temp">${tempMean[i].toFixed(1)}</td>
-                    <td class="td-num">${gainsOverHoriz[i].toFixed(2)}</td>
-                    <td class="td-num">${gainsOverAnnual[i].toFixed(2)}</td>
-                    <td class="td-num">${gainsOverSeasonal[i].toFixed(2)}</td>
-                    <td class="td-num">${gainsOverAzim[i].toFixed(2)}</td>
-                    <td class="td-num">${gainsOverHorizTrack[i].toFixed(2)}</td>
+                    <td class="td-num">${formatNum(radHoriz[i], 2)}</td>
+                    <td class="td-num td-track-val"><strong>${formatNum(radPolar[i], 2)}</strong></td>
+                    <td class="td-num td-track-temp">${formatNum(tempMean[i], 1)}</td>
+                    <td class="td-num">${formatNum(gainsOverHoriz[i], 2)}</td>
+                    <td class="td-num">${formatNum(gainsOverAnnual[i], 2)}</td>
+                    <td class="td-num">${formatNum(gainsOverSeasonal[i], 2)}</td>
+                    <td class="td-num">${formatNum(gainsOverAzim[i], 2)}</td>
+                    <td class="td-num">${formatNum(gainsOverHorizTrack[i], 2)}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -224,16 +225,16 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
                 <tr class="tracking-media-row">
                   <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
                   <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 700; white-space: nowrap; text-align: center; color: #38bdf8;">
-                    Inc: ${res.latitude.toFixed(1)}° | Ori: ${res.latitude >= 0 ? '0.0°' : '180.0°'}
+                    Inc: ${formatNum(res.latitude, 1)}° | Ori: ${res.latitude >= 0 ? '0,0°' : '180,0°'}
                   </td>
-                  <td class="td-num"><strong>${meanHoriz.toFixed(2)}</strong></td>
-                  <td class="td-num td-track-val"><strong>${meanPolar.toFixed(2)}</strong></td>
-                  <td class="td-num td-track-temp"><strong>${tempAnnualMean.toFixed(1)}</strong></td>
-                  <td class="td-num"><strong>${meanGainHoriz.toFixed(2)}</strong></td>
-                  <td class="td-num"><strong>${meanGainAnnual.toFixed(2)}</strong></td>
-                  <td class="td-num"><strong>${meanGainSeasonal.toFixed(2)}</strong></td>
-                  <td class="td-num"><strong>${meanGainAzim.toFixed(2)}</strong></td>
-                  <td class="td-num"><strong>${meanGainHorizTrack.toFixed(2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanHoriz, 2)}</strong></td>
+                  <td class="td-num td-track-val"><strong>${formatNum(meanPolar, 2)}</strong></td>
+                  <td class="td-num td-track-temp"><strong>${formatNum(tempAnnualMean, 1)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGainHoriz, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGainAnnual, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGainSeasonal, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGainAzim, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGainHorizTrack, 2)}</strong></td>
                 </tr>
               </tfoot>
             </table>

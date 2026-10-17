@@ -636,7 +636,7 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
             </div>
             <div class="meta-item">
               <span class="meta-label">${isEn ? 'Latitude' : 'Latitud'} (°):</span>
-              <strong class="meta-val">${latitude.toFixed(2)}°</strong>
+              <strong class="meta-val">${formatNum(latitude, 2)}°</strong>
             </div>
             <div class="meta-item">
               <span class="meta-label">${isEn ? 'Study' : 'Estudio'}:</span>

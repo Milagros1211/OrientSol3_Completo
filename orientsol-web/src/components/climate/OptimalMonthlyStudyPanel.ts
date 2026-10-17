@@ -178,7 +178,7 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
           <div class="opt-study-title-block">
             <div class="opt-study-badges">
               <span class="badge badge-primary">📍 ${props.locationName}</span>
-              <span class="badge badge-neutral">Lat: ${props.latitude.toFixed(2)}°</span>
+              <span class="badge badge-neutral">Lat: ${formatNum(props.latitude, 2)}°</span>
               <span class="badge badge-success">12 ${isEn ? 'Independent Positions' : 'Posiciones Independientes'}</span>
             </div>
             <h3 class="opt-study-title">
@@ -405,20 +405,20 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
                 const factA = gainsAnnualFactors[idx];
                 const pctA = gainsAnnualPcts[idx];
 
-                const displayFactH = isAlbedo ? '-' : factH.toFixed(2);
-                const displayPctH = isAlbedo ? '-' : `${pctH >= 0 ? '+' : ''}${pctH.toFixed(2)}`;
+                const displayFactH = isAlbedo ? '-' : formatNum(factH, 2);
+                const displayPctH = isAlbedo ? '-' : `${pctH >= 0 ? '+' : ''}${formatNum(pctH, 2)}`;
 
                 return `
                   <tr>
                     <td class="td-month-name"><strong>${mName}</strong></td>
-                    <td class="td-num">${g0.toFixed(2)}</td>
-                    <td class="td-num" style="font-weight: 700; color: #10b981;">${deg}°</td>
-                    <td class="td-num td-col-opt" style="font-weight: 800;">${gOpt.toFixed(2)}</td>
-                    <td class="td-num td-col-temp">${temp.toFixed(1)}</td>
+                    <td class="td-num">${formatNum(g0, 2)}</td>
+                    <td class="td-num" style="font-weight: 700; color: #10b981;">${formatNum(deg, 1)}°</td>
+                    <td class="td-num td-col-opt" style="font-weight: 800;">${formatNum(gOpt, 2)}</td>
+                    <td class="td-num td-col-temp">${formatNum(temp, 1)}</td>
                     <td class="td-num td-gain-factor">${displayFactH}</td>
                     <td class="td-num td-gain-pct ${!isAlbedo && pctH >= 0 ? 'gain-pos' : !isAlbedo ? 'gain-neg' : ''}">${isAlbedo ? '-' : `${displayPctH}%`}</td>
-                    <td class="td-num td-gain-factor">${factA.toFixed(2)}</td>
-                    <td class="td-num td-gain-pct ${pctA >= 0 ? 'gain-pos' : 'gain-neg'}">${pctA >= 0 ? '+' : ''}${pctA.toFixed(2)}%</td>
+                    <td class="td-num td-gain-factor">${formatNum(factA, 2)}</td>
+                    <td class="td-num td-gain-pct ${pctA >= 0 ? 'gain-pos' : 'gain-neg'}">${pctA >= 0 ? '+' : ''}${formatNum(pctA, 2)}%</td>
                   </tr>
                 `;
               }).join('')}
@@ -426,14 +426,14 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
             <tfoot>
               <tr class="table-media-row">
                 <td class="td-month-name"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
-                <td class="td-num"><strong>${mean0.toFixed(2)}</strong></td>
-                <td class="td-num" style="font-weight: 700; color: #10b981;"><strong>${meanTilt.toFixed(1)}°</strong></td>
-                <td class="td-num td-col-opt"><strong>${meanMonthlyOpt.toFixed(2)}</strong></td>
-                <td class="td-num td-col-temp"><strong>${meanTemp.toFixed(1)}</strong></td>
-                <td class="td-num td-gain-factor"><strong>${isAlbedo ? '-' : (mean0 > 0.001 ? (meanMonthlyOpt / mean0).toFixed(2) : '1.00')}</strong></td>
-                <td class="td-num td-gain-pct gain-pos"><strong>${isAlbedo ? '-' : `+${meanGainHorizPct.toFixed(2)}%`}</strong></td>
-                <td class="td-num td-gain-factor"><strong>${(meanAnnualOpt > 0.001 ? (meanMonthlyOpt / meanAnnualOpt).toFixed(2) : '1.00')}</strong></td>
-                <td class="td-num td-gain-pct gain-pos"><strong>+${meanGainAnnualPct.toFixed(2)}%</strong></td>
+                <td class="td-num"><strong>${formatNum(mean0, 2)}</strong></td>
+                <td class="td-num" style="font-weight: 700; color: #10b981;"><strong>${formatNum(meanTilt, 1)}°</strong></td>
+                <td class="td-num td-col-opt"><strong>${formatNum(meanMonthlyOpt, 2)}</strong></td>
+                <td class="td-num td-col-temp"><strong>${formatNum(meanTemp, 1)}</strong></td>
+                <td class="td-num td-gain-factor"><strong>${isAlbedo ? '-' : (mean0 > 0.001 ? formatNum(meanMonthlyOpt / mean0, 2) : '1,00')}</strong></td>
+                <td class="td-num td-gain-pct gain-pos"><strong>${isAlbedo ? '-' : `+${formatNum(meanGainHorizPct, 2)}%`}</strong></td>
+                <td class="td-num td-gain-factor"><strong>${(meanAnnualOpt > 0.001 ? formatNum(meanMonthlyOpt / meanAnnualOpt, 2) : '1,00')}</strong></td>
+                <td class="td-num td-gain-pct gain-pos"><strong>+${formatNum(meanGainAnnualPct, 2)}%</strong></td>
               </tr>
             </tfoot>
           </table>

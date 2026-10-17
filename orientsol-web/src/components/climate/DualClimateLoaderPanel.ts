@@ -634,10 +634,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           ${record.metadata?.rawFormat ? `<span class="badge badge-neutral">${escapeHtml(String(record.metadata.rawFormat))}</span>` : ''}
         </div>
         <div class="record-meta-pills">
-          <span><strong>${t.location.latitude}:</strong> ${record.latitude.toFixed(3)}°</span>
-          <span><strong>${t.location.longitude}:</strong> ${record.longitude.toFixed(3)}°</span>
-          <span><strong>G<sub>dm</sub>(0):</strong> ${annualG.toFixed(2)} kWh/m²/d</span>
-          <span><strong>T<sub>amb</sub>:</strong> ${annualT.toFixed(1)} °C</span>
+          <span><strong>${t.location.latitude}:</strong> ${formatNum(record.latitude, 3)}°</span>
+          <span><strong>${t.location.longitude}:</strong> ${formatNum(record.longitude, 3)}°</span>
+          <span><strong>G<sub>dm</sub>(0):</strong> ${formatNum(annualG, 2)} kWh/m²/d</span>
+          <span><strong>T<sub>amb</sub>:</strong> ${formatNum(annualT, 1)} °C</span>
         </div>
       </div>
 
@@ -652,11 +652,11 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <tbody>
             <tr>
               <td class="row-label">G<sub>dm</sub>(0) [kWh/m²/d]</td>
-              ${record.monthlyGdm0.map((v) => `<td>${v.toFixed(2)}</td>`).join('')}
+              ${record.monthlyGdm0.map((v) => `<td>${formatNum(v, 2)}</td>`).join('')}
             </tr>
             <tr>
               <td class="row-label">T<sub>amb</sub> [°C]</td>
-              ${record.monthlyTemperature.map((t) => `<td>${t.toFixed(1)}</td>`).join('')}
+              ${record.monthlyTemperature.map((t) => `<td>${formatNum(t, 1)}</td>`).join('')}
             </tr>
           </tbody>
         </table>
@@ -851,9 +851,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
                     <span class="suggestion-pill ${badgeClass}">${badgeText}</span>
                   </div>
                   <div class="suggestion-meta">
-                    <span>Lat: ${m.latitude.toFixed(2)}°</span>
-                    <span>Lon: ${m.longitude.toFixed(2)}°</span>
-                    <span>G<sub>dm</sub>(0): ${annualG.toFixed(2)} kWh/m²/d</span>
+                    <span>Lat: ${formatNum(m.latitude, 2)}°</span>
+                    <span>Lon: ${formatNum(m.longitude, 2)}°</span>
+                    <span>G<sub>dm</sub>(0): ${formatNum(annualG, 2)} kWh/m²/d</span>
                   </div>
                 </div>
               `;
@@ -1139,7 +1139,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       return null;
     }
 
-    const latRaw = manualLat.value.trim();
+    const latRaw = manualLat.value.trim().replace(',', '.');
     const lat = parseFloat(latRaw);
     if (!latRaw || isNaN(lat) || lat < -90 || lat > 90) {
       highlightErrorInput(manualLat);
@@ -1152,7 +1152,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       return null;
     }
 
-    const lonRaw = manualLon.value.trim();
+    const lonRaw = manualLon.value.trim().replace(',', '.');
     const lon = parseFloat(lonRaw);
     if (!lonRaw || isNaN(lon) || lon < -180 || lon > 180) {
       highlightErrorInput(manualLon);
@@ -1165,7 +1165,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       return null;
     }
 
-    const albedoRaw = manualAlbedo.value.trim();
+    const albedoRaw = manualAlbedo.value.trim().replace(',', '.');
     const albedo = parseFloat(albedoRaw);
     if (!albedoRaw || isNaN(albedo) || albedo < 0 || albedo > 1) {
       highlightErrorInput(manualAlbedo);
@@ -1182,7 +1182,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     const temp: number[] = [];
 
     for (let i = 0; i < 12; i++) {
-      const gRaw = manualGInputs[i]?.value.trim() ?? '';
+      const gRaw = (manualGInputs[i]?.value.trim() ?? '').replace(',', '.');
       const gVal = parseFloat(gRaw);
       if (!gRaw || isNaN(gVal) || gVal <= 0 || gVal > 30) {
         if (manualGInputs[i]) highlightErrorInput(manualGInputs[i]);
@@ -1196,7 +1196,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       }
       gdm0.push(gVal);
 
-      const tRaw = manualTInputs[i]?.value.trim() ?? '';
+      const tRaw = (manualTInputs[i]?.value.trim() ?? '').replace(',', '.');
       const tVal = parseFloat(tRaw);
       if (!tRaw || isNaN(tVal) || tVal < -50 || tVal > 65) {
         if (manualTInputs[i]) highlightErrorInput(manualTInputs[i]);
@@ -1512,7 +1512,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             <span class="badge badge-neutral">${res.executionTimeMs} ms</span>
             <span class="badge badge-source">${res.source.toUpperCase()}</span>
           </div>
-          <h3>${escapeHtml(t.results.resultsFor.replace('{location}', res.locationName).replace('{lat}', res.latitude.toFixed(2)))}</h3>
+          <h3>${escapeHtml(t.results.resultsFor.replace('{location}', res.locationName).replace('{lat}', formatNum(res.latitude, 2)))}</h3>
         </div>
         <div class="results-export-actions">
           <button id="btn-copy-summary" class="btn-export btn-export-copy" type="button" title="${t.results.exportCopyBtn}">
