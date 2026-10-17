@@ -6,8 +6,18 @@ import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
 import { buildSeasonalComponentSheet } from '@/components/export/seasonalExportHelper';
 import { buildPolarComponentSheet } from '@/components/export/polarExportHelper';
 import { sanitizeForSpreadsheet } from '@/utils/security';
-import { getNoonAzimuthDeg, getDualAxisNoonTiltDeg, getHorizontalTrackerDailyMeanTiltDeg } from '@/services/solarGeometryAngles';
 import { formatPercent, formatNum, formatInt, formatAngle } from '@/utils/formatters';
+import {
+  applySpanishNumberFormattingToWorksheet,
+  getExportFileTimestamp,
+  getStandardizedExcelFilename,
+  buildAnnualComponentSheet,
+  buildAzimuthalComponentSheet,
+  buildHorizontalComponentSheet,
+  buildDualAxisComponentSheet,
+  buildComparativeComponentSheet,
+  buildMonthlyComponentSheet,
+} from '@/components/export/excelFormatHelper';
 
 const MONTHS_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -50,22 +60,9 @@ export function exportOrientSolMasterExcel(
   const wb = XLSX.utils.book_new();
 
   // Exact Timestamp of export
-  const now = new Date();
-  const pad = (n: number) => String(n).padStart(2, '0');
-  const day = pad(now.getDate());
-  const month = pad(now.getMonth() + 1);
-  const year = now.getFullYear();
-  const hours = pad(now.getHours());
-  const minutes = pad(now.getMinutes());
-  const seconds = pad(now.getSeconds());
-
-  const formattedDateTime = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-  const isoTimestamp = now.toISOString();
-  const fileTimestamp = `${year}${month}${day}_${hours}${minutes}${seconds}`;
+  const { fileTimestamp, formattedDateTime, isoTimestamp } = getExportFileTimestamp();
 
   const optAngle = res.optimalAnnual.optimalTiltDeg;
-  const tempVals = res.temperatures.ambient.monthlyMeanC;
-  const cellTemps = res.temperatures.cellOperating.monthlyCellTempOptimalC;
 
   const studyTitles: Record<string, string> = {
     annual: isEn ? 'Annual Optimal Tilt' : 'Inclinación Óptima Anual',
@@ -81,7 +78,94 @@ export function exportOrientSolMasterExcel(
   const currentStudyTitle = studyTitles[activeOp] || activeOp;
 
   // =========================================================================
-  // HOJA 1: RESUMEN GENERAL & BALANCE ENERGÉTICO (Imagen 1)
+  // HOJA 1..4: TABLA DETALLADA DE LA OPERACIÓN (FORMATO MATLAB .M)
+  // =========================================================================
+  function buildStudyTableData(compName: string): (string | number)[][] {
+    const compType = (compName === 'beam' || compName === 'diffuse' || compName === 'albedo' ? compName : 'global') as TableRadiationComponent;
+    if (activeOp === 'annual') {
+      return buildAnnualComponentSheet(res, compType, isEn);
+    }
+    if (activeOp === 'seasonal') {
+      return buildSeasonalComponentSheet(res, compType, isEn);
+    }
+    if (activeOp === 'polar') {
+      return buildPolarComponentSheet(res, compType, isEn);
+    }
+    if (activeOp === 'azimuthal') {
+      return buildAzimuthalComponentSheet(res, compType, isEn);
+    }
+    if (activeOp === 'horizontal') {
+      return buildHorizontalComponentSheet(res, compType, isEn);
+    }
+    if (activeOp === 'dual') {
+      return buildDualAxisComponentSheet(res, compType, isEn);
+    }
+    if (activeOp === 'comparative') {
+      return buildComparativeComponentSheet(res, compType, isEn);
+    }
+    if (activeOp === 'monthly') {
+      return buildMonthlyComponentSheet(res, compType, isEn);
+    }
+    return buildAnnualComponentSheet(res, compType, isEn);
+  }
+
+  // 1. Appending Primary Study Sheets (Hoja1..Hoja4) strictly conforming to MATLAB OrientSol 3.0
+  if (options.exportMode === 'all') {
+    const compConfigs = [
+      { key: 'global', sheetName: isEn ? 'Hoja1_Global' : 'Hoja1_Global' },
+      { key: 'beam', sheetName: isEn ? 'Hoja2_Direct' : 'Hoja2_Directa' },
+      { key: 'diffuse', sheetName: isEn ? 'Hoja3_Diffuse' : 'Hoja3_Difusa' },
+      { key: 'albedo', sheetName: isEn ? 'Hoja4_Albedo' : 'Hoja4_Albedo' },
+    ];
+    for (const compCfg of compConfigs) {
+      const data = buildStudyTableData(compCfg.key);
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      applySpanishNumberFormattingToWorksheet(ws);
+      XLSX.utils.book_append_sheet(wb, ws, compCfg.sheetName);
+    }
+  } else {
+    const data = buildStudyTableData(activeComp);
+    const wsActive = XLSX.utils.aoa_to_sheet(data);
+    applySpanishNumberFormattingToWorksheet(wsActive);
+    const compLabel =
+      activeComp === 'global'
+        ? (isEn ? 'Global' : 'Global')
+        : activeComp === 'beam'
+        ? (isEn ? 'Direct' : 'Directa')
+        : activeComp === 'diffuse'
+        ? (isEn ? 'Diffuse' : 'Difusa')
+        : (isEn ? 'Albedo' : 'Albedo');
+    XLSX.utils.book_append_sheet(wb, wsActive, `Hoja1_${compLabel}`);
+  }
+
+  // 2. Appending Energia_Generada (Figura 5.2.82 / Energia_Osterwald.m)
+  const activeStudyDailyRad =
+    activeOp === 'annual'
+      ? res.optimalAnnual.monthlyDailyKwh
+      : activeOp === 'monthly'
+      ? res.monthlyOptimum12.monthlyDailyKwh
+      : activeOp === 'seasonal'
+      ? res.seasonal.monthlyDailyKwh
+      : activeOp === 'polar'
+      ? res.tracking.polarAxis.monthlyDailyKwh
+      : activeOp === 'azimuthal'
+      ? res.tracking.azimuthalAxis.monthlyDailyKwh
+      : activeOp === 'horizontal'
+      ? res.tracking.horizontalAxis.monthlyDailyKwh
+      : res.tracking.dualAxis.monthlyDailyKwh;
+
+  const wsEnergy = createEnergyWorksheet(res, {
+    studyTitle: currentStudyTitle,
+    studyDailyRad: activeStudyDailyRad,
+    isEn,
+    peakPowerKw: peakKw,
+    tonc,
+  });
+  applySpanishNumberFormattingToWorksheet(wsEnergy);
+  XLSX.utils.book_append_sheet(wb, wsEnergy, isEn ? 'Energy_Yield' : 'Energia_Generada');
+
+  // =========================================================================
+  // HOJA AUDITORÍA: RESUMEN GENERAL & BALANCE ENERGÉTICO (OrientSol 4.0)
   // =========================================================================
   const summaryData: (string | number)[][] = [
     ['ORIENTSOL 4.0 - ' + (isEn ? 'SIMULATION REPORT & ENERGY BALANCE' : 'INFORME DE SIMULACIÓN Y BALANCE ENERGÉTICO')],
@@ -106,7 +190,7 @@ export function exportOrientSolMasterExcel(
     [],
     [isEn ? 'PHOTOVOLTAIC GENERATOR SPECIFICATIONS' : 'PARÁMETROS DEL GENERADOR FOTOVOLTAICO'],
     [isEn ? 'Installed Peak Power (kWp)' : 'Potencia Pico Instalada (kWp)', peakKw],
-    [isEn ? 'Performance Ratio (PR)' : 'Factor de Rendimiento Global (PR)', `${(pr * 100).toFixed(1)}%`],
+    [isEn ? 'Performance Ratio (PR)' : 'Factor de Rendimiento Global (PR)', formatPercent(pr * 100, 1)],
     [isEn ? 'Nominal Cell Operating Temp (TONC / NOCT) (°C)' : 'TONC / NOCT de los Módulos (°C)', tonc],
     [isEn ? 'Power Temperature Coefficient gamma (%/°C)' : 'Coeficiente de Temperatura de Potencia gamma (%/°C)', '-0,40%/°C'],
     [isEn ? 'Estimated Collector Surface Area (m²)' : 'Superficie de Captación Estimada (m²)', Number(res.energyYield.collectorAreaM2.toFixed(2))],
@@ -118,461 +202,20 @@ export function exportOrientSolMasterExcel(
     [isEn ? 'PV Net Energy Yield - Osterwald Model (kWh/yr)' : 'Energía FV Producida Neta - Modelo Osterwald (kWh/año)', Math.round(res.energyYield.producida.osterwald.annualKwh)],
     [isEn ? 'Specific Productivity Yield (kWh/kWp)' : 'Productividad Específica del Sistema (kWh/kWp)', Math.round(res.energyYield.producida.osterwald.specificYieldKwhKwp)],
     [isEn ? 'Cell Thermal Losses vs STC (kWh/yr)' : 'Pérdidas Térmicas por Calentamiento de Célula vs STC 25°C (kWh/año)', -Math.round(res.energyYield.producida.osterwald.thermalLossKwh)],
-    [isEn ? 'Cell Thermal Losses Relative (%)' : 'Pérdidas Térmicas Relativas por Derating (%)', `-${res.energyYield.producida.osterwald.thermalLossPct.toFixed(2)}%`],
+    [isEn ? 'Cell Thermal Losses Relative (%)' : 'Pérdidas Térmicas Relativas por Derating (%)', formatPercent(-res.energyYield.producida.osterwald.thermalLossPct, 2)],
     [isEn ? 'PV Energy Yield - Simplified Model (kWh/yr)' : 'Energía FV Producida - Modelo Simplificado PR (kWh/año)', Math.round(res.energyYield.producida.simplified.annualKwh)],
     [],
     [isEn ? 'ACTIVE STUDY SUMMARY' : 'RESUMEN DEL ESTUDIO ACTIVO SELECCIONADO'],
     [isEn ? 'Selected Study' : 'Estudio / Operación Seleccionada', currentStudyTitle],
     [isEn ? 'Evaluated Component' : 'Componente Radiativa Evaluada', activeComp.toUpperCase()],
     [isEn ? 'Optimal Annual Fixed Tilt β (°)' : 'Inclinación Fija Óptima Anual β (°)', optAngle],
-    [isEn ? 'CTE DB-HE4 Optimal Orientation β / α (°)' : 'Punto Óptimo Absoluto CTE DB-HE4 (β / α)', `β = ${res.captureLossMap.optimalPoint.betaDeg}° | α = ${res.captureLossMap.optimalPoint.alphaDeg}°`],
+    [isEn ? 'CTE DB-HE4 Optimal Orientation β / α (°)' : 'Punto Óptimo Absoluto CTE DB-HE4 (β / α)', `β = ${formatAngle(res.captureLossMap.optimalPoint.betaDeg, 1)} | α = ${formatAngle(res.captureLossMap.optimalPoint.alphaDeg, 1)}`],
     [isEn ? 'Max Daily Radiation at Optimum (kWh/m²/day)' : 'Radiación Diaria Máxima en el Óptimo (kWh/m²/día)', Number(res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3))],
   ];
 
   const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+  applySpanishNumberFormattingToWorksheet(wsSummary);
   XLSX.utils.book_append_sheet(wb, wsSummary, isEn ? 'General_Summary' : 'Resumen_General');
-
-  // =========================================================================
-  // HOJA 2: TABLA DETALLADA DE LA OPERACIÓN ACTIVA (Imagen 3)
-  // =========================================================================
-  function buildStudyTableData(compName: string): (string | number)[][] {
-    const activeTableData: (string | number)[][] = [];
-
-    const compTag = compName === 'beam' ? 'Bdm' : compName === 'diffuse' ? 'Ddm' : compName === 'albedo' ? 'Rdm' : 'Gdm';
-    const compLabel =
-      compName === 'beam'
-        ? (isEn ? 'Direct' : 'Directa')
-        : compName === 'diffuse'
-        ? (isEn ? 'Diffuse' : 'Difusa')
-        : compName === 'albedo'
-        ? (isEn ? 'Albedo' : 'Albedo')
-        : (isEn ? 'Global' : 'Global');
-
-    activeTableData.push([
-      'ORIENTSOL 4.0 - ' + (isEn ? `DETAILED OPERATION & STUDY BREAKDOWN (${compTag})` : `DESGLOSE DETALLADO DEL ESTUDIO SELECCIONADO (${compTag})`)
-    ]);
-    activeTableData.push([
-      isEn ? 'Export Timestamp:' : 'Marca temporal de exportación:',
-      formattedDateTime,
-      '',
-      isEn ? 'ISO Timestamp:' : 'Marca ISO:',
-      isoTimestamp
-    ]);
-    activeTableData.push([
-      sanitizeForSpreadsheet(res.locationName),
-      `Lat: ${res.latitude.toFixed(4)}°`,
-      currentStudyTitle,
-      `${isEn ? 'Component' : 'Componente'}: ${compLabel.toUpperCase()} (${compTag})`,
-    ]);
-    activeTableData.push([]);
-
-    const compType = (compName === 'beam' || compName === 'diffuse' || compName === 'albedo' ? compName : 'global') as TableRadiationComponent;
-    if (activeOp === 'seasonal') {
-      return buildSeasonalComponentSheet(res, compType, isEn);
-    }
-    if (activeOp === 'polar') {
-      return buildPolarComponentSheet(res, compType, isEn);
-    }
-    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
-    // Metrics Bar matching UI (Imagen 3)
-    let activeMeanDaily = 0;
-    let activeAnnualTotal = 0;
-    let activeGainHorizPct = 0;
-    let activeGainAnnualOptPct = 0;
-
-    const r0Comp = getMonthlyRadiationForAngle(res, compType, 0);
-    const m0Comp = r0Comp.reduce((a, b) => a + b, 0) / 12;
-
-    if (activeOp === 'annual') {
-      const rOptComp = getMonthlyRadiationForAngle(res, compType, optAngle);
-      activeMeanDaily = rOptComp.reduce((a, b) => a + b, 0) / 12;
-      activeAnnualTotal = rOptComp.reduce((a, b, idx) => a + b * daysInMonth[idx], 0);
-      activeGainHorizPct = m0Comp > 0 ? ((activeMeanDaily - m0Comp) / m0Comp) * 100 : 0;
-      activeGainAnnualOptPct = 0.0;
-    } else if (activeOp === 'monthly') {
-      const tilts = res.monthlyOptimum12.optimalTiltsDeg;
-      const rOptMonthly = tilts.map((t, idx) => getMonthlyRadiationForAngle(res, compType, t)[idx]);
-      activeMeanDaily = rOptMonthly.reduce((a, b) => a + b, 0) / 12;
-      activeAnnualTotal = rOptMonthly.reduce((a, b, idx) => a + b * daysInMonth[idx], 0);
-      const rAnnComp = getMonthlyRadiationForAngle(res, compType, optAngle);
-      const mAnnComp = rAnnComp.reduce((a, b) => a + b, 0) / 12;
-      activeGainHorizPct = m0Comp > 0 ? ((activeMeanDaily - m0Comp) / m0Comp) * 100 : 0;
-      activeGainAnnualOptPct = mAnnComp > 0 ? ((activeMeanDaily - mAnnComp) / mAnnComp) * 100 : 0;
-    } else if (activeOp === 'seasonal') {
-      const seasonTilts = [
-        res.seasonal.winterTiltDeg, res.seasonal.winterTiltDeg, res.seasonal.springTiltDeg,
-        res.seasonal.springTiltDeg, res.seasonal.springTiltDeg, res.seasonal.summerTiltDeg,
-        res.seasonal.summerTiltDeg, res.seasonal.summerTiltDeg, res.seasonal.autumnTiltDeg,
-        res.seasonal.autumnTiltDeg, res.seasonal.autumnTiltDeg, res.seasonal.winterTiltDeg,
-      ];
-      const rOptSeas = seasonTilts.map((t, idx) => getMonthlyRadiationForAngle(res, compType, t)[idx]);
-      activeMeanDaily = rOptSeas.reduce((a, b) => a + b, 0) / 12;
-      activeAnnualTotal = rOptSeas.reduce((a, b, idx) => a + b * daysInMonth[idx], 0);
-      const rAnnComp = getMonthlyRadiationForAngle(res, compType, optAngle);
-      const mAnnComp = rAnnComp.reduce((a, b) => a + b, 0) / 12;
-      activeGainHorizPct = m0Comp > 0 ? ((activeMeanDaily - m0Comp) / m0Comp) * 100 : 0;
-      activeGainAnnualOptPct = mAnnComp > 0 ? ((activeMeanDaily - mAnnComp) / mAnnComp) * 100 : 0;
-    } else if (activeOp === 'polar') {
-      activeMeanDaily = res.tracking.polarAxis.annualMeanDailyKwh;
-      activeAnnualTotal = res.tracking.polarAxis.annualTotalKwh;
-      activeGainHorizPct = res.tracking.polarAxis.gainOverHorizontalPct;
-      activeGainAnnualOptPct = res.tracking.polarAxis.gainOverOptimalAnnualPct;
-    } else if (activeOp === 'azimuthal') {
-      activeMeanDaily = res.tracking.azimuthalAxis.annualMeanDailyKwh;
-      activeAnnualTotal = res.tracking.azimuthalAxis.annualTotalKwh;
-      activeGainHorizPct = res.tracking.azimuthalAxis.gainOverHorizontalPct;
-      activeGainAnnualOptPct = res.tracking.azimuthalAxis.gainOverOptimalAnnualPct;
-    } else if (activeOp === 'horizontal') {
-      activeMeanDaily = res.tracking.horizontalAxis.annualMeanDailyKwh;
-      activeAnnualTotal = res.tracking.horizontalAxis.annualTotalKwh;
-      activeGainHorizPct = res.tracking.horizontalAxis.gainOverHorizontalPct;
-      activeGainAnnualOptPct = res.tracking.horizontalAxis.gainOverOptimalAnnualPct;
-    } else if (activeOp === 'dual') {
-      activeMeanDaily = res.tracking.dualAxis.annualMeanDailyKwh;
-      activeAnnualTotal = res.tracking.dualAxis.annualTotalKwh;
-      activeGainHorizPct = res.tracking.dualAxis.gainOverHorizontalPct;
-      activeGainAnnualOptPct = res.tracking.dualAxis.gainOverOptimalAnnualPct;
-    }
-
-    activeTableData.push([
-      isEn ? 'KEY STUDY METRICS' : 'MÉTRICAS CLAVE DEL ESTUDIO',
-      `${isEn ? 'Annual Mean' : 'Media Anual'}: ${formatNum(activeMeanDaily, 3)} kWh/m²/d (${formatInt(Math.round(activeAnnualTotal))} kWh/m²·${isEn ? 'yr' : 'año'})`,
-      `${isEn ? 'Gain vs Fixed Opt' : 'Ganancia s/ Fijo Ópt'}: +${formatPercent(activeGainAnnualOptPct, 2)}`,
-      `${isEn ? 'Gain vs Horiz (0°)' : 'Ganancia s/ Horiz (0°)'}: +${formatPercent(activeGainHorizPct, 2)}`,
-    ]);
-    activeTableData.push([]);
-
-    if (activeOp === 'annual') {
-      activeTableData.push([
-        isEn ? 'Month' : 'Mes',
-        `${compTag} (0°)`,
-        `${compTag} (15°)`,
-        `${compTag} (30°)`,
-        `${compTag} (45°)`,
-        `${compTag} (60°)`,
-        `${compTag} (75°)`,
-        `${compTag} (90°)`,
-        `${compTag} ${isEn ? 'Opt' : 'Ópt'} (${optAngle}°)`,
-        isEn ? 'Ambient Temp T_amb (°C)' : 'Tª Ambiente T_amb (°C)',
-        isEn ? 'Cell Temp T_C (°C)' : 'Tª Célula T_C (°C)',
-        isEn ? 'PV Yield Osterwald (kWh)' : 'Prod FV Osterwald (kWh)',
-        isEn ? 'Gain vs Horiz (Factor)' : 'Ganancia s/ Horiz (Factor)',
-        isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)',
-      ]);
-      const r0 = getMonthlyRadiationForAngle(res, compType, 0);
-      const rOpt = getMonthlyRadiationForAngle(res, compType, optAngle);
-      for (let i = 0; i < 12; i++) {
-        const g0 = r0[i];
-        const gOpt = rOpt[i];
-        const factor = compType === 'albedo' ? '-' : (g0 > 0 ? Number((gOpt / g0).toFixed(4)) : 1);
-        const pct = compType === 'albedo' ? '-' : (g0 > 0 ? Number(((gOpt / g0 - 1) * 100).toFixed(2)) : 0);
-        activeTableData.push([
-          months[i],
-          Number(r0[i].toFixed(2)),
-          Number(getMonthlyRadiationForAngle(res, compType, 15)[i].toFixed(2)),
-          Number(getMonthlyRadiationForAngle(res, compType, 30)[i].toFixed(2)),
-          Number(getMonthlyRadiationForAngle(res, compType, 45)[i].toFixed(2)),
-          Number(getMonthlyRadiationForAngle(res, compType, 60)[i].toFixed(2)),
-          Number(getMonthlyRadiationForAngle(res, compType, 75)[i].toFixed(2)),
-          Number(getMonthlyRadiationForAngle(res, compType, 90)[i].toFixed(2)),
-          Number(gOpt.toFixed(2)),
-          Number(tempVals[i].toFixed(1)),
-          Number(cellTemps[i].toFixed(1)),
-          Math.round(res.energyYield.producida.osterwald.monthlyKwh[i] ?? 0),
-          factor,
-          pct,
-        ]);
-      }
-    } else if (activeOp === 'monthly') {
-      activeTableData.push([
-        isEn ? 'Month' : 'Mes',
-        `${compTag} (0°)`,
-        isEn ? 'Optimal Tilt β (°)' : 'Inclinación Óptima β (°)',
-        `${compTag} ${isEn ? 'Monthly Opt (kWh/m²/d)' : 'Óptimo Mensual (kWh/m²/d)'}`,
-        isEn ? 'Ambient Temp T_amb (°C)' : 'Tª Ambiente T_amb (°C)',
-        isEn ? 'Cell Temp T_C (°C)' : 'Tª Célula T_C (°C)',
-        isEn ? 'PV Yield Osterwald (kWh)' : 'Prod FV Osterwald (kWh)',
-        isEn ? 'Gain vs Horiz (Factor)' : 'Ganancia s/ Horiz (Factor)',
-        isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)',
-        isEn ? `Gain vs Fixed Opt (${optAngle}°) (%)` : `Ganancia s/ Óptimo Anual (${optAngle}°) (%)`,
-      ]);
-      const r0 = getMonthlyRadiationForAngle(res, compType, 0);
-      const tilts = res.monthlyOptimum12.optimalTiltsDeg;
-      const rFixed = getMonthlyRadiationForAngle(res, compType, optAngle);
-      for (let i = 0; i < 12; i++) {
-        const g0 = r0[i];
-        const gOpt = getMonthlyRadiationForAngle(res, compType, tilts[i])[i];
-        const gFix = rFixed[i];
-        const factor = compType === 'albedo' ? '-' : (g0 > 0 ? Number((gOpt / g0).toFixed(4)) : 1);
-        const pctHoriz = compType === 'albedo' ? '-' : (g0 > 0 ? Number(((gOpt / g0 - 1) * 100).toFixed(2)) : 0);
-        const pctFix = gFix > 0 ? Number((((gOpt - gFix) / gFix) * 100).toFixed(2)) : 0;
-        activeTableData.push([
-          months[i],
-          Number(g0.toFixed(2)),
-          tilts[i],
-          Number(gOpt.toFixed(2)),
-          Number(tempVals[i].toFixed(1)),
-          Number(cellTemps[i].toFixed(1)),
-          Math.round(res.energyYield.producida.osterwald.monthlyKwh[i] ?? 0),
-          factor,
-          pctHoriz,
-          pctFix,
-        ]);
-      }
-    } else if (activeOp === 'seasonal') {
-      activeTableData.push([
-        isEn ? 'Month' : 'Mes',
-        `${compTag} (0°)`,
-        isEn ? 'Seasonal Angle (°)' : 'Inclinación Estacional (°)',
-        `${compTag} ${isEn ? 'Seasonal' : 'Estacional'}`,
-        isEn ? 'Ambient Temp T_amb (°C)' : 'Tª Ambiente T_amb (°C)',
-        isEn ? 'Cell Temp T_C (°C)' : 'Tª Célula T_C (°C)',
-        isEn ? 'PV Yield Osterwald (kWh)' : 'Prod FV Osterwald (kWh)',
-        isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)',
-        isEn ? 'Gain vs Annual Opt (%)' : 'Ganancia s/ Ópt Anual (%)',
-      ]);
-      const r0 = getMonthlyRadiationForAngle(res, compType, 0);
-      const rAnn = getMonthlyRadiationForAngle(res, compType, optAngle);
-      const seasonTilts = [
-        res.seasonal.winterTiltDeg, res.seasonal.winterTiltDeg, res.seasonal.springTiltDeg,
-        res.seasonal.springTiltDeg, res.seasonal.springTiltDeg, res.seasonal.summerTiltDeg,
-        res.seasonal.summerTiltDeg, res.seasonal.summerTiltDeg, res.seasonal.autumnTiltDeg,
-        res.seasonal.autumnTiltDeg, res.seasonal.autumnTiltDeg, res.seasonal.winterTiltDeg,
-      ];
-      for (let i = 0; i < 12; i++) {
-        const g0 = r0[i];
-        const gOpt = getMonthlyRadiationForAngle(res, compType, seasonTilts[i])[i];
-        const gAnn = rAnn[i];
-        const pctHoriz = compType === 'albedo' ? '-' : (g0 > 0 ? Number((((gOpt - g0) / g0) * 100).toFixed(2)) : 0);
-        const pctAnn = gAnn > 0 ? Number((((gOpt - gAnn) / gAnn) * 100).toFixed(2)) : 0;
-        activeTableData.push([
-          months[i],
-          Number(g0.toFixed(2)),
-          seasonTilts[i],
-          Number(gOpt.toFixed(2)),
-          Number(tempVals[i].toFixed(1)),
-          Number(cellTemps[i].toFixed(1)),
-          Math.round(res.energyYield.producida.osterwald.monthlyKwh[i] ?? 0),
-          pctHoriz,
-          pctAnn,
-        ]);
-      }
-    } else if (activeOp === 'comparative') {
-      // Option 8: Complete Comparative Matrix Table matching Figura 5.2.98 & Web with Angles
-      activeTableData.push([
-        isEn ? 'Month' : 'Mes',
-        `${compTag} (0°)`,
-        isEn ? 'Angles (0°)' : 'Ángulos (0°)',
-        isEn ? `${compTag} Fixed Opt` : `${compTag} Ópt. Anual`,
-        isEn ? 'Angles Fixed Opt' : 'Ángulos Ópt. Anual',
-        isEn ? `${compTag} Seasonal Opt` : `${compTag} Ópt. Estac.`,
-        isEn ? 'Angles Seasonal' : 'Ángulos Ópt. Estac.',
-        isEn ? `${compTag} Monthly Opt` : `${compTag} Ópt. Mens.`,
-        isEn ? 'Angles Monthly' : 'Ángulos Ópt. Mens.',
-        isEn ? `${compTag} Polar 1-Axis` : `${compTag} Eje Polar`,
-        isEn ? 'Angles Polar' : 'Ángulos Eje Polar',
-        isEn ? `${compTag} Azimuthal 1-Axis` : `${compTag} Eje Azimutal`,
-        isEn ? 'Angles Azimuthal' : 'Ángulos Eje Azimutal',
-        isEn ? `${compTag} Horizontal 1-Axis` : `${compTag} Eje Horizontal`,
-        isEn ? 'Angles Horizontal' : 'Ángulos Eje Horizontal',
-        isEn ? `${compTag} Two-Axis (Dual)` : `${compTag} Dos Ejes`,
-        isEn ? 'Angles Two-Axis' : 'Ángulos Dos Ejes',
-        isEn ? 'Mean Ambient Temp (°C)' : 'Tª Ambiente Media (°C)',
-      ]);
-
-      const r0 = getMonthlyRadiationForAngle(res, compType, 0);
-      const rAnn = getMonthlyRadiationForAngle(res, compType, optAngle);
-      const seasonTilts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => {
-        if (i === 11 || i === 0 || i === 1) {
-          return res.seasonal?.winterTiltDeg ?? 60;
-        } else if (i === 2 || i === 3 || i === 4) {
-          return res.seasonal?.springTiltDeg ?? 35;
-        } else if (i === 5 || i === 6 || i === 7) {
-          return res.seasonal?.summerTiltDeg ?? 15;
-        }
-        return res.seasonal?.autumnTiltDeg ?? 35;
-      });
-      const rSeas = new Array(12).fill(0);
-      for (let i = 0; i < 12; i++) {
-        rSeas[i] = getMonthlyRadiationForAngle(res, compType, seasonTilts[i])[i];
-      }
-
-      const monthlyOptTilts = res.monthlyOptimum12?.optimalTiltsDeg ?? [];
-      const rMth = new Array(12).fill(0);
-      for (let i = 0; i < 12; i++) {
-        rMth[i] = getMonthlyRadiationForAngle(res, compType, monthlyOptTilts[i] ?? optAngle)[i];
-      }
-
-      const getCompVals = (
-        compObj: { global?: number[]; beam?: number[]; diffuse?: number[]; albedo?: number[] } | undefined,
-        fallback: number[]
-      ) => {
-        if (compType === 'global') return fallback;
-        if (compObj && compObj[compType]) return compObj[compType]!;
-        if (compType === 'beam') return res.horizontal.bdm0;
-        if (compType === 'diffuse') return res.horizontal.ddm0;
-        return new Array(12).fill(0.0);
-      };
-
-      const rPolar = getCompVals(res.tracking.polarAxis.components, res.tracking.polarAxis.monthlyDailyKwh);
-      const rAzim = getCompVals(res.tracking.azimuthalAxis.components, res.tracking.azimuthalAxis.monthlyDailyKwh);
-      const rHoriz = getCompVals(res.tracking.horizontalAxis.components, res.tracking.horizontalAxis.monthlyDailyKwh);
-      const rDual = getCompVals(res.tracking.dualAxis.components, res.tracking.dualAxis.monthlyDailyKwh);
-
-      const noonDualTilts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => getDualAxisNoonTiltDeg(res.latitude, i));
-      const noonAzims = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => getNoonAzimuthDeg(res.latitude, i));
-      const horizTilts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => getHorizontalTrackerDailyMeanTiltDeg(res.latitude, i));
-      const fixedOri = res.latitude >= 0 ? 0.0 : 180.0;
-
-      for (let i = 0; i < 12; i++) {
-        activeTableData.push([
-          months[i],
-          Number(r0[i].toFixed(2)),
-          isEn ? 'Inc: 0.0° | Ori: 0.0°' : 'Inc: 0,0° | Ori: 0,0°',
-          Number(rAnn[i].toFixed(2)),
-          `Inc: ${formatNum(optAngle, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
-          Number(rSeas[i].toFixed(2)),
-          `Inc: ${formatNum(seasonTilts[i], 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
-          Number(rMth[i].toFixed(2)),
-          `Inc: ${formatNum(monthlyOptTilts[i] ?? 0, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
-          Number(rPolar[i].toFixed(2)),
-          `Inc: ${formatNum(res.latitude, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
-          Number(rAzim[i].toFixed(2)),
-          `Inc: ${formatNum(res.latitude, 1)}° | Ori: ${formatNum(noonAzims[i], 1)}°`,
-          Number(rHoriz[i].toFixed(2)),
-          `Inc: ${formatNum(horizTilts[i], 1)}° | Ori: ${isEn ? '90.0°' : '90,0°'}`,
-          Number(rDual[i].toFixed(2)),
-          `Inc: ${formatNum(noonDualTilts[i], 1)}° | Ori: ${formatNum(noonAzims[i], 1)}°`,
-          Number(tempVals[i].toFixed(1)),
-        ]);
-      }
-
-      // Average row for comparative
-      const avgComp = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / 12;
-      const avgSeasonalTilt = avgComp(seasonTilts);
-      const avgMonthlyTilt = monthlyOptTilts.length ? avgComp(monthlyOptTilts) : 0;
-      const avgDualTilt = avgComp(noonDualTilts);
-      const avgDualAzim = avgComp(noonAzims);
-      const avgHorizTilt = avgComp(horizTilts);
-
-      activeTableData.push([]);
-      activeTableData.push([
-        isEn ? 'ANNUAL AVERAGE' : 'PROMEDIO ANUAL',
-        Number(avgComp(r0).toFixed(3)),
-        isEn ? 'Inc: 0.0° | Ori: 0.0°' : 'Inc: 0,0° | Ori: 0,0°',
-        Number(avgComp(rAnn).toFixed(3)),
-        `Inc: ${formatNum(optAngle, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
-        Number(avgComp(rSeas).toFixed(3)),
-        `Inc: ${formatNum(avgSeasonalTilt, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
-        Number(avgComp(rMth).toFixed(3)),
-        `Inc: ${formatNum(avgMonthlyTilt, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
-        Number(avgComp(rPolar).toFixed(3)),
-        `Inc: ${formatNum(res.latitude, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
-        Number(avgComp(rAzim).toFixed(3)),
-        `Inc: ${formatNum(res.latitude, 1)}° | Ori: ${formatNum(avgDualAzim, 1)}°`,
-        Number(avgComp(rHoriz).toFixed(3)),
-        `Inc: ${formatNum(avgHorizTilt, 1)}° | Ori: 90,0°`,
-        Number(avgComp(rDual).toFixed(3)),
-        `Inc: ${formatNum(avgDualTilt, 1)}° | Ori: ${formatNum(avgDualAzim, 1)}°`,
-        Number(res.temperatures.ambient.annualMeanC.toFixed(2)),
-      ]);
-    } else {
-      // Tracking (polar, azimuthal, horizontal, dual)
-      const radStudy =
-        activeOp === 'polar'
-          ? res.tracking.polarAxis.monthlyDailyKwh
-          : activeOp === 'azimuthal'
-          ? res.tracking.azimuthalAxis.monthlyDailyKwh
-          : activeOp === 'horizontal'
-          ? res.tracking.horizontalAxis.monthlyDailyKwh
-          : res.tracking.dualAxis.monthlyDailyKwh;
-
-      activeTableData.push([
-        isEn ? 'Month' : 'Mes',
-        `${compTag} (0°)`,
-        isEn ? `${compTag} Tracking (kWh/m²/d)` : `${compTag} Seguidor (kWh/m²/d)`,
-        isEn ? 'Ambient Temp T_amb (°C)' : 'Tª Ambiente T_amb (°C)',
-        isEn ? 'Cell Temp T_C (°C)' : 'Tª Célula T_C (°C)',
-        isEn ? 'PV Yield Osterwald (kWh)' : 'Prod FV Osterwald (kWh)',
-        isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)',
-        isEn ? 'Gain vs Annual Opt (%)' : 'Ganancia s/ Fijo Ópt Anual (%)',
-        isEn ? 'Gain vs Seasonal (%)' : 'Ganancia s/ Estacional (%)',
-      ]);
-
-      const r0 = getMonthlyRadiationForAngle(res, compType, 0);
-      const rAnn = getMonthlyRadiationForAngle(res, compType, optAngle);
-      const seasonTilts = [
-        res.seasonal.winterTiltDeg, res.seasonal.winterTiltDeg, res.seasonal.springTiltDeg,
-        res.seasonal.springTiltDeg, res.seasonal.springTiltDeg, res.seasonal.summerTiltDeg,
-        res.seasonal.summerTiltDeg, res.seasonal.summerTiltDeg, res.seasonal.autumnTiltDeg,
-        res.seasonal.autumnTiltDeg, res.seasonal.autumnTiltDeg, res.seasonal.winterTiltDeg,
-      ];
-      const rSeas = new Array(12).fill(0);
-      for (let i = 0; i < 12; i++) {
-        rSeas[i] = getMonthlyRadiationForAngle(res, compType, seasonTilts[i])[i];
-      }
-
-      for (let i = 0; i < 12; i++) {
-        const g0Total = res.horizontal.gdm0[i];
-        const compRatio = g0Total > 0 ? r0[i] / g0Total : 1;
-        const p = compType === 'global' ? radStudy[i] : radStudy[i] * compRatio;
-        const g0 = r0[i];
-        const gAnn = rAnn[i];
-        const gSeas = rSeas[i];
-
-        activeTableData.push([
-          months[i],
-          Number(g0.toFixed(2)),
-          Number(p.toFixed(2)),
-          Number(tempVals[i].toFixed(1)),
-          Number(cellTemps[i].toFixed(1)),
-          Math.round(res.energyYield.producida.osterwald.monthlyKwh[i] ?? 0),
-          compType === 'albedo' ? '-' : Number((g0 > 0 ? ((p - g0) / g0) * 100 : 0).toFixed(2)),
-          Number((gAnn > 0 ? ((p - gAnn) / gAnn) * 100 : 0).toFixed(2)),
-          Number((gSeas > 0 ? ((p - gSeas) / gSeas) * 100 : 0).toFixed(2)),
-        ]);
-      }
-    }
-
-    // Row of Means & Totals
-    const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / 12;
-    const r0Final = getMonthlyRadiationForAngle(res, compType, 0);
-
-    activeTableData.push([]);
-    activeTableData.push([
-      isEn ? 'ANNUAL AVERAGE / TOTAL' : 'PROMEDIO ANUAL / TOTAL',
-      Number(avg(r0Final).toFixed(3)),
-      '-',
-      Number(activeMeanDaily.toFixed(3)),
-      Number(res.temperatures.ambient.annualMeanC.toFixed(2)),
-      Number(res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(2)),
-      Math.round(res.energyYield.producida.osterwald.annualKwh),
-      '-',
-      Number(activeGainHorizPct.toFixed(2)),
-      Number(activeGainAnnualOptPct.toFixed(2)),
-    ]);
-
-    return activeTableData;
-  }
-
-  if (options.exportMode === 'all') {
-    const compConfigs = [
-      { key: 'global', sheetName: isEn ? 'Hoja1_Global' : 'Hoja1_Global' },
-      { key: 'beam', sheetName: isEn ? 'Hoja2_Direct' : 'Hoja2_Directa' },
-      { key: 'diffuse', sheetName: isEn ? 'Hoja3_Diffuse' : 'Hoja3_Difusa' },
-      { key: 'albedo', sheetName: isEn ? 'Hoja4_Albedo' : 'Hoja4_Albedo' },
-    ];
-    for (const compCfg of compConfigs) {
-      const data = buildStudyTableData(compCfg.key);
-      const ws = XLSX.utils.aoa_to_sheet(data);
-      XLSX.utils.book_append_sheet(wb, ws, compCfg.sheetName);
-    }
-  } else {
-    const data = buildStudyTableData(activeComp);
-    const wsActive = XLSX.utils.aoa_to_sheet(data);
-    XLSX.utils.book_append_sheet(wb, wsActive, isEn ? 'Active_Study_Detail' : 'Detalle_Estudio_Activo');
-  }
 
   // =========================================================================
   // HOJA 3: COMPARATIVA Y RANKING DE LAS 8 SUPERFICIES (Imagen 2 & 5)
@@ -614,6 +257,7 @@ export function exportOrientSolMasterExcel(
   });
 
   const wsRanking = XLSX.utils.aoa_to_sheet(rankingSheetData);
+  applySpanishNumberFormattingToWorksheet(wsRanking);
   XLSX.utils.book_append_sheet(wb, wsRanking, isEn ? 'Surfaces_Ranking' : 'Ranking_Superficies');
 
   // =========================================================================
@@ -706,6 +350,7 @@ export function exportOrientSolMasterExcel(
   }
 
   const wsCte = XLSX.utils.aoa_to_sheet(cteSheetData);
+  applySpanishNumberFormattingToWorksheet(wsCte);
   XLSX.utils.book_append_sheet(wb, wsCte, isEn ? 'CTE_DB_HE4_Losses' : 'Perdidas_CTE_DB-HE4');
 
   // =========================================================================
@@ -748,39 +393,13 @@ export function exportOrientSolMasterExcel(
   }
 
   const wsAngles = XLSX.utils.aoa_to_sheet(anglesSheetData);
+  applySpanishNumberFormattingToWorksheet(wsAngles);
   XLSX.utils.book_append_sheet(wb, wsAngles, isEn ? 'Tilt_Curves_1_to_90' : 'Curvas_Angulos_1_a_90');
 
-  // =========================================================================
-  // HOJA 6: ENERGÍA MEDIA MENSUAL Y GENERADA (Figura 5.2.82 OrientSol 3.0)
-  // =========================================================================
-  const activeStudyDailyRad =
-    activeOp === 'annual'
-      ? res.optimalAnnual.monthlyDailyKwh
-      : activeOp === 'monthly'
-      ? res.monthlyOptimum12.monthlyDailyKwh
-      : activeOp === 'seasonal'
-      ? res.seasonal.monthlyDailyKwh
-      : activeOp === 'polar'
-      ? res.tracking.polarAxis.monthlyDailyKwh
-      : activeOp === 'azimuthal'
-      ? res.tracking.azimuthalAxis.monthlyDailyKwh
-      : activeOp === 'horizontal'
-      ? res.tracking.horizontalAxis.monthlyDailyKwh
-      : res.tracking.dualAxis.monthlyDailyKwh;
-
-  const wsEnergy = createEnergyWorksheet(res, {
-    studyTitle: currentStudyTitle,
-    studyDailyRad: activeStudyDailyRad,
-    isEn,
-    peakPowerKw: peakKw,
-    tonc,
-  });
-  XLSX.utils.book_append_sheet(wb, wsEnergy, isEn ? 'Energy_Yield' : 'Energia_Generada');
-
-  // Download File with Full Timestamp in Filename
-  const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = isEn
-    ? `OrientSol4_${activeOp.toUpperCase()}_Full_${cleanLoc}_${fileTimestamp}.xlsx`
-    : `OrientSol4_${activeOp.toUpperCase()}_Completo_${cleanLoc}_${fileTimestamp}.xlsx`;
+  // Standardized File Name: Operación + Emplazamiento + Componente + Timestamp
+  const compSuffix = options.exportMode === 'all'
+    ? (isEn ? 'All_Components' : 'Todas_las_componentes')
+    : activeComp;
+  const filename = getStandardizedExcelFilename(activeOp, res.locationName, compSuffix, fileTimestamp);
   XLSX.writeFile(wb, filename);
 }

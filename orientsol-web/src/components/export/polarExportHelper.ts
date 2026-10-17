@@ -3,6 +3,11 @@ import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalcula
 import { getMonthlyRadiationForAngle, type TableRadiationComponent } from '@/components/climate/OptimalAnnualStudyPanel';
 import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
 import { sanitizeForSpreadsheet } from '@/utils/security';
+import {
+  applySpanishNumberFormattingToWorksheet,
+  getExportFileTimestamp,
+  getStandardizedExcelFilename,
+} from '@/components/export/excelFormatHelper';
 
 const MONTH_NAMES_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -376,24 +381,28 @@ export async function exportPolarExcelWorkbook(
     const gridGlobal = buildPolarComponentSheet(res, 'global', isEn);
     const ws1 = XLSX.utils.aoa_to_sheet(gridGlobal);
     applySheetFormatting(ws1);
+    applySpanishNumberFormattingToWorksheet(ws1);
     XLSX.utils.book_append_sheet(wb, ws1, isEn ? 'Sheet1_Global' : 'Hoja1_Global');
 
     // Hoja2: Directa
     const gridBeam = buildPolarComponentSheet(res, 'beam', isEn);
     const ws2 = XLSX.utils.aoa_to_sheet(gridBeam);
     applySheetFormatting(ws2);
+    applySpanishNumberFormattingToWorksheet(ws2);
     XLSX.utils.book_append_sheet(wb, ws2, isEn ? 'Sheet2_Direct' : 'Hoja2_Directa');
 
     // Hoja3: Difusa
     const gridDiffuse = buildPolarComponentSheet(res, 'diffuse', isEn);
     const ws3 = XLSX.utils.aoa_to_sheet(gridDiffuse);
     applySheetFormatting(ws3);
+    applySpanishNumberFormattingToWorksheet(ws3);
     XLSX.utils.book_append_sheet(wb, ws3, isEn ? 'Sheet3_Diffuse' : 'Hoja3_Difusa');
 
     // Hoja4: Albedo
     const gridAlbedo = buildPolarComponentSheet(res, 'albedo', isEn);
     const ws4 = XLSX.utils.aoa_to_sheet(gridAlbedo);
     applySheetFormatting(ws4);
+    applySpanishNumberFormattingToWorksheet(ws4);
     XLSX.utils.book_append_sheet(wb, ws4, isEn ? 'Sheet4_Albedo' : 'Hoja4_Albedo');
   } else {
     // Single sheet for activeComponent
@@ -408,6 +417,7 @@ export async function exportPolarExcelWorkbook(
 
     const ws = XLSX.utils.aoa_to_sheet(gridComp);
     applySheetFormatting(ws);
+    applySpanishNumberFormattingToWorksheet(ws);
     XLSX.utils.book_append_sheet(wb, ws, sheetTitle);
   }
 
@@ -419,13 +429,15 @@ export async function exportPolarExcelWorkbook(
     peakPowerKw: options.peakPowerKw,
     tonc: options.tonc,
   });
+  applySpanishNumberFormattingToWorksheet(wsEnergy);
   XLSX.utils.book_append_sheet(wb, wsEnergy, isEn ? 'Energy_Yield' : 'Energia_Generada');
 
-  // Generate file name
-  const safeCity = (res.locationName || 'Ciudad').replace(/[^a-zA-Z0-9_\u00C0-\u017F]/g, '_');
-  const now = new Date();
-  const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
-  const fileName = `OrientSol4_Seguimiento_Eje_Polar_${safeCity}_${dateStr}.xlsx`;
+  // Standardized File Name: Operación + Emplazamiento + Componente + Timestamp
+  const { fileTimestamp } = getExportFileTimestamp();
+  const compSuffix = options.exportMode === 'all'
+    ? (isEn ? 'All_Components' : 'Todas_las_componentes')
+    : options.activeComponent;
+  const fileName = getStandardizedExcelFilename('polar', res.locationName, compSuffix, fileTimestamp);
 
   XLSX.writeFile(wb, fileName);
 }

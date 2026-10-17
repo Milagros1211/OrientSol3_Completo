@@ -3,6 +3,11 @@ import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalcula
 import { getMonthlyRadiationForAngle, type TableRadiationComponent } from '@/components/climate/OptimalAnnualStudyPanel';
 import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
 import { sanitizeForSpreadsheet } from '@/utils/security';
+import {
+  applySpanishNumberFormattingToWorksheet,
+  getExportFileTimestamp,
+  getStandardizedExcelFilename,
+} from '@/components/export/excelFormatHelper';
 
 const MONTH_NAMES_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -379,11 +384,13 @@ export async function exportSeasonalExcelWorkbook(
     components.forEach((comp, idx) => {
       const data = buildSeasonalComponentSheet(res, comp, isEn);
       const ws = XLSX.utils.aoa_to_sheet(data);
+      applySpanishNumberFormattingToWorksheet(ws);
       XLSX.utils.book_append_sheet(wb, ws, sheetNames[idx]);
     });
   } else {
     const data = buildSeasonalComponentSheet(res, activeComp, isEn);
     const ws = XLSX.utils.aoa_to_sheet(data);
+    applySpanishNumberFormattingToWorksheet(ws);
     const sheetName =
       activeComp === 'global'
         ? (isEn ? 'Sheet1_Global' : 'Hoja1_Global')
@@ -403,10 +410,15 @@ export async function exportSeasonalExcelWorkbook(
     peakPowerKw: peakKw,
     tonc,
   });
+  applySpanishNumberFormattingToWorksheet(energyWs);
   XLSX.utils.book_append_sheet(wb, energyWs, isEn ? 'Energy_Yield' : 'Energia_Generada');
 
-  const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
-  const filename = `OrientSol3_OptEstacional_${cleanLoc}.xlsx`;
+  // Standardized File Name: Operación + Emplazamiento + Componente + Timestamp
+  const { fileTimestamp } = getExportFileTimestamp();
+  const compSuffix = mode === 'all'
+    ? (isEn ? 'All_Components' : 'Todas_las_componentes')
+    : activeComp;
+  const filename = getStandardizedExcelFilename('seasonal', res.locationName, compSuffix, fileTimestamp);
 
   const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
   const blob = new Blob([excelBuffer], {
