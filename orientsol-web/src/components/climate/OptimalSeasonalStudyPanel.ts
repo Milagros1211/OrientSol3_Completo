@@ -15,6 +15,7 @@ import { renderOptimalSeasonalGraphsWindow } from '@/components/charts/OptimalSe
 import { renderCaptureLossMapSection } from '@/components/climate/CaptureLossMapSection';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { exportSeasonalExcelWorkbook } from '@/components/export/seasonalExportHelper';
+import { formatNum } from '@/utils/formatters';
 
 export type SeasonalRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -325,7 +326,7 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
               </span>
               <span class="meta-label" style="margin-left: 2rem;">
                 <strong>${isEn ? 'Latitude (°):' : 'Latitud (°):'}</strong>
-                <span class="meta-val" style="font-weight: 700; margin-left: 0.35rem;">${latitude.toFixed(2)}°</span>
+                <span class="meta-val" style="font-weight: 700; margin-left: 0.35rem;">${formatNum(latitude, 2)}°</span>
               </span>
             </div>
             <div class="opt-seasonal-study-title-row">
@@ -418,17 +419,17 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
                     ? 'val-opt-summer'
                     : 'val-opt-autumn';
 
-                const displayPctH = isAlbedo ? '-' : pctHoriz.toFixed(2);
-                const displayPctAnu = pctAnu.toFixed(2);
+                const displayPctH = isAlbedo ? '-' : formatNum(pctHoriz, 2);
+                const displayPctAnu = formatNum(pctAnu, 2);
 
                 return `
                   <tr class="row-season-${season}">
                     <td class="td-month-badge badge-${season}">
                       <strong>${monthName}</strong>
                     </td>
-                    ${angles.map((_, aIdx) => `<td class="td-num">${radAngles[aIdx][monthIdx].toFixed(2)}</td>`).join('')}
+                    ${angles.map((_, aIdx) => `<td class="td-num">${formatNum(radAngles[aIdx][monthIdx], 2)}</td>`).join('')}
                     <td class="td-num td-opt-deg-cell">${optAngleCell}</td>
-                    <td class="td-num td-opt-val ${optColorClass}"><strong>${gOpt.toFixed(2)}</strong></td>
+                    <td class="td-num td-opt-val ${optColorClass}"><strong>${formatNum(gOpt, 2)}</strong></td>
                     <td class="td-num td-gain-h ${!isAlbedo && pctHoriz >= 0 ? 'text-gain-pos' : !isAlbedo ? 'text-gain-neg' : ''}">${displayPctH}</td>
                     <td class="td-num td-gain-anu ${pctAnu >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${displayPctAnu}</td>
                   </tr>
@@ -440,11 +441,11 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
                 <td class="td-month-badge badge-media">
                   <strong>${isEn ? 'MEAN' : 'MEDIA'}</strong>
                 </td>
-                ${meanRadAngles.map((v) => `<td class="td-num"><strong>${v.toFixed(2)}</strong></td>`).join('')}
+                ${meanRadAngles.map((v) => `<td class="td-num"><strong>${formatNum(v, 2)}</strong></td>`).join('')}
                 <td class="td-num"></td>
-                <td class="td-num td-opt-val highlight-media"><strong>${meanSeasonalOpt.toFixed(2)}</strong></td>
-                <td class="td-num td-gain-h"><strong>${isAlbedo ? '-' : meanGainHoriz.toFixed(2)}</strong></td>
-                <td class="td-num td-gain-anu"><strong>${meanGainAnnual.toFixed(2)}</strong></td>
+                <td class="td-num td-opt-val highlight-media"><strong>${formatNum(meanSeasonalOpt, 2)}</strong></td>
+                <td class="td-num td-gain-h"><strong>${isAlbedo ? '-' : formatNum(meanGainHoriz, 2)}</strong></td>
+                <td class="td-num td-gain-anu"><strong>${formatNum(meanGainAnnual, 2)}</strong></td>
               </tr>
             </tfoot>
           </table>

@@ -10,6 +10,7 @@ import {
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { getNoonAzimuthDeg } from '@/services/solarGeometryAngles';
+import { formatNum } from '@/utils/formatters';
 
 export type TrackingRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -121,7 +122,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
               <span class="meta-label"><strong>${isEn ? 'City:' : 'Ciudad:'}</strong> ${locationName}</span>
               <span class="meta-label" style="margin-left: 2rem;">
                 <strong>${isEn ? 'Latitude (°):' : 'Latitud (°):'}</strong>
-                <span style="color: #38bdf8; font-weight: 700;">${latitude.toFixed(2)}</span>
+                <span style="color: #38bdf8; font-weight: 700;">${formatNum(latitude, 2)}</span>
               </span>
             </div>
             <div class="opt-tracking-study-title-row">
@@ -205,16 +206,16 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
                     <tr>
                       <td class="td-track-month"><strong>${mName}</strong></td>
                       <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 600; white-space: nowrap; text-align: center;">
-                        <span style="color: #c084fc;">Inc: ${res.latitude.toFixed(1)}°</span> <span style="opacity: 0.4;">|</span> <span style="color: var(--text-muted);">Ori: ${noonAzim.toFixed(1)}°</span>
+                        <span style="color: #c084fc;">Inc: ${formatNum(res.latitude, 1)}°</span> <span style="opacity: 0.4;">|</span> <span style="color: var(--text-muted);">Ori: ${formatNum(noonAzim, 1)}°</span>
                       </td>
-                      <td class="td-num">${g0.toFixed(2)}</td>
-                      <td class="td-num td-track-val"><strong>${pVal.toFixed(2)}</strong></td>
-                      <td class="td-num td-track-temp">${tVal !== undefined ? tVal.toFixed(1) : '-'}</td>
-                      <td class="td-num">${gHor.toFixed(2)}</td>
-                      <td class="td-num">${gAnn.toFixed(2)}</td>
-                      <td class="td-num">${gSeas.toFixed(2)}</td>
-                      <td class="td-num">${gPol.toFixed(2)}</td>
-                      <td class="td-num">${gHz.toFixed(2)}</td>
+                      <td class="td-num">${formatNum(g0, 2)}</td>
+                      <td class="td-num td-track-val"><strong>${formatNum(pVal, 2)}</strong></td>
+                      <td class="td-num td-track-temp">${tVal !== undefined ? formatNum(tVal, 1) : '-'}</td>
+                      <td class="td-num">${formatNum(gHor, 2)}</td>
+                      <td class="td-num">${formatNum(gAnn, 2)}</td>
+                      <td class="td-num">${formatNum(gSeas, 2)}</td>
+                      <td class="td-num">${formatNum(gPol, 2)}</td>
+                      <td class="td-num">${formatNum(gHz, 2)}</td>
                     </tr>
                   `;
                 }).join('')}
@@ -223,16 +224,16 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
                 <tr class="tracking-media-row">
                   <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
                   <td class="td-num td-angles" style="font-size: 0.80rem; font-weight: 700; white-space: nowrap; text-align: center; color: #c084fc;">
-                    Inc: ${res.latitude.toFixed(1)}° | Ori: ${(months.reduce((acc, _, idx) => acc + getNoonAzimuthDeg(res.latitude, idx), 0) / 12).toFixed(1)}°
+                    Inc: ${formatNum(res.latitude, 1)}° | Ori: ${formatNum(months.reduce((acc, _, idx) => acc + getNoonAzimuthDeg(res.latitude, idx), 0) / 12, 1)}°
                   </td>
-                  <td class="td-num"><strong>${meanHoriz.toFixed(2)}</strong></td>
-                  <td class="td-num td-track-val"><strong>${meanAzim.toFixed(2)}</strong></td>
-                  <td class="td-num td-track-temp"><strong>${tempAnnualMean !== undefined ? tempAnnualMean.toFixed(1) : '-'}</strong></td>
-                  <td class="td-num"><strong>${meanGainHoriz.toFixed(2)}</strong></td>
-                  <td class="td-num"><strong>${meanGainAnnual.toFixed(2)}</strong></td>
-                  <td class="td-num"><strong>${meanGainSeasonal.toFixed(2)}</strong></td>
-                  <td class="td-num"><strong>${meanGainPolar.toFixed(2)}</strong></td>
-                  <td class="td-num"><strong>${meanGainHorizTrack.toFixed(2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanHoriz, 2)}</strong></td>
+                  <td class="td-num td-track-val"><strong>${formatNum(meanAzim, 2)}</strong></td>
+                  <td class="td-num td-track-temp"><strong>${tempAnnualMean !== undefined ? formatNum(tempAnnualMean, 1) : '-'}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGainHoriz, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGainAnnual, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGainSeasonal, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGainPolar, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGainHorizTrack, 2)}</strong></td>
                 </tr>
               </tfoot>
             </table>
