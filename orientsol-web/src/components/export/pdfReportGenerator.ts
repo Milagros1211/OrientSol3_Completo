@@ -2239,25 +2239,24 @@ export async function generateOrientSolPDFReport(
     const seasonalData = res.seasonal;
     const fixedOri = res.latitude >= 0 ? 0.0 : 180.0;
 
-    let studyColTitle = '';
+    let studyColTitleLine1 = isEn ? 'Performed study' : 'Estudio realizado';
+    let studyColTitleLine2 = '';
     if (studyType === 'monthly') {
-      studyColTitle = isEn ? 'Performed study (12 Monthly Angles)' : 'Estudio realizado (12 Inclinaciones)';
+      studyColTitleLine2 = isEn ? '(12 Monthly Angles)' : '(12 Inclinaciones óptimas)';
     } else if (studyType === 'seasonal' && seasonalData) {
-      studyColTitle = isEn
-        ? `Performed study (Seasonal: ${formatNum(seasonalData.winterTiltDeg, 1)}° / ${formatNum(seasonalData.springTiltDeg, 1)}° / ${formatNum(seasonalData.summerTiltDeg, 1)}° / ${formatNum(seasonalData.autumnTiltDeg, 1)}°)`
-        : `Estudio realizado (Estacional: ${formatNum(seasonalData.winterTiltDeg, 1)}° / ${formatNum(seasonalData.springTiltDeg, 1)}° / ${formatNum(seasonalData.summerTiltDeg, 1)}° / ${formatNum(seasonalData.autumnTiltDeg, 1)}°)`;
+      studyColTitleLine2 = isEn ? '(Seasonal Optimal Tilts)' : '(Inclinación ópt. estacional)';
     } else if (studyType === 'polar') {
-      studyColTitle = isEn ? 'Performed study (Polar 1-axis)' : 'Estudio realizado (Seg. 1 eje polar)';
+      studyColTitleLine2 = isEn ? '(Polar 1-axis)' : '(Seg. 1 eje polar)';
     } else if (studyType === 'azimuthal') {
-      studyColTitle = isEn ? 'Performed study (Azimuthal 1-axis)' : 'Estudio realizado (Seg. 1 eje azimutal)';
+      studyColTitleLine2 = isEn ? '(Azimuthal 1-axis)' : '(Seg. 1 eje azimutal)';
     } else if (studyType === 'horizontal') {
-      studyColTitle = isEn ? 'Performed study (Horizontal 1-axis)' : 'Estudio realizado (Seg. 1 eje horizontal)';
+      studyColTitleLine2 = isEn ? '(Horizontal 1-axis)' : '(Seg. 1 eje horizontal)';
     } else if (studyType === 'dual') {
-      studyColTitle = isEn ? 'Performed study (2-axis tracking)' : 'Estudio realizado (Seg. 2 ejes)';
+      studyColTitleLine2 = isEn ? '(2-axis tracking)' : '(Seguimiento 2 ejes)';
     } else {
-      studyColTitle = isEn
-        ? `Performed study (Inc: ${formatNum(optAngle, 1)}° | Ori: ${formatNum(fixedOri, 1)}°)`
-        : `Estudio realizado (Inc: ${formatNum(optAngle, 1)}° | Ori: ${formatNum(fixedOri, 1)}°)`;
+      studyColTitleLine2 = isEn
+        ? `(Tilt: ${formatNum(optAngle, 1)}° | Azim: ${formatNum(fixedOri, 1)}°)`
+        : `(Inc: ${formatNum(optAngle, 1)}° | Ori: ${formatNum(fixedOri, 1)}°)`;
     }
 
     // 2. Section Header
@@ -2346,8 +2345,8 @@ export async function generateOrientSolPDFReport(
 
     // 4. The 5-Column Table Matching Screenshot
     const tblEnerY = seCardY + seCardH + 5;
-    const colE_X = [22, 44, 94, 126, 162];
-    const colE_W = [22, 50, 32, 36, 28];
+    const colE_X = [22, 43, 90, 122, 165];
+    const colE_W = [20, 46, 31, 42, 24];
 
     // Header Background
     doc.setFillColor(30, 41, 59);
@@ -2360,16 +2359,11 @@ export async function generateOrientSolPDFReport(
     doc.text(isEn ? 'Considered angles (Inc | Ori)' : 'Ángulos considerados (Inc | Ori)', colE_X[1], tblEnerY + 4.7);
     doc.text(isEn ? 'Horizontal (0°)' : 'Superficie horizontal (0°)', colE_X[2] + colE_W[2] - 2, tblEnerY + 4.7, { align: 'right' });
 
-    // Col 4 title (with auto-wrap or compact font if long)
-    const cleanCol4Title = sanitizePdfText(studyColTitle);
-    const col4Lines = doc.splitTextToSize(cleanCol4Title, colE_W[3] + 2);
-    if (col4Lines.length > 1) {
-      doc.setFontSize(5.2);
-      doc.text(col4Lines[0], colE_X[3] + colE_W[3] - 1, tblEnerY + 3.2, { align: 'right' });
-      doc.text(col4Lines[1], colE_X[3] + colE_W[3] - 1, tblEnerY + 6.0, { align: 'right' });
-    } else {
-      doc.text(col4Lines[0], colE_X[3] + colE_W[3] - 1, tblEnerY + 4.7, { align: 'right' });
-    }
+    // Col 4 title with clean 2-line wrapped text
+    doc.setFontSize(5.6);
+    doc.text(sanitizePdfText(studyColTitleLine1), colE_X[3] + colE_W[3] - 1, tblEnerY + 3.0, { align: 'right' });
+    doc.setFontSize(5.2);
+    doc.text(sanitizePdfText(studyColTitleLine2), colE_X[3] + colE_W[3] - 1, tblEnerY + 5.8, { align: 'right' });
 
     doc.setFontSize(6.2);
     doc.text(isEn ? 'Gain (kWh)' : 'Ganancia (kWh)', colE_X[4] + colE_W[4] - 2, tblEnerY + 4.7, { align: 'right' });
@@ -2425,11 +2419,11 @@ export async function generateOrientSolPDFReport(
       doc.setFillColor(241, 245, 249);
       doc.setDrawColor(203, 213, 225);
       doc.setLineWidth(0.2);
-      doc.roundedRect(colE_X[1], curRowEnerY + 0.9, 48, 3.8, 0.8, 0.8, 'FD');
+      doc.roundedRect(colE_X[1] + 1, curRowEnerY + 0.9, 44, 3.8, 0.8, 0.8, 'FD');
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(5.2);
       doc.setTextColor(3, 105, 161);
-      doc.text(angleText, colE_X[1] + 24, curRowEnerY + 3.5, { align: 'center' });
+      doc.text(angleText, colE_X[1] + 1 + 22, curRowEnerY + 3.5, { align: 'center' });
 
       // Col 3: Horizontal 0°
       doc.setFont('helvetica', 'normal');
@@ -2497,10 +2491,10 @@ export async function generateOrientSolPDFReport(
 
     // Pill in footer
     doc.setFillColor(30, 41, 59);
-    doc.roundedRect(colE_X[1], curRowEnerY + 1.2, 48, 4.0, 0.8, 0.8, 'F');
+    doc.roundedRect(colE_X[1] + 1, curRowEnerY + 1.2, 44, 4.0, 0.8, 0.8, 'F');
     doc.setTextColor(56, 189, 248);
     doc.setFontSize(5.2);
-    doc.text(avgAngleText, colE_X[1] + 24, curRowEnerY + 3.8, { align: 'center' });
+    doc.text(avgAngleText, colE_X[1] + 1 + 22, curRowEnerY + 3.8, { align: 'center' });
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(6.2);
@@ -2526,10 +2520,10 @@ export async function generateOrientSolPDFReport(
     doc.text(isEn ? 'MEAN' : 'MEDIA', colE_X[0], curRowEnerY + 4.0);
 
     doc.setFillColor(15, 23, 42);
-    doc.roundedRect(colE_X[1], curRowEnerY + 1.0, 48, 4.0, 0.8, 0.8, 'F');
+    doc.roundedRect(colE_X[1] + 1, curRowEnerY + 1.0, 44, 4.0, 0.8, 0.8, 'F');
     doc.setTextColor(148, 163, 184);
     doc.setFontSize(5.2);
-    doc.text(avgAngleText, colE_X[1] + 24, curRowEnerY + 3.6, { align: 'center' });
+    doc.text(avgAngleText, colE_X[1] + 1 + 22, curRowEnerY + 3.6, { align: 'center' });
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(6.2);
@@ -2578,7 +2572,7 @@ export async function generateOrientSolPDFReport(
         { text: 'M,STC', isSub: true, color: [15, 23, 42] },
         { text: ' · (G / G', color: [15, 23, 42] },
         { text: 'STC', isSub: true, color: [15, 23, 42] },
-        { text: ') · [1 + γ · (T', color: [15, 23, 42] },
+        { text: ') · [1 + gamma · (T', color: [15, 23, 42] },
         { text: 'C', isSub: true, color: [15, 23, 42] },
         { text: ' - 25)]', color: [15, 23, 42] }
       ],
@@ -2596,7 +2590,7 @@ export async function generateOrientSolPDFReport(
         { text: 'C', isSub: true, color: [71, 85, 105] },
         { text: ' = T', color: [71, 85, 105] },
         { text: 'amb', isSub: true, color: [71, 85, 105] },
-        { text: ` + [(TONC - 20) / 800] · G   •   E = ∫ p(t) dt`, color: [71, 85, 105] }
+        { text: ` + [(TONC - 20) / 800] · G   •   E = integral p(t) dt`, color: [71, 85, 105] }
       ],
       26,
       btmBoxY + 16.5,
@@ -2614,7 +2608,7 @@ export async function generateOrientSolPDFReport(
     doc.text(`• PM: ${isEn ? 'Maximum power at MPP (W)' : 'Potencia máxima en el MPP (W)'} | PM,STC: ${isEn ? 'STC power (W)' : 'Potencia en STC (W)'}`, 24, nomY);
     doc.text(`• G: ${isEn ? 'Incident global irradiance (W/m²)' : 'Irradiancia global incidente (W/m²)'} | GSTC = 1.000 W/m²`, 24, nomY + nomLineGap);
     doc.text(`• TC: ${isEn ? 'Operating cell temperature (°C)' : 'Temperatura de la célula (°C)'} | Tamb: ${isEn ? 'Ambient temperature (°C)' : 'Temperatura ambiente (°C)'}`, 24, nomY + nomLineGap * 2);
-    doc.text(`• γ: ${isEn ? 'Power temperature coefficient' : 'Coeficiente térmico de potencia'} (${formatNum(coefTemp, 4)} 1/°C)`, 24, nomY + nomLineGap * 3);
+    doc.text(`• gamma: ${isEn ? 'Power temperature coefficient' : 'Coeficiente térmico de potencia'} (${formatNum(coefTemp, 4)} 1/°C)`, 24, nomY + nomLineGap * 3);
     doc.text(`• TONC: ${isEn ? 'Nominal operating cell temperature' : 'Temperatura de operación nominal'} (${formatNum(tonc, 1)} °C)`, 24, nomY + nomLineGap * 4);
     doc.text(isEn ? '  (measured at 800 W/m², 20 °C Tamb, AM 1.5, wind 1 m/s)' : '  (medida a 800 W/m², Tamb = 20 °C, espectro AM 1,5, viento 1 m/s)', 24, nomY + nomLineGap * 5);
 
@@ -2635,7 +2629,7 @@ export async function generateOrientSolPDFReport(
         : [
             `Balance Anual de Producción: La configuración ${cleanStudyName} produce ${formatInt(energyData.e_anual)} kWh/año (${formatInt(energyData.e_anual / peakKw)} kWh/kWp), obteniendo una ganancia neta de ${energyData.ganancia_anual >= 0 ? '+' : ''}${formatInt(energyData.ganancia_anual)} kWh/año (+${formatNum(gainPct, 1)}%) frente a superficie horizontal.`,
             `Nivelación Estacional: En los meses fríos la adaptación angular refuerza la captación directa frente a superficie plana (pico: ${mFull[maxMonthIdx]} con ${formatInt(maxMonthKwh)} kWh; mínimo: ${mFull[minMonthIdx]} con ${formatInt(minMonthKwh)} kWh; factor estacional: ${(maxMonthKwh / (minMonthKwh || 1)).toFixed(2)}x).`,
-            `Impacto del Derating Térmico: En verano la elevación de temperatura de célula modula la potencia máxima mediante el coeficiente γ (${formatNum(coefTemp, 4)} 1/°C), situando el punto de mayor rendimiento relativo en primavera con insolación alta y temperatura moderada.`
+            `Impacto del Derating Térmico: En verano la elevación de temperatura de célula modula la potencia máxima mediante el coeficiente gamma (${formatNum(coefTemp, 4)} 1/°C), situando el punto de mayor rendimiento relativo en primavera con insolación alta y temperatura moderada.`
           ],
       btmRightX,
       btmBoxY,
