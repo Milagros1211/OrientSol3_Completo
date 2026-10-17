@@ -1221,14 +1221,14 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(5);
   doc.setTextColor(220, 38, 38);
-  doc.text(`${isEn ? 'MAX' : 'MÁX'}: ${maxRadVal.toFixed(2)}`, xMax1, yMax1, { align: 'center' });
+  doc.text(`${isEn ? 'MAX' : 'MÁX'}: ${formatNum(maxRadVal, 2)}`, xMax1, yMax1, { align: 'center' });
 
   const xMin1 = axisX + 2.0 + minRadIdx * stepX1 + 7.6;
   const yMin1 = baseY1 - (minRadVal / maxRadPlot) * plotH1 - 1.8;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(5);
   doc.setTextColor(2, 132, 199);
-  doc.text(`${isEn ? 'MIN' : 'MÍN'}: ${minRadVal.toFixed(2)}`, xMin1, yMin1, { align: 'center' });
+  doc.text(`${isEn ? 'MIN' : 'MÍN'}: ${formatNum(minRadVal, 2)}`, xMin1, yMin1, { align: 'center' });
 
   // -------------------------------------------------------------
   // GRÁFICO 2: PRODUCCIÓN FV Y COMPORTAMIENTO TÉRMICO
@@ -2263,40 +2263,40 @@ export async function generateOrientSolPDFReport(
           ? (isEn
               ? [
                   `Direct Beam Geometry: Beam radiation depends on direct solar incidence angle theta (cos(theta)). Optimization minimizes optical misalignment with the sun.`,
-                  `Solar Capture Gain: In ${res.locationName}, direct beam capture yields +${gainVsHoriz_c.toFixed(1)}% over horizontal (${Math.round(activeAnnualTotalKwh_c)} kWh/m²·yr).`
+                  `Solar Capture Gain: In ${res.locationName}, direct beam capture yields +${formatPercent(gainVsHoriz_c, 1)} over horizontal (${formatInt(Math.round(activeAnnualTotalKwh_c))} kWh/m²·yr).`
                 ]
               : [
                   `Geometría de Haz Directo: La radiación directa depende de la proyección del vector solar sobre el plano captador (cos(theta)), minimizando el ángulo de incidencia.`,
-                  `Ganancia de Captación Directa: En ${res.locationName}, el aprovechamiento directo proporciona un incremento de +${gainVsHoriz_c.toFixed(1)}% frente al plano horizontal (${Math.round(activeAnnualTotalKwh_c)} kWh/m²·año).`
+                  `Ganancia de Captación Directa: En ${res.locationName}, el aprovechamiento directo proporciona un incremento de +${formatPercent(gainVsHoriz_c, 1)} frente al plano horizontal (${formatInt(Math.round(activeAnnualTotalKwh_c))} kWh/m²·año).`
                 ])
           : comp === 'diffuse'
           ? (isEn
               ? [
                   `Atmospheric Diffuse Radiation: Atmospheric scattering from Rayleigh and aerosols, calculated via isotropic sky view factor (1 + cos(beta))/2.`,
-                  `Contribution in Overcast Conditions: Diffuse radiation contributes a steady baseline throughout the year (${Math.round(activeAnnualTotalKwh_c)} kWh/m²·yr in ${res.locationName}).`
+                  `Contribution in Overcast Conditions: Diffuse radiation contributes a steady baseline throughout the year (${formatInt(Math.round(activeAnnualTotalKwh_c))} kWh/m²·yr in ${res.locationName}).`
                 ]
               : [
                   `Dispersión Difusa Atmosférica: Procede de la dispersión de Rayleigh y aerosoles, calculada con factor de visión celeste (1 + cos(beta))/2.`,
-                  `Aporte en Condiciones Difusas: La componente difusa mantiene una aportación constante a lo largo del año (${Math.round(activeAnnualTotalKwh_c)} kWh/m²·año en ${res.locationName}).`
+                  `Aporte en Condiciones Difusas: La componente difusa mantiene una aportación constante a lo largo del año (${formatInt(Math.round(activeAnnualTotalKwh_c))} kWh/m²·año en ${res.locationName}).`
                 ])
           : comp === 'albedo'
           ? (isEn
               ? [
                   `Ground Albedo Reflection: Ground-reflected diffuse radiation modulated by reflectivity rho and plane tilt angle factor (1 - cos(beta))/2.`,
-                  `Tilt Dependence: Exactly 0 on flat horizontal surfaces (0°) and increases with tilt, contributing +${Math.round(activeAnnualTotalKwh_c)} kWh/m²·yr in ${res.locationName}.`
+                  `Tilt Dependence: Exactly 0 on flat horizontal surfaces (0°) and increases with tilt, contributing +${formatInt(Math.round(activeAnnualTotalKwh_c))} kWh/m²·yr in ${res.locationName}.`
                 ]
               : [
                   `Reflexión del Albedo del Terreno: Radiación reflejada por el suelo según reflectividad rho y factor de forma (1 - cos(beta))/2.`,
-                  `Dependencia de Inclinación: Nula en plano horizontal (0°) y creciente con la inclinación, aportando +${Math.round(activeAnnualTotalKwh_c)} kWh/m²·año en ${res.locationName}.`
+                  `Dependencia de Inclinación: Nula en plano horizontal (0°) y creciente con la inclinación, aportando +${formatInt(Math.round(activeAnnualTotalKwh_c))} kWh/m²·año en ${res.locationName}.`
                 ])
           : (isEn
               ? [
-                  `Seasonal Adaptation of Optimal Tilt: Solar declination varies between delta = -23.45° and +23.45°. Monthly tilt reaches 58°-60° in winter and 0°-4° in summer.`,
-                  `Gain Comparison vs Annual Fixed: Optimization provides a net energy boost of +${gainVsOpt_c.toFixed(2)}% (+${Math.max(0, Math.round(activeAnnualTotalKwh_c - optAnnualTotalKwh_c))} kWh/m²·yr) compared to annual fixed tilt (${optAngle}°).`
+                  `Seasonal Adaptation of Optimal Tilt: Solar declination varies between delta = -23,45° and +23,45°. Monthly tilt reaches 58°-60° in winter and 0°-4° in summer.`,
+                  `Gain Comparison vs Annual Fixed: Optimization provides a net energy boost of +${formatPercent(gainVsOpt_c, 2)} (+${formatInt(Math.max(0, Math.round(activeAnnualTotalKwh_c - optAnnualTotalKwh_c)))} kWh/m²·yr) compared to annual fixed tilt (${formatAngle(optAngle, 1)}).`
                 ]
               : [
-                  `Adaptación Estacional del Ángulo Óptimo: La declinación solar varía entre delta = -23.45° y +23.45°. En invierno el ángulo alcanza 58°-60° en ${res.locationName} y en verano 0°-4°.`,
-                  `Comparativa de Ganancia frente a Fijo Anual: La optimización proporciona un incremento neto de energía del +${gainVsOpt_c.toFixed(2)}% (+${Math.max(0, Math.round(activeAnnualTotalKwh_c - optAnnualTotalKwh_c))} kWh/m²·año) frente a la inclinación fija anual de ${optAngle}°.`
+                  `Adaptación Estacional del Ángulo Óptimo: La declinación solar varía entre delta = -23,45° y +23,45°. En invierno el ángulo alcanza 58°-60° en ${res.locationName} y en verano 0°-4°.`,
+                  `Comparativa de Ganancia frente a Fijo Anual: La optimización proporciona un incremento neto de energía del +${formatPercent(gainVsOpt_c, 2)} (+${formatInt(Math.max(0, Math.round(activeAnnualTotalKwh_c - optAnnualTotalKwh_c)))} kWh/m²·año) frente a la inclinación fija anual de ${formatAngle(optAngle, 1)}.`
                 ]);
 
       drawInsightBox(
@@ -2815,7 +2815,7 @@ export async function generateOrientSolPDFReport(
     // Percentage Gain text (In a prominent, dedicated visible position at X = 154mm)
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(s.gainOverHorizontalPct > 0 ? 5 : 100, s.gainOverHorizontalPct > 0 ? 150 : 116, s.gainOverHorizontalPct > 0 ? 105 : 139);
-    const gainStr = s.gainOverHorizontalPct > 0 ? `(+${s.gainOverHorizontalPct.toFixed(1)}%)` : '(Base 0%)';
+    const gainStr = s.gainOverHorizontalPct > 0 ? `(+${formatPercent(s.gainOverHorizontalPct, 1)})` : '(Base 0,0%)';
     doc.text(gainStr, 154, barRowY + 3.8);
 
     barRowY += 7.2;
@@ -3375,11 +3375,11 @@ export async function generateOrientSolPDFReport(
   doc.setLineWidth(0.8);
   doc.line(90, cvBoxY + 8, 98, cvBoxY + 8);
   doc.setTextColor(14, 165, 233);
-  doc.text(`${isEn ? 'Horizontal Plane 0°' : 'Plano Horizontal 0°'} (${meanRad0.toFixed(2)})`, 100, cvBoxY + 9);
+  doc.text(`${isEn ? 'Horizontal Plane 0°' : 'Plano Horizontal 0°'} (${formatNum(meanRad0, 2)})`, 100, cvBoxY + 9);
 
   doc.setDrawColor(16, 185, 129);
   doc.setLineWidth(1.0);
-  const legendStudyCurve = doc.splitTextToSize(`${cleanStudyName} (${meanRadStudy.toFixed(2)})`, 34);
+  const legendStudyCurve = doc.splitTextToSize(`${cleanStudyName} (${formatNum(meanRadStudy, 2)})`, 34);
   if (legendStudyCurve.length > 1) {
     doc.text(legendStudyCurve[0], 155, cvBoxY + 7.5);
     doc.text(legendStudyCurve[1], 155, cvBoxY + 10.5);
@@ -3852,8 +3852,8 @@ export async function generateOrientSolEnergyPDFReport(
       : 'INSIGHT TÉCNICO: RECURSO HORIZONTAL Y VARIACIÓN ESTACIONAL',
     [
       isEn
-        ? `Flat Surface Seasonality: Generation on a horizontal surface reaches its minimum in December (${Math.round(energyData.e0_mes[11])} kWh) and its maximum in July (${Math.round(energyData.e0_mes[6])} kWh), with a variation ratio of ${((energyData.e0_mes[6] || 1) / (energyData.e0_mes[11] || 1)).toFixed(2)}x.`
-        : `Estacionalidad de Superficie Plana: La generación sobre superficie horizontal alcanza su mínimo en diciembre (${Math.round(energyData.e0_mes[11])} kWh) y su máximo en julio (${Math.round(energyData.e0_mes[6])} kWh), con un factor de variación de ${((energyData.e0_mes[6] || 1) / (energyData.e0_mes[11] || 1)).toFixed(2)}x.`,
+        ? `Flat Surface Seasonality: Generation on a horizontal surface reaches its minimum in December (${formatInt(Math.round(energyData.e0_mes[11]))} kWh) and its maximum in July (${formatInt(Math.round(energyData.e0_mes[6]))} kWh), with a variation ratio of ${formatNum((energyData.e0_mes[6] || 1) / (energyData.e0_mes[11] || 1), 2)}x.`
+        : `Estacionalidad de Superficie Plana: La generación sobre superficie horizontal alcanza su mínimo en diciembre (${formatInt(Math.round(energyData.e0_mes[11]))} kWh) y su máximo en julio (${formatInt(Math.round(energyData.e0_mes[6]))} kWh), con un factor de variación de ${formatNum((energyData.e0_mes[6] || 1) / (energyData.e0_mes[11] || 1), 2)}x.`,
     ],
     20,
     insE1Y,
@@ -3972,8 +3972,8 @@ export async function generateOrientSolEnergyPDFReport(
       : 'INSIGHT TÉCNICO: APORTE NETO DE LA OPTIMIZACIÓN ENERGÉTICA',
     [
       isEn
-        ? `Cumulative Annual Gain: The selected configuration (${studyTitle}) provides a net annual gain of +${energyData.ganancia_anual.toFixed(1)} kWh compared to a horizontal surface, concentrating the greatest relative gain during winter by intercepting beam irradiance at a lower incident angle.`
-        : `Beneficio Anual Acumulado: La configuración seleccionada (${studyTitle}) genera una ganancia anual neta de +${energyData.ganancia_anual.toFixed(1)} kWh frente a superficie horizontal, concentrándose el mayor beneficio relativo en invierno al captar la radiación directa con menor ángulo de incidencia.`,
+        ? `Cumulative Annual Gain: The selected configuration (${studyTitle}) provides a net annual gain of +${formatNum(energyData.ganancia_anual, 1)} kWh compared to a horizontal surface, concentrating the greatest relative gain during winter by intercepting beam irradiance at a lower incident angle.`
+        : `Beneficio Anual Acumulado: La configuración seleccionada (${studyTitle}) genera una ganancia anual neta de +${formatNum(energyData.ganancia_anual, 1)} kWh frente a superficie horizontal, concentrándose el mayor beneficio relativo en invierno al captar la radiación directa con menor ángulo de incidencia.`,
     ],
     20,
     insE2Y,

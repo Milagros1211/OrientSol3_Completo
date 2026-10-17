@@ -7,7 +7,7 @@ import { buildSeasonalComponentSheet } from '@/components/export/seasonalExportH
 import { buildPolarComponentSheet } from '@/components/export/polarExportHelper';
 import { sanitizeForSpreadsheet } from '@/utils/security';
 import { getNoonAzimuthDeg, getDualAxisNoonTiltDeg, getHorizontalTrackerDailyMeanTiltDeg } from '@/services/solarGeometryAngles';
-import { formatPercent } from '@/utils/formatters';
+import { formatPercent, formatNum, formatInt, formatAngle } from '@/utils/formatters';
 
 const MONTHS_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -466,15 +466,15 @@ export function exportOrientSolMasterExcel(
         Number(avgComp(rSeas).toFixed(3)),
         `Inc: ${avgSeasonalTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
         Number(avgComp(rMth).toFixed(3)),
-        `Inc: ${avgMonthlyTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+        `Inc: ${formatNum(avgMonthlyTilt, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
         Number(avgComp(rPolar).toFixed(3)),
-        `Inc: ${res.latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+        `Inc: ${formatNum(res.latitude, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
         Number(avgComp(rAzim).toFixed(3)),
-        `Inc: ${res.latitude.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`,
+        `Inc: ${formatNum(res.latitude, 1)}° | Ori: ${formatNum(avgDualAzim, 1)}°`,
         Number(avgComp(rHoriz).toFixed(3)),
-        `Inc: ${avgHorizTilt.toFixed(1)}° | Ori: 90.0°`,
+        `Inc: ${formatNum(avgHorizTilt, 1)}° | Ori: 90,0°`,
         Number(avgComp(rDual).toFixed(3)),
-        `Inc: ${avgDualTilt.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`,
+        `Inc: ${formatNum(avgDualTilt, 1)}° | Ori: ${formatNum(avgDualAzim, 1)}°`,
         Number(res.temperatures.ambient.annualMeanC.toFixed(2)),
       ]);
     } else {
@@ -625,9 +625,9 @@ export function exportOrientSolMasterExcel(
     [],
     [
       isEn ? 'OPTIMAL CAPTATION POINT' : 'PUNTO DE MÁXIMA CAPTACIÓN ABSOLUTO',
-      `${isEn ? 'Tilt' : 'Inclinación'} β = ${res.captureLossMap.optimalPoint.betaDeg}°`,
-      `${isEn ? 'Azimuth' : 'Azimut'} α = ${res.captureLossMap.optimalPoint.alphaDeg}°`,
-      `${isEn ? 'Maximum Radiation' : 'Radiación Máxima'} = ${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/d'} (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} ${isEn ? 'kWh/m²·yr' : 'kWh/m²·año'})`,
+      `${isEn ? 'Tilt' : 'Inclinación'} β = ${formatAngle(res.captureLossMap.optimalPoint.betaDeg, 1)}`,
+      `${isEn ? 'Azimuth' : 'Azimut'} α = ${formatAngle(res.captureLossMap.optimalPoint.alphaDeg, 1)}`,
+      `${isEn ? 'Maximum Radiation' : 'Radiación Máxima'} = ${formatNum(res.captureLossMap.optimalPoint.maxDailyRadiationKwh, 3)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/d'} (${formatInt(Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2))} ${isEn ? 'kWh/m²·yr' : 'kWh/m²·año'})`,
     ],
     [],
     [isEn ? 'CTE DB-HE4 LIMITS & SEARCH SPACE COVERAGE' : 'EXIGENCIAS REGLAMENTARIAS CTE DB-HE4 Y COBERTURA DEL ESPACIO ANGULAR'],
@@ -714,7 +714,7 @@ export function exportOrientSolMasterExcel(
   const anglesSheetData: (string | number)[][] = [
     ['ORIENTSOL 4.0 - ' + (isEn ? 'CONTINUOUS RADIATION CURVES (TILT ANGLES 1° TO 90°)' : 'DESARROLLO DE RADIACIÓN EN EL RANGO DE ÁNGULOS 1° A 90°')],
     [isEn ? 'Export Timestamp:' : 'Marca temporal de exportación:', formattedDateTime, '', isEn ? 'ISO Timestamp:' : 'Marca ISO:', isoTimestamp],
-    [sanitizeForSpreadsheet(res.locationName), isEn ? `Latitude: ${res.latitude.toFixed(4)}°` : `Latitud: ${res.latitude.toFixed(4)}°`, isEn ? `Annual Optimum: β = ${optAngle}°` : `Óptimo Anual: β = ${optAngle}°`],
+    [sanitizeForSpreadsheet(res.locationName), isEn ? `Latitude: ${formatNum(res.latitude, 4)}°` : `Latitud: ${formatNum(res.latitude, 4)}°`, isEn ? `Annual Optimum: β = ${formatAngle(optAngle, 1)}` : `Óptimo Anual: β = ${formatAngle(optAngle, 1)}`],
     [],
     [
       isEn ? 'Tilt Angle (°)' : 'Ángulo de Inclinación (°)',

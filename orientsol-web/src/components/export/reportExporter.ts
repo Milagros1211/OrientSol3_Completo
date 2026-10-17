@@ -36,11 +36,11 @@ export function exportToCSV(
   lines.push(`${isEn ? 'Download Date & Time' : 'Fecha y Hora de Descarga'};${downloadDateFormatted}`);
   lines.push(`${isEn ? 'ISO Timestamp' : 'Marca Temporal ISO'};${now.toISOString()}`);
   lines.push(`${isEn ? 'Location' : 'Localidad'};${sanitizeForSpreadsheet(res.locationName)}`);
-  lines.push(`${isEn ? 'Latitude' : 'Latitud'};${res.latitude.toFixed(4)}°`);
-  lines.push(`${isEn ? 'Longitude' : 'Longitud'};${res.longitude.toFixed(4)}°`);
+  lines.push(`${isEn ? 'Latitude' : 'Latitud'};${formatNum(res.latitude, 4)}°`);
+  lines.push(`${isEn ? 'Longitude' : 'Longitud'};${formatNum(res.longitude, 4)}°`);
   lines.push(`${isEn ? 'Data Source' : 'Fuente de Datos'};${sanitizeForSpreadsheet(res.source.toUpperCase())}`);
-  lines.push(`${isEn ? 'PV Peak Power' : 'Potencia Pico FV'};${peakKw.toFixed(2)} kWp`);
-  lines.push(`Performance Ratio (PR);${(pr * 100).toFixed(1)} %`);
+  lines.push(`${isEn ? 'PV Peak Power' : 'Potencia Pico FV'};${formatNum(peakKw, 2)} kWp`);
+  lines.push(`Performance Ratio (PR);${formatPercent(pr * 100, 1)}`);
   lines.push(`${isEn ? 'Execution Engine' : 'Motor de Simulación'};Python 3.14 (Pyodide Python WASM)`);
   lines.push(`${isEn ? 'Calculation Time' : 'Tiempo de Motor'};${res.executionTimeMs} ms`);
   lines.push('');
@@ -115,12 +115,12 @@ export function exportToCSV(
       [
         getSurfaceDisplayName(surf, isEn),
         getCategoryBadge(surf.category, isEn),
-        surf.meanDailyKwhM2.toFixed(3),
-        Math.round(surf.annualRadiationKwhM2),
-        surf.gainOverHorizontalPct.toFixed(2),
-        surf.gainOverAnnualFixedPct.toFixed(2),
-        Math.round(surf.energyProducedOsterwaldKwhYear),
-        surf.meanCellTempDegC.toFixed(1),
+        surf.meanDailyKwhM2 !== null ? formatNum(surf.meanDailyKwhM2, 3) : '',
+        formatInt(Math.round(surf.annualRadiationKwhM2)),
+        formatPercent(surf.gainOverHorizontalPct, 2),
+        formatPercent(surf.gainOverAnnualFixedPct, 2),
+        formatInt(Math.round(surf.energyProducedOsterwaldKwhYear)),
+        formatNum(surf.meanCellTempDegC, 1),
       ].join(';')
     );
   }
@@ -130,11 +130,11 @@ export function exportToCSV(
   lines.push('----------------------------------------------------------------------');
   lines.push(isEn ? 'CTE DB-HE4 CAPTURE LOSS MATRIX SUMMARY' : 'RESUMEN DEL MAPA DE PÉRDIDAS CTE DB-HE4');
   lines.push('----------------------------------------------------------------------');
-  lines.push(`${isEn ? 'Absolute Optimal Point' : 'Punto Óptimo Absoluto'};${isEn ? 'Tilt Beta' : 'Inclinación Beta'} = ${res.captureLossMap.optimalPoint.betaDeg}° | ${isEn ? 'Azimuth Alpha' : 'Acimut Alpha'} = ${res.captureLossMap.optimalPoint.alphaDeg}°`);
-  lines.push(`${isEn ? 'Optimal Radiation' : 'Radiación Óptima'};${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/día'} (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} ${isEn ? 'kWh/m²·yr' : 'kWh/m²·año'})`);
-  lines.push(`${isEn ? 'CTE General Limit (<=10% loss)' : 'Límite General CTE (Pérdida <= 10%)'};${res.captureLossMap.cteZones.generalPctCompliant} ${isEn ? '% of map' : '% del mapa'}`);
-  lines.push(`${isEn ? 'CTE Superposition Limit (<=20% loss)' : 'Superposición CTE (Pérdida <= 20%)'};${res.captureLossMap.cteZones.superpositionPctCompliant} ${isEn ? '% of map' : '% del mapa'}`);
-  lines.push(`${isEn ? 'CTE Integration Limit (<=40% loss)' : 'Integración Arquitectónica CTE (Pérdida <= 40%)'};${res.captureLossMap.cteZones.integrationPctCompliant} ${isEn ? '% of map' : '% del mapa'}`);
+  lines.push(`${isEn ? 'Absolute Optimal Point' : 'Punto Óptimo Absoluto'};${isEn ? 'Tilt Beta' : 'Inclinación Beta'} = ${formatNum(res.captureLossMap.optimalPoint.betaDeg, 1)}° | ${isEn ? 'Azimuth Alpha' : 'Acimut Alpha'} = ${formatNum(res.captureLossMap.optimalPoint.alphaDeg, 1)}°`);
+  lines.push(`${isEn ? 'Optimal Radiation' : 'Radiación Óptima'};${formatNum(res.captureLossMap.optimalPoint.maxDailyRadiationKwh, 3)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/día'} (${formatInt(Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2))} ${isEn ? 'kWh/m²·yr' : 'kWh/m²·año'})`);
+  lines.push(`${isEn ? 'CTE General Limit (<=10% loss)' : 'Límite General CTE (Pérdida <= 10%)'};${formatPercent(res.captureLossMap.cteZones.generalPctCompliant, 1)} ${isEn ? 'of map' : 'del mapa'}`);
+  lines.push(`${isEn ? 'CTE Superposition Limit (<=20% loss)' : 'Superposición CTE (Pérdida <= 20%)'};${formatPercent(res.captureLossMap.cteZones.superpositionPctCompliant, 1)} ${isEn ? 'of map' : 'del mapa'}`);
+  lines.push(`${isEn ? 'CTE Integration Limit (<=40% loss)' : 'Integración Arquitectónica CTE (Pérdida <= 40%)'};${formatPercent(res.captureLossMap.cteZones.integrationPctCompliant, 1)} ${isEn ? 'of map' : 'del mapa'}`);
 
   const csvContent = BOM + lines.join('\r\n');
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

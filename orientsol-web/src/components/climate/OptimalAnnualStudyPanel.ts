@@ -15,7 +15,7 @@ import {
 } from '@/components/export/pdfReportGenerator';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { renderCaptureLossMapSection } from '@/components/climate/CaptureLossMapSection';
-import { formatNum, formatInt } from '@/utils/formatters';
+import { formatNum, formatInt, formatPercent } from '@/utils/formatters';
 
 export type RadiationComponentType = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 export type TableRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
@@ -857,12 +857,12 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
                 ${stateComparisonMode ? `<td class="td-num td-col-anglex"><strong>${formatNum(meanX, 2)}</strong></td>` : ''}
                 <td class="td-num td-col-temp"><strong>${formatNum(tempMeanAnnual, 1)}</strong></td>
                 <td class="td-num td-gain-factor" title="${isEn ? 'Annual Resource Gain Factor' : 'Factor de ganancia anual del recurso'}"><strong>${isAlbedo ? '-' : formatNum(meanFactorHoriz, 2)}</strong></td>
-                <td class="td-num td-gain-pct ${!isAlbedo && annualGainVsHorizPct >= 0 ? 'text-gain-pos' : !isAlbedo ? 'text-gain-neg' : ''}" title="${isEn ? `Annual Resource Gain: ${annualGainVsHorizPct >= 0 ? '+' : ''}${annualGainVsHorizPct.toFixed(2)}% (Monthly unweighted avg: ${meanPctHoriz >= 0 ? '+' : ''}${meanPctHoriz.toFixed(2)}%)` : `Ganancia anual del recurso: ${annualGainVsHorizPct >= 0 ? '+' : ''}${annualGainVsHorizPct.toFixed(2)}% (Media mensual sin ponderar: ${meanPctHoriz >= 0 ? '+' : ''}${meanPctHoriz.toFixed(2)}%)`}"><strong>${isAlbedo ? '-' : `${annualGainVsHorizPct >= 0 ? '+' : ''}${formatNum(annualGainVsHorizPct, 2)}%`}</strong></td>
+                <td class="td-num td-gain-pct ${!isAlbedo && annualGainVsHorizPct >= 0 ? 'text-gain-pos' : !isAlbedo ? 'text-gain-neg' : ''}" title="${isEn ? `Annual Resource Gain: ${formatPercent(annualGainVsHorizPct, 2, true)} (Monthly unweighted avg: ${formatPercent(meanPctHoriz, 2, true)})` : `Ganancia anual del recurso: ${formatPercent(annualGainVsHorizPct, 2, true)} (Media mensual sin ponderar: ${formatPercent(meanPctHoriz, 2, true)})`}"><strong>${isAlbedo ? '-' : formatPercent(annualGainVsHorizPct, 2, true)}</strong></td>
                 ${
                   stateComparisonMode
                     ? `
                   <td class="td-num td-gain-factor-x"><strong>${formatNum(meanFactorX, 2)}</strong></td>
-                  <td class="td-num td-gain-pct-x ${meanPctX >= 0 ? 'text-gain-pos' : 'text-gain-neg'}"><strong>${meanPctX >= 0 ? '+' : ''}${formatNum(meanPctX, 2)}</strong></td>
+                  <td class="td-num td-gain-pct-x ${meanPctX >= 0 ? 'text-gain-pos' : 'text-gain-neg'}"><strong>${formatPercent(meanPctX, 2, true)}</strong></td>
                 `
                     : ''
                 }
