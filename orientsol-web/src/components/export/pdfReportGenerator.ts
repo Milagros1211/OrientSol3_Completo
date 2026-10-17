@@ -143,12 +143,15 @@ function sanitizePdfText(text: string): string {
     .replace(/[▲\u25B2]/g, '')
     .replace(/[▼\u25BC]/g, '')
     .replace(/β/g, 'Inc')
-    .replace(/γ/g, 'gamma')
-    .replace(/δ/g, 'delta')
-    .replace(/α/g, 'alfa')
-    .replace(/ψ/g, 'psi')
-    .replace(/λ/g, 'lambda')
-    .replace(/θ/g, 'theta')
+    .replace(/[γ\u03B3]/g, 'gamma')
+    .replace(/[δ\u03B4]/g, 'delta')
+    .replace(/[α\u03B1]/g, 'alfa')
+    .replace(/[ψ\u03C8]/g, 'psi')
+    .replace(/[λ\u03BB]/g, 'lambda')
+    .replace(/[θ\u03B8]/g, 'theta')
+    .replace(/[∫\u222B]/g, 'integral')
+    .replace(/[≈\u2248]/g, '~')
+    .replace(/[≠\u2260]/g, '!=')
     .replace(/±/g, '+/-')
     .replace(/≤/g, '<=')
     .replace(/≥/g, '>=')
@@ -184,9 +187,15 @@ function drawTextWithSubscripts(
   // In jsPDF mm units: baseline shift for subscript is ~28% of base font size in mm (1 pt = 0.3528 mm)
   const subYShift = baseFontSize * 0.3528 * 0.28;
 
+  // Sanitize all text segments before measurement and rendering to guarantee clean ASCII output
+  const cleanSegments = segments.map((seg) => ({
+    ...seg,
+    text: sanitizePdfText(seg.text),
+  }));
+
   // 1. Measure total width
   let totalW = 0;
-  segments.forEach((seg) => {
+  cleanSegments.forEach((seg) => {
     const isBold = seg.bold !== undefined ? seg.bold : defaultFontBold;
     doc.setFont(currentFontName, isBold ? 'bold' : 'normal');
     doc.setFontSize(seg.isSub ? subFontSize : baseFontSize);
@@ -202,7 +211,7 @@ function drawTextWithSubscripts(
   }
 
   // 3. Render each segment with appropriate style and baseline offset
-  segments.forEach((seg) => {
+  cleanSegments.forEach((seg) => {
     const isBold = seg.bold !== undefined ? seg.bold : defaultFontBold;
     doc.setFont(currentFontName, isBold ? 'bold' : 'normal');
     doc.setFontSize(seg.isSub ? subFontSize : baseFontSize);
@@ -221,7 +230,7 @@ function drawTextWithSubscripts(
 
 /**
  * Renders an elegant highlighted insights callout card with icon, title, and bullet points,
- * calculating dynamic height to strictly prevent bottom border clipping.
+ * calculating dynamic height and line-wrapping to strictly prevent horizontal cutoffs or border clipping.
  */
 function drawPdfInsightBox(
   doc: jsPDF,
@@ -237,20 +246,33 @@ function drawPdfInsightBox(
   const cleanTitle = sanitizePdfText(title);
   const cleanPoints = points.map((p) => sanitizePdfText(p));
 
-  const textStartX = x + 8;
-  const maxTextW = w - 26; // 144mm for w=170, leaving 18mm safe right buffer before the 190mm border
+  const isCompactBox = w < 100;
+  const textStartX = isCompactBox ? x + 7.5 : x + 8;
+  // Available width spans virtually the entire box width leaving a comfortable 4mm padding on the right
+  const maxTextW = Math.max(30, w - 11);
 
   // Pre-calculate line wrapping with the EXACT font and size used for rendering
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(6.5);
+  const bodyFontSize = isCompactBox ? 5.8 : 6.5;
+  doc.setFontSize(bodyFontSize);
   const wrappedList: string[][] = cleanPoints.map((pt) => {
     const bulletText = `- ${pt}`;
     return doc.splitTextToSize(bulletText, maxTextW);
   });
 
+  // Title wrapping for compact / half-width cards
+  const titleFontSize = isCompactBox ? 6.8 : 7.5;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(titleFontSize);
+  const titleLines: string[] = doc.splitTextToSize(cleanTitle, maxTextW);
+
   const totalLines = wrappedList.reduce((acc, lines) => acc + lines.length, 0);
-  const lineSpacing = 3.3;
-  let calculatedH = Math.max(minH, 12 + totalLines * lineSpacing + (cleanPoints.length - 1) * 1.8 + 4);
+  const lineSpacing = isCompactBox ? 2.9 : 3.3;
+  const titleSpacing = 3.3;
+  let calculatedH = Math.max(
+    minH,
+    6 + titleLines.length * titleSpacing + 2 + totalLines * lineSpacing + (cleanPoints.length - 1) * 1.5 + 4
+  );
 
   // If box bottom would exceed page limit, clamp height and adjust text spacing
   if (y + calculatedH > maxAllowedY) {
@@ -263,18 +285,24 @@ function drawPdfInsightBox(
   doc.roundedRect(x, y, w, calculatedH, 2, 2, 'FD');
 
   doc.setFillColor(2, 132, 199);
-  doc.roundedRect(x + 3, y + 3, 3.5, calculatedH - 6, 1, 1, 'F');
+  doc.roundedRect(x + 2.5, y + 2.5, 3.0, calculatedH - 5, 0.8, 0.8, 'F');
 
+  // Draw Title Lines
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
+  doc.setFontSize(titleFontSize);
   doc.setTextColor(3, 105, 161);
-  doc.text(cleanTitle, textStartX, y + 6.8);
+  let titleCurY = y + 5.8;
+  for (const tLine of titleLines) {
+    doc.text(tLine, textStartX, titleCurY);
+    titleCurY += titleSpacing;
+  }
 
+  // Draw Body Bullets
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(6.5);
+  doc.setFontSize(bodyFontSize);
   doc.setTextColor(30, 41, 59);
 
-  let textY = y + 11.5;
+  let textY = Math.max(y + 10.5, titleCurY + 0.8);
   for (const lines of wrappedList) {
     for (const l of lines) {
       if (textY < y + calculatedH - 2) {
@@ -282,7 +310,7 @@ function drawPdfInsightBox(
         textY += lineSpacing;
       }
     }
-    textY += 1.2;
+    textY += isCompactBox ? 1.0 : 1.2;
   }
 
   return calculatedH;
@@ -579,7 +607,7 @@ export async function generateOrientSolPDFReport(
   const drawPageChrome = (chapterTitle: string, pageNum: number, totalPages: number) => {
     drawOrientSolPageChrome(doc, {
       chapterTitle,
-      subHeader: `OrientSol 4.0 • ${cleanStudyName} • ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`,
+      subHeader: `OrientSol 4.0 • ${cleanStudyName} • ${res.locationName} (Lat: ${formatNum(res.latitude, 2)}°)`,
       pageNum,
       totalPages,
       formattedDateTime,
@@ -612,14 +640,14 @@ export async function generateOrientSolPDFReport(
   doc.setFontSize(18);
   doc.setTextColor(248, 250, 252);
   const bannerTitle = isEn
-    ? `OrientSol 4.0 Results: ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`
-    : `Resultados OrientSol 4.0: ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`;
+    ? `OrientSol 4.0 Results: ${res.locationName} (Lat: ${formatNum(res.latitude, 2)}°)`
+    : `Resultados OrientSol 4.0: ${res.locationName} (Lat: ${formatNum(res.latitude, 2)}°)`;
   const bannerLines = doc.splitTextToSize(sanitizePdfText(bannerTitle), 170);
   if (bannerLines.length > 1) {
-    doc.text(bannerLines[0], 20, 16);
-    doc.text(bannerLines[1], 20, 23);
+    doc.text(bannerLines[0], 20, 15);
+    doc.text(bannerLines[1], 20, 22);
   } else {
-    doc.text(bannerLines[0] || '', 20, 20);
+    doc.text(bannerLines[0] || '', 20, 19);
   }
 
   doc.setFont('helvetica', 'normal');
@@ -629,21 +657,36 @@ export async function generateOrientSolPDFReport(
     ? `Solar Radiation & PV Simulation Report • MATLAB to Web & Desktop Migration`
     : `Informe Técnico de Simulación Solar y Fotovoltaica • Migración MATLAB a Web & Desktop`;
   const subBannerLines = doc.splitTextToSize(subBanner, 170);
-  doc.text(subBannerLines[0] || '', 20, 28);
+  doc.text(subBannerLines[0] || '', 20, bannerLines.length > 1 ? 27.5 : 26.5);
 
-  // Prominent Timestamp Pill
-  doc.setFillColor(30, 41, 59);
-  doc.roundedRect(20, 31, 170, 7, 1.5, 1.5, 'F');
+  // Prominent Timestamp Pill with WRAPPED TEXT & Dynamic Scaling
+  const auditText = isEn
+    ? `TIMESTAMP AUDIT RECORD: Exported on ${formattedDateTime} (ISO: ${isoTimestamp}) • Engine: Python 3.14 WASM (${res.executionTimeMs} ms)`
+    : `REGISTRO OFICIAL DE AUDITORÍA: Exportado el ${formattedDateTime} (ISO: ${isoTimestamp}) • Motor: Python 3.14 WASM (${res.executionTimeMs} ms)`;
+  const cleanAuditText = sanitizePdfText(auditText);
+  let pillFontSize = 7.0;
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
+  doc.setFontSize(pillFontSize);
+  while (doc.getTextWidth(cleanAuditText) > 164 && pillFontSize > 5.4) {
+    pillFontSize -= 0.2;
+    doc.setFontSize(pillFontSize);
+  }
+  const pillLines: string[] = doc.splitTextToSize(cleanAuditText, 164);
+  const pillH = pillLines.length > 1 ? 8.5 : 7.0;
+  const pillY = bannerLines.length > 1 ? 31.5 : 31.0;
+
+  doc.setFillColor(30, 41, 59);
+  doc.roundedRect(20, pillY, 170, pillH, 1.5, 1.5, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(pillFontSize);
   doc.setTextColor(56, 189, 248);
-  doc.text(
-    isEn
-      ? `TIMESTAMP AUDIT RECORD: Exported on ${formattedDateTime} (ISO: ${isoTimestamp}) • Engine: Python 3.14 WASM (${res.executionTimeMs} ms)`
-      : `REGISTRO OFICIAL DE AUDITORÍA: Exportado el ${formattedDateTime} (ISO: ${isoTimestamp}) • Motor: Python 3.14 WASM (${res.executionTimeMs} ms)`,
-    23,
-    35.8
-  );
+
+  if (pillLines.length === 1) {
+    doc.text(pillLines[0], 23, pillY + 4.8);
+  } else {
+    doc.text(pillLines[0], 23, pillY + 3.6);
+    if (pillLines[1]) doc.text(pillLines[1], 23, pillY + 7.0);
+  }
 
   // -------------------------------------------------------------
   // 4 TARJETAS DE TEMPERATURA AMBIENTAL Y CÉLULA OPERATIVA (Imagen 1)
@@ -925,7 +968,7 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Location' : 'Localidad'}:`, c1LabX, paramsY + 15);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${res.locationName} (${res.latitude.toFixed(2)}° N)`, c1ValX, paramsY + 15);
+  doc.text(`${res.locationName} (${formatNum(res.latitude, 2)}° N)`, c1ValX, paramsY + 15);
 
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Data Source' : 'Fuente de Datos'}:`, c2LabX, paramsY + 15);
@@ -936,29 +979,29 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Peak Power' : 'Potencia Pico'}:`, c1LabX, paramsY + 23);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${peakKw.toFixed(2)} kWp`, c1ValX, paramsY + 23);
+  doc.text(`${formatNum(peakKw, 2)} kWp`, c1ValX, paramsY + 23);
 
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Performance Ratio' : 'Rendimiento (PR)'}:`, c2LabX, paramsY + 23);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${(pr * 100).toFixed(0)}%`, c2ValX, paramsY + 23);
+  doc.text(`${formatNum(pr * 100, 0)}%`, c2ValX, paramsY + 23);
 
   // Row 3
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Module NOCT' : 'TONC Módulos'}:`, c1LabX, paramsY + 31);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${tonc.toFixed(1)} °C (g: -0.40%/°C)`, c1ValX, paramsY + 31);
+  doc.text(`${formatNum(tonc, 1)} °C (gamma: ${formatNum(coefTemp * 100, 2)}%/°C)`, c1ValX, paramsY + 31);
 
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Collector Area' : 'Sup. Captación'}:`, c2LabX, paramsY + 31);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${res.energyYield.collectorAreaM2.toFixed(1)} m²`, c2ValX, paramsY + 31);
+  doc.text(`${formatNum(res.energyYield.collectorAreaM2, 1)} m²`, c2ValX, paramsY + 31);
 
   // Row 4
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Fixed Optimal Tilt' : 'Inclinación Óptima'}:`, c1LabX, paramsY + 39);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${optAngle}° (+${res.optimalAnnual.gainOverHorizontalPct.toFixed(1)}% vs Horiz)`, c1ValX, paramsY + 39);
+  doc.text(`${formatNum(optAngle, 1)}° (+${formatNum(res.optimalAnnual.gainOverHorizontalPct, 1)}% vs Horiz)`, c1ValX, paramsY + 39);
 
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Study' : 'Estudio'}:`, c2LabX, paramsY + 39);
@@ -1349,7 +1392,7 @@ export async function generateOrientSolPDFReport(
   doc.setFillColor(220, 38, 38);
   doc.circle(pTcMax.x, pTcMax.y, 1.4, 'F');
   
-  const tcMaxLabel = ` ${isEn ? 'MAX' : 'MÁX'}: ${maxTcVal.toFixed(1)}°C`;
+  const tcMaxLabel = ` ${isEn ? 'MAX' : 'MÁX'}: ${formatNum(maxTcVal, 1)}°C`;
   const tcPillW = 20.0;
   doc.setFillColor(255, 255, 255);
   doc.setDrawColor(254, 202, 202);
@@ -1376,18 +1419,18 @@ export async function generateOrientSolPDFReport(
   const radAnnMax = Math.max(...res.optimalAnnual.monthlyDailyKwh);
   const radAnnMin = Math.min(...res.optimalAnnual.monthlyDailyKwh);
   const thermLossKwh = Math.abs(Math.round(res.energyYield.producida.osterwald.thermalLossKwh));
-  const thermLossPct = Math.abs(res.energyYield.producida.osterwald.thermalLossPct).toFixed(2);
+  const thermLossPct = formatNum(Math.abs(res.energyYield.producida.osterwald.thermalLossPct), 2);
 
   drawInsightBox(
     isEn ? 'KEY TECHNICAL INSIGHTS: SOLAR DYNAMICS & THERMAL BEHAVIOR' : 'INSIGHTS TÉCNICOS DESTACADOS: DINÁMICA SOLAR Y COMPORTAMIENTO TÉRMICO',
     isEn
       ? [
-          `Seasonal Variation & Leveling: Incident solar resource exhibits marked seasonality (peak ${radAnnMax.toFixed(2)} kWh/m²/d vs ${radAnnMin.toFixed(2)} kWh/m²/d in December). Angular adaptation in autumn and winter boosts collection by up to +40% over a horizontal plane, bridging the seasonal electricity generation gap.`,
-          `Thermal Derating from Cell Heating: During summer, operating cell temperature reaches means of ${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)}°C (peak ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)}°C). With gamma = -0.40%/°C, thermal losses reach -${thermLossKwh} kWh/yr (-${thermLossPct}%), making spring months (April-May) achieve the highest net electrical efficiency.`,
+          `Seasonal Variation & Leveling: Incident solar resource exhibits marked seasonality (peak ${formatNum(radAnnMax, 2)} kWh/m²/d vs ${formatNum(radAnnMin, 2)} kWh/m²/d in December). Angular adaptation in autumn and winter boosts collection by up to +40% over a horizontal plane, bridging the seasonal electricity generation gap.`,
+          `Thermal Derating from Cell Heating: During summer, operating cell temperature reaches means of ${formatNum(res.temperatures.cellOperating.meanCellTempOptimalC, 1)}°C (peak ${formatNum(res.temperatures.cellOperating.maxCellTempOptimalC, 1)}°C). With gamma = -0.40%/°C, thermal losses reach -${thermLossKwh} kWh/yr (-${thermLossPct}%), making spring months (April-May) achieve the highest net electrical efficiency.`,
         ]
       : [
-          `Variación Estacional y Nivelación: El recurso solar incidente presenta una acusada estacionalidad (pico estival de ${radAnnMax.toFixed(2)} kWh/m²/d vs ${radAnnMin.toFixed(2)} kWh/m²/d en invierno). La adaptación angular en otoño e invierno incrementa la captación hasta un +40% respecto a superficie horizontal, reduciendo la brecha estacional de generación eléctrica.`,
-          `Derating Térmico por Calentamiento de Célula: Durante el estío, la temperatura de célula operativa alcanza medias de ${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)}°C (pico de ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)}°C). Con γ = -0.40%/°C, las pérdidas térmicas ascienden a -${thermLossKwh} kWh/año (-${thermLossPct}%), haciendo que los meses primaverales (abril-mayo) presenten la mayor eficiencia neta.`,
+          `Variación Estacional y Nivelación: El recurso solar incidente presenta una acusada estacionalidad (pico estival de ${formatNum(radAnnMax, 2)} kWh/m²/d vs ${formatNum(radAnnMin, 2)} kWh/m²/d en invierno). La adaptación angular en otoño e invierno incrementa la captación hasta un +40% respecto a superficie horizontal, reduciendo la brecha estacional de generación eléctrica.`,
+          `Derating Térmico por Calentamiento de Célula: Durante el estío, la temperatura de célula operativa alcanza medias de ${formatNum(res.temperatures.cellOperating.meanCellTempOptimalC, 1)}°C (pico de ${formatNum(res.temperatures.cellOperating.maxCellTempOptimalC, 1)}°C). Con gamma = -0,40%/°C, las pérdidas térmicas ascienden a -${thermLossKwh} kWh/año (-${thermLossPct}%), haciendo que los meses primaverales (abril-mayo) presenten la mayor eficiencia neta.`,
         ],
     20,
     ins1Y,
@@ -3474,7 +3517,7 @@ export async function generateOrientSolEnergyPDFReport(
   const drawPageChrome = (chapterTitle: string, pageNum: number, totalPages: number) => {
     drawOrientSolPageChrome(doc, {
       chapterTitle,
-      subHeader: `OrientSol 4.0 • ${cleanStudyTitle} • ${res.locationName} (Lat: ${res.latitude.toFixed(2)}°)`,
+      subHeader: `OrientSol 4.0 • ${cleanStudyTitle} • ${res.locationName} (Lat: ${formatNum(res.latitude, 2)}°)`,
       pageNum,
       totalPages,
       formattedDateTime: downloadDateFormatted,
@@ -3600,7 +3643,7 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Latitude' : 'Latitud'}:`, 110, 146);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${res.latitude.toFixed(4)}°`, 135, 146);
+  doc.text(`${formatNum(res.latitude, 4)}°`, 135, 146);
 
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Study' : 'Estudio'}:`, 25, 154);
@@ -3616,17 +3659,17 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Installed peak power' : 'Potencia pico instalada'}:`, 25, 162);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${peakKw} kWp`, 80, 162);
+  doc.text(`${formatNum(peakKw, 2)} kWp`, 80, 162);
 
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Temperature coefficient' : 'Coeficiente de temperatura'} (gamma):`, 25, 170);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${coefTemp} 1/°C`, 85, 170);
+  doc.text(`${formatNum(coefTemp, 4)} 1/°C`, 85, 170);
 
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'NOCT / TONC' : 'TONC'}:`, 25, 178);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${tonc} °C`, 85, 178);
+  doc.text(`${formatNum(tonc, 1)} °C`, 85, 178);
 
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Export timestamp' : 'Marca temporal de exportación'}:`, 25, 186);
@@ -3689,13 +3732,13 @@ export async function generateOrientSolEnergyPDFReport(
     doc.setFontSize(8);
     doc.setTextColor(30, 41, 59);
     doc.text(months[i], 23, curY + 4);
-    doc.text(energyData.e0_mes[i].toFixed(2), 65, curY + 4);
-    doc.text(energyData.e_mes[i].toFixed(2), 120, curY + 4);
+    doc.text(formatNum(energyData.e0_mes[i], 2), 65, curY + 4);
+    doc.text(formatNum(energyData.e_mes[i], 2), 120, curY + 4);
 
     const g = energyData.ganancia_mes[i];
     if (g >= 0) doc.setTextColor(16, 185, 129);
     else doc.setTextColor(239, 68, 68);
-    doc.text(`${g >= 0 ? '+' : ''}${g.toFixed(2)}`, 165, curY + 4);
+    doc.text(`${g >= 0 ? '+' : ''}${formatNum(g, 2)}`, 165, curY + 4);
 
     curY += 5.5;
   }
@@ -3707,9 +3750,9 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setFontSize(8.5);
   doc.setTextColor(255, 255, 255);
   doc.text(isEn ? 'ANNUAL' : 'ANUAL', 23, curY + 4.5);
-  doc.text(energyData.e0_anual.toFixed(1), 65, curY + 4.5);
-  doc.text(energyData.e_anual.toFixed(1), 120, curY + 4.5);
-  doc.text(`${energyData.ganancia_anual >= 0 ? '+' : ''}${energyData.ganancia_anual.toFixed(2)}`, 165, curY + 4.5);
+  doc.text(formatNum(energyData.e0_anual, 1), 65, curY + 4.5);
+  doc.text(formatNum(energyData.e_anual, 1), 120, curY + 4.5);
+  doc.text(`${energyData.ganancia_anual >= 0 ? '+' : ''}${formatNum(energyData.ganancia_anual, 2)}`, 165, curY + 4.5);
 
   // Figura 2.1: Gráfica de energía horizontal
   const chart1Y = curY + 14;
