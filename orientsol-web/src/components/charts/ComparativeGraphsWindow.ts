@@ -2,6 +2,7 @@ import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { getMonthlyRadiationForAngle } from '@/components/climate/OptimalAnnualStudyPanel';
 import { themeManager } from '@/services/theme/themeManager';
+import { formatNum } from '@/utils/formatters';
 
 export type RadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
 export type GraphType = 'lines' | 'bars';
@@ -95,7 +96,7 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
             </div>
             <div style="font-size: 0.88rem; color: ${textMuted}; margin-top: 0.25rem;">
               <span>${isEn ? 'City:' : 'Ciudad:'} <strong style="color: #38bdf8;">${locationName}</strong></span>
-              <span style="margin-left: 1.5rem;">${isEn ? 'Latitude (°):' : 'Latitud (°):'} <strong style="color: #38bdf8;">${latitude.toFixed(2)}</strong></span>
+              <span style="margin-left: 1.5rem;">${isEn ? 'Latitude (°):' : 'Latitud (°):'} <strong style="color: #38bdf8;">${formatNum(latitude, 2)}</strong></span>
             </div>
           </div>
           <div style="font-size: 1.35rem; font-weight: 900; letter-spacing: 0.5px; color: #0284c7;">
@@ -225,13 +226,13 @@ export function renderComparativeGraphsWindow(props: ComparativeGraphsProps): HT
           ${title}
         </div>
         <div style="padding: 0.3rem 0.5rem; display: flex; justify-content: space-between; background: ${row1Bg}; font-family: monospace;">
-          <span>mín</span><strong>${s.min.toFixed(2)}</strong>
+          <span>mín</span><strong>${formatNum(s.min, 2)}</strong>
         </div>
         <div style="padding: 0.3rem 0.5rem; display: flex; justify-content: space-between; background: ${row2Bg}; font-family: monospace;">
-          <span>med</span><strong>${s.med.toFixed(2)}</strong>
+          <span>med</span><strong>${formatNum(s.med, 2)}</strong>
         </div>
         <div style="padding: 0.3rem 0.5rem; display: flex; justify-content: space-between; background: ${row3Bg}; font-family: monospace;">
-          <span>máx</span><strong>${s.max.toFixed(2)}</strong>
+          <span>máx</span><strong>${formatNum(s.max, 2)}</strong>
         </div>
       </div>
     `;

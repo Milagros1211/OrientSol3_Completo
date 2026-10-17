@@ -6,6 +6,7 @@ import {
 } from '@/services/bridge/solarCalculationBridge';
 import type { ClimateDataRecord, ClimateSourceType } from '@/types/climate';
 import { i18n } from '@/i18n';
+import { formatNum, formatInt } from '@/utils/formatters';
 
 const CITY_PRESETS = [
   { name: 'Madrid (España)', lat: 40.4168, lon: -3.7038 },
@@ -308,20 +309,20 @@ export function renderClimateIntegrationPanel(): HTMLElement {
           <span class="badge badge-source">${record.source.toUpperCase()}</span>
         </div>
         <div class="card-meta">
-          <span>${t.location.latitude}: ${record.latitude.toFixed(4)}°</span>
-          <span>${t.location.longitude}: ${record.longitude.toFixed(4)}°</span>
-          <span>${t.location.elevation}: ${record.elevationM ?? 'N/D'} m</span>
+          <span>${t.location.latitude}: ${formatNum(record.latitude, 4)}°</span>
+          <span>${t.location.longitude}: ${formatNum(record.longitude, 4)}°</span>
+          <span>${t.location.elevation}: ${record.elevationM != null ? formatInt(record.elevationM) : 'N/D'} m</span>
         </div>
       </div>
 
       <div class="climate-kpis-grid">
         <div class="kpi-box">
           <span class="kpi-label">${t.externalClimate.annualGdm0}</span>
-          <span class="kpi-val">${annualGdm0.toFixed(2)} <small>kWh/m²/día</small></span>
+          <span class="kpi-val">${formatNum(annualGdm0, 2)} <small>kWh/m²/día</small></span>
         </div>
         <div class="kpi-box">
           <span class="kpi-label">${t.externalClimate.annualTemp}</span>
-          <span class="kpi-val">${annualTemp.toFixed(1)} <small>°C</small></span>
+          <span class="kpi-val">${formatNum(annualTemp, 1)} <small>°C</small></span>
         </div>
       </div>
 
@@ -336,11 +337,11 @@ export function renderClimateIntegrationPanel(): HTMLElement {
           <tbody>
             <tr>
               <td class="row-label">G<sub>dm</sub>(0) [kWh/m²/d]</td>
-              ${record.monthlyGdm0.map((v) => `<td>${v.toFixed(2)}</td>`).join('')}
+              ${record.monthlyGdm0.map((v) => `<td>${formatNum(v, 2)}</td>`).join('')}
             </tr>
             <tr>
               <td class="row-label">T<sub>amb</sub> [°C]</td>
-              ${record.monthlyTemperature.map((t) => `<td>${t.toFixed(1)}</td>`).join('')}
+              ${record.monthlyTemperature.map((t) => `<td>${formatNum(t, 1)}</td>`).join('')}
             </tr>
           </tbody>
         </table>
@@ -356,7 +357,7 @@ export function renderClimateIntegrationPanel(): HTMLElement {
           <span class="badge badge-success">${t.results.pythonSuccess}</span>
           <span class="badge badge-neutral">${res.executionTimeMs} ms</span>
         </div>
-        <h3>${t.results.resultsFor.replace('{location}', res.locationName).replace('{lat}', res.latitude.toFixed(2))}</h3>
+        <h3>${t.results.resultsFor.replace('{location}', res.locationName).replace('{lat}', formatNum(res.latitude, 2))}</h3>
       </div>
 
       <div class="results-section-grid">
@@ -366,44 +367,44 @@ export function renderClimateIntegrationPanel(): HTMLElement {
             <span class="tag-optimum">${res.optimalAnnual.optimalTiltDeg}°</span>
           </div>
           <div class="result-stat-main">
-            <span class="stat-highlight">${res.optimalAnnual.annualMeanDailyKwh.toFixed(2)}</span>
+            <span class="stat-highlight">${formatNum(res.optimalAnnual.annualMeanDailyKwh, 2)}</span>
             <span class="stat-unit">kWh/m²/día</span>
           </div>
           <div class="result-stat-sub">
             <span>${t.results.gainOverHoriz}</span>
-            <strong class="text-gain">+${res.optimalAnnual.gainOverHorizontalPct.toFixed(2)}%</strong>
+            <strong class="text-gain">+${formatNum(res.optimalAnnual.gainOverHorizontalPct, 2)}%</strong>
           </div>
           <div class="result-stat-sub">
             <span>${t.results.annualTotalRad}</span>
-            <strong>${Math.round(res.optimalAnnual.annualTotalKwh)} kWh/m²·año</strong>
+            <strong>${formatInt(Math.round(res.optimalAnnual.annualTotalKwh))} kWh/m²·año</strong>
           </div>
         </div>
 
         <div class="result-card">
           <div class="result-card-header">
             <h4>${t.results.seasonalTitle}</h4>
-            <span class="text-gain">+${res.seasonal.gainOverOptimalAnnualPct.toFixed(2)}% ${t.results.vsFixed}</span>
+            <span class="text-gain">+${formatNum(res.seasonal.gainOverOptimalAnnualPct, 2)}% ${t.results.vsFixed}</span>
           </div>
           <div class="seasonal-angles-list">
             <div class="seasonal-item">
               <span class="season-badge winter">${t.results.winter}</span>
               <strong class="season-deg">${res.seasonal.winterTiltDeg}°</strong>
-              <span class="season-rad">${res.seasonal.winterMeanDailyKwh.toFixed(2)} kWh/m²/d</span>
+              <span class="season-rad">${formatNum(res.seasonal.winterMeanDailyKwh, 2)} kWh/m²/d</span>
             </div>
             <div class="seasonal-item">
               <span class="season-badge spring">${t.results.spring}</span>
               <strong class="season-deg">${res.seasonal.springTiltDeg}°</strong>
-              <span class="season-rad">${res.seasonal.springMeanDailyKwh.toFixed(2)} kWh/m²/d</span>
+              <span class="season-rad">${formatNum(res.seasonal.springMeanDailyKwh, 2)} kWh/m²/d</span>
             </div>
             <div class="seasonal-item">
               <span class="season-badge summer">${t.results.summer}</span>
               <strong class="season-deg">${res.seasonal.summerTiltDeg}°</strong>
-              <span class="season-rad">${res.seasonal.summerMeanDailyKwh.toFixed(2)} kWh/m²/d</span>
+              <span class="season-rad">${formatNum(res.seasonal.summerMeanDailyKwh, 2)} kWh/m²/d</span>
             </div>
             <div class="seasonal-item">
               <span class="season-badge autumn">${t.results.autumn}</span>
               <strong class="season-deg">${res.seasonal.autumnTiltDeg}°</strong>
-              <span class="season-rad">${res.seasonal.autumnMeanDailyKwh.toFixed(2)} kWh/m²/d</span>
+              <span class="season-rad">${formatNum(res.seasonal.autumnMeanDailyKwh, 2)} kWh/m²/d</span>
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalcula
 import { themeManager } from '@/services/theme/themeManager';
 import { renderWrappedSvgTitle } from './chartSvgUtils';
 import { showAlbedoWarningModal } from '@/components/modals/AlbedoWarningModal';
+import { formatNum } from '@/utils/formatters';
 
 export type TrackingGraphComponentChoice = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -423,7 +424,7 @@ export function renderTrackingAzimuthalGraphsWindow(props: TrackingAzimuthalGrap
               <span class="meta-label"><strong>${isEn ? 'City:' : 'Ciudad:'}</strong> ${locationName}</span>
               <span class="meta-label" style="margin-left: 2rem;">
                 <strong>${isEn ? 'Latitude (°):' : 'Latitud (°):'}</strong>
-                <span style="color: #38bdf8; font-weight: 700;">${latitude.toFixed(2)}</span>
+                <span style="color: #38bdf8; font-weight: 700;">${formatNum(latitude, 2)}</span>
               </span>
             </div>
             <div class="opt-graphs-study-row">
@@ -482,15 +483,15 @@ export function renderTrackingAzimuthalGraphsWindow(props: TrackingAzimuthalGrap
                 <div class="stat-frame-title title-opt">${isEn ? 'Azimuthal tracking' : 'Seguimiento azimutal'}</div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Maximum' : 'Máximo'}</span>
-                  <strong>${maxVal(radAzim).toFixed(2)}</strong>
+                  <strong>${formatNum(maxVal(radAzim), 2)}</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Minimum' : 'Mínimo'}</span>
-                  <strong>${minVal(radAzim).toFixed(2)}</strong>
+                  <strong>${formatNum(minVal(radAzim), 2)}</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Mean' : 'Media'}</span>
-                  <strong>${meanVal(radAzim).toFixed(2)}</strong>
+                  <strong>${formatNum(meanVal(radAzim), 2)}</strong>
                 </div>
               </div>
 
@@ -498,15 +499,15 @@ export function renderTrackingAzimuthalGraphsWindow(props: TrackingAzimuthalGrap
                 <div class="stat-frame-title title-horiz">${isEn ? 'Horizontal surface (0°)' : 'Superficie horizontal (0°)'}</div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Maximum' : 'Máximo'}</span>
-                  <strong>${maxVal(rad0).toFixed(2)}</strong>
+                  <strong>${formatNum(maxVal(rad0), 2)}</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Minimum' : 'Mínimo'}</span>
-                  <strong>${minVal(rad0).toFixed(2)}</strong>
+                  <strong>${formatNum(minVal(rad0), 2)}</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Mean' : 'Media'}</span>
-                  <strong>${meanVal(rad0).toFixed(2)}</strong>
+                  <strong>${formatNum(meanVal(rad0), 2)}</strong>
                 </div>
               </div>
 
@@ -514,15 +515,15 @@ export function renderTrackingAzimuthalGraphsWindow(props: TrackingAzimuthalGrap
                 <div class="stat-frame-title title-gain">${isEn ? 'Gain vs 0° (%)' : 'Ganancia vs 0° (%)'}</div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Maximum' : 'Máximo'}</span>
-                  <strong>${isAlbedo ? '-' : `${maxVal(gainsVs0).toFixed(2)} %`}</strong>
+                  <strong>${isAlbedo ? '-' : `${formatNum(maxVal(gainsVs0), 2)} %`}</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Minimum' : 'Mínimo'}</span>
-                  <strong>${isAlbedo ? '-' : `${minVal(gainsVs0).toFixed(2)} %`}</strong>
+                  <strong>${isAlbedo ? '-' : `${formatNum(minVal(gainsVs0), 2)} %`}</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Mean' : 'Media'}</span>
-                  <strong>${isAlbedo ? '-' : `${meanVal(gainsVs0).toFixed(2)} %`}</strong>
+                  <strong>${isAlbedo ? '-' : `${formatNum(meanVal(gainsVs0), 2)} %`}</strong>
                 </div>
               </div>
 
@@ -530,15 +531,15 @@ export function renderTrackingAzimuthalGraphsWindow(props: TrackingAzimuthalGrap
                 <div class="stat-frame-title" style="color: #34d399; font-weight: 700; font-size: 0.85rem; margin-bottom: 4px;">${isEn ? 'Gain vs Annual Opt (%)' : 'Ganancia vs Ópt. Anual (%)'}</div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Maximum' : 'Máximo'}</span>
-                  <strong>${maxVal(gainsVsAnn).toFixed(2)} %</strong>
+                  <strong>${formatNum(maxVal(gainsVsAnn), 2)} %</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Minimum' : 'Mínimo'}</span>
-                  <strong>${minVal(gainsVsAnn).toFixed(2)} %</strong>
+                  <strong>${formatNum(minVal(gainsVsAnn), 2)} %</strong>
                 </div>
                 <div class="stat-frame-row">
                   <span>${isEn ? 'Mean' : 'Media'}</span>
-                  <strong>${meanVal(gainsVsAnn).toFixed(2)} %</strong>
+                  <strong>${formatNum(meanVal(gainsVsAnn), 2)} %</strong>
                 </div>
               </div>
             </div>

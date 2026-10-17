@@ -175,7 +175,7 @@ export function renderTrackingAzimuthalStudyPanel(props: TrackingStudyProps): HT
                   <th rowspan="2" class="th-track-month">${isEn ? 'Month' : 'Mes'}</th>
                   <th rowspan="2" class="th-track-angles" style="min-width: 140px;">
                     <div>${isEn ? 'Considered Angles' : 'Ángulos considerados'}</div>
-                    <div style="font-size: 0.72rem; font-weight: 600; color: #a855f7;">Inc: ${res.latitude.toFixed(1)}° | Ori: ${res.latitude >= 0 ? (res.latitude < 23.45 ? '0.0°/180.0°' : '0.0°') : (res.latitude > -23.45 ? '180.0°/0.0°' : '180.0°')}</div>
+                    <div style="font-size: 0.72rem; font-weight: 600; color: #a855f7;">Inc: ${formatNum(res.latitude, 1)}° | Ori: ${res.latitude >= 0 ? (res.latitude < 23.45 ? '0,0°/180,0°' : '0,0°') : (res.latitude > -23.45 ? '180,0°/0,0°' : '180,0°')}</div>
                   </th>
                   <th rowspan="2" class="th-track-h0">${compSym} (0°)</th>
                   <th rowspan="2" class="th-track-opt">${compSym}</th>

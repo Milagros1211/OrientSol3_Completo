@@ -7,6 +7,7 @@ import {
 import { themeManager } from '@/services/theme/themeManager';
 import { renderWrappedSvgTitle } from './chartSvgUtils';
 import { showAlbedoWarningModal } from '@/components/modals/AlbedoWarningModal';
+import { formatNum } from '@/utils/formatters';
 
 export type GraphComponentChoice = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -460,27 +461,27 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
     const statBoxOptHtml = `
       <div class="matlab-stat-frame">
         <div class="stat-frame-title title-opt">${isEn ? 'Annual optimal tilt' : 'Inclinación ópt. anual'}</div>
-        <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${minVal(radOpt).toFixed(2)}</strong></div>
-        <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${meanVal(radOpt).toFixed(2)}</strong></div>
-        <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${maxVal(radOpt).toFixed(2)}</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${formatNum(minVal(radOpt), 2)}</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${formatNum(meanVal(radOpt), 2)}</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${formatNum(maxVal(radOpt), 2)}</strong></div>
       </div>
     `;
 
     const statBoxHorizHtml = `
       <div class="matlab-stat-frame">
         <div class="stat-frame-title title-horiz">${isEn ? 'On horizontal plane' : 'Sobre plano horizontal'}</div>
-        <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${minVal(rad0).toFixed(2)}</strong></div>
-        <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${meanVal(rad0).toFixed(2)}</strong></div>
-        <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${maxVal(rad0).toFixed(2)}</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${formatNum(minVal(rad0), 2)}</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${formatNum(meanVal(rad0), 2)}</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${formatNum(maxVal(rad0), 2)}</strong></div>
       </div>
     `;
 
     const statBoxGainHtml = `
       <div class="matlab-stat-frame" style="margin-top: 1.5rem;">
         <div class="stat-frame-title title-gain">${isEn ? 'Rel. horizontal plane' : 'Res. plano horizontal'}</div>
-        <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${isAlbedo ? '-' : minVal(gainsPct).toFixed(2)}</strong></div>
-        <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${isAlbedo ? '-' : meanVal(gainsPct).toFixed(2)}</strong></div>
-        <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${isAlbedo ? '-' : maxVal(gainsPct).toFixed(2)}</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'min' : 'mínimo'}</span> <strong>${isAlbedo ? '-' : formatNum(minVal(gainsPct), 2)}</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'mean' : 'media'}</span> <strong>${isAlbedo ? '-' : formatNum(meanVal(gainsPct), 2)}</strong></div>
+        <div class="stat-frame-row"><span>${isEn ? 'max' : 'máximo'}</span> <strong>${isAlbedo ? '-' : formatNum(maxVal(gainsPct), 2)}</strong></div>
       </div>
     `;
 
@@ -493,7 +494,7 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
               <span class="meta-label"><strong>${isEn ? 'City:' : 'Ciudad:'}</strong> ${locationName}</span>
               <span class="meta-label" style="margin-left: 2rem;">
                 <strong>${isEn ? 'Latitude (°):' : 'Latitud (°):'}</strong>
-                <span style="color: #38bdf8; font-weight: 700;">${latitude.toFixed(2)}</span>
+                <span style="color: #38bdf8; font-weight: 700;">${formatNum(latitude, 2)}</span>
               </span>
             </div>
             <div class="opt-graphs-study-row">

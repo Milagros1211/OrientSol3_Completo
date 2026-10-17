@@ -250,8 +250,8 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
 
           <div class="kpi-mini-card kpi-horiz">
             <span class="kpi-mini-title">${isEn ? 'Gain over Horizontal (0°)' : 'Ganancia s/ Horizontal (0°)'}</span>
-            <div class="kpi-mini-main" style="color: var(--accent-cyan);">${isAlbedo ? '-' : `+${meanGainHorizPct.toFixed(2)}%`}</div>
-            <span class="kpi-mini-sub">${isAlbedo ? 'Rdm(0°) = 0' : `+${Math.round((meanMonthlyOpt - mean0) * 365)} kWh/m²·${isEn ? 'yr' : 'año'}`}</span>
+            <div class="kpi-mini-main" style="color: var(--accent-cyan);">${isAlbedo ? '-' : `+${formatNum(meanGainHorizPct, 2)}%`}</div>
+            <span class="kpi-mini-sub">${isAlbedo ? 'Rdm(0°) = 0' : `+${formatInt(Math.round((meanMonthlyOpt - mean0) * 365))} kWh/m²·${isEn ? 'yr' : 'año'}`}</span>
           </div>
         </div>
 
@@ -322,7 +322,7 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
                           <rect x="${xGroup + 14}" y="${220 - hAnn}" width="12" height="${hAnn}" fill="#0284c7" rx="2"/>
                           <rect x="${xGroup + 28}" y="${220 - hOpt}" width="12" height="${hOpt}" fill="#10b981" rx="2"/>
                           <text x="${xGroup + 20}" y="238" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.8">${m.slice(0, 3)}</text>
-                          <text x="${xGroup + 34}" y="${215 - hOpt}" font-size="9" text-anchor="middle" font-weight="bold" fill="#10b981">${radMonthlyOpt[i].toFixed(1)}</text>
+                          <text x="${xGroup + 34}" y="${215 - hOpt}" font-size="9" text-anchor="middle" font-weight="bold" fill="#10b981">${formatNum(radMonthlyOpt[i], 1)}</text>
                         </g>
                       `;
                     }).join('')}

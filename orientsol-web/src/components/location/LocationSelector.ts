@@ -1,6 +1,7 @@
 import { LOCATIONS_DATABASE, ALBEDO_DATABASE } from '@/database';
 import type { LocationData } from '@/types/database';
 import { i18n } from '@/i18n';
+import { formatNum } from '@/utils/formatters';
 
 export function renderLocationSelector(
   onSelect: (location: LocationData, albedo: number) => void
@@ -31,12 +32,12 @@ export function renderLocationSelector(
         <select id="location-select" class="form-select">
           <optgroup label="${isEn ? 'Spain (Provincial Capitals)' : 'España (Capitales de Provincia)'}">
             ${LOCATIONS_DATABASE.filter((l) => l.region === 'spain')
-              .map((l) => `<option value="${l.id}">${l.name} (${l.country}) - Lat: ${l.latitude.toFixed(2)}°</option>`)
+              .map((l) => `<option value="${l.id}">${l.name} (${l.country}) - Lat: ${formatNum(l.latitude, 2)}°</option>`)
               .join('')}
           </optgroup>
           <optgroup label="${isEn ? 'Europe & World' : 'Europa y Mundo'}">
             ${LOCATIONS_DATABASE.filter((l) => l.region === 'europe')
-              .map((l) => `<option value="${l.id}">${l.name} (${l.country}) - Lat: ${l.latitude.toFixed(2)}°</option>`)
+              .map((l) => `<option value="${l.id}">${l.name} (${l.country}) - Lat: ${formatNum(l.latitude, 2)}°</option>`)
               .join('')}
           </optgroup>
         </select>
@@ -47,7 +48,7 @@ export function renderLocationSelector(
         <select id="albedo-select" class="form-select">
           ${ALBEDO_DATABASE.map(
             (a) => `<option value="${a.albedo}" ${a.id === 'standard' ? 'selected' : ''}>
-              ${a.albedo.toFixed(2)} - ${isEn ? a.name : a.nameEs}
+              ${formatNum(a.albedo, 2)} - ${isEn ? a.name : a.nameEs}
             </option>`
           ).join('')}
         </select>
@@ -73,9 +74,9 @@ export function renderLocationSelector(
 
     detailsBox.innerHTML = `
       <div class="meta-pills">
-        <span class="meta-pill"><strong>${currT.location.latitude}:</strong> ${selectedLoc.latitude.toFixed(4)}° N</span>
-        <span class="meta-pill"><strong>${currT.externalClimate.annualGdm0}:</strong> ${annualGdm0.toFixed(2)} kWh/m²/d</span>
-        <span class="meta-pill"><strong>${currT.location.albedoLabel}:</strong> ${albedoVal.toFixed(2)}</span>
+        <span class="meta-pill"><strong>${currT.location.latitude}:</strong> ${formatNum(selectedLoc.latitude, 4)}° N</span>
+        <span class="meta-pill"><strong>${currT.externalClimate.annualGdm0}:</strong> ${formatNum(annualGdm0, 2)} kWh/m²/d</span>
+        <span class="meta-pill"><strong>${currT.location.albedoLabel}:</strong> ${formatNum(albedoVal, 2)}</span>
       </div>
       <div class="mini-chart-summary">
         <span class="summary-label">${currT.common.appName} G<sub>dm</sub>(0) [kWh/m²/d]:</span>

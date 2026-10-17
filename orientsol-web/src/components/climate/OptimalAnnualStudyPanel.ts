@@ -602,8 +602,8 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
             <strong>${isEn ? 'Optimal Tilt Superiority:' : 'Ganancia del Ángulo Óptimo:'}</strong>
             <span>${t.results.compBetterMessage
               .replace('{optBeta}', String(optAngle))
-              .replace('{pct}', diffPct.toFixed(2))
-              .replace('{kwh}', String(Math.round(diffAnnualKwh)))
+              .replace('{pct}', formatNum(diffPct, 2))
+              .replace('{kwh}', formatInt(Math.round(diffAnnualKwh)))
               .replace('{xBeta}', String(stateAngleX))}</span>
           </div>
         </div>
@@ -618,7 +618,7 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
             <strong>${isEn ? 'Selected Angle Performance:' : 'Rendimiento Ángulo Seleccionado:'}</strong>
             <span>${t.results.compWorseMessage
               .replace('{xBeta}', String(stateAngleX))
-              .replace('{pct}', Math.abs(diffPct).toFixed(2))
+              .replace('{pct}', formatNum(Math.abs(diffPct), 2))
               .replace('{optBeta}', String(optAngle))}</span>
           </div>
         </div>
@@ -1018,8 +1018,8 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
                   </svg>
                   <span>${isEn
-                    ? `Peak radiation occurs at β = ${optAngle}° with ${meanOpt.toFixed(2)} kWh/m²/day. Horizontal plane (0°) yields ${mean0.toFixed(2)} kWh/m²/day, and selected Angle X (β = ${stateAngleX}°) yields ${meanX.toFixed(2)} kWh/m²/day.`
-                    : `El punto de máxima captación se sitúa en β = ${optAngle}° con ${meanOpt.toFixed(2)} kWh/m²/día. La superficie horizontal (0°) capta ${mean0.toFixed(2)} kWh/m²/día, y el ángulo seleccionado X (β = ${stateAngleX}°) capta ${meanX.toFixed(2)} kWh/m²/día.`
+                    ? `Peak radiation occurs at β = ${optAngle}° with ${formatNum(meanOpt, 2)} kWh/m²/day. Horizontal plane (0°) yields ${formatNum(mean0, 2)} kWh/m²/day, and selected Angle X (β = ${stateAngleX}°) yields ${formatNum(meanX, 2)} kWh/m²/day.`
+                    : `El punto de máxima captación se sitúa en β = ${optAngle}° con ${formatNum(meanOpt, 2)} kWh/m²/día. La superficie horizontal (0°) capta ${formatNum(mean0, 2)} kWh/m²/día, y el ángulo seleccionado X (β = ${stateAngleX}°) capta ${formatNum(meanX, 2)} kWh/m²/día.`
                   }</span>
                 </div>
               </div>
