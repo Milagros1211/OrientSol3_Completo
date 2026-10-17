@@ -170,7 +170,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         continue-on-error: true
         with:
-          tag_name: ${{ github.ref_name || 'v4.0.0-offline' }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v4.0.0' }}
           name: OrientSol 4.0 - Offline Releases (Windows / macOS / Android)
           draft: false
           prerelease: false
