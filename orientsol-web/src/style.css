@@ -2334,6 +2334,15 @@ body.theme-dark .dual-tabs-bar {
   white-space: nowrap;
 }
 
+.dual-tab-btn.tab-disabled,
+.dual-tab-btn:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  filter: grayscale(0.85);
+  border-style: dashed !important;
+}
+
 [data-theme="light"] .dual-tab-btn,
 body.theme-light .dual-tab-btn {
   color: #475569;

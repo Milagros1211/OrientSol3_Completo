@@ -79,6 +79,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   const t = i18n.t;
   const isEn = i18n.getLocale() === 'en';
   const MONTH_NAMES = t.common.monthNamesShort;
+  const isOnlineInit = climateDatabaseService.isOnline();
+  if (!isOnlineInit && cachedActiveTab === 'api') {
+    cachedActiveTab = 'historical';
+  }
   const currentActiveRecordInit: ClimateDataRecord = cachedActiveRecord || hybridClimateManager.getHistoricalLocations()[0];
 
   container.innerHTML = `
@@ -123,14 +127,14 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         <span>${t.hybridLoader.tabUpload}</span>
       </button>
 
-      <button class="dual-tab-btn ${cachedActiveTab === 'api' ? 'active' : ''}" data-tab="api">
+      <button class="dual-tab-btn ${cachedActiveTab === 'api' ? 'active' : ''} ${!isOnlineInit ? 'tab-disabled' : ''}" data-tab="api" id="dual-tab-btn-api" ${!isOnlineInit ? 'disabled' : ''} title="${!isOnlineInit ? (isEn ? 'Internet connection required for satellite APIs' : 'Requiere conexión a Internet para consultar APIs satelitales (PVGIS / NASA)') : ''}">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="5"></circle>
           <line x1="12" y1="1" x2="12" y2="3"></line>
           <line x1="12" y1="21" x2="12" y2="23"></line>
           <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"></path>
         </svg>
-        <span>${isEn ? '4. Satellite Climate APIs (PVGIS / NASA)' : '4. APIs Climáticas Satelitales (PVGIS / NASA)'}</span>
+        <span id="tab-api-title-text">${!isOnlineInit ? (isEn ? '4. Satellite Climate APIs (Offline 🔒)' : '4. APIs Satelitales (Sin conexión 🔒)') : (isEn ? '4. Satellite Climate APIs (PVGIS / NASA)' : '4. APIs Climáticas Satelitales (PVGIS / NASA)')}</span>
       </button>
     </div>
 
@@ -289,6 +293,21 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     <!-- TAB 4: SATELLITE CLIMATE APIS -->
     <div id="tab-content-api" class="dual-tab-content ${cachedActiveTab === 'api' ? '' : 'hidden'}">
+      <div id="tab4-offline-alert" class="search-alert-box alert-warning-box ${isOnlineInit ? 'hidden' : ''}" style="margin-bottom: 1rem;">
+        <div class="alert-icon-wrap">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f59e0b" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <div>
+          <div class="alert-title">${isEn ? 'Satellite APIs Offline' : 'APIs Satelitales Sin Conexión'}</div>
+          <div class="alert-desc">
+            ${isEn ? 'Internet connection required to query PVGIS or NASA satellite servers. Please use Tab 1 (Historical Database) or Tab 2 (Manual Entry) while offline.' : 'Se requiere conexión a Internet para consultar los servidores satelitales de PVGIS o NASA. Por favor, utilice la Pestaña 1 (Base de Datos Histórica) o Pestaña 2 (Entrada Manual) mientras esté desconectado.'}
+          </div>
+        </div>
+      </div>
       <div class="climate-controls-grid">
         <div class="form-group">
           <label for="api-source-select" class="form-label">${isEn ? 'Data Source' : 'Fuente de Datos'}</label>
@@ -471,7 +490,12 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
   // Tab switching
   tabButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      if (btn.disabled || btn.classList.contains('tab-disabled')) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
       tabButtons.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
 
@@ -723,28 +747,99 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     allSearchableStations = merged;
   };
 
+  // Dynamically sync Tab 4 (Satellite APIs) disabled status based on real-time internet connectivity
+  function syncNetworkTabState(online: boolean) {
+    const apiBtn = container.querySelector<HTMLButtonElement>('#dual-tab-btn-api');
+    const apiText = container.querySelector('#tab-api-title-text');
+    const apiOfflineAlert = container.querySelector('#tab4-offline-alert');
+    const apiFetchBtn = container.querySelector<HTMLButtonElement>('#btn-fetch-satellite');
+    const fileUploadPermissionBox = container.querySelector('#file-upload-permission-box');
+
+    if (apiBtn) {
+      if (!online) {
+        apiBtn.disabled = true;
+        apiBtn.classList.add('tab-disabled');
+        apiBtn.title = isEn
+          ? 'Internet connection required for satellite APIs'
+          : 'Requiere conexión a Internet para consultar APIs satelitales (PVGIS / NASA)';
+        if (apiText) {
+          apiText.textContent = isEn
+            ? '4. Satellite Climate APIs (Offline 🔒)'
+            : '4. APIs Satelitales (Sin conexión 🔒)';
+        }
+        if (apiOfflineAlert) {
+          apiOfflineAlert.classList.remove('hidden');
+        }
+        if (apiFetchBtn) {
+          apiFetchBtn.disabled = true;
+          apiFetchBtn.classList.add('disabled');
+        }
+
+        // If user is currently looking at Tab 4 (API) when internet cuts off, auto-switch to Tab 1 (Historical)
+        if (cachedActiveTab === 'api') {
+          const histBtn = container.querySelector<HTMLButtonElement>('.dual-tab-btn[data-tab="historical"]');
+          if (histBtn) {
+            histBtn.click();
+          }
+        }
+      } else {
+        apiBtn.disabled = false;
+        apiBtn.classList.remove('tab-disabled');
+        apiBtn.title = '';
+        if (apiText) {
+          apiText.textContent = isEn
+            ? '4. Satellite Climate APIs (PVGIS / NASA)'
+            : '4. APIs Climáticas Satelitales (PVGIS / NASA)';
+        }
+        if (apiOfflineAlert) {
+          apiOfflineAlert.classList.add('hidden');
+        }
+        if (apiFetchBtn) {
+          apiFetchBtn.disabled = false;
+          apiFetchBtn.classList.remove('disabled');
+        }
+      }
+    }
+
+    if (fileUploadPermissionBox) {
+      fileUploadPermissionBox.innerHTML = renderSupabaseUploadBannerHtml(isEn);
+    }
+  }
+
   // Pre-load and re-sync on network state changes & database updates
   updateSearchableStations();
+  syncNetworkTabState(climateDatabaseService.isOnline());
+
   climateDatabaseService.subscribe(() => {
+    syncNetworkTabState(climateDatabaseService.isOnline());
     updateSearchableStations().then(() => {
       if (histSearchInput && histSearchInput.value.trim()) {
         performSearch(histSearchInput.value.trim());
       }
     });
   });
+
   window.addEventListener('online', () => {
+    syncNetworkTabState(true);
     updateSearchableStations().then(() => {
       if (histSearchInput && histSearchInput.value.trim()) {
         performSearch(histSearchInput.value.trim());
       }
     });
   });
+
   window.addEventListener('offline', () => {
+    syncNetworkTabState(false);
     updateSearchableStations().then(() => {
       if (histSearchInput && histSearchInput.value.trim()) {
         performSearch(histSearchInput.value.trim());
       }
     });
+  });
+
+  window.addEventListener('orientsol:network-changed', (e: Event) => {
+    const detail = (e as CustomEvent)?.detail;
+    syncNetworkTabState(detail?.isOnline ?? climateDatabaseService.isOnline());
   });
 
   function showNotFoundBanner(queryText: string) {

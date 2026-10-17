@@ -358,6 +358,34 @@ export function calculateDataSimilarity(recA: ClimateDataRecord, recB: ClimateDa
 export class ClimateDatabaseService {
   private static instance: ClimateDatabaseService | null = null;
   private listeners: Set<DatabaseStateListener> = new Set();
+  private _isOnline: boolean = typeof navigator !== 'undefined' ? navigator.onLine : true;
+
+  private constructor() {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', () => {
+        this.setOnline(true);
+      });
+      window.addEventListener('offline', () => {
+        this.setOnline(false);
+      });
+
+      // Electron native connectivity updates
+      const electronAPI = (window as any).electronAPI;
+      if (electronAPI?.onNetworkStatusChanged) {
+        electronAPI.onNetworkStatusChanged((onlineState: boolean) => {
+          this.setOnline(onlineState);
+        });
+      }
+
+      // Periodic sanity check every 5 seconds to detect live drops
+      setInterval(() => {
+        const currentNav = typeof navigator !== 'undefined' ? navigator.onLine : true;
+        if (currentNav !== this._isOnline) {
+          this.setOnline(currentNav);
+        }
+      }, 5000);
+    }
+  }
 
   public static getInstance(): ClimateDatabaseService {
     if (!ClimateDatabaseService.instance) {
@@ -371,7 +399,18 @@ export class ClimateDatabaseService {
   }
 
   public isOnline(): boolean {
-    return typeof navigator !== 'undefined' ? navigator.onLine : true;
+    return this._isOnline;
+  }
+
+  public setOnline(status: boolean): void {
+    if (this._isOnline !== status) {
+      this._isOnline = status;
+      console.log(`[Supabase Service] Network connectivity changed -> ${status ? 'ONLINE (Connected)' : 'OFFLINE (Disconnected)'}`);
+      this.notify();
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('orientsol:network-changed', { detail: { isOnline: status } }));
+      }
+    }
   }
 
   public subscribe(listener: DatabaseStateListener): () => void {
@@ -381,7 +420,7 @@ export class ClimateDatabaseService {
     };
   }
 
-  private notify(): void {
+  public notify(): void {
     this.listeners.forEach((fn) => {
       try {
         fn();
