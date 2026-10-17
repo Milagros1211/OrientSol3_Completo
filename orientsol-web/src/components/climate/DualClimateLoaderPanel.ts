@@ -19,7 +19,9 @@ import {
   renderRadiationChart,
   renderEnergyAndTemperatureChart,
   renderSurfacesRankingChart,
+  attachSolarChartsEventListeners,
 } from '@/components/charts/SolarCharts';
+import { themeManager } from '@/services/theme/themeManager';
 import { copyReportToClipboard } from '@/components/export/reportExporter';
 import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslations';
 import { pyodideService } from '@/services/pyodide';
@@ -2017,6 +2019,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       }
     });
 
+    // Attach event listeners for saving the 3 main solar charts locally
+    attachSolarChartsEventListeners(resultsContainer, res, isEn);
+
     if (shouldScroll) {
       resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -2024,6 +2029,13 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
   // Initial render with current station
   renderActiveRecord(currentActiveRecord);
+
+  // Automatically refresh charts when user toggles Theme (Dark <-> Light) so SVGs reflect new background colors
+  themeManager.subscribe(() => {
+    if (cachedLastSimulationResult) {
+      renderResults(cachedLastSimulationResult, false);
+    }
+  });
 
   if (cachedLastSimulationResult) {
     // If we already have simulation results computed, render them immediately in the selected language!
