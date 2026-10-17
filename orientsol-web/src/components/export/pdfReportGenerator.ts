@@ -1345,7 +1345,7 @@ export async function generateOrientSolPDFReport(
     doc.line(axisX, yT, rightAxisX, yT); // Gridline
     doc.setDrawColor(203, 213, 225);
     doc.line(axisX - 1.2, yT, axisX, yT);
-    doc.text(String(tv), axisX - 1.5, yT + 1.2, { align: 'right' });
+    doc.text(formatInt(tv), axisX - 1.5, yT + 1.2, { align: 'right' });
   });
 
   // Right Temperature Ticks (0..50 °C)
@@ -2014,6 +2014,14 @@ export async function generateOrientSolPDFReport(
           ? `${formatNum(res.monthlyOptimum12.optimalTiltsDeg.reduce((a, b) => a + b, 0) / 12, 1)}°`
           : studyType === 'seasonal'
           ? `${Math.round((res.seasonal.winterTiltDeg + res.seasonal.summerTiltDeg) / 2)}°`
+          : studyType === 'polar'
+          ? `${formatNum(res.latitude, 1)}°`
+          : studyType === 'azimuthal'
+          ? `${formatNum(res.latitude, 1)}°`
+          : studyType === 'horizontal'
+          ? `${formatNum(res.latitude >= 0 ? 0.0 : 180.0, 1)}°`
+          : studyType === 'dual'
+          ? `${formatNum(res.latitude, 1)}°`
           : `${formatAngle(optAngle, 0)}`;
       doc.text(tiltAvg, op2X + 4, opBarY + 14);
       doc.setFont('helvetica', 'normal');
@@ -2024,6 +2032,18 @@ export async function generateOrientSolPDFReport(
           ? (isEn
               ? `Min: ${Math.min(...res.monthlyOptimum12.optimalTiltsDeg)}° | Max: ${Math.max(...res.monthlyOptimum12.optimalTiltsDeg)}°`
               : `Mín: ${Math.min(...res.monthlyOptimum12.optimalTiltsDeg)}° | Máx: ${Math.max(...res.monthlyOptimum12.optimalTiltsDeg)}°`)
+          : studyType === 'seasonal'
+          ? (isEn
+              ? `Winter: ${res.seasonal.winterTiltDeg}° | Summer: ${res.seasonal.summerTiltDeg}°`
+              : `Inv: ${res.seasonal.winterTiltDeg}° | Ver: ${res.seasonal.summerTiltDeg}°`)
+          : studyType === 'polar'
+          ? (isEn ? 'Polar axis tracking' : 'Seguimiento polar 1 eje')
+          : studyType === 'azimuthal'
+          ? (isEn ? 'Azimuthal tracking' : 'Seguimiento azimutal')
+          : studyType === 'horizontal'
+          ? (isEn ? 'E-W horizontal tracking' : 'Seguimiento horizontal E-O')
+          : studyType === 'dual'
+          ? (isEn ? 'Continuous 2-axis tracking' : 'Seguimiento 2 ejes continuo')
           : (isEn ? 'Design fixed optimum' : 'Óptimo fijo de diseño'),
         op2X + 4,
         opBarY + 19
@@ -2242,6 +2262,14 @@ export async function generateOrientSolPDFReport(
             ? `${res.monthlyOptimum12.optimalTiltsDeg[i]}°`
             : studyType === 'seasonal'
             ? `${seasonalTiltDeg}°`
+            : studyType === 'polar'
+            ? `${formatNum(res.latitude, 1)}°`
+            : studyType === 'azimuthal'
+            ? `${formatNum(res.latitude, 1)}°`
+            : studyType === 'horizontal'
+            ? '0,0°'
+            : studyType === 'dual'
+            ? `${formatNum(res.latitude, 1)}°`
             : `${optAngle}°`;
         doc.text(tiltStr, colX[2], curRowY + 3.5);
 
@@ -2332,7 +2360,7 @@ export async function generateOrientSolPDFReport(
                 ])
           : (isEn
               ? [
-                  `Seasonal Adaptation of Optimal Tilt: Solar declination varies between delta = -23,45° and +23,45°. Monthly tilt reaches 58°-60° in winter and 0°-4° in summer.`,
+                  `Seasonal Adaptation of Optimal Tilt: Solar declination varies between delta = -23.45° and +23.45°. Monthly tilt reaches 58°-60° in winter and 0°-4° in summer.`,
                   `Gain Comparison vs Annual Fixed: Optimization provides a net energy boost of +${formatPercent(gainVsOpt_c, 2)} (+${formatInt(Math.max(0, Math.round(activeAnnualTotalKwh_c - optAnnualTotalKwh_c)))} kWh/m²·yr) compared to annual fixed tilt (${formatAngle(optAngle, 1)}).`
                 ]
               : [
@@ -3919,15 +3947,40 @@ export async function generateOrientSolEnergyPDFReport(
   doc.roundedRect(20, chart1Y + 4, 170, 52, 2, 2, 'FD');
 
   const maxE0 = Math.max(...energyData.e0_mes) * 1.15 || 2500;
-  const barPlotBaseY = chart1Y + 50;
-  const barPlotH = 34;
-  const barW = 9;
-  const barStep = 13;
+  const barPlotBaseY = chart1Y + 48;
+  const barPlotH = 32;
+  const barW = 8.5;
+  const barStep = 12.5;
+  const axisX1 = 30;
+  const axisEndX1 = 186;
+
+  // Axes lines and Y scale
+  doc.setDrawColor(203, 213, 225);
+  doc.setLineWidth(0.4);
+  doc.line(axisX1, barPlotBaseY, axisX1, barPlotBaseY - barPlotH - 2); // Y axis line
+  doc.line(axisX1, barPlotBaseY, axisEndX1, barPlotBaseY); // X baseline
+
+  // Y axis title & ticks
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(5.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text('kWh', axisX1 - 2, barPlotBaseY - barPlotH - 3, { align: 'right' });
+
+  const e0Ticks = [0.25, 0.5, 0.75, 1.0].map((f) => Math.round(maxE0 * f));
+  e0Ticks.forEach((tv) => {
+    const yT = barPlotBaseY - (tv / maxE0) * barPlotH;
+    doc.setDrawColor(241, 245, 249);
+    doc.setLineWidth(0.25);
+    doc.line(axisX1, yT, axisEndX1, yT); // gridline
+    doc.setDrawColor(203, 213, 225);
+    doc.line(axisX1 - 1.2, yT, axisX1, yT); // tick
+    doc.text(formatInt(tv), axisX1 - 2, yT + 1.2, { align: 'right' });
+  });
 
   for (let i = 0; i < 12; i++) {
     const val = energyData.e0_mes[i];
     const h = (val / maxE0) * barPlotH;
-    const x = 27 + i * barStep;
+    const x = axisX1 + 3 + i * barStep;
     const y = barPlotBaseY - h;
 
     doc.setFillColor(37, 99, 235);
@@ -3936,10 +3989,11 @@ export async function generateOrientSolEnergyPDFReport(
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.5);
     doc.setTextColor(71, 85, 105);
-    doc.text(String(i + 1), x + 3, barPlotBaseY + 4);
+    doc.text(String(i + 1), x + 2.5, barPlotBaseY + 4);
 
     doc.setFontSize(5.5);
-    doc.text(String(Math.round(val)), x - 1, y - 2);
+    doc.setTextColor(37, 99, 235);
+    doc.text(formatInt(Math.round(val)), x - 1, y - 2);
   }
 
   // Insight box on Page 2
@@ -3990,12 +4044,36 @@ export async function generateOrientSolEnergyPDFReport(
   doc.roundedRect(20, chart2Y + 4, 170, 54, 2, 2, 'FD');
 
   const maxE = Math.max(...energyData.e_mes) * 1.15 || 2500;
-  const barPlot2BaseY = chart2Y + 52;
+  const barPlot2BaseY = chart2Y + 48;
+  const barPlot2H = 32;
+
+  // Axes lines and Y scale
+  doc.setDrawColor(203, 213, 225);
+  doc.setLineWidth(0.4);
+  doc.line(axisX1, barPlot2BaseY, axisX1, barPlot2BaseY - barPlot2H - 2); // Y axis line
+  doc.line(axisX1, barPlot2BaseY, axisEndX1, barPlot2BaseY); // X baseline
+
+  // Y axis title & ticks
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(5.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text('kWh', axisX1 - 2, barPlot2BaseY - barPlot2H - 3, { align: 'right' });
+
+  const eTicks = [0.25, 0.5, 0.75, 1.0].map((f) => Math.round(maxE * f));
+  eTicks.forEach((tv) => {
+    const yT = barPlot2BaseY - (tv / maxE) * barPlot2H;
+    doc.setDrawColor(241, 245, 249);
+    doc.setLineWidth(0.25);
+    doc.line(axisX1, yT, axisEndX1, yT); // gridline
+    doc.setDrawColor(203, 213, 225);
+    doc.line(axisX1 - 1.2, yT, axisX1, yT); // tick
+    doc.text(formatInt(tv), axisX1 - 2, yT + 1.2, { align: 'right' });
+  });
 
   for (let i = 0; i < 12; i++) {
     const val = energyData.e_mes[i];
-    const h = (val / maxE) * 36;
-    const x = 27 + i * barStep;
+    const h = (val / maxE) * barPlot2H;
+    const x = axisX1 + 3 + i * barStep;
     const y = barPlot2BaseY - h;
 
     doc.setFillColor(16, 185, 129);
@@ -4004,10 +4082,11 @@ export async function generateOrientSolEnergyPDFReport(
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.5);
     doc.setTextColor(71, 85, 105);
-    doc.text(String(i + 1), x + 3, barPlot2BaseY + 4);
+    doc.text(String(i + 1), x + 2.5, barPlot2BaseY + 4);
 
     doc.setFontSize(5.5);
-    doc.text(String(Math.round(val)), x - 1, y - 2);
+    doc.setTextColor(16, 185, 129);
+    doc.text(formatInt(Math.round(val)), x - 1, y - 2);
   }
 
   // Figura 2.3: Ganancias respecto al plano horizontal
@@ -4028,17 +4107,40 @@ export async function generateOrientSolEnergyPDFReport(
   doc.roundedRect(20, chart3Y + 4, 170, 56, 2, 2, 'FD');
 
   const maxGainAbs = Math.max(...energyData.ganancia_mes.map((g) => Math.abs(g))) * 1.25 || 500;
-  const zeroLineY = chart3Y + 36;
+  const zeroLineY = chart3Y + 34;
 
-  // Zero axis line
-  doc.setDrawColor(148, 163, 184);
+  // Zero axis line and Y axis
+  doc.setDrawColor(203, 213, 225);
   doc.setLineWidth(0.4);
-  doc.line(24, zeroLineY, 186, zeroLineY);
+  doc.line(axisX1, chart3Y + 12, axisX1, chart3Y + 50); // Vertical Y axis line
+  doc.setDrawColor(148, 163, 184);
+  doc.line(axisX1, zeroLineY, axisEndX1, zeroLineY); // Zero baseline
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(5.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text('kWh', axisX1 - 2, chart3Y + 11, { align: 'right' });
+  doc.text('0', axisX1 - 2, zeroLineY + 1, { align: 'right' });
+
+  // Gain ticks (+posGain, -posGain)
+  const posGainTick = Math.round(maxGainAbs * 0.75);
+  const yPosTick = zeroLineY - (posGainTick / maxGainAbs) * 18;
+  const yNegTick = zeroLineY + (posGainTick / maxGainAbs) * 18;
+
+  doc.setDrawColor(241, 245, 249);
+  doc.setLineWidth(0.25);
+  doc.line(axisX1, yPosTick, axisEndX1, yPosTick);
+  doc.line(axisX1, yNegTick, axisEndX1, yNegTick);
+  doc.setDrawColor(203, 213, 225);
+  doc.line(axisX1 - 1.2, yPosTick, axisX1, yPosTick);
+  doc.line(axisX1 - 1.2, yNegTick, axisX1, yNegTick);
+  doc.text(`+${formatInt(posGainTick)}`, axisX1 - 2, yPosTick + 1.2, { align: 'right' });
+  doc.text(`-${formatInt(posGainTick)}`, axisX1 - 2, yNegTick + 1.2, { align: 'right' });
 
   for (let i = 0; i < 12; i++) {
     const g = energyData.ganancia_mes[i];
-    const h = (Math.abs(g) / maxGainAbs) * 20;
-    const x = 27 + i * barStep;
+    const h = (Math.abs(g) / maxGainAbs) * 18;
+    const x = axisX1 + 3 + i * barStep;
 
     if (g >= 0) {
       doc.setFillColor(16, 185, 129);
@@ -4046,20 +4148,20 @@ export async function generateOrientSolEnergyPDFReport(
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(5.5);
       doc.setTextColor(16, 185, 129);
-      doc.text(`+${Math.round(g)}`, x - 1, zeroLineY - h - 2);
+      doc.text(`+${formatInt(Math.round(g))}`, x - 1, zeroLineY - h - 2);
     } else {
       doc.setFillColor(239, 68, 68);
       doc.rect(x, zeroLineY, barW, h, 'F');
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(5.5);
       doc.setTextColor(239, 68, 68);
-      doc.text(`${Math.round(g)}`, x - 1, zeroLineY + h + 5);
+      doc.text(formatInt(Math.round(g)), x - 1, zeroLineY + h + 5);
     }
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.5);
     doc.setTextColor(71, 85, 105);
-    doc.text(String(i + 1), x + 3, zeroLineY + (g >= 0 ? 4 : -2));
+    doc.text(String(i + 1), x + 2.5, zeroLineY + (g >= 0 ? 4 : -2));
   }
 
   // Insight box on Page 3
