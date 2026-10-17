@@ -1171,8 +1171,12 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(5);
   doc.setTextColor(148, 163, 184);
-  doc.text('0', axisX - 1.5, baseY1 + 1, { align: 'right' });
-  drawRichText(doc, 'kWh/m²·d', axisX - 1.5, baseY1 - plotH1 - 1, 5, 'right', false, [148, 163, 184]);
+  // Y-Axis Title (Wrapped into 2 clean lines above top tick)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(5.0);
+  doc.setTextColor(71, 85, 105);
+  doc.text('Gdm', axisX - 2, baseY1 - plotH1 - 3.5, { align: 'right' });
+  doc.text('(kWh/m²/d)', axisX - 2, baseY1 - plotH1 - 1.0, { align: 'right' });
 
   radTicks.forEach((tv) => {
     const yT = baseY1 - (tv / maxRadPlot) * plotH1;
@@ -1214,6 +1218,12 @@ export async function generateOrientSolPDFReport(
     doc.setTextColor(100, 116, 139);
     doc.text(mShort[i], xBase + 1.5, baseY1 + 4);
   }
+
+  // X-Axis Title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(5.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'Month of the year' : 'Mes del año', (axisX + axisEndX) / 2, baseY1 + 7.2, { align: 'center' });
 
   // Max and Min labels on Chart 1
   const xMax1 = axisX + 2.0 + maxRadIdx * stepX1 + 7.6;
@@ -1336,7 +1346,13 @@ export async function generateOrientSolPDFReport(
   doc.setFontSize(5);
   doc.setTextColor(148, 163, 184);
   doc.text('0', axisX - 1.5, baseY2 + 1, { align: 'right' });
-  doc.text('kWh', axisX - 1.5, baseY2 - plotH2 - 1, { align: 'right' });
+
+  // Left Y-Axis Title (Wrapped into 2 clean lines above top tick)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(5.0);
+  doc.setTextColor(71, 85, 105);
+  doc.text(isEn ? 'PV Yield' : 'Prod. FV', axisX - 2, baseY2 - plotH2 - 3.5, { align: 'right' });
+  doc.text('(kWh)', axisX - 2, baseY2 - plotH2 - 1.0, { align: 'right' });
 
   pvTicks.forEach((tv) => {
     const yT = baseY2 - (tv / maxPvPlot) * plotH2;
@@ -1350,8 +1366,15 @@ export async function generateOrientSolPDFReport(
 
   // Right Temperature Ticks (0..50 °C)
   const tempTicks = [10, 20, 30, 40, 50];
+  // Right Y-Axis Title (Wrapped into 2 clean lines above top tick)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(5.0);
+  doc.setTextColor(71, 85, 105);
+  doc.text('Temp.', rightAxisX + 2, baseY2 - plotH2 - 3.5);
+  doc.text('(°C)', rightAxisX + 2, baseY2 - plotH2 - 1.0);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(5);
   doc.setTextColor(148, 163, 184);
-  doc.text('°C', rightAxisX + 1.5, baseY2 - plotH2 - 1);
   tempTicks.forEach((tv) => {
     const yT = baseY2 - (tv / 55.0) * plotH2;
     doc.setDrawColor(203, 213, 225);
@@ -1382,6 +1405,12 @@ export async function generateOrientSolPDFReport(
     doc.setTextColor(100, 116, 139);
     doc.text(mShort[i], xBase + 1.5, baseY2 + 4);
   }
+
+  // X-Axis Title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(5.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'Month of the year' : 'Mes del año', (axisX + rightAxisX) / 2, baseY2 + 7.2, { align: 'center' });
 
   // Draw Tc curve line (Red)
   doc.setDrawColor(220, 38, 38);
@@ -3414,11 +3443,12 @@ export async function generateOrientSolPDFReport(
     doc.text(formatNum(val, 1), axOriginX - 2.5, yPos + 0.9, { align: 'right' });
   }
 
-  // Y-Axis Title / Unit
+  // Y-Axis Title / Unit (Wrapped cleanly into 2 lines strictly inside margin and above top tick)
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(5.8);
+  doc.setFontSize(5.5);
   doc.setTextColor(71, 85, 105);
-  doc.text(isEn ? 'Gdm (kWh/m²/d)' : 'Gdm (kWh/m²/d)', axOriginX - 2, axTopY - 1, { align: 'right' });
+  doc.text('Gdm', axOriginX - 2.5, cvBoxY + 8.5, { align: 'right' });
+  doc.text('(kWh/m²/d)', axOriginX - 2.5, cvBoxY + 11.5, { align: 'right' });
 
   // Horizontal Reference Line
   const y0Line = getCvY(meanRad0);
@@ -3479,12 +3509,16 @@ export async function generateOrientSolPDFReport(
     doc.text(`${ang}°`, ax, axOriginY + 4.2, { align: 'center' });
   }
 
-  // X-Axis Title / Unit
+  // X-Axis Title / Unit (Wrapped cleanly, character-safe without corrupted glyphs)
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(6.2);
   doc.setTextColor(71, 85, 105);
   const axMidX = (axOriginX + axMaxX) / 2;
-  doc.text(isEn ? 'Tilt Angle β (°)' : 'Inclinación β (°)', axMidX, axOriginY + 8.5, { align: 'center' });
+  const xTitle = isEn ? 'Collector Tilt Angle (°)' : 'Ángulo de Inclinación del Captador (°)';
+  const xTitleWrapped = doc.splitTextToSize(xTitle, 75);
+  xTitleWrapped.forEach((line: string, lIdx: number) => {
+    doc.text(line, axMidX, axOriginY + 8.5 + lIdx * 3.0, { align: 'center' });
+  });
 
   // Legend
   doc.setFontSize(6.8);
@@ -3960,11 +3994,12 @@ export async function generateOrientSolEnergyPDFReport(
   doc.line(axisX1, barPlotBaseY, axisX1, barPlotBaseY - barPlotH - 2); // Y axis line
   doc.line(axisX1, barPlotBaseY, axisEndX1, barPlotBaseY); // X baseline
 
-  // Y axis title & ticks
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(5.5);
-  doc.setTextColor(100, 116, 139);
-  doc.text('kWh', axisX1 - 2, barPlotBaseY - barPlotH - 3, { align: 'right' });
+  // Y axis title (Wrapped into 2 clean lines above top tick)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(5.0);
+  doc.setTextColor(71, 85, 105);
+  doc.text(isEn ? 'Energy' : 'Energía', axisX1 - 2, barPlotBaseY - barPlotH - 3.8, { align: 'right' });
+  doc.text('(kWh)', axisX1 - 2, barPlotBaseY - barPlotH - 1.2, { align: 'right' });
 
   const e0Ticks = [0.25, 0.5, 0.75, 1.0].map((f) => Math.round(maxE0 * f));
   e0Ticks.forEach((tv) => {
@@ -3995,6 +4030,12 @@ export async function generateOrientSolEnergyPDFReport(
     doc.setTextColor(37, 99, 235);
     doc.text(formatInt(Math.round(val)), x - 1, y - 2);
   }
+
+  // X-Axis Title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(5.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'Month of the year' : 'Mes del año', (axisX1 + axisEndX1) / 2, barPlotBaseY + 7.5, { align: 'center' });
 
   // Insight box on Page 2
   const insE1Y = chart1Y + 60;
@@ -4053,11 +4094,12 @@ export async function generateOrientSolEnergyPDFReport(
   doc.line(axisX1, barPlot2BaseY, axisX1, barPlot2BaseY - barPlot2H - 2); // Y axis line
   doc.line(axisX1, barPlot2BaseY, axisEndX1, barPlot2BaseY); // X baseline
 
-  // Y axis title & ticks
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(5.5);
-  doc.setTextColor(100, 116, 139);
-  doc.text('kWh', axisX1 - 2, barPlot2BaseY - barPlot2H - 3, { align: 'right' });
+  // Y axis title (Wrapped into 2 clean lines above top tick)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(5.0);
+  doc.setTextColor(71, 85, 105);
+  doc.text(isEn ? 'Energy' : 'Energía', axisX1 - 2, barPlot2BaseY - barPlot2H - 3.8, { align: 'right' });
+  doc.text('(kWh)', axisX1 - 2, barPlot2BaseY - barPlot2H - 1.2, { align: 'right' });
 
   const eTicks = [0.25, 0.5, 0.75, 1.0].map((f) => Math.round(maxE * f));
   eTicks.forEach((tv) => {
@@ -4089,6 +4131,12 @@ export async function generateOrientSolEnergyPDFReport(
     doc.text(formatInt(Math.round(val)), x - 1, y - 2);
   }
 
+  // X-Axis Title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(5.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'Month of the year' : 'Mes del año', (axisX1 + axisEndX1) / 2, barPlot2BaseY + 7.5, { align: 'center' });
+
   // Figura 2.3: Ganancias respecto al plano horizontal
   const chart3Y = chart2Y + 64;
   doc.setFont('helvetica', 'bold');
@@ -4116,10 +4164,15 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setDrawColor(148, 163, 184);
   doc.line(axisX1, zeroLineY, axisEndX1, zeroLineY); // Zero baseline
 
+  // Y axis title (Wrapped into 2 clean lines above zero line)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(5.0);
+  doc.setTextColor(71, 85, 105);
+  doc.text(isEn ? 'Net Gain' : 'Ganancia', axisX1 - 2, chart3Y + 9.5, { align: 'right' });
+  doc.text('(kWh)', axisX1 - 2, chart3Y + 12.2, { align: 'right' });
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(5.5);
   doc.setTextColor(100, 116, 139);
-  doc.text('kWh', axisX1 - 2, chart3Y + 11, { align: 'right' });
   doc.text('0', axisX1 - 2, zeroLineY + 1, { align: 'right' });
 
   // Gain ticks (+posGain, -posGain)
@@ -4163,6 +4216,12 @@ export async function generateOrientSolEnergyPDFReport(
     doc.setTextColor(71, 85, 105);
     doc.text(String(i + 1), x + 2.5, zeroLineY + (g >= 0 ? 4 : -2));
   }
+
+  // X-Axis Title
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(5.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'Month of the year' : 'Mes del año', (axisX1 + axisEndX1) / 2, zeroLineY + 8.5, { align: 'center' });
 
   // Insight box on Page 3
   const insE2Y = chart3Y + 66;
