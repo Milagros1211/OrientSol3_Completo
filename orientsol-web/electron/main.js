@@ -292,40 +292,53 @@ function setupIpcHandlers() {
 }
 
 function createWindow() {
-  // Setup headers for SharedArrayBuffer / Pyodide WebAssembly performance
-  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-    callback({
-      responseHeaders: {
-        ...details.responseHeaders,
-        'Cross-Origin-Opener-Policy': ['same-origin'],
-        'Cross-Origin-Embedder-Policy': ['require-corp'],
-      },
-    });
-  });
+  console.log('[Electron Main] Initializing createWindow...');
 
   const preloadCjs = path.join(__dirname, 'preload.cjs');
   const preloadJs = path.join(__dirname, 'preload.js');
   const actualPreload = fs.existsSync(preloadCjs) ? preloadCjs : preloadJs;
+  console.log('[Electron Main] Using preload script:', actualPreload);
 
   mainWindow = new BrowserWindow({
     width: 1360,
     height: 900,
     minWidth: 1024,
     minHeight: 700,
-    title: 'OrientSol 3 - Simulación Solar & Fotovoltaica',
+    title: 'OrientSol 4.0 - Simulación Solar & Fotovoltaica',
     backgroundColor: '#0a0e17',
-    show: false,
+    show: true,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: actualPreload,
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
-      webSecurity: true,
+      webSecurity: false,
     },
   });
 
+  console.log('[Electron Main] BrowserWindow created, window ID:', mainWindow.id);
+
+  mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
+    console.error('[Electron Main] Failed to load:', errorCode, errorDescription, validatedURL);
+  });
+
+  mainWindow.webContents.on('dom-ready', () => {
+    console.log('[Electron Main] DOM is ready!');
+  });
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    console.log('[Electron Main] did-finish-load completed successfully!');
+  });
+
+  mainWindow.webContents.on('console-message', (_event, level, message, line, sourceId) => {
+    console.log(`[Renderer Console L${level}] ${message} (${sourceId}:${line})`);
+  });
+
   mainWindow.once('ready-to-show', () => {
+    console.log('[Electron Main] ready-to-show triggered, showing window!');
     mainWindow.show();
+    mainWindow.focus();
   });
 
   // Load URL or local dist/index.html
@@ -335,12 +348,16 @@ function createWindow() {
   if (isDev && devServerUrl) {
     console.log('[Electron Main] Loading Dev Server:', devServerUrl);
     mainWindow.loadURL(devServerUrl);
-    mainWindow.webContents.openDevTools({ mode: 'detach' });
   } else {
     const distPath = path.join(__dirname, '../dist/index.html');
+    console.log('[Electron Main] Target distPath:', distPath);
     if (fs.existsSync(distPath)) {
-      console.log('[Electron Main] Loading production build from:', distPath);
-      mainWindow.loadFile(distPath);
+      console.log('[Electron Main] distPath exists. Calling loadFile...');
+      mainWindow.loadFile(distPath).then(() => {
+        console.log('[Electron Main] loadFile promise resolved!');
+      }).catch((err) => {
+        console.error('[Electron Main] Failed to loadFile:', err);
+      });
     } else {
       console.warn('[Electron Main] dist/index.html not found, attempting localhost:5173...');
       mainWindow.loadURL('http://localhost:5173');
