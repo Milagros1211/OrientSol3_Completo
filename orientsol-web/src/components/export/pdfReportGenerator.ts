@@ -2921,7 +2921,7 @@ export async function generateOrientSolPDFReport(
   doc.text(isEn ? 'CTE GENERAL LIMIT' : 'LÍMITE GENERAL CTE', 24, lCardY + 5.5);
   doc.text(isEn ? '(Loss <= 10%)' : '(Pérdida <= 10%)', 24, lCardY + 9.5);
   doc.setFontSize(11);
-  doc.text(`${res.captureLossMap.cteZones.generalPctCompliant}%`, 24, lCardY + 16.5);
+  doc.text(formatPercent(res.captureLossMap.cteZones.generalPctCompliant, 1), 24, lCardY + 16.5);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(5.5);
   doc.setTextColor(100, 116, 139);
@@ -2938,7 +2938,7 @@ export async function generateOrientSolPDFReport(
   doc.text(isEn ? 'CTE SUPERPOSITION' : 'SUPERPOSICIÓN CTE', l2X + 4, lCardY + 5.5);
   doc.text(isEn ? '(Loss <= 20%)' : '(Pérdida <= 20%)', l2X + 4, lCardY + 9.5);
   doc.setFontSize(11);
-  doc.text(`${res.captureLossMap.cteZones.superpositionPctCompliant}%`, l2X + 4, lCardY + 16.5);
+  doc.text(formatPercent(res.captureLossMap.cteZones.superpositionPctCompliant, 1), l2X + 4, lCardY + 16.5);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(5.5);
   doc.setTextColor(100, 116, 139);
@@ -2955,7 +2955,7 @@ export async function generateOrientSolPDFReport(
   doc.text(isEn ? 'ARCH. INTEGRATION' : 'INTEGRACIÓN ARQUITECT.', l3X + 4, lCardY + 5.5);
   doc.text(isEn ? '(Loss <= 40%)' : '(Pérdida <= 40%)', l3X + 4, lCardY + 9.5);
   doc.setFontSize(11);
-  doc.text(`${res.captureLossMap.cteZones.integrationPctCompliant}%`, l3X + 4, lCardY + 16.5);
+  doc.text(formatPercent(res.captureLossMap.cteZones.integrationPctCompliant, 1), l3X + 4, lCardY + 16.5);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(5.5);
   doc.setTextColor(100, 116, 139);
@@ -2972,8 +2972,8 @@ export async function generateOrientSolPDFReport(
   doc.text(isEn ? 'NON-COMPLIANT' : 'FUERA DE NORMA', l4X + 4, lCardY + 5.5);
   doc.text(isEn ? '(Loss > 40%)' : '(Pérdida > 40%)', l4X + 4, lCardY + 9.5);
   doc.setFontSize(11);
-  const outOfNorm = (100 - res.captureLossMap.cteZones.integrationPctCompliant).toFixed(1);
-  doc.text(`${outOfNorm}%`, l4X + 4, lCardY + 16.5);
+  const outOfNorm = 100 - res.captureLossMap.cteZones.integrationPctCompliant;
+  doc.text(formatPercent(outOfNorm, 1), l4X + 4, lCardY + 16.5);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(5.5);
   doc.setTextColor(100, 116, 139);

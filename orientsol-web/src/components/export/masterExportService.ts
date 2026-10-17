@@ -7,6 +7,7 @@ import { buildSeasonalComponentSheet } from '@/components/export/seasonalExportH
 import { buildPolarComponentSheet } from '@/components/export/polarExportHelper';
 import { sanitizeForSpreadsheet } from '@/utils/security';
 import { getNoonAzimuthDeg, getDualAxisNoonTiltDeg, getHorizontalTrackerDailyMeanTiltDeg } from '@/services/solarGeometryAngles';
+import { formatPercent } from '@/utils/formatters';
 
 const MONTHS_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -639,25 +640,25 @@ export function exportOrientSolMasterExcel(
     [
       isEn ? 'General CTE Limit' : 'Límite General CTE',
       isEn ? 'Loss ≤ 10%' : 'Pérdida ≤ 10%',
-      `${res.captureLossMap.cteZones.generalPctCompliant}%`,
+      formatPercent(res.captureLossMap.cteZones.generalPctCompliant, 1),
       isEn ? 'COMPLIANT' : 'CONFORME (Uso General)',
     ],
     [
       isEn ? 'Superposition Limit' : 'Superposición CTE',
       isEn ? 'Loss ≤ 20%' : 'Pérdida ≤ 20%',
-      `${res.captureLossMap.cteZones.superpositionPctCompliant}%`,
+      formatPercent(res.captureLossMap.cteZones.superpositionPctCompliant, 1),
       isEn ? 'COMPLIANT' : 'CONFORME (Superposición en cubierta)',
     ],
     [
       isEn ? 'Architectural Integration Limit' : 'Integración Arquitectónica CTE',
       isEn ? 'Loss ≤ 40%' : 'Pérdida ≤ 40%',
-      `${res.captureLossMap.cteZones.integrationPctCompliant}%`,
+      formatPercent(res.captureLossMap.cteZones.integrationPctCompliant, 1),
       isEn ? 'COMPLIANT' : 'CONFORME (Integración total en fachada/cubierta)',
     ],
     [
       isEn ? 'Non-Compliant Zone' : 'Fuera de Norma CTE',
       isEn ? 'Loss > 40%' : 'Pérdida > 40%',
-      `${Number((100 - res.captureLossMap.cteZones.integrationPctCompliant).toFixed(1))}%`,
+      formatPercent(100 - res.captureLossMap.cteZones.integrationPctCompliant, 1),
       isEn ? 'NON-COMPLIANT' : 'NO CONFORME (Fuera de límites reglamentarios)',
     ],
     [],
