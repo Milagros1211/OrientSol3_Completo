@@ -1318,7 +1318,7 @@ export async function generateOrientSolPDFReport(
 
   const pvMonthly = res.energyYield.producida.osterwald.monthlyKwh;
   const maxPvVal = Math.max(...pvMonthly);
-  const maxPvPlot = Math.max(1000, Math.ceil(maxPvVal / 200) * 200);
+  const maxPvPlot = Math.max(1000, Math.ceil((maxPvVal * 1.30) / 200) * 200);
   const baseY2 = c2BoxY + c1H - 7;
   const plotH2 = 30.0;
   const rightAxisX = 184.0;
@@ -1402,26 +1402,93 @@ export async function generateOrientSolPDFReport(
   doc.circle(taPoints[11].x, taPoints[11].y, 0.7, 'F');
 
   // Max and Min labels on Chart 2 (PV Production and Peak Temperatures)
-  // Max and Min labels on Chart 2 (PV Production and Peak Temperatures)
   const maxPvIdx = pvMonthly.indexOf(maxPvVal);
   const minPvVal = Math.min(...pvMonthly);
   const minPvIdx = pvMonthly.indexOf(minPvVal);
 
-  // Peak PV Callout with opaque background badge
-  const maxPvText = `${isEn ? 'MAX' : 'MÁX'}: ${Math.round(maxPvVal)} kWh`;
+  const tcVals = res.temperatures.cellOperating.monthlyCellTempOptimalC;
+  const maxTcVal = Math.max(...tcVals);
+  const maxTcIdx = tcVals.indexOf(maxTcVal);
+  const pTcMax = tcPoints[maxTcIdx];
+
+  // Draw prominent red dot on Tc peak point
+  doc.setFillColor(220, 38, 38);
+  doc.circle(pTcMax.x, pTcMax.y, 1.4, 'F');
+
+  // Compute text and widths
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(5);
-  const maxPvTextW = doc.getTextWidth(maxPvText);
-  const xPvMax = axisX + 2.0 + maxPvIdx * stepX1 + 4.1;
-  const yPvMax = baseY2 - (maxPvVal / maxPvPlot) * plotH2 - 1.8;
-  doc.setFillColor(255, 255, 255);
-  doc.roundedRect(xPvMax - maxPvTextW / 2 - 1.2, yPvMax - 3.2, maxPvTextW + 2.4, 4.0, 0.8, 0.8, 'F');
-  doc.setTextColor(5, 150, 105);
-  doc.text(maxPvText, xPvMax, yPvMax, { align: 'center' });
 
-  // Min PV Callout with Collision Prevention
-  const minPvText = `${isEn ? 'MIN' : 'MÍN'}: ${Math.round(minPvVal)} kWh`;
+  const maxPvText = `${isEn ? 'MAX' : 'MÁX'}: ${formatInt(Math.round(maxPvVal))} kWh`;
+  const maxPvTextW = doc.getTextWidth(maxPvText);
+  const pvPillW = maxPvTextW + 3.0;
+  const pvPillH = 3.8;
+  const xPvMax = axisX + 2.0 + maxPvIdx * stepX1 + 4.1;
+  const barTopMaxY = baseY2 - (maxPvVal / maxPvPlot) * plotH2;
+
+  const tcMaxLabel = ` ${isEn ? 'MAX' : 'MÁX'}: ${formatNum(maxTcVal, 1)}°C`;
+  const tcPillW = 20.0;
+  const tcPillH = 3.8;
+  const xTcMax = pTcMax.x;
+
+  // Collision detection between PV peak callout and Tc peak callout
+  const isMonthNear = Math.abs(maxPvIdx - maxTcIdx) <= 1;
+
+  let yPvPill: number;
+  let yTcPill: number;
+
+  if (isMonthNear) {
+    // Both peaks occur on the same or adjacent months (e.g. July) -> Stack vertically with guaranteed spacing
+    const topAnchorY = Math.min(barTopMaxY, pTcMax.y);
+
+    // Tier 1 (Lower): Tc Max Callout, directly above the curve/bar
+    yTcPill = topAnchorY - 1.8;
+    // Tier 2 (Upper): PV Max Callout, stacked cleanly above Tc Callout with 0.9mm gap
+    yPvPill = (yTcPill - tcPillH) - 0.9;
+
+    // Draw subtle vertical leader line from red dot up to Tc callout if dot is below the pill
+    if (pTcMax.y > yTcPill) {
+      doc.setDrawColor(254, 202, 202);
+      doc.setLineWidth(0.4);
+      doc.line(xTcMax, pTcMax.y - 1.5, xTcMax, yTcPill);
+    }
+  } else {
+    // Separate months (>= 2 months apart) -> Each sits independently above its own feature
+    yPvPill = barTopMaxY - 1.8;
+    yTcPill = pTcMax.y - 1.8;
+  }
+
+  // 1. Render Peak PV Callout (Green border, white background, high contrast)
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(167, 243, 208);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(xPvMax - pvPillW / 2, yPvPill - pvPillH, pvPillW, pvPillH, 0.8, 0.8, 'FD');
+  doc.setTextColor(5, 150, 105);
+  doc.text(maxPvText, xPvMax, yPvPill - 1.1, { align: 'center' });
+
+  // 2. Render Peak Cell Temperature Callout (Red border, white background)
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(254, 202, 202);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(xTcMax - tcPillW / 2, yTcPill - tcPillH, tcPillW, tcPillH, 0.8, 0.8, 'FD');
+  drawTextWithSubscripts(
+    doc,
+    [
+      { text: 'T', color: [220, 38, 38] },
+      { text: 'C', isSub: true, color: [220, 38, 38] },
+      { text: tcMaxLabel, color: [220, 38, 38] }
+    ],
+    xTcMax,
+    yTcPill - 1.1,
+    5,
+    'center',
+    true
+  );
+
+  // 3. Min PV Callout with Collision Prevention (relative to temperature curves)
+  const minPvText = `${isEn ? 'MIN' : 'MÍN'}: ${formatInt(Math.round(minPvVal))} kWh`;
   const minPvTextW = doc.getTextWidth(minPvText);
+  const minPillW = minPvTextW + 2.6;
   const xPvMin = axisX + 2.0 + minPvIdx * stepX1 + 4.1;
   const barTopMinY = baseY2 - (minPvVal / maxPvPlot) * plotH2;
   const yPvMinAbove = barTopMinY - 1.8;
@@ -1430,47 +1497,21 @@ export async function generateOrientSolPDFReport(
   const collidesWithCurves = Math.abs(yPvMinAbove - tcAtMin) < 5.5 || Math.abs(yPvMinAbove - taAtMin) < 5.5;
 
   if (collidesWithCurves) {
-    // If temperature curves cross above the bar, render cleanly INSIDE the bar in white text with high-contrast badge
+    // If temperature curves cross directly above the bar, render cleanly INSIDE the bar in white text with high-contrast badge
     const yPvMinInside = barTopMinY + 4.2;
     doc.setFillColor(15, 23, 42);
-    doc.roundedRect(xPvMin - minPvTextW / 2 - 1.2, yPvMinInside - 3.0, minPvTextW + 2.4, 3.8, 0.8, 0.8, 'F');
+    doc.roundedRect(xPvMin - minPillW / 2, yPvMinInside - 3.2, minPillW, 3.8, 0.8, 0.8, 'F');
     doc.setTextColor(255, 255, 255);
-    doc.text(minPvText, xPvMin, yPvMinInside, { align: 'center' });
+    doc.text(minPvText, xPvMin, yPvMinInside - 0.7, { align: 'center' });
   } else {
-    // Render above bar with opaque white badge to prevent any line intersections
+    // Render above bar with crisp white pill badge
     doc.setFillColor(255, 255, 255);
-    doc.roundedRect(xPvMin - minPvTextW / 2 - 1.2, yPvMinAbove - 3.2, minPvTextW + 2.4, 4.0, 0.8, 0.8, 'F');
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(xPvMin - minPillW / 2, yPvMinAbove - 3.4, minPillW, 3.8, 0.8, 0.8, 'FD');
     doc.setTextColor(100, 116, 139);
-    doc.text(minPvText, xPvMin, yPvMinAbove, { align: 'center' });
+    doc.text(minPvText, xPvMin, yPvMinAbove - 0.8, { align: 'center' });
   }
-
-  // Peak Cell Temperature Callout with crisp white pill badge
-  const tcVals = res.temperatures.cellOperating.monthlyCellTempOptimalC;
-  const maxTcVal = Math.max(...tcVals);
-  const maxTcIdx = tcVals.indexOf(maxTcVal);
-  const pTcMax = tcPoints[maxTcIdx];
-  doc.setFillColor(220, 38, 38);
-  doc.circle(pTcMax.x, pTcMax.y, 1.4, 'F');
-  
-  const tcMaxLabel = ` ${isEn ? 'MAX' : 'MÁX'}: ${formatNum(maxTcVal, 1)}°C`;
-  const tcPillW = 20.0;
-  doc.setFillColor(255, 255, 255);
-  doc.setDrawColor(254, 202, 202);
-  doc.setLineWidth(0.3);
-  doc.roundedRect(pTcMax.x - tcPillW / 2, pTcMax.y - 5.5, tcPillW, 3.8, 0.8, 0.8, 'FD');
-  drawTextWithSubscripts(
-    doc,
-    [
-      { text: 'T', color: [220, 38, 38] },
-      { text: 'C', isSub: true, color: [220, 38, 38] },
-      { text: tcMaxLabel, color: [220, 38, 38] }
-    ],
-    pTcMax.x,
-    pTcMax.y - 2.8,
-    5,
-    'center',
-    true
-  );
 
   // -------------------------------------------------------------
   // CAJA DE INSIGHTS RELEVANTES RESALTADOS (Imagen 1)
