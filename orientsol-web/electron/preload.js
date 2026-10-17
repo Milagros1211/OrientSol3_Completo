@@ -1,9 +1,8 @@
 /**
- * OrientSol 3 - Electron Preload Script
+ * OrientSol 4.0 - Electron Preload Script
+ * Securely exposes safe IPC methods to the renderer process via contextBridge.
  */
-import { contextBridge, ipcRenderer } from 'electron';
-
-contextBridge.exposeInMainWorld('isElectron', true);
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
   isElectron: true,
@@ -18,12 +17,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => ipcRenderer.removeListener('network:status-changed', subscription);
   },
 
-  // Offline Climate Cache
+  // Offline Climate Cache (Local Disk JSON Persistence)
   getOfflineClimateCache: () => ipcRenderer.invoke('offline-cache:get-all'),
   saveOfflineClimateRecord: (record) => ipcRenderer.invoke('offline-cache:save-record', record),
   getOfflineRecordByCoords: (lat, lon, toleranceDeg = 0.5) =>
     ipcRenderer.invoke('offline-cache:get-by-coords', lat, lon, toleranceDeg),
 
-  // Application Info
+  // Application Info & Cache Path
   getAppInfo: () => ipcRenderer.invoke('app:get-info'),
 });
