@@ -52,21 +52,51 @@ La versión 4.0 ha sido sometida a una auditoría exhaustiva de seguridad ofensi
 
 ---
 
-## 3. Comandos de Desarrollo y Compilación
+## 3. Comandos de Desarrollo y Compilación Multiplataforma (100% Offline)
 
+### Entorno de Desarrollo Web
 ```bash
 # Iniciar servidor local de desarrollo
 npm run dev
 
 # Compilar versión web para producción
 npm run build
+```
 
-# Ejecutar como aplicación nativa de escritorio (Windows / Electron)
+### Windows Desktop (Electron)
+```bash
+# Ejecutar directamente en escritorio Windows en modo desarrollo
 npm run app:desktop
 
-# Empaquetar instalador .exe para Windows
+# Empaquetar instalador NSIS (.exe) y versión portable (.exe)
 npm run build:win
-
-# Sincronizar y compilar APK para Android
-npm run build:apk
+# Binarios generados en: release/OrientSol 4.0 Setup 4.0.0.exe y release/OrientSol 4.0 4.0.0.exe
 ```
+
+### macOS Desktop (Electron)
+```bash
+# Empaquetar imagen de disco (.dmg) y paquete .app (.zip) para macOS
+npm run build:mac
+# Binario generado en: release/OrientSol 4.0-4.0.0.dmg
+```
+
+### Android Mobile & Tablet (Capacitor)
+```bash
+# Sincronizar el bundle web compilado y el motor Pyodide WASM con el proyecto Android nativo
+npm run cap:sync
+
+# Compilar el archivo instalador APK autónomo
+npm run build:apk
+# Binario generado en: android/app/build/outputs/apk/debug/app-debug.apk
+
+# Abrir en Android Studio para emulación y firma de release (Google Play Bundle .aab)
+npm run cap:open:android
+```
+
+### Automatización CI/CD (GitHub Actions)
+El repositorio incluye el flujo automatizado `.github/workflows/build-offline-releases.yml` que:
+1. Compila los instaladores de **Windows (`.exe`)** en un runner `windows-latest`.
+2. Compila la imagen de **macOS (`.dmg`)** en un runner `macos-latest`.
+3. Compila el paquete de **Android (`.apk`)** con Java JDK 21 y Android SDK en un runner `ubuntu-latest`.
+4. Publica automáticamente un **GitHub Release** con todos los binarios descargables listos para su uso offline sin conexión.
+
