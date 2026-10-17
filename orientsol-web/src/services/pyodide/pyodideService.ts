@@ -49,19 +49,39 @@ export function isElectronEnvironment(): boolean {
 }
 
 /**
+ * Dynamically detects whether the application is running in an offline native container
+ * (Electron for Windows/macOS or Capacitor for Android).
+ */
+export function isNativeEnvironment(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  // 1. Electron Desktop
+  if (isElectronEnvironment()) return true;
+
+  // 2. Capacitor Android / Mobile Native
+  if ((window as any).Capacitor?.isNativePlatform?.() === true) return true;
+  if ((window as any).Capacitor && typeof (window as any).Capacitor.getPlatform === 'function') {
+    const platform = (window as any).Capacitor.getPlatform();
+    if (platform === 'android' || platform === 'ios') return true;
+  }
+
+  return false;
+}
+
+/**
  * Resolves the appropriate indexURL based on the detected runtime environment:
- * - Electron (offline): Local path (/pyodide/ or relative path ./pyodide/ to local disk)
- * - Web (online): Official jsdelivr CDN URL
+ * - Native Desktop/Mobile (offline): Local path (/pyodide/ or relative path ./pyodide/ to local bundle)
+ * - Web (online): Official jsdelivr CDN URL (with graceful local fallback if offline)
  */
 export function resolvePyodideIndexURL(indexURL?: string): { url: string; isOfflineElectron: boolean } {
   if (indexURL) {
-    return { url: indexURL, isOfflineElectron: isElectronEnvironment() };
+    return { url: indexURL, isOfflineElectron: isNativeEnvironment() };
   }
 
-  const isElectron = isElectronEnvironment();
+  const isNative = isNativeEnvironment();
 
-  if (isElectron) {
-    // In Electron, use relative or file-based local path to guarantee 100% offline functionality
+  if (isNative) {
+    // In Electron & Capacitor, use relative or local path to guarantee 100% offline functionality
     let localPath: string;
     if (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:') {
       // Resolves to local dist/pyodide/ folder on disk without internet
