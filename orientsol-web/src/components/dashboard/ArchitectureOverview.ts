@@ -62,7 +62,7 @@ export function renderArchitectureOverview(isEn?: boolean): HTMLElement {
         <ul class="arch-list">
           <li><code>locations.ts</code>: ${isEnglish ? 'Historical database with monthly Gdm(0) radiation and ambient temperatures' : 'Catálogo de localidades con radiación Gdm(0) y temperaturas'}</li>
           <li><code>supabase/</code>: ${isEnglish ? 'Cloud sync for custom emplacements with anti-duplicate validation' : 'Sincronización en la nube para emplazamientos personalizados'}</li>
-          <li><code>solarConstants.ts</code>: ${isEnglish ? 'Solar constant (1367 W/m², WMO/WRC standard) and characteristic days' : 'Constante solar (1367 W/m², estándar OMM/WRC) y días característicos'}</li>
+          <li><code>solarConstants.ts</code>: ${isEnglish ? 'Solar constant (1.367 W/m², WMO/WRC standard) and characteristic days' : 'Constante solar (1.367 W/m², estándar OMM/WRC) y días característicos'}</li>
           <li><code>pvModules.ts</code>: ${isEnglish ? 'Commercial PV module specifications and temperature coefficients' : 'Especificaciones de módulos fotovoltaicos comerciales'}</li>
         </ul>
       </div>

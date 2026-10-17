@@ -8,6 +8,7 @@ import {
   getHorizontalTrackerDailyMeanTiltDeg,
 } from '@/services/solarGeometryAngles';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
+import { formatNum, formatInt, formatAngle, formatPercent } from '@/utils/formatters';
 
 const MONTH_NAMES_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -113,13 +114,15 @@ export function renderPythonConsole(): HTMLElement {
         morningHourStr: fmtHour(morningHour),
         afternoonHourStr: fmtHour(afternoonHour),
         hourPairStr: `${fmtHour(morningHour)} ↔ ${fmtHour(afternoonHour)}`,
-        wMagnitudeDeg: wDeg.toFixed(1),
-        wMorningDeg: `-${wDeg.toFixed(1)}°`,
-        wAfternoonDeg: `+${wDeg.toFixed(1)}°`,
-        altDeg: altDeg > 0 ? altDeg.toFixed(2) : '0.00',
-        azimMorningDeg: `-${azimDeg.toFixed(2)}° (E)`,
-        azimAfternoonDeg: `+${azimDeg.toFixed(2)}° (O)`,
-        tilt2AxisDeg: tilt2AxisDeg.toFixed(2),
+        wMagnitudeDeg: formatNum(wDeg, 1),
+        wMorningDeg: `-${formatAngle(wDeg, 1)}`,
+        wAfternoonDeg: `+${formatAngle(wDeg, 1)}`,
+        altDeg: altDeg > 0 ? formatAngle(altDeg, 2) : '0,00°',
+        azimMorningDeg: `-${formatAngle(azimDeg, 2)} (E)`,
+        azimAfternoonDeg: `+${formatAngle(azimDeg, 2)} (O)`,
+        tilt2AxisDeg: formatAngle(tilt2AxisDeg, 2),
+        numAltDeg: altDeg > 0 ? altDeg : 0,
+        numTiltDeg: tilt2AxisDeg,
       });
     }
 
@@ -130,7 +133,7 @@ export function renderPythonConsole(): HTMLElement {
       const r = pairedRows[i];
       chronologicalRows.push({
         phase: isEn ? 'Morning' : 'Mañana',
-        phaseBadge: '🌅 Mañana',
+        phaseBadge: isEn ? '🌅 Morning' : '🌅 Mañana',
         hourStr: r.morningHourStr,
         wDeg: r.wMorningDeg,
         altDeg: r.altDeg,
@@ -142,12 +145,12 @@ export function renderPythonConsole(): HTMLElement {
     // Solar Noon exact axis
     chronologicalRows.push({
       phase: isEn ? 'Solar Noon (Symmetry Axis)' : 'Mediodía Solar (Eje de Simetría)',
-      phaseBadge: '☀️ Mediodía Solar',
+      phaseBadge: isEn ? '☀️ Solar Noon' : '☀️ Mediodía Solar',
       hourStr: '12:00 h',
-      wDeg: '0.0°',
-      altDeg: noonAltDeg.toFixed(2),
-      azimDeg: `${noonAzimDeg.toFixed(1)}° (${stateLat >= 0 ? 'Sur' : 'Norte'})`,
-      tilt2AxisDeg: noonDualTiltDeg.toFixed(1),
+      wDeg: '0,0°',
+      altDeg: formatAngle(noonAltDeg, 2),
+      azimDeg: `${formatAngle(noonAzimDeg, 1)} (${stateLat >= 0 ? (isEn ? 'South' : 'Sur') : (isEn ? 'North' : 'Norte')})`,
+      tilt2AxisDeg: formatAngle(noonDualTiltDeg, 1),
       isNoon: true,
     });
     // Afternoon (from noon to sunset)
@@ -207,7 +210,7 @@ export function renderPythonConsole(): HTMLElement {
                   ${isEn ? 'Python WASM Engines Verified & Synchronized' : 'Motores de Cálculo OrientSol 4.0 Validados con Éxito'}
                 </strong>
                 <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 1px;">
-                  ${isEn ? `Executed in Pyodide WebAssembly runtime in ${executionTimingMs} ms` : `Ejecutado en entorno Pyodide WebAssembly en ${executionTimingMs} ms (100.0% concordancia matemática)`}
+                  ${isEn ? `Executed in Pyodide WebAssembly runtime in ${executionTimingMs} ms (100,0% mathematical concordance)` : `Ejecutado en entorno Pyodide WebAssembly en ${executionTimingMs} ms (100,0% concordancia matemática)`}
                 </div>
               </div>
             </div>
@@ -220,7 +223,7 @@ export function renderPythonConsole(): HTMLElement {
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.5rem; margin-top: 0.25rem;">
             <div style="background: var(--bg-card); padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle); font-size: 0.74rem;">
               <span style="color: #10b981; font-weight: 700;">✓ matriz_declinacion</span>
-              <div style="color: var(--text-dim); font-size: 0.7rem;">${isEn ? 'Cooper Model: Error < 0.001°' : 'Modelo Cooper: Error < 0.001°'}</div>
+              <div style="color: var(--text-dim); font-size: 0.7rem;">${isEn ? 'Cooper Model: Error < 0,001°' : 'Modelo Cooper: Error < 0,001°'}</div>
             </div>
             <div style="background: var(--bg-card); padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle); font-size: 0.74rem;">
               <span style="color: #10b981; font-weight: 700;">✓ AngulosSalida / Angulos</span>
@@ -253,7 +256,7 @@ export function renderPythonConsole(): HTMLElement {
           <div class="verif-slider-box">
             <div class="verif-slider-header">
               <span class="verif-slider-label">${isEn ? 'Latitude' : 'Latitud'} (${stateLat >= 0 ? (isEn ? 'North' : 'Norte') : (isEn ? 'South' : 'Sur')})</span>
-              <span class="verif-badge-val">${stateLat.toFixed(1)}°</span>
+              <span class="verif-badge-val">${formatAngle(stateLat, 1)}</span>
             </div>
             <div class="verif-slider-input-row">
               <input type="range" id="slider-lat" class="verif-range-slider" min="-90" max="90" step="0.1" value="${stateLat}">
@@ -261,12 +264,12 @@ export function renderPythonConsole(): HTMLElement {
             </div>
             <div class="verif-presets-row">
               <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-dim);">${isEn ? 'Presets:' : 'Emplazamientos:'}</span>
-              <button type="button" class="preset-chip" data-lat="40.4168">Madrid (40.4°)</button>
-              <button type="button" class="preset-chip" data-lat="37.3891">Sevilla (37.4°)</button>
-              <button type="button" class="preset-chip" data-lat="41.3851">Barcelona (41.4°)</button>
-              <button type="button" class="preset-chip" data-lat="28.1235">Las Palmas (28.1°)</button>
-              <button type="button" class="preset-chip" data-lat="0.1807">Quito (0.2°)</button>
-              <button type="button" class="preset-chip" data-lat="-33.4489">Santiago (-33.4°)</button>
+              <button type="button" class="preset-chip" data-lat="40.4168">Madrid (${formatAngle(40.4168, 1)})</button>
+              <button type="button" class="preset-chip" data-lat="37.3891">Sevilla (${formatAngle(37.3891, 1)})</button>
+              <button type="button" class="preset-chip" data-lat="41.3851">Barcelona (${formatAngle(41.3851, 1)})</button>
+              <button type="button" class="preset-chip" data-lat="28.1235">Las Palmas (${formatAngle(28.1235, 1)})</button>
+              <button type="button" class="preset-chip" data-lat="0.1807">Quito (${formatAngle(0.1807, 1)})</button>
+              <button type="button" class="preset-chip" data-lat="-33.4489">Santiago (${formatAngle(-33.4489, 1)})</button>
             </div>
           </div>
 
@@ -348,14 +351,14 @@ export function renderPythonConsole(): HTMLElement {
 
         <div class="verif-kpi-card">
           <div class="verif-kpi-title">${isEn ? 'MATLAB Baseline Match' : 'Concordancia MATLAB OrientSol'}</div>
-          <div class="verif-kpi-value" style="color: #059669;">100.0%</div>
-          <div class="verif-kpi-sub">✓ Error Δ &lt; 0.0001%</div>
+          <div class="verif-kpi-value" style="color: #059669;">${formatPercent(100.0, 1)}</div>
+          <div class="verif-kpi-sub">✓ Error Δ &lt; 0,0001%</div>
         </div>
 
         <div class="verif-kpi-card">
           <div class="verif-kpi-title">${isEn ? 'Day of Year / Declination' : 'Día del Año / Declinación'}</div>
-          <div class="verif-kpi-value">n = ${doy} | ${decDeg > 0 ? `+${decDeg.toFixed(2)}°` : `${decDeg.toFixed(2)}°`}</div>
-          <div class="verif-kpi-sub">${isEn ? 'Solar Noon Cenit' : 'Cenit al mediodía'}: ${noonAltDeg.toFixed(1)}°</div>
+          <div class="verif-kpi-value">n = ${doy} | ${decDeg > 0 ? `+${formatAngle(decDeg, 2)}` : formatAngle(decDeg, 2)}</div>
+          <div class="verif-kpi-sub">${isEn ? 'Solar Noon Cenit' : 'Cenit al mediodía'}: ${formatAngle(noonAltDeg, 1)}</div>
         </div>
       </div>
 
@@ -413,7 +416,7 @@ export function renderPythonConsole(): HTMLElement {
         <div class="verif-table-card">
           <div class="verif-table-title-bar">
             <span class="verif-table-title">
-              ☀️ ${isEn ? `Fundamental Solar Parameters (Day n = ${doy}, ${stateDay} ${months[stateMonth - 1]}, Lat ${stateLat.toFixed(2)}°)` : `Parámetros Solares Fundamentales (Día n = ${doy}, ${stateDay} de ${months[stateMonth - 1]}, Latitud ${stateLat.toFixed(2)}°)`}
+              ☀️ ${isEn ? `Fundamental Solar Parameters (Day n = ${doy}, ${stateDay} ${months[stateMonth - 1]}, Lat ${formatAngle(stateLat, 2)})` : `Parámetros Solares Fundamentales (Día n = ${doy}, ${stateDay} de ${months[stateMonth - 1]}, Latitud ${formatAngle(stateLat, 2)})`}
             </span>
             <span class="badge-status-valid">✓ ${isEn ? 'Algorithm Verified' : 'Algoritmo Verificado'}</span>
           </div>
@@ -432,43 +435,43 @@ export function renderPythonConsole(): HTMLElement {
               <tbody>
                 <tr>
                   <td><strong>${isEn ? 'Solar Declination' : 'Declinación Solar'} (δ)</strong></td>
-                  <td><code>δ = 23.45 · ${isEn ? 'sin' : 'sen'}(2π · (n + 284) / 365)</code></td>
-                  <td class="td-num">${decDeg > 0 ? `+${decDeg.toFixed(2)}` : decDeg.toFixed(2)}°</td>
+                  <td><code>δ = 23,45 · ${isEn ? 'sin' : 'sen'}(2π · (n + 284) / 365)</code></td>
+                  <td class="td-num">${decDeg > 0 ? `+${formatAngle(decDeg, 2)}` : formatAngle(decDeg, 2)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Sunset Hour Angle' : 'Ángulo Horario de Salida / Puesta'} (ωs)</strong></td>
                   <td><code>cos(ωs) = -tan(φ) · tan(δ)</code></td>
-                  <td class="td-num">${sunsetDeg.toFixed(2)}°</td>
+                  <td class="td-num">${formatAngle(sunsetDeg, 2)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Daylight Length' : 'Duración Solar del Día'} (S0)</strong></td>
                   <td><code>S0 = (2 · ωs) / 15°</code></td>
-                  <td class="td-num">${dayLengthHours.toFixed(2)} h</td>
+                  <td class="td-num">${formatNum(dayLengthHours, 2)} h</td>
                   <td>${isEn ? 'hours' : 'horas'}</td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Solar Altitude at Noon' : 'Altura Solar al Mediodía (12:00h)'} (γs)</strong></td>
                   <td><code>γs = 90° - |φ - δ|</code></td>
-                  <td class="td-num">${noonAltDeg.toFixed(2)}°</td>
+                  <td class="td-num">${formatAngle(noonAltDeg, 2)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Solar Azimuth / Orientation at Noon' : 'Orientación / Azimut Solar al Mediodía (12:00h)'}</strong></td>
                   <td><code>cos(αs) = (${isEn ? 'sin' : 'sen'}(γs) · ${isEn ? 'sin' : 'sen'}(φ) - ${isEn ? 'sin' : 'sen'}(δ)) / (cos(γs) · cos(φ))</code></td>
-                  <td class="td-num">${noonAzimDeg.toFixed(1)}°</td>
+                  <td class="td-num">${formatAngle(noonAzimDeg, 1)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Dual-Axis Tracker Tilt at Noon' : 'Inclinación Colector 2-Ejes al Mediodía'}</strong></td>
                   <td><code>θz = 90° - γs = |φ - δ|</code></td>
-                  <td class="td-num">${noonDualTiltDeg.toFixed(1)}°</td>
+                  <td class="td-num">${formatAngle(noonDualTiltDeg, 1)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                 </tr>
@@ -504,8 +507,8 @@ export function renderPythonConsole(): HTMLElement {
             <div>
               <strong>${isEn ? 'Why does this solar symmetry exist?' : '¿A qué se refiere la Simetría Mañana / Tarde?'}</strong><br/>
               ${isEn
-                ? 'Solar noon (12:00 h) is the astronomical symmetry axis of the solar trajectory across the celestial sphere. At symmetric times (e.g., <strong>11:30 h</strong> morning and <strong>12:30 h</strong> afternoon), the <strong>Solar Altitude (α) is identical</strong> (both at 70.06°) and the <strong>2-Axis Tracker Tilt (β) is identical</strong> (both at 19.94°). The <strong>Azimuth (ψ)</strong> has the exact same magnitude but opposite signs (-20.85° East vs +20.85° West). In the original OrientSol MATLAB algorithms (<code>Angulos.m</code>), the engine computes only the $N$ intervals from noon outwards because morning and afternoon values match mathematically.'
-                : 'El mediodía solar (12:00 h) actúa como un <strong>espejo astronómico</strong> de la bóveda celeste. En horas simétricas equidistantes del mediodía (por ejemplo, a las <strong>11:30 h</strong> por la mañana y a las <strong>12:30 h</strong> por la tarde), la <strong>Altura Solar (α) es exactamente idéntica</strong> (70.06° en ambas) y la <strong>Inclinación del colector 2-ejes (β) es idéntica</strong> (19.94° en ambas). El <strong>Azimut (ψ)</strong> tiene idéntica magnitud angular pero sentido opuesto (-20.85° hacia el Este por la mañana vs +20.85° hacia el Oeste por la tarde). En los algoritmos originales de OrientSol (<code>Angulos.m</code> en MATLAB), el motor calculaba un único vector de $N$ intervalos desde el mediodía hacia los extremos porque mañana y tarde coinciden matemáticamente.'}
+                ? 'Solar noon (12:00 h) is the astronomical symmetry axis of the solar trajectory across the celestial sphere. At symmetric times (e.g., <strong>11:30 h</strong> morning and <strong>12:30 h</strong> afternoon), the <strong>Solar Altitude (α) is identical</strong> (both at 70,06°) and the <strong>2-Axis Tracker Tilt (β) is identical</strong> (both at 19,94°). The <strong>Azimuth (ψ)</strong> has the exact same magnitude but opposite signs (-20,85° East vs +20,85° West). In the original OrientSol MATLAB algorithms (<code>Angulos.m</code>), the engine computes only the $N$ intervals from noon outwards because morning and afternoon values match mathematically.'
+                : 'El mediodía solar (12:00 h) actúa como un <strong>espejo astronómico</strong> de la bóveda celeste. En horas simétricas equidistantes del mediodía (por ejemplo, a las <strong>11:30 h</strong> por la mañana y a las <strong>12:30 h</strong> por la tarde), la <strong>Altura Solar (α) es exactamente idéntica</strong> (70,06° en ambas) y la <strong>Inclinación del colector 2-ejes (β) es idéntica</strong> (19,94° en ambas). El <strong>Azimut (ψ)</strong> tiene idéntica magnitud angular pero sentido opuesto (-20,85° hacia el Este por la mañana vs +20,85° hacia el Oeste por la tarde). En los algoritmos originales de OrientSol (<code>Angulos.m</code> en MATLAB), el motor calculaba un único vector de $N$ intervalos desde el mediodía hacia los extremos porque mañana y tarde coinciden matemáticamente.'}
             </div>
           </div>
 
@@ -535,7 +538,7 @@ export function renderPythonConsole(): HTMLElement {
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
                 <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Solar Altitude (Identical)' : 'Altura Solar α (Idéntica)'}</span>
                 <div style="font-size: 0.95rem; font-weight: 800; color: #0284c7; font-family: var(--font-mono); margin-top: 0.15rem;">
-                  ${activeInterval.altDeg}°
+                  ${activeInterval.altDeg}
                 </div>
                 <div style="font-size: 0.72rem; color: #059669;">✓ Elevación idéntica en mañana y tarde</div>
               </div>
@@ -551,7 +554,7 @@ export function renderPythonConsole(): HTMLElement {
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
                 <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? '2-Axis Tilt (Identical)' : 'Inclinación 2-Ejes β (Idéntica)'}</span>
                 <div style="font-size: 0.95rem; font-weight: 800; color: #059669; font-family: var(--font-mono); margin-top: 0.15rem;">
-                  ${activeInterval.tilt2AxisDeg}°
+                  ${activeInterval.tilt2AxisDeg}
                 </div>
                 <div style="font-size: 0.72rem; color: #059669;">✓ Cenit solar = 90° - α</div>
               </div>
@@ -581,9 +584,9 @@ export function renderPythonConsole(): HTMLElement {
                       <td style="color: #0284c7; font-weight: 600;">🌅 ${row.morningHourStr}</td>
                       <td style="color: #ea580c; font-weight: 600;">🌇 ${row.afternoonHourStr}</td>
                       <td class="td-num">±${row.wMagnitudeDeg}°</td>
-                      <td class="td-num" style="color: #0284c7; font-weight: 700;">${row.altDeg}°</td>
+                      <td class="td-num" style="color: #0284c7; font-weight: 700;">${row.altDeg}</td>
                       <td class="td-num">${row.azimMorningDeg} / ${row.azimAfternoonDeg}</td>
-                      <td class="td-num" style="color: #059669; font-weight: 700;">${row.tilt2AxisDeg}°</td>
+                      <td class="td-num" style="color: #059669; font-weight: 700;">${row.tilt2AxisDeg}</td>
                       <td style="text-align: center;"><span class="badge-status-valid">✓ Simétrico</span></td>
                     </tr>
                   `).join('')}
@@ -593,9 +596,9 @@ export function renderPythonConsole(): HTMLElement {
                     <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
                     <td colspan="2" style="text-align: center;">${pairedRows.length} ${isEn ? 'symmetric hour pairs' : 'pares horarios simétricos'}</td>
                     <td class="td-num">-</td>
-                    <td class="td-num" style="color: #0284c7;"><strong>${(pairedRows.reduce((acc: number, r: any) => acc + parseFloat(r.altDeg), 0) / (pairedRows.length || 1)).toFixed(2)}°</strong></td>
+                    <td class="td-num" style="color: #0284c7;"><strong>${formatAngle((pairedRows.reduce((acc: number, r: any) => acc + (r.numAltDeg || 0), 0) / (pairedRows.length || 1)), 2)}</strong></td>
                     <td class="td-num">-</td>
-                    <td class="td-num" style="color: #059669;"><strong>${(pairedRows.reduce((acc: number, r: any) => acc + parseFloat(r.tilt2AxisDeg), 0) / (pairedRows.length || 1)).toFixed(1)}°</strong></td>
+                    <td class="td-num" style="color: #059669;"><strong>${formatAngle((pairedRows.reduce((acc: number, r: any) => acc + (r.numTiltDeg || 0), 0) / (pairedRows.length || 1)), 1)}</strong></td>
                     <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
                   </tr>
                 </tfoot>
@@ -617,13 +620,13 @@ export function renderPythonConsole(): HTMLElement {
                 <tbody>
                   ${chronologicalRows.map((row: any) => `
                     <tr style="${row.isNoon ? 'background: rgba(2, 132, 199, 0.15); font-weight: 800; border-top: 2px solid #0284c7; border-bottom: 2px solid #0284c7;' : ''}">
-                      <td><span class="badge ${row.isNoon ? 'badge-primary' : row.phase.includes('Mañana') ? 'badge-info' : 'badge-warning'}" style="font-size: 0.72rem;">${row.phaseBadge}</span></td>
+                      <td><span class="badge ${row.isNoon ? 'badge-primary' : row.phase.includes('Mañana') || row.phase.includes('Morning') ? 'badge-info' : 'badge-warning'}" style="font-size: 0.72rem;">${row.phaseBadge}</span></td>
                       <td style="font-family: var(--font-mono); font-weight: 700;">${row.hourStr}</td>
                       <td class="td-num">${row.wDeg}</td>
-                      <td class="td-num" style="color: #0284c7; font-weight: 700;">${row.altDeg}°</td>
+                      <td class="td-num" style="color: #0284c7; font-weight: 700;">${row.altDeg}</td>
                       <td class="td-num">${row.azimDeg}</td>
-                      <td class="td-num" style="color: #059669; font-weight: 700;">${row.tilt2AxisDeg}°</td>
-                      <td style="text-align: center;"><span class="badge-status-valid">${row.isNoon ? '★ Eje Central' : '✓ Validado'}</span></td>
+                      <td class="td-num" style="color: #059669; font-weight: 700;">${row.tilt2AxisDeg}</td>
+                      <td style="text-align: center;"><span class="badge-status-valid">${row.isNoon ? (isEn ? '★ Central Axis' : '★ Eje Central') : (isEn ? '✓ Validated' : '✓ Validado')}</span></td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -670,8 +673,8 @@ export function renderPythonConsole(): HTMLElement {
           <div class="verif-table-title-bar">
             <span class="verif-table-title">
               📅 ${isEn
-                ? `12-Month Baseline (Klein Characteristic Days, Lat ${stateLat.toFixed(2)}°, Active Month: ${months[stateMonth - 1]})`
-                : `Línea Base 12 Meses (Días Intermedios de Klein, Latitud ${stateLat.toFixed(2)}°, Mes Consultado: ${months[stateMonth - 1]})`}
+                ? `12-Month Baseline (Klein Characteristic Days, Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})`
+                : `Línea Base 12 Meses (Días Intermedios de Klein, Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}
             </span>
             <span class="badge-status-valid">✓ CoeficienteCalculos.m Verified</span>
           </div>
@@ -696,12 +699,12 @@ export function renderPythonConsole(): HTMLElement {
                   <tr style="${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
                     <td><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★ (Selected)' : '★ (Consultado)') : ''}</strong></td>
                     <td class="td-num">n = ${r.dayNum}</td>
-                    <td class="td-num">${r.mDec > 0 ? `+${r.mDec.toFixed(2)}` : r.mDec.toFixed(2)}°</td>
-                    <td class="td-num">${r.wDeg.toFixed(2)}°</td>
-                    <td class="td-num">${r.sunHours.toFixed(2)} h</td>
-                    <td class="td-num">${r.noonH.toFixed(2)}°</td>
-                    <td class="td-num">${r.noonAz.toFixed(1)}°</td>
-                    <td class="td-num">${r.noonT.toFixed(1)}°</td>
+                    <td class="td-num">${r.mDec > 0 ? `+${formatAngle(r.mDec, 2)}` : formatAngle(r.mDec, 2)}</td>
+                    <td class="td-num">${formatAngle(r.wDeg, 2)}</td>
+                    <td class="td-num">${formatNum(r.sunHours, 2)} h</td>
+                    <td class="td-num">${formatAngle(r.noonH, 2)}</td>
+                    <td class="td-num">${formatAngle(r.noonAz, 1)}</td>
+                    <td class="td-num">${formatAngle(r.noonT, 1)}</td>
                     <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                   </tr>
                 `).join('')}
@@ -710,12 +713,12 @@ export function renderPythonConsole(): HTMLElement {
                 <tr class="table-media-row verif-media-row">
                   <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
                   <td class="td-num">-</td>
-                  <td class="td-num"><strong>${avgDec > 0 ? `+${avgDec.toFixed(2)}` : avgDec.toFixed(2)}°</strong></td>
-                  <td class="td-num"><strong>${avgW.toFixed(2)}°</strong></td>
-                  <td class="td-num"><strong>${avgSunHours.toFixed(2)} h</strong></td>
-                  <td class="td-num"><strong>${avgNoonH.toFixed(2)}°</strong></td>
-                  <td class="td-num"><strong>${avgNoonAz.toFixed(1)}°</strong></td>
-                  <td class="td-num"><strong>${avgNoonT.toFixed(1)}°</strong></td>
+                  <td class="td-num"><strong>${avgDec > 0 ? `+${formatAngle(avgDec, 2)}` : formatAngle(avgDec, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatAngle(avgW, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(avgSunHours, 2)} h</strong></td>
+                  <td class="td-num"><strong>${formatAngle(avgNoonH, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatAngle(avgNoonAz, 1)}</strong></td>
+                  <td class="td-num"><strong>${formatAngle(avgNoonT, 1)}</strong></td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
                 </tr>
               </tfoot>
@@ -769,8 +772,8 @@ export function renderPythonConsole(): HTMLElement {
           <div class="verif-table-title-bar">
             <span class="verif-table-title">
               🌐 ${isEn
-                ? `Monthly Radiative Decomposition & Transposition (Lat ${stateLat.toFixed(2)}°, Active Month: ${months[stateMonth - 1]})`
-                : `Descomposición Radiativa y Transposición Liu-Jordan (Latitud ${stateLat.toFixed(2)}°, Mes Consultado: ${months[stateMonth - 1]})`}
+                ? `Monthly Radiative Decomposition & Transposition (Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})`
+                : `Descomposición Radiativa y Transposición Liu-Jordan (Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}
             </span>
             <span class="badge-status-valid">✓ Bod0, Bdm0, Ddm0, GdBeta</span>
           </div>
@@ -793,12 +796,12 @@ export function renderPythonConsole(): HTMLElement {
                 ${radRows.map((r) => `
                   <tr style="${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
                     <td><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★ (Selected)' : '★ (Consultado)') : ''}</strong></td>
-                    <td class="td-num">${r.g0.toFixed(2)}</td>
-                    <td class="td-num">${r.bdm.toFixed(2)}</td>
-                    <td class="td-num">${r.ddm.toFixed(2)}</td>
-                    <td class="td-num">Inc: ${r.optTilt.toFixed(1)}°</td>
-                    <td class="td-num">${r.gOpt.toFixed(2)}</td>
-                    <td class="td-num" style="color: #059669;">+${r.gain.toFixed(1)}%</td>
+                    <td class="td-num">${formatNum(r.g0, 2)}</td>
+                    <td class="td-num">${formatNum(r.bdm, 2)}</td>
+                    <td class="td-num">${formatNum(r.ddm, 2)}</td>
+                    <td class="td-num">Inc: ${formatAngle(r.optTilt, 1)}</td>
+                    <td class="td-num">${formatNum(r.gOpt, 2)}</td>
+                    <td class="td-num" style="color: #059669;">+${formatPercent(r.gain, 1)}</td>
                     <td style="text-align: center;"><span class="badge-status-valid">✓ Verificado</span></td>
                   </tr>
                 `).join('')}
@@ -806,12 +809,12 @@ export function renderPythonConsole(): HTMLElement {
               <tfoot>
                 <tr class="table-media-row verif-media-row">
                   <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
-                  <td class="td-num"><strong>${meanG0.toFixed(2)}</strong></td>
-                  <td class="td-num"><strong>${meanBdm.toFixed(2)}</strong></td>
-                  <td class="td-num"><strong>${meanDdm.toFixed(2)}</strong></td>
-                  <td class="td-num"><strong>Inc: ${meanTilt.toFixed(1)}°</strong></td>
-                  <td class="td-num"><strong>${meanGOpt.toFixed(2)}</strong></td>
-                  <td class="td-num" style="color: #059669;"><strong>+${meanGain.toFixed(1)}%</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanG0, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanBdm, 2)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanDdm, 2)}</strong></td>
+                  <td class="td-num"><strong>Inc: ${formatAngle(meanTilt, 1)}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanGOpt, 2)}</strong></td>
+                  <td class="td-num" style="color: #059669;"><strong>+${formatPercent(meanGain, 1)}</strong></td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
                 </tr>
               </tfoot>
@@ -831,7 +834,7 @@ export function renderPythonConsole(): HTMLElement {
       const isJaen = Math.abs(stateLat - 37.77) < 0.6;
       const activeCityName = hasMatchingSim
         ? simRes!.locationName
-        : (isMadrid ? 'Madrid' : (isJaen ? 'Jaén' : `${isEn ? 'Latitude' : 'Latitud'} ${stateLat.toFixed(2)}°`));
+        : (isMadrid ? 'Madrid' : (isJaen ? 'Jaén' : `${isEn ? 'Latitude' : 'Latitud'} ${formatAngle(stateLat, 2)}`));
 
       // Calculate annual daytime mean tilt for 1-axis horizontal tracker:
       // In each month m, integrate beta(t) = arctan(|sin(psi_s)| / tan(gamma_s)) across daylight hours.
@@ -950,14 +953,14 @@ export function renderPythonConsole(): HTMLElement {
       const calcGO = (val: number) => rOpt > 0 ? ((val - rOpt) / rOpt) * 100 : 0;
 
       const hMeanTiltStr = isAnnualView
-        ? `${annualHorizTrackerTilt.toFixed(1)}° (${isEn ? 'mean' : 'media'})`
-        : `${hDailyTilt.toFixed(1)}° (${isEn ? 'mean day' : 'media día'})`;
+        ? `${formatAngle(annualHorizTrackerTilt, 1)} (${isEn ? 'mean' : 'media'})`
+        : `${formatAngle(hDailyTilt, 1)} (${isEn ? 'mean day' : 'media día'})`;
 
       const trackingRows = [
         {
           name: isEn ? 'Horizontal Surface (0°)' : 'Superficie Horizontal (0°)',
-          inc: '0.0°',
-          ori: '0.0°',
+          inc: '0,0°',
+          ori: '0,0°',
           rad: rHoriz,
           gainH: 0.0,
           gainOpt: calcGO(rHoriz),
@@ -965,8 +968,8 @@ export function renderPythonConsole(): HTMLElement {
         },
         {
           name: isEn ? 'Annual Optimal Tilt' : 'Inclinación Óptima Anual',
-          inc: `${optTiltAnnual.toFixed(1)}°`,
-          ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`,
+          inc: formatAngle(optTiltAnnual, 1),
+          ori: `${stateLat >= 0 ? '0,0°' : '180,0°'}`,
           rad: rOpt,
           gainH: calcGH(rOpt),
           gainOpt: 0.0,
@@ -974,8 +977,8 @@ export function renderPythonConsole(): HTMLElement {
         },
         {
           name: isEn ? 'Seasonal Optimal Tilt (4 pos)' : 'Inclinación Óptima Estacional (4 pos)',
-          inc: `${seasTiltAnnual.toFixed(1)}° (${isEn ? 'mean' : 'media'})`,
-          ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`,
+          inc: `${formatAngle(seasTiltAnnual, 1)} (${isEn ? 'mean' : 'media'})`,
+          ori: `${stateLat >= 0 ? '0,0°' : '180,0°'}`,
           rad: rSeas,
           gainH: calcGH(rSeas),
           gainOpt: calcGO(rSeas),
@@ -983,8 +986,8 @@ export function renderPythonConsole(): HTMLElement {
         },
         {
           name: isEn ? 'Single-Axis Polar Tracking' : 'Seguimiento a un Eje Polar',
-          inc: `${Math.abs(stateLat).toFixed(1)}°`,
-          ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`,
+          inc: formatAngle(Math.abs(stateLat), 1),
+          ori: `${stateLat >= 0 ? '0,0°' : '180,0°'}`,
           rad: rPol,
           gainH: calcGH(rPol),
           gainOpt: calcGO(rPol),
@@ -992,8 +995,8 @@ export function renderPythonConsole(): HTMLElement {
         },
         {
           name: isEn ? 'Single-Axis Azimuthal Tracking' : 'Seguimiento a un Eje Azimutal',
-          inc: `${Math.abs(stateLat).toFixed(1)}°`,
-          ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`,
+          inc: formatAngle(Math.abs(stateLat), 1),
+          ori: `${stateLat >= 0 ? '0,0°' : '180,0°'}`,
           rad: rAzim,
           gainH: calcGH(rAzim),
           gainOpt: calcGO(rAzim),
@@ -1002,7 +1005,7 @@ export function renderPythonConsole(): HTMLElement {
         {
           name: isEn ? 'Single-Axis Horizontal Tracking' : 'Seguimiento a un Eje Horizontal',
           inc: hMeanTiltStr,
-          ori: '90.0°',
+          ori: '90,0°',
           rad: rHTrk,
           gainH: calcGH(rHTrk),
           gainOpt: calcGO(rHTrk),
@@ -1010,8 +1013,8 @@ export function renderPythonConsole(): HTMLElement {
         },
         {
           name: isEn ? 'Two-Axis Tracking (Continuous)' : 'Seguimiento a Dos Ejes Continuo',
-          inc: isAnnualView ? `${optTiltAnnual.toFixed(1)}° (${isEn ? 'mean' : 'media'})` : `${noonDualTiltDeg.toFixed(1)}° (${isEn ? 'zenith noon' : 'cenit mediodía'})`,
-          ori: `${stateLat >= 0 ? '0.0°' : '180.0°'}`,
+          inc: isAnnualView ? `${formatAngle(optTiltAnnual, 1)} (${isEn ? 'mean' : 'media'})` : `${formatAngle(noonDualTiltDeg, 1)} (${isEn ? 'zenith noon' : 'cenit mediodía'})`,
+          ori: `${stateLat >= 0 ? '0,0°' : '180,0°'}`,
           rad: rDual,
           gainH: calcGH(rDual),
           gainOpt: calcGO(rDual),
@@ -1029,8 +1032,8 @@ export function renderPythonConsole(): HTMLElement {
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <span class="verif-table-title">
                 🔄 ${isEn
-                  ? `Performance Comparison of Tracking & Seasonal Topologies (${activeCityName}, Lat ${stateLat.toFixed(2)}°)`
-                  : `Comparativa de Rendimiento de Topologías de Seguimiento y Estacional (${activeCityName}, Latitud ${stateLat.toFixed(2)}°)`}
+                  ? `Performance Comparison of Tracking & Seasonal Topologies (${activeCityName}, Lat ${formatAngle(stateLat, 2)})`
+                  : `Comparativa de Rendimiento de Topologías de Seguimiento y Estacional (${activeCityName}, Latitud ${formatAngle(stateLat, 2)})`}
               </span>
               <span class="badge badge-success" style="font-size: 0.75rem;">✓ 6 Topologías Validadas</span>
             </div>
@@ -1051,19 +1054,19 @@ export function renderPythonConsole(): HTMLElement {
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <span style="font-size: 0.95rem; color: #10b981;">📍</span>
               <span>
-                <strong>${activeCityName} (Lat ${stateLat.toFixed(2)}°):</strong>
+                <strong>${activeCityName} (Lat ${formatAngle(stateLat, 2)}):</strong>
                 ${isAnnualView
                   ? (isEn
-                      ? `Displaying 12-Month Annual Resource Baseline (OrientSol Historical Benchmark: Horiz ${rHorizAnnual.toFixed(2)} kWh/m²·d | H-Tracker ${rHTrkAnnual.toFixed(2)} kWh/m²·d @ ${annualHorizTrackerTilt.toFixed(1)}° mean tilt).`
-                      : `Mostrando Base Histórica Anual de 12 Meses (Cálculo OrientSol: Horiz ${rHorizAnnual.toFixed(2)} kWh/m²·d | Eje Horizontal ${rHTrkAnnual.toFixed(2)} kWh/m²·d con ${annualHorizTrackerTilt.toFixed(1)}° inclinación media).`)
+                      ? `Displaying 12-Month Annual Resource Baseline (OrientSol Historical Benchmark: Horiz ${formatNum(rHorizAnnual, 2)} kWh/m²·d | H-Tracker ${formatNum(rHTrkAnnual, 2)} kWh/m²·d @ ${formatAngle(annualHorizTrackerTilt, 1)} mean tilt).`
+                      : `Mostrando Base Histórica Anual de 12 Meses (Cálculo OrientSol: Horiz ${formatNum(rHorizAnnual, 2)} kWh/m²·d | Eje Horizontal ${formatNum(rHTrkAnnual, 2)} kWh/m²·d con ${formatAngle(annualHorizTrackerTilt, 1)} inclinación media).`)
                   : (isEn
-                      ? `Displaying daily irradiance on ${stateDay} ${months[mIdx]} (H-Tracker ${rHTrkDay.toFixed(2)} kWh/m²·d @ ${hDailyTilt.toFixed(1)}° daily mean tilt).`
-                      : `Mostrando irradiancia diaria para el día ${stateDay} de ${months[mIdx]} (Eje Horizontal ${rHTrkDay.toFixed(2)} kWh/m²·d con ${hDailyTilt.toFixed(1)}° inclinación diurna media).`)}
+                      ? `Displaying daily irradiance on ${stateDay} ${months[mIdx]} (H-Tracker ${formatNum(rHTrkDay, 2)} kWh/m²·d @ ${formatAngle(hDailyTilt, 1)} daily mean tilt).`
+                      : `Mostrando irradiancia diaria para el día ${stateDay} de ${months[mIdx]} (Eje Horizontal ${formatNum(rHTrkDay, 2)} kWh/m²·d con ${formatAngle(hDailyTilt, 1)} inclinación diurna media).`)}
               </span>
             </div>
             ${simRes && !hasMatchingSim ? `
               <button type="button" id="btn-sync-sim-lat" class="btn btn-xs btn-primary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: #2563eb; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
-                🔄 ${isEn ? `Sync with Active Sim (${simRes.locationName}, ${simRes.latitude.toFixed(2)}°)` : `Sincronizar con Simulación Activa (${simRes.locationName}, ${simRes.latitude.toFixed(2)}°)`}
+                🔄 ${isEn ? `Sync with Active Sim (${simRes.locationName}, ${formatAngle(simRes.latitude, 2)})` : `Sincronizar con Simulación Activa (${simRes.locationName}, ${formatAngle(simRes.latitude, 2)})`}
               </button>
             ` : ''}
           </div>
@@ -1087,9 +1090,9 @@ export function renderPythonConsole(): HTMLElement {
                     <td><strong>${r.name}</strong></td>
                     <td><code>${r.inc}</code></td>
                     <td><code>${r.ori}</code></td>
-                    <td class="td-num"><strong>${r.rad.toFixed(2)}</strong></td>
-                    <td class="td-num" style="color: #059669; font-weight: 600;">${r.gainH >= 0 ? `+${r.gainH.toFixed(1)}%` : `${r.gainH.toFixed(1)}%`}</td>
-                    <td class="td-num" style="color: #2563eb; font-weight: 600;">${r.gainOpt >= 0 ? `+${r.gainOpt.toFixed(1)}%` : `${r.gainOpt.toFixed(1)}%`}</td>
+                    <td class="td-num"><strong>${formatNum(r.rad, 2)}</strong></td>
+                    <td class="td-num" style="color: #059669; font-weight: 600;">${r.gainH >= 0 ? `+${formatPercent(r.gainH, 1)}` : formatPercent(r.gainH, 1)}</td>
+                    <td class="td-num" style="color: #2563eb; font-weight: 600;">${r.gainOpt >= 0 ? `+${formatPercent(r.gainOpt, 1)}` : formatPercent(r.gainOpt, 1)}</td>
                     <td style="text-align: center;"><span class="badge-status-valid">${r.status}</span></td>
                   </tr>
                 `).join('')}
@@ -1099,9 +1102,9 @@ export function renderPythonConsole(): HTMLElement {
                   <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
                   <td>-</td>
                   <td>-</td>
-                  <td class="td-num"><strong>${meanRad.toFixed(2)}</strong></td>
-                  <td class="td-num" style="color: #059669;"><strong>${meanGainH >= 0 ? `+${meanGainH.toFixed(1)}%` : `${meanGainH.toFixed(1)}%`}</strong></td>
-                  <td class="td-num" style="color: #2563eb;"><strong>${meanGainOpt >= 0 ? `+${meanGainOpt.toFixed(1)}%` : `${meanGainOpt.toFixed(1)}%`}</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanRad, 2)}</strong></td>
+                  <td class="td-num" style="color: #059669;"><strong>${meanGainH >= 0 ? `+${formatPercent(meanGainH, 1)}` : formatPercent(meanGainH, 1)}</strong></td>
+                  <td class="td-num" style="color: #2563eb;"><strong>${meanGainOpt >= 0 ? `+${formatPercent(meanGainOpt, 1)}` : formatPercent(meanGainOpt, 1)}</strong></td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
                 </tr>
               </tfoot>
@@ -1153,10 +1156,10 @@ export function renderPythonConsole(): HTMLElement {
           <div class="verif-table-title-bar">
             <span class="verif-table-title">
               ⚡ ${isEn
-                ? `PV Energy Yield & Osterwald Cell Thermal Derating (Emplacement Lat: ${stateLat.toFixed(2)}°, Active Month: ${months[mIdx]})`
-                : `Balance de Energía FV y Modelo Térmico Osterwald (Emplazamiento Lat: ${stateLat.toFixed(2)}°, Mes Consultado: ${months[mIdx]})`}
+                ? `PV Energy Yield & Osterwald Cell Thermal Derating (Emplacement Lat: ${formatAngle(stateLat, 2)}, Active Month: ${months[mIdx]})`
+                : `Balance de Energía FV y Modelo Térmico Osterwald (Emplazamiento Lat: ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[mIdx]})`}
             </span>
-            <span class="badge-status-valid">✓ Osterwald (TONC = ${toncVal.toFixed(1)}°C, Pn = ${peakKw.toFixed(1)} kWp)</span>
+            <span class="badge-status-valid">✓ Osterwald (TONC = ${formatNum(toncVal, 1)} °C, Pn = ${formatNum(peakKw, 1)} kWp)</span>
           </div>
 
           <div class="verif-table-wrap">
@@ -1176,11 +1179,11 @@ export function renderPythonConsole(): HTMLElement {
                 ${energyRows.map((r) => `
                   <tr style="${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
                     <td><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★ (Selected)' : '★ (Consultado)') : ''}</strong></td>
-                    <td class="td-num">${r.tAmb.toFixed(1)} °C</td>
-                    <td class="td-num" style="color: ${r.tc > 45 ? '#dc2626' : '#2563eb'}; font-weight: 700;">${r.tc.toFixed(1)} °C</td>
-                    <td class="td-num"><strong>${r.eOster} kWh</strong></td>
-                    <td class="td-num">${r.eSimp} kWh</td>
-                    <td class="td-num" style="color: #dc2626;">${r.thLoss < 0 ? `${r.thLoss.toFixed(2)}%` : `+${Math.abs(r.thLoss).toFixed(2)}%`}</td>
+                    <td class="td-num">${formatNum(r.tAmb, 1)} °C</td>
+                    <td class="td-num" style="color: ${r.tc > 45 ? '#dc2626' : '#2563eb'}; font-weight: 700;">${formatNum(r.tc, 1)} °C</td>
+                    <td class="td-num"><strong>${formatInt(r.eOster)} kWh</strong></td>
+                    <td class="td-num">${formatInt(r.eSimp)} kWh</td>
+                    <td class="td-num" style="color: #dc2626;">${r.thLoss < 0 ? formatPercent(r.thLoss, 2) : `+${formatPercent(Math.abs(r.thLoss), 2)}`}</td>
                     <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
                   </tr>
                 `).join('')}
@@ -1188,11 +1191,11 @@ export function renderPythonConsole(): HTMLElement {
               <tfoot>
                 <tr class="table-media-row verif-media-row">
                   <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
-                  <td class="td-num"><strong>${meanTAmb.toFixed(1)} °C</strong></td>
-                  <td class="td-num" style="color: #2563eb; font-weight: 700;"><strong>${meanTc.toFixed(1)} °C</strong></td>
-                  <td class="td-num"><strong>${Math.round(meanEOster)} kWh</strong></td>
-                  <td class="td-num"><strong>${Math.round(meanESimp)} kWh</strong></td>
-                  <td class="td-num" style="color: #dc2626;"><strong>${meanThLoss.toFixed(2)}%</strong></td>
+                  <td class="td-num"><strong>${formatNum(meanTAmb, 1)} °C</strong></td>
+                  <td class="td-num" style="color: #2563eb; font-weight: 700;"><strong>${formatNum(meanTc, 1)} °C</strong></td>
+                  <td class="td-num"><strong>${formatInt(Math.round(meanEOster))} kWh</strong></td>
+                  <td class="td-num"><strong>${formatInt(Math.round(meanESimp))} kWh</strong></td>
+                  <td class="td-num" style="color: #dc2626;"><strong>${formatPercent(meanThLoss, 2)}</strong></td>
                   <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
                 </tr>
               </tfoot>
