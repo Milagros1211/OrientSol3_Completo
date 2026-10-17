@@ -5,6 +5,8 @@ import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslati
 import { showExportComponentChoiceModal, type ExportComponentChoice } from './exportModalHelper';
 import { getNoonAzimuthDeg, getDualAxisNoonTiltDeg, getHorizontalTrackerDailyMeanTiltDeg } from '@/services/solarGeometryAngles';
 import { formatNum, formatInt, formatAngle, formatPercent } from '@/utils/formatters';
+import { solarSyncState } from '@/services/bridge/solarSyncState';
+import { calculateOsterwaldEnergy } from '@/components/energy/EnergyCalculationPanel';
 
 export { showExportComponentChoiceModal, type ExportComponentChoice };
 
@@ -127,6 +129,7 @@ export interface PDFReportOptions {
   peakPowerKw?: number;
   performanceRatio?: number;
   tonc?: number;
+  coefTemp?: number;
   componentsMode?: 'single' | 'all';
   activeComponent?: TableRadiationComponent;
 }
@@ -381,9 +384,10 @@ export async function generateOrientSolPDFReport(
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const optAngle = res.optimalAnnual.optimalTiltDeg;
-  const peakKw = options?.peakPowerKw ?? 5.0;
+  const peakKw = options?.peakPowerKw ?? solarSyncState.getPeakPowerKw() ?? 5.0;
   const pr = options?.performanceRatio ?? 0.80;
-  const tonc = options?.tonc ?? 47.0;
+  const tonc = options?.tonc ?? solarSyncState.getTonc() ?? 47.0;
+  const coefTemp = options?.coefTemp ?? solarSyncState.getCoefTemp() ?? -0.0035;
 
   // Exact Timestamp
   const now = new Date();
@@ -560,14 +564,16 @@ export async function generateOrientSolPDFReport(
           return [{ comp: activeC, label, nameEs, nameEn }];
         })();
 
+  const hasEnergyPage = studyType !== 'comparative';
+  const energyPageCount = hasEnergyPage ? 1 : 0;
   const numCompPages = componentsToRender.length;
   const pageChap1 = 2;
   const pageChap2 = 3;
-  const pageChap3 = 3 + numCompPages;
-  const pageChap4 = 4 + numCompPages;
-  const pageChap5 = 5 + numCompPages + extraMapPages;
-  const totalPagesDyn = pageChap5;
-  const chapter5Page = pageChap5;
+  const pageEnergy = 3 + numCompPages;
+  const pageChapBenchmark = pageEnergy + energyPageCount;
+  const pageChapLossMaps = pageChapBenchmark + 1;
+  const pageChapEvolution = pageChapLossMaps + 1 + extraMapPages;
+  const totalPagesDyn = pageChapEvolution;
 
   // Header & Footer helper
   const drawPageChrome = (chapterTitle: string, pageNum: number, totalPages: number) => {
@@ -782,16 +788,30 @@ export async function generateOrientSolPDFReport(
     });
   }
 
+  if (hasEnergyPage) {
+    tocList.push({
+      num: '3',
+      title: isEn
+        ? `PV Energy Yield Calculation (Osterwald Method) - ${cleanStudyName}`
+        : `Cálculo de la Energía Producida (Método de Osterwald) - ${cleanStudyName}`,
+      page: pageEnergy,
+    });
+  }
+
+  const benchmarkNum = hasEnergyPage ? '4' : '3';
+  const lossMapsNum = hasEnergyPage ? '5' : '4';
+  const evolutionNum = hasEnergyPage ? '6' : '5';
+
   tocList.push(
     {
-      num: '3',
+      num: benchmarkNum,
       title: isEn
         ? 'Global Benchmark & Ranking of All 8 Solar Collector Topologies'
         : 'Comparativa y Ranking Global de las 8 Topologías de Captación',
-      page: pageChap3,
+      page: pageChapBenchmark,
     },
     {
-      num: '4',
+      num: lossMapsNum,
       title: isEn
         ? 'Technical Building Code (CTE DB-HE4) Captation Losses Matrix'
         : extraMapPages > 0
@@ -799,21 +819,21 @@ export async function generateOrientSolPDFReport(
             ? 'Mapas de Pérdidas de Captación CTE DB-HE4 (Anual + 12 Mensuales)'
             : 'Mapas de Pérdidas de Captación CTE DB-HE4 (Anual + 4 Estacionales)')
         : 'Mapa de Pérdidas de Captación y Cumplimiento CTE DB-HE4',
-      page: pageChap4,
+      page: pageChapLossMaps,
     },
     {
-      num: '5',
+      num: evolutionNum,
       title: isEn
         ? 'Continuous Radiation Evolution Curve (Tilt Spectrum 1° to 90°)'
         : 'Evolución Continua de Radiación en el Rango de Inclinaciones (1° a 90°)',
-      page: pageChap5,
+      page: pageChapEvolution,
     }
   );
 
   doc.setFont('helvetica', 'normal');
   const isMultiComp = componentsToRender.length > 1;
-  const rowH = isMultiComp ? 6.2 : 7.2;
-  const rowGap = isMultiComp ? 7.0 : 8.2;
+  const rowH = (isMultiComp || hasEnergyPage) ? 5.8 : 7.2;
+  const rowGap = (isMultiComp || hasEnergyPage) ? 6.8 : 8.2;
   let curTocY = tocY + 9;
 
   tocList.forEach((item) => {
@@ -2178,10 +2198,460 @@ export async function generateOrientSolPDFReport(
   });
 
   // =========================================================================
+  // PÁGINA: CÁLCULO DE LA ENERGÍA PRODUCIDA (MÉTODO DE OSTERWALD)
+  // (Para las operaciones que generan cálculos de energía)
+  // =========================================================================
+  if (hasEnergyPage) {
+    doc.addPage();
+    const energyChapTitle = isEn
+      ? `Chapter 3. PV Energy Yield Calculation: ${cleanStudyName}`
+      : `Capítulo 3. Cálculo de la Energía Producida: ${cleanStudyName}`;
+    drawPageChrome(energyChapTitle, pageEnergy, totalPagesDyn);
+
+    // 1. Calculations
+    const radHoriz = res.horizontal.gdm0;
+    const radStudy =
+      studyType === 'monthly'
+        ? res.monthlyOptimum12.monthlyDailyKwh
+        : studyType === 'seasonal'
+        ? res.seasonal.monthlyDailyKwh
+        : studyType === 'polar'
+        ? res.tracking.polarAxis.monthlyDailyKwh
+        : studyType === 'azimuthal'
+        ? res.tracking.azimuthalAxis.monthlyDailyKwh
+        : studyType === 'horizontal'
+        ? res.tracking.horizontalAxis.monthlyDailyKwh
+        : studyType === 'dual'
+        ? res.tracking.dualAxis.monthlyDailyKwh
+        : res.optimalAnnual.monthlyDailyKwh;
+
+    const tempAmb = res.temperatures.ambient.monthlyMeanC;
+
+    const energyData = calculateOsterwaldEnergy(
+      radHoriz,
+      radStudy,
+      tempAmb,
+      peakKw,
+      coefTemp,
+      tonc
+    );
+
+    const seasonalData = res.seasonal;
+    const fixedOri = res.latitude >= 0 ? 0.0 : 180.0;
+
+    let studyColTitle = '';
+    if (studyType === 'monthly') {
+      studyColTitle = isEn ? 'Performed study (12 Monthly Angles)' : 'Estudio realizado (12 Inclinaciones)';
+    } else if (studyType === 'seasonal' && seasonalData) {
+      studyColTitle = isEn
+        ? `Performed study (Seasonal: ${formatNum(seasonalData.winterTiltDeg, 1)}° / ${formatNum(seasonalData.springTiltDeg, 1)}° / ${formatNum(seasonalData.summerTiltDeg, 1)}° / ${formatNum(seasonalData.autumnTiltDeg, 1)}°)`
+        : `Estudio realizado (Estacional: ${formatNum(seasonalData.winterTiltDeg, 1)}° / ${formatNum(seasonalData.springTiltDeg, 1)}° / ${formatNum(seasonalData.summerTiltDeg, 1)}° / ${formatNum(seasonalData.autumnTiltDeg, 1)}°)`;
+    } else if (studyType === 'polar') {
+      studyColTitle = isEn ? 'Performed study (Polar 1-axis)' : 'Estudio realizado (Seg. 1 eje polar)';
+    } else if (studyType === 'azimuthal') {
+      studyColTitle = isEn ? 'Performed study (Azimuthal 1-axis)' : 'Estudio realizado (Seg. 1 eje azimutal)';
+    } else if (studyType === 'horizontal') {
+      studyColTitle = isEn ? 'Performed study (Horizontal 1-axis)' : 'Estudio realizado (Seg. 1 eje horizontal)';
+    } else if (studyType === 'dual') {
+      studyColTitle = isEn ? 'Performed study (2-axis tracking)' : 'Estudio realizado (Seg. 2 ejes)';
+    } else {
+      studyColTitle = isEn
+        ? `Performed study (Inc: ${formatNum(optAngle, 1)}° | Ori: ${formatNum(fixedOri, 1)}°)`
+        : `Estudio realizado (Inc: ${formatNum(optAngle, 1)}° | Ori: ${formatNum(fixedOri, 1)}°)`;
+    }
+
+    // 2. Section Header
+    const seTopY = 27;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(15, 23, 42);
+    doc.text(
+      isEn
+        ? 'Mean Monthly PV Energy Yield (kWh) • Osterwald Method'
+        : 'Energía Media Mensual Generada y Balance de Producción (kWh) • Método de Osterwald',
+      20,
+      seTopY
+    );
+
+    // 3. Top 4 KPI Parameter Cards (y = 31, h = 20, w = 39.5)
+    const seCardY = seTopY + 4;
+    const seCardW = 39.5;
+    const seCardH = 20;
+
+    // Card 1: Potencia Pico
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(226, 232, 240);
+    doc.roundedRect(20, seCardY, seCardW, seCardH, 2, 2, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(isEn ? 'INSTALLED PEAK POWER' : 'POTENCIA PICO INSTALADA', 24, seCardY + 5.0);
+    doc.setFontSize(12);
+    doc.setTextColor(15, 23, 42);
+    doc.text(`${formatNum(peakKw, 1)} kWp`, 24, seCardY + 12.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(5.8);
+    doc.setTextColor(100, 116, 139);
+    doc.text(isEn ? 'Monocrystalline Silicon' : 'Silicio Monocristalino', 24, seCardY + 17.2);
+
+    // Card 2: Coeficiente Térmico
+    const se2X = 20 + seCardW + cardGap;
+    doc.setFillColor(248, 250, 252);
+    doc.roundedRect(se2X, seCardY, seCardW, seCardH, 2, 2, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(isEn ? 'TEMP. COEFFICIENT (gamma)' : 'COEF. TEMPERATURA (gamma)', se2X + 4, seCardY + 5.0);
+    doc.setFontSize(12);
+    doc.setTextColor(220, 38, 38);
+    doc.text(`${formatNum(coefTemp, 4)} 1/°C`, se2X + 4, seCardY + 12.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(5.8);
+    doc.setTextColor(100, 116, 139);
+    doc.text(isEn ? 'Power derating per °C' : 'Variación de potencia s/ STC', se2X + 4, seCardY + 17.2);
+
+    // Card 3: TONC
+    const se3X = se2X + seCardW + cardGap;
+    doc.setFillColor(248, 250, 252);
+    doc.roundedRect(se3X, seCardY, seCardW, seCardH, 2, 2, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(isEn ? 'NOCT / TONC' : 'TONC DE MÓDULOS', se3X + 4, seCardY + 5.0);
+    doc.setFontSize(12);
+    doc.setTextColor(180, 83, 9);
+    doc.text(`${formatNum(tonc, 1)} °C`, se3X + 4, seCardY + 12.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(5.8);
+    doc.setTextColor(100, 116, 139);
+    doc.text(isEn ? '800 W/m² | Tamb = 20°C' : '800 W/m² | Tamb = 20°C', se3X + 4, seCardY + 17.2);
+
+    // Card 4: Producción Anual
+    const se4X = se3X + seCardW + cardGap;
+    doc.setFillColor(240, 253, 250);
+    doc.setDrawColor(167, 243, 208);
+    doc.roundedRect(se4X, seCardY, seCardW, seCardH, 2, 2, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.5);
+    doc.setTextColor(4, 120, 87);
+    doc.text(isEn ? 'ANNUAL GENERATION' : 'PRODUCCIÓN ANUAL (ESTUDIO)', se4X + 4, seCardY + 5.0);
+    doc.setFontSize(12);
+    doc.setTextColor(5, 150, 105);
+    doc.text(`${formatInt(energyData.e_anual)} kWh`, se4X + 4, seCardY + 12.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(5.8);
+    doc.setTextColor(4, 120, 87);
+    const gainPct = energyData.e0_anual > 0 ? (energyData.ganancia_anual / energyData.e0_anual) * 100 : 0;
+    doc.text(`${energyData.ganancia_anual >= 0 ? '+' : ''}${formatInt(energyData.ganancia_anual)} kWh (+${formatNum(gainPct, 1)}%)`, se4X + 4, seCardY + 17.2);
+
+    // 4. The 5-Column Table Matching Screenshot
+    const tblEnerY = seCardY + seCardH + 5;
+    const colE_X = [22, 44, 94, 126, 162];
+    const colE_W = [22, 50, 32, 36, 28];
+
+    // Header Background
+    doc.setFillColor(30, 41, 59);
+    doc.rect(20, tblEnerY, 170, 7.0, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.2);
+    doc.setTextColor(255, 255, 255);
+
+    doc.text(isEn ? 'Month' : 'Mes', colE_X[0], tblEnerY + 4.7);
+    doc.text(isEn ? 'Considered angles (Inc | Ori)' : 'Ángulos considerados (Inc | Ori)', colE_X[1], tblEnerY + 4.7);
+    doc.text(isEn ? 'Horizontal (0°)' : 'Superficie horizontal (0°)', colE_X[2] + colE_W[2] - 2, tblEnerY + 4.7, { align: 'right' });
+
+    // Col 4 title (with auto-wrap or compact font if long)
+    const cleanCol4Title = sanitizePdfText(studyColTitle);
+    const col4Lines = doc.splitTextToSize(cleanCol4Title, colE_W[3] + 2);
+    if (col4Lines.length > 1) {
+      doc.setFontSize(5.2);
+      doc.text(col4Lines[0], colE_X[3] + colE_W[3] - 1, tblEnerY + 3.2, { align: 'right' });
+      doc.text(col4Lines[1], colE_X[3] + colE_W[3] - 1, tblEnerY + 6.0, { align: 'right' });
+    } else {
+      doc.text(col4Lines[0], colE_X[3] + colE_W[3] - 1, tblEnerY + 4.7, { align: 'right' });
+    }
+
+    doc.setFontSize(6.2);
+    doc.text(isEn ? 'Gain (kWh)' : 'Ganancia (kWh)', colE_X[4] + colE_W[4] - 2, tblEnerY + 4.7, { align: 'right' });
+
+    // 12 Monthly Rows
+    const rowEnerH = 5.6;
+    let curRowEnerY = tblEnerY + 7.0;
+
+    for (let i = 0; i < 12; i++) {
+      if (i % 2 === 1) {
+        doc.setFillColor(248, 250, 252);
+        doc.rect(20, curRowEnerY, 170, rowEnerH, 'F');
+      }
+
+      // Highlight study column cell
+      doc.setFillColor(240, 253, 250);
+      doc.rect(colE_X[3] - 1, curRowEnerY, colE_W[3] + 1, rowEnerH, 'F');
+
+      // Month name
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.2);
+      doc.setTextColor(30, 41, 59);
+      doc.text(mFull[i], colE_X[0], curRowEnerY + 3.8);
+
+      // Angle Badge text
+      let angleText = '';
+      if (studyType === 'monthly') {
+        const mDeg = res.monthlyOptimum12?.optimalTiltsDeg ? res.monthlyOptimum12.optimalTiltsDeg[i] : optAngle;
+        angleText = `Inc: ${formatNum(mDeg, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
+      } else if (studyType === 'seasonal' && seasonalData) {
+        if (i === 11 || i === 0 || i === 1) {
+          angleText = `Inv: Inc: ${formatNum(seasonalData.winterTiltDeg, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
+        } else if (i === 2 || i === 3 || i === 4) {
+          angleText = `Pri: Inc: ${formatNum(seasonalData.springTiltDeg, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
+        } else if (i === 5 || i === 6 || i === 7) {
+          angleText = `Ver: Inc: ${formatNum(seasonalData.summerTiltDeg, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
+        } else {
+          angleText = `Oto: Inc: ${formatNum(seasonalData.autumnTiltDeg, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
+        }
+      } else if (studyType === 'polar') {
+        angleText = `Inc: ${formatNum(res.latitude, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
+      } else if (studyType === 'azimuthal') {
+        angleText = `Inc: ${formatNum(res.latitude, 1)}° | Ori: ${formatNum(getNoonAzimuthDeg(res.latitude, i), 1)}°`;
+      } else if (studyType === 'horizontal') {
+        angleText = `Inc: ${formatNum(getHorizontalTrackerDailyMeanTiltDeg(res.latitude, i), 1)}° | Ori: 90,0°`;
+      } else if (studyType === 'dual') {
+        angleText = `Inc: ${formatNum(getDualAxisNoonTiltDeg(res.latitude, i), 1)}° | Ori: ${formatNum(getNoonAzimuthDeg(res.latitude, i), 1)}°`;
+      } else {
+        angleText = `Inc: ${formatNum(optAngle, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
+      }
+
+      // Render angle badge pill
+      doc.setFillColor(241, 245, 249);
+      doc.setDrawColor(203, 213, 225);
+      doc.setLineWidth(0.2);
+      doc.roundedRect(colE_X[1], curRowEnerY + 0.9, 48, 3.8, 0.8, 0.8, 'FD');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(5.2);
+      doc.setTextColor(3, 105, 161);
+      doc.text(angleText, colE_X[1] + 24, curRowEnerY + 3.5, { align: 'center' });
+
+      // Col 3: Horizontal 0°
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.2);
+      doc.setTextColor(71, 85, 105);
+      doc.text(formatNum(energyData.e0_mes[i], 2), colE_X[2] + colE_W[2] - 2, curRowEnerY + 3.8, { align: 'right' });
+
+      // Col 4: Performed study
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(6.2);
+      doc.setTextColor(15, 23, 42);
+      doc.text(formatNum(energyData.e_mes[i], 2), colE_X[3] + colE_W[3] - 2, curRowEnerY + 3.8, { align: 'right' });
+
+      // Col 5: Gain
+      const g = energyData.ganancia_mes[i];
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(6.2);
+      if (Math.abs(g) < 0.005) {
+        doc.setTextColor(100, 116, 139);
+        doc.text('0,00', colE_X[4] + colE_W[4] - 2, curRowEnerY + 3.8, { align: 'right' });
+      } else if (g > 0) {
+        doc.setTextColor(5, 150, 105);
+        doc.text(`+${formatNum(g, 2)}`, colE_X[4] + colE_W[4] - 2, curRowEnerY + 3.8, { align: 'right' });
+      } else {
+        doc.setTextColor(220, 38, 38);
+        doc.text(formatNum(g, 2), colE_X[4] + colE_W[4] - 2, curRowEnerY + 3.8, { align: 'right' });
+      }
+
+      curRowEnerY += rowEnerH;
+    }
+
+    // Average angle string for footer rows
+    let avgAngleText = '';
+    const avgDualAzim = [0,1,2,3,4,5,6,7,8,9,10,11].reduce((acc, idx) => acc + getNoonAzimuthDeg(res.latitude, idx), 0) / 12;
+    if (studyType === 'monthly') {
+      const avgMonthlyTilt = res.monthlyOptimum12?.optimalTiltsDeg
+        ? res.monthlyOptimum12.optimalTiltsDeg.reduce((a, b) => a + b, 0) / 12
+        : optAngle;
+      avgAngleText = `Inc: ${formatNum(avgMonthlyTilt, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
+    } else if (studyType === 'seasonal' && seasonalData) {
+      const avgSeasonalTilt = (seasonalData.winterTiltDeg * 3 + seasonalData.springTiltDeg * 3 + seasonalData.summerTiltDeg * 3 + seasonalData.autumnTiltDeg * 3) / 12;
+      avgAngleText = `Inc: ${formatNum(avgSeasonalTilt, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
+    } else if (studyType === 'polar') {
+      avgAngleText = `Inc: ${formatNum(res.latitude, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
+    } else if (studyType === 'azimuthal') {
+      avgAngleText = `Inc: ${formatNum(res.latitude, 1)}° | Ori: ${formatNum(avgDualAzim, 1)}°`;
+    } else if (studyType === 'horizontal') {
+      const avgHorizTilt = [0,1,2,3,4,5,6,7,8,9,10,11].reduce((acc, idx) => acc + getHorizontalTrackerDailyMeanTiltDeg(res.latitude, idx), 0) / 12;
+      avgAngleText = `Inc: ${formatNum(avgHorizTilt, 1)}° | Ori: 90,0°`;
+    } else if (studyType === 'dual') {
+      const avgDualTilt = [0,1,2,3,4,5,6,7,8,9,10,11].reduce((acc, idx) => acc + getDualAxisNoonTiltDeg(res.latitude, idx), 0) / 12;
+      avgAngleText = `Inc: ${formatNum(avgDualTilt, 1)}° | Ori: ${formatNum(avgDualAzim, 1)}°`;
+    } else {
+      avgAngleText = `Inc: ${formatNum(optAngle, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
+    }
+
+    // Footer Row 1: TOTAL ANUAL
+    doc.setFillColor(15, 23, 42);
+    doc.rect(20, curRowEnerY, 170, 6.4, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.2);
+    doc.setTextColor(56, 189, 248);
+    doc.text(isEn ? 'ANNUAL TOTAL' : 'TOTAL ANUAL', colE_X[0], curRowEnerY + 4.2);
+
+    // Pill in footer
+    doc.setFillColor(30, 41, 59);
+    doc.roundedRect(colE_X[1], curRowEnerY + 1.2, 48, 4.0, 0.8, 0.8, 'F');
+    doc.setTextColor(56, 189, 248);
+    doc.setFontSize(5.2);
+    doc.text(avgAngleText, colE_X[1] + 24, curRowEnerY + 3.8, { align: 'center' });
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.2);
+    doc.setTextColor(255, 255, 255);
+    doc.text(formatNum(energyData.e0_anual, 1), colE_X[2] + colE_W[2] - 2, curRowEnerY + 4.2, { align: 'right' });
+
+    doc.setTextColor(56, 189, 248);
+    doc.text(formatNum(energyData.e_anual, 1), colE_X[3] + colE_W[3] - 2, curRowEnerY + 4.2, { align: 'right' });
+
+    doc.setTextColor(52, 211, 153);
+    const gainTotalText = `${energyData.ganancia_anual >= 0 ? '+' : ''}${formatNum(energyData.ganancia_anual, 2)}`;
+    doc.text(gainTotalText, colE_X[4] + colE_W[4] - 2, curRowEnerY + 4.2, { align: 'right' });
+
+    curRowEnerY += 6.4;
+
+    // Footer Row 2: MEDIA
+    doc.setFillColor(30, 41, 59);
+    doc.rect(20, curRowEnerY, 170, 6.0, 'F');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.2);
+    doc.setTextColor(148, 163, 184);
+    doc.text(isEn ? 'MEAN' : 'MEDIA', colE_X[0], curRowEnerY + 4.0);
+
+    doc.setFillColor(15, 23, 42);
+    doc.roundedRect(colE_X[1], curRowEnerY + 1.0, 48, 4.0, 0.8, 0.8, 'F');
+    doc.setTextColor(148, 163, 184);
+    doc.setFontSize(5.2);
+    doc.text(avgAngleText, colE_X[1] + 24, curRowEnerY + 3.6, { align: 'center' });
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.2);
+    doc.setTextColor(255, 255, 255);
+    doc.text(formatNum(energyData.e0_anual / 12, 1), colE_X[2] + colE_W[2] - 2, curRowEnerY + 4.0, { align: 'right' });
+
+    doc.setTextColor(255, 255, 255);
+    doc.text(formatNum(energyData.e_anual / 12, 1), colE_X[3] + colE_W[3] - 2, curRowEnerY + 4.0, { align: 'right' });
+
+    doc.setTextColor(52, 211, 153);
+    const gainMeanText = `${(energyData.ganancia_anual / 12) >= 0 ? '+' : ''}${formatNum(energyData.ganancia_anual / 12, 2)}`;
+    doc.text(gainMeanText, colE_X[4] + colE_W[4] - 2, curRowEnerY + 4.0, { align: 'right' });
+
+    curRowEnerY += 6.0;
+
+    // 5. Bottom Section: Osterwald Nomenclature (Left) + Insights (Right)
+    const btmBoxY = curRowEnerY + 5;
+    const btmH = 54;
+    const btmLeftW = 82;
+    const btmRightW = 84;
+    const btmRightX = 20 + btmLeftW + 4;
+
+    // Left Box: Método de Osterwald y Nomenclatura (Figura 5.2.80)
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(186, 230, 253);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(20, btmBoxY, btmLeftW, btmH, 2, 2, 'FD');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(6.8);
+    doc.setTextColor(3, 105, 161);
+    doc.text(isEn ? 'OSTERWALD METHOD & NOMENCLATURE' : 'MÉTODO DE OSTERWALD Y NOMENCLATURA', 24, btmBoxY + 5.5);
+
+    // Formula Box
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(253, 186, 116);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(24, btmBoxY + 7.5, btmLeftW - 8, 12, 1.2, 1.2, 'FD');
+
+    drawTextWithSubscripts(
+      doc,
+      [
+        { text: 'P', color: [15, 23, 42] },
+        { text: 'M', isSub: true, color: [15, 23, 42] },
+        { text: ' = P', color: [15, 23, 42] },
+        { text: 'M,STC', isSub: true, color: [15, 23, 42] },
+        { text: ' · (G / G', color: [15, 23, 42] },
+        { text: 'STC', isSub: true, color: [15, 23, 42] },
+        { text: ') · [1 + γ · (T', color: [15, 23, 42] },
+        { text: 'C', isSub: true, color: [15, 23, 42] },
+        { text: ' - 25)]', color: [15, 23, 42] }
+      ],
+      26,
+      btmBoxY + 12.0,
+      5.8,
+      'left',
+      true
+    );
+
+    drawTextWithSubscripts(
+      doc,
+      [
+        { text: isEn ? 'where: T' : 'donde: T', color: [71, 85, 105] },
+        { text: 'C', isSub: true, color: [71, 85, 105] },
+        { text: ' = T', color: [71, 85, 105] },
+        { text: 'amb', isSub: true, color: [71, 85, 105] },
+        { text: ` + [(TONC - 20) / 800] · G   •   E = ∫ p(t) dt`, color: [71, 85, 105] }
+      ],
+      26,
+      btmBoxY + 16.5,
+      5.2,
+      'left',
+      false
+    );
+
+    // Nomenclature bullet list
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(5.0);
+    doc.setTextColor(51, 65, 85);
+    const nomY = btmBoxY + 23.5;
+    const nomLineGap = 4.8;
+    doc.text(`• PM: ${isEn ? 'Maximum power at MPP (W)' : 'Potencia máxima en el MPP (W)'} | PM,STC: ${isEn ? 'STC power (W)' : 'Potencia en STC (W)'}`, 24, nomY);
+    doc.text(`• G: ${isEn ? 'Incident global irradiance (W/m²)' : 'Irradiancia global incidente (W/m²)'} | GSTC = 1.000 W/m²`, 24, nomY + nomLineGap);
+    doc.text(`• TC: ${isEn ? 'Operating cell temperature (°C)' : 'Temperatura de la célula (°C)'} | Tamb: ${isEn ? 'Ambient temperature (°C)' : 'Temperatura ambiente (°C)'}`, 24, nomY + nomLineGap * 2);
+    doc.text(`• γ: ${isEn ? 'Power temperature coefficient' : 'Coeficiente térmico de potencia'} (${formatNum(coefTemp, 4)} 1/°C)`, 24, nomY + nomLineGap * 3);
+    doc.text(`• TONC: ${isEn ? 'Nominal operating cell temperature' : 'Temperatura de operación nominal'} (${formatNum(tonc, 1)} °C)`, 24, nomY + nomLineGap * 4);
+    doc.text(isEn ? '  (measured at 800 W/m², 20 °C Tamb, AM 1.5, wind 1 m/s)' : '  (medida a 800 W/m², Tamb = 20 °C, espectro AM 1,5, viento 1 m/s)', 24, nomY + nomLineGap * 5);
+
+    // Right Box: Technical Insights (using drawInsightBox)
+    const maxMonthIdx = energyData.e_mes.indexOf(Math.max(...energyData.e_mes));
+    const minMonthIdx = energyData.e_mes.indexOf(Math.min(...energyData.e_mes));
+    const maxMonthKwh = energyData.e_mes[maxMonthIdx];
+    const minMonthKwh = energyData.e_mes[minMonthIdx];
+
+    drawInsightBox(
+      isEn ? 'KEY TECHNICAL INSIGHTS: PV ENERGY GENERATION' : 'INSIGHTS TÉCNICOS DESTACADOS: GENERACIÓN DE ENERGÍA FV',
+      isEn
+        ? [
+            `Annual Energy Harvest: The ${cleanStudyName} configuration generates ${formatInt(energyData.e_anual)} kWh/yr (${formatInt(energyData.e_anual / peakKw)} kWh/kWp), obtaining a net gain of ${energyData.ganancia_anual >= 0 ? '+' : ''}${formatInt(energyData.ganancia_anual)} kWh/yr (+${formatNum(gainPct, 1)}%) over a horizontal plane.`,
+            `Seasonal Leveling: Winter collection is substantially boosted by angular tilting, bridging the seasonal gap (peak: ${mFull[maxMonthIdx]} with ${formatInt(maxMonthKwh)} kWh; minimum: ${mFull[minMonthIdx]} with ${formatInt(minMonthKwh)} kWh; ratio: ${(maxMonthKwh / (minMonthKwh || 1)).toFixed(2)}x).`,
+            `Thermal Derating Impact: Summer operating cell temperature reaches high values, where gamma (${formatNum(coefTemp, 4)} 1/°C) modulates maximum power, while spring conditions offer optimal conversion efficiency.`
+          ]
+        : [
+            `Balance Anual de Producción: La configuración ${cleanStudyName} produce ${formatInt(energyData.e_anual)} kWh/año (${formatInt(energyData.e_anual / peakKw)} kWh/kWp), obteniendo una ganancia neta de ${energyData.ganancia_anual >= 0 ? '+' : ''}${formatInt(energyData.ganancia_anual)} kWh/año (+${formatNum(gainPct, 1)}%) frente a superficie horizontal.`,
+            `Nivelación Estacional: En los meses fríos la adaptación angular refuerza la captación directa frente a superficie plana (pico: ${mFull[maxMonthIdx]} con ${formatInt(maxMonthKwh)} kWh; mínimo: ${mFull[minMonthIdx]} con ${formatInt(minMonthKwh)} kWh; factor estacional: ${(maxMonthKwh / (minMonthKwh || 1)).toFixed(2)}x).`,
+            `Impacto del Derating Térmico: En verano la elevación de temperatura de célula modula la potencia máxima mediante el coeficiente γ (${formatNum(coefTemp, 4)} 1/°C), situando el punto de mayor rendimiento relativo en primavera con insolación alta y temperatura moderada.`
+          ],
+      btmRightX,
+      btmBoxY,
+      btmRightW,
+      btmH
+    );
+  }
+
+  // =========================================================================
   // PÁGINA: RANKING DE RENDIMIENTO DE LAS 8 SUPERFICIES (Imagen 2 & Imagen 5)
   // =========================================================================
   doc.addPage();
-  drawPageChrome(isEn ? 'Chapter 3. Global Benchmark & Ranking of Surfaces' : 'Capítulo 3. Comparativa y Ranking Global de Superficies', 3 + numCompPages, totalPagesDyn);
+  const benchmarkChapterHeader = hasEnergyPage
+    ? (isEn ? 'Chapter 4. Global Benchmark & Ranking of Surfaces' : 'Capítulo 4. Comparativa y Ranking Global de Superficies')
+    : (isEn ? 'Chapter 3. Global Benchmark & Ranking of Surfaces' : 'Capítulo 3. Comparativa y Ranking Global de Superficies');
+  drawPageChrome(benchmarkChapterHeader, pageChapBenchmark, totalPagesDyn);
 
 
   // Ranking Bar Chart (Matching Imagen 2)
@@ -2335,7 +2805,10 @@ export async function generateOrientSolPDFReport(
   // PÁGINA 5: MAPA DE PÉRDIDAS DE CAPTACIÓN CTE DB-HE4 (Imagen 4)
   // =========================================================================
   doc.addPage();
-  drawPageChrome(isEn ? 'Chapter 4. CTE DB-HE4 Captation Losses' : 'Capítulo 4. Pérdidas de Captación CTE DB-HE4', 4 + numCompPages, totalPagesDyn);
+  const lossMapsChapterHeader = hasEnergyPage
+    ? (isEn ? 'Chapter 5. CTE DB-HE4 Captation Losses' : 'Capítulo 5. Pérdidas de Captación CTE DB-HE4')
+    : (isEn ? 'Chapter 4. CTE DB-HE4 Captation Losses' : 'Capítulo 4. Pérdidas de Captación CTE DB-HE4');
+  drawPageChrome(lossMapsChapterHeader, pageChapLossMaps, totalPagesDyn);
 
   // Optimal Point Card
   const cteTopY = 28;
@@ -2431,8 +2904,8 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(15, 23, 42);
-  const extraStartPage = pageChap4 + 1;
-  const extraEndPage = pageChap4 + extraMapPages;
+  const extraStartPage = pageChapLossMaps + 1;
+  const extraEndPage = pageChapLossMaps + extraMapPages;
   const extraPageText = extraMapPages > 1
     ? (isEn ? `Pages ${extraStartPage}-${extraEndPage}` : `Págs. ${extraStartPage} y ${extraEndPage}`)
     : (isEn ? `Page ${extraStartPage}` : `Pág. ${extraStartPage}`);
@@ -2633,11 +3106,12 @@ export async function generateOrientSolPDFReport(
 
     for (let p = 0; p < extraMapPages; p++) {
       doc.addPage();
-      const pageNo = 4 + numCompPages + p + 1;
+      const pageNo = pageChapLossMaps + p + 1;
+      const extraChapterPrefix = hasEnergyPage ? (isEn ? 'Chapter 5.' : 'Capítulo 5.') : (isEn ? 'Chapter 4.' : 'Capítulo 4.');
       drawPageChrome(
         studyType === 'monthly'
-          ? (isEn ? `Chapter 4. Monthly Loss Maps (${p + 1}/${extraMapPages})` : `Capítulo 4. Mapas de Pérdidas Mensuales (${p + 1}/${extraMapPages})`)
-          : (isEn ? 'Chapter 4. Seasonal Loss Maps' : 'Capítulo 4. Mapas de Pérdidas Estacionales'),
+          ? `${extraChapterPrefix} ${isEn ? `Monthly Loss Maps (${p + 1}/${extraMapPages})` : `Mapas de Pérdidas Mensuales (${p + 1}/${extraMapPages})`}`
+          : `${extraChapterPrefix} ${isEn ? 'Seasonal Loss Maps' : 'Mapas de Pérdidas Estacionales'}`,
         pageNo,
         totalPagesDyn
       );
@@ -2690,7 +3164,10 @@ export async function generateOrientSolPDFReport(
   // PÁGINA FINAL: CURVA DE EVOLUCIÓN CONTINUA 1° A 90° (Capítulo Radiación)
   // =========================================================================
   doc.addPage();
-  drawPageChrome(isEn ? 'Chapter 5. Continuous Radiation Evolution Curve (Tilt 1° to 90°)' : 'Capítulo 5. Evolución Continua de Radiación (Inclinación 1° a 90°)', chapter5Page, totalPagesDyn);
+  const evolutionChapterHeader = hasEnergyPage
+    ? (isEn ? 'Chapter 6. Continuous Radiation Evolution Curve (Tilt 1° to 90°)' : 'Capítulo 6. Evolución Continua de Radiación (Inclinación 1° a 90°)')
+    : (isEn ? 'Chapter 5. Continuous Radiation Evolution Curve (Tilt 1° to 90°)' : 'Capítulo 5. Evolución Continua de Radiación (Inclinación 1° a 90°)');
+  drawPageChrome(evolutionChapterHeader, pageChapEvolution, totalPagesDyn);
 
   // Curve 1° to 90° Chart Frame
   doc.setFont('helvetica', 'bold');

@@ -2,6 +2,7 @@ import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { getDualAxisNoonTiltDeg, getNoonAzimuthDeg, getHorizontalTrackerDailyMeanTiltDeg } from '@/services/solarGeometryAngles';
+import { formatNum } from '@/utils/formatters';
 
 
 export interface EnergyCalculationProps {
@@ -415,27 +416,27 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
 
                     if (studyType === 'monthly') {
                       const mDeg = res.monthlyOptimum12?.optimalTiltsDeg ? res.monthlyOptimum12.optimalTiltsDeg[idx] : optTiltAnnual;
-                      angleBadgeText = `Inc: ${Number(mDeg).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                      angleBadgeText = `Inc: ${formatNum(mDeg, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                     } else if (isSeasonal && seasonalData) {
                       if (idx === 11 || idx === 0 || idx === 1) {
-                        angleBadgeText = `Inv: Inc: ${seasonalData.winterTiltDeg.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                        angleBadgeText = `Inv: Inc: ${formatNum(seasonalData.winterTiltDeg, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                       } else if (idx === 2 || idx === 3 || idx === 4) {
-                        angleBadgeText = `Pri: Inc: ${seasonalData.springTiltDeg.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                        angleBadgeText = `Pri: Inc: ${formatNum(seasonalData.springTiltDeg, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                       } else if (idx === 5 || idx === 6 || idx === 7) {
-                        angleBadgeText = `Ver: Inc: ${seasonalData.summerTiltDeg.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                        angleBadgeText = `Ver: Inc: ${formatNum(seasonalData.summerTiltDeg, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                       } else {
-                        angleBadgeText = `Oto: Inc: ${seasonalData.autumnTiltDeg.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                        angleBadgeText = `Oto: Inc: ${formatNum(seasonalData.autumnTiltDeg, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                       }
                     } else if (studyType === 'polar') {
-                      angleBadgeText = `Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                      angleBadgeText = `Inc: ${formatNum(latitude, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                     } else if (studyType === 'azimuthal') {
-                      angleBadgeText = `Inc: ${latitude.toFixed(1)}° | Ori: ${noonAzim.toFixed(1)}°`;
+                      angleBadgeText = `Inc: ${formatNum(latitude, 1)}° | Ori: ${formatNum(noonAzim, 1)}°`;
                     } else if (studyType === 'horizontal') {
-                      angleBadgeText = `Inc: ${getHorizontalTrackerDailyMeanTiltDeg(latitude, idx).toFixed(1)}° | Ori: 90.0°`;
+                      angleBadgeText = `Inc: ${formatNum(getHorizontalTrackerDailyMeanTiltDeg(latitude, idx), 1)}° | Ori: 90,0°`;
                     } else if (studyType === 'dual') {
-                      angleBadgeText = `Inc: ${noonDualTilt.toFixed(1)}° | Ori: ${noonAzim.toFixed(1)}°`;
+                      angleBadgeText = `Inc: ${formatNum(noonDualTilt, 1)}° | Ori: ${formatNum(noonAzim, 1)}°`;
                     } else {
-                      angleBadgeText = `Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                      angleBadgeText = `Inc: ${formatNum(optTiltAnnual, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                     }
 
                     return `
@@ -444,12 +445,12 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                         <td class="td-ener-angle">
                           <span class="energy-angle-badge">${angleBadgeText}</span>
                         </td>
-                        <td class="td-num">${e0.toFixed(2)}</td>
+                        <td class="td-num">${formatNum(e0, 2)}</td>
                         <td class="td-num td-ener-study-val">
-                          <strong>${e.toFixed(2)}</strong>
+                          <strong>${formatNum(e, 2)}</strong>
                         </td>
                         <td class="td-num td-ener-gain-val ${g >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                          ${g.toFixed(2)}
+                          ${g >= 0 ? '+' : ''}${formatNum(g, 2)}
                         </td>
                       </tr>
                     `;
@@ -467,36 +468,36 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                             const avgMonthlyTilt = res.monthlyOptimum12?.optimalTiltsDeg
                               ? res.monthlyOptimum12.optimalTiltsDeg.reduce((a, b) => a + b, 0) / 12
                               : optTiltAnnual;
-                            return `Inc: ${avgMonthlyTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                            return `Inc: ${formatNum(avgMonthlyTilt, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                           }
                           if (isSeasonal) {
                             const avgSeasonalTilt = seasonalData
                               ? (seasonalData.winterTiltDeg * 3 + seasonalData.springTiltDeg * 3 + seasonalData.summerTiltDeg * 3 + seasonalData.autumnTiltDeg * 3) / 12
                               : 30.0;
-                            return `Inc: ${avgSeasonalTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                            return `Inc: ${formatNum(avgSeasonalTilt, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                           }
                           if (studyType === 'polar') {
-                            return `Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                            return `Inc: ${formatNum(latitude, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                           }
                           if (studyType === 'azimuthal') {
-                            return `Inc: ${latitude.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`;
+                            return `Inc: ${formatNum(latitude, 1)}° | Ori: ${formatNum(avgDualAzim, 1)}°`;
                           }
                           if (studyType === 'horizontal') {
                             const avgHorizTilt = months.reduce((acc, _, idx) => acc + getHorizontalTrackerDailyMeanTiltDeg(latitude, idx), 0) / 12;
-                            return `Inc: ${avgHorizTilt.toFixed(1)}° | Ori: 90.0°`;
+                            return `Inc: ${formatNum(avgHorizTilt, 1)}° | Ori: 90,0°`;
                           }
                           if (studyType === 'dual') {
                             const avgDualTilt = months.reduce((acc, _, idx) => acc + getDualAxisNoonTiltDeg(latitude, idx), 0) / 12;
-                            return `Inc: ${avgDualTilt.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`;
+                            return `Inc: ${formatNum(avgDualTilt, 1)}° | Ori: ${formatNum(avgDualAzim, 1)}°`;
                           }
-                          return `Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                          return `Inc: ${formatNum(optTiltAnnual, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                         })()}
                       </span>
                     </td>
-                    <td class="td-num"><strong>${energyData.e0_anual.toFixed(1)}</strong></td>
-                    <td class="td-num td-ener-study-val"><strong>${energyData.e_anual.toFixed(1)}</strong></td>
+                    <td class="td-num"><strong>${formatNum(energyData.e0_anual, 1)}</strong></td>
+                    <td class="td-num td-ener-study-val"><strong>${formatNum(energyData.e_anual, 1)}</strong></td>
                     <td class="td-num td-ener-gain-val ${energyData.ganancia_anual >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                      <strong>${energyData.ganancia_anual >= 0 ? '+' : ''}${energyData.ganancia_anual.toFixed(2)}</strong>
+                      <strong>${energyData.ganancia_anual >= 0 ? '+' : ''}${formatNum(energyData.ganancia_anual, 2)}</strong>
                     </td>
                   </tr>
                   <tr class="table-media-row energy-media-row">
@@ -510,36 +511,36 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
                             const avgMonthlyTilt = res.monthlyOptimum12?.optimalTiltsDeg
                               ? res.monthlyOptimum12.optimalTiltsDeg.reduce((a, b) => a + b, 0) / 12
                               : optTiltAnnual;
-                            return `Inc: ${avgMonthlyTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                            return `Inc: ${formatNum(avgMonthlyTilt, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                           }
                           if (isSeasonal) {
                             const avgSeasonalTilt = seasonalData
                               ? (seasonalData.winterTiltDeg * 3 + seasonalData.springTiltDeg * 3 + seasonalData.summerTiltDeg * 3 + seasonalData.autumnTiltDeg * 3) / 12
                               : 30.0;
-                            return `Inc: ${avgSeasonalTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                            return `Inc: ${formatNum(avgSeasonalTilt, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                           }
                           if (studyType === 'polar') {
-                            return `Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                            return `Inc: ${formatNum(latitude, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                           }
                           if (studyType === 'azimuthal') {
-                            return `Inc: ${latitude.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`;
+                            return `Inc: ${formatNum(latitude, 1)}° | Ori: ${formatNum(avgDualAzim, 1)}°`;
                           }
                           if (studyType === 'horizontal') {
                             const avgHorizTilt = months.reduce((acc, _, idx) => acc + getHorizontalTrackerDailyMeanTiltDeg(latitude, idx), 0) / 12;
-                            return `Inc: ${avgHorizTilt.toFixed(1)}° | Ori: 90.0°`;
+                            return `Inc: ${formatNum(avgHorizTilt, 1)}° | Ori: 90,0°`;
                           }
                           if (studyType === 'dual') {
                             const avgDualTilt = months.reduce((acc, _, idx) => acc + getDualAxisNoonTiltDeg(latitude, idx), 0) / 12;
-                            return `Inc: ${avgDualTilt.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`;
+                            return `Inc: ${formatNum(avgDualTilt, 1)}° | Ori: ${formatNum(avgDualAzim, 1)}°`;
                           }
-                          return `Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`;
+                          return `Inc: ${formatNum(optTiltAnnual, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`;
                         })()}
                       </span>
                     </td>
-                    <td class="td-num"><strong>${(energyData.e0_anual / 12).toFixed(1)}</strong></td>
-                    <td class="td-num td-ener-study-val"><strong>${(energyData.e_anual / 12).toFixed(1)}</strong></td>
+                    <td class="td-num"><strong>${formatNum(energyData.e0_anual / 12, 1)}</strong></td>
+                    <td class="td-num td-ener-study-val"><strong>${formatNum(energyData.e_anual / 12, 1)}</strong></td>
                     <td class="td-num td-ener-gain-val ${(energyData.ganancia_anual / 12) >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">
-                      <strong>${(energyData.ganancia_anual / 12) >= 0 ? '+' : ''}${(energyData.ganancia_anual / 12).toFixed(2)}</strong>
+                      <strong>${(energyData.ganancia_anual / 12) >= 0 ? '+' : ''}${formatNum(energyData.ganancia_anual / 12, 2)}</strong>
                     </td>
                   </tr>
                 </tfoot>
@@ -556,6 +557,12 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
             </button>
             <button id="btn-energy-salir" class="btn-study-foot btn-salir" type="button">
               <span>${isEn ? 'Exit' : 'Salir'}</span>
+            </button>
+          </div>
+          <div class="footer-btn-right-group">
+            <button id="btn-energy-pdf" class="btn-study-foot btn-pdf" type="button" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; border: 1px solid #38bdf8; border-radius: 4px; padding: 6px 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <span>${isEn ? 'PDF Report' : 'Informe PDF'}</span>
             </button>
           </div>
         </div>
@@ -648,6 +655,20 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
     const btnSalir = container.querySelector<HTMLButtonElement>('#btn-energy-salir');
     btnSalir?.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // 5. Informe PDF Button
+    const btnPdf = container.querySelector<HTMLButtonElement>('#btn-energy-pdf');
+    btnPdf?.addEventListener('click', () => {
+      import('@/components/export/pdfReportGenerator').then(({ showPdfGenerationNoticeModal, generateOrientSolPDFReport }) => {
+        showPdfGenerationNoticeModal(isEn, () => {
+          generateOrientSolPDFReport(res, isEn, studyType, {
+            peakPowerKw: statePeakKw,
+            tonc: stateTonc,
+            coefTemp: stateCoefTemp,
+          });
+        });
+      });
     });
   }
 
