@@ -217,12 +217,12 @@ export function renderEnergyAndTemperatureChart(res: SolarBridgeSimulationResult
       <div class="chart-header">
         <div>
           <h4>${isEn ? 'Monthly PV Energy Yield & Temperature derating' : 'Producción de Energía FV y Comportamiento Térmico'}</h4>
-          <span class="chart-subtitle">${isEn ? 'Net generation (kWh) vs Operating Cell Temp Tc and Ambient Temp Tamb (°C)' : 'Generación neta (kWh) vs Temp. de Célula Tc y Ambiente Tamb (°C)'}</span>
+          <span class="chart-subtitle">${isEn ? 'Net generation (kWh) vs Operating Cell Temp T<sub>C</sub> and Ambient Temp T<sub>amb</sub> (°C)' : 'Generación neta (kWh) vs Temp. de Célula T<sub>C</sub> y Ambiente T<sub>amb</sub> (°C)'}</span>
         </div>
         <div class="chart-legend-box">
           <span class="legend-item"><span class="legend-dot dot-energy"></span>${isEn ? 'PV Yield (kWh)' : 'Producción FV (kWh)'}</span>
-          <span class="legend-item"><span class="legend-dot dot-cell"></span>${isEn ? 'Cell Temp Tc (°C)' : 'Temp. Célula Tc (°C)'}</span>
-          <span class="legend-item"><span class="legend-dot dot-amb"></span>${isEn ? 'Ambient Tamb (°C)' : 'Temp. Ambiente (°C)'}</span>
+          <span class="legend-item"><span class="legend-dot dot-cell"></span>${isEn ? 'Cell Temp T<sub>C</sub> (°C)' : 'Temp. Célula T<sub>C</sub> (°C)'}</span>
+          <span class="legend-item"><span class="legend-dot dot-amb"></span>${isEn ? 'Ambient T<sub>amb</sub> (°C)' : 'Temp. Ambiente T<sub>amb</sub> (°C)'}</span>
         </div>
       </div>
       <div class="chart-svg-container">

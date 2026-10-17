@@ -135,6 +135,8 @@ export interface PDFReportOptions {
 function sanitizePdfText(text: string): string {
   if (!text) return '';
   return text
+    .replace(/[▲\u25B2]/g, '')
+    .replace(/[▼\u25BC]/g, '')
     .replace(/β/g, 'Inc')
     .replace(/γ/g, 'gamma')
     .replace(/δ/g, 'delta')
@@ -149,6 +151,67 @@ function sanitizePdfText(text: string): string {
     .replace(/★/g, '*')
     .replace(/²/g, '^2')
     .replace(/³/g, '^3');
+}
+
+export interface TextSubscriptSegment {
+  text: string;
+  isSub?: boolean;
+  color?: [number, number, number];
+  bold?: boolean;
+}
+
+/**
+ * Draws text segments with true visual subscripts in jsPDF.
+ * Accurately scales font size, shifts baseline downwards, and supports left/center/right alignment.
+ */
+function drawTextWithSubscripts(
+  doc: jsPDF,
+  segments: TextSubscriptSegment[],
+  x: number,
+  baseY: number,
+  baseFontSize: number = 7,
+  align: 'left' | 'center' | 'right' = 'left',
+  defaultFontBold: boolean = false
+): number {
+  const currentFontName = doc.getFont().fontName || 'helvetica';
+  const subRatio = 0.72;
+  const subFontSize = baseFontSize * subRatio;
+  // In jsPDF mm units: baseline shift for subscript is ~28% of base font size in mm (1 pt = 0.3528 mm)
+  const subYShift = baseFontSize * 0.3528 * 0.28;
+
+  // 1. Measure total width
+  let totalW = 0;
+  segments.forEach((seg) => {
+    const isBold = seg.bold !== undefined ? seg.bold : defaultFontBold;
+    doc.setFont(currentFontName, isBold ? 'bold' : 'normal');
+    doc.setFontSize(seg.isSub ? subFontSize : baseFontSize);
+    totalW += doc.getTextWidth(seg.text);
+  });
+
+  // 2. Determine start X based on alignment
+  let curX = x;
+  if (align === 'center') {
+    curX = x - totalW / 2;
+  } else if (align === 'right') {
+    curX = x - totalW;
+  }
+
+  // 3. Render each segment with appropriate style and baseline offset
+  segments.forEach((seg) => {
+    const isBold = seg.bold !== undefined ? seg.bold : defaultFontBold;
+    doc.setFont(currentFontName, isBold ? 'bold' : 'normal');
+    doc.setFontSize(seg.isSub ? subFontSize : baseFontSize);
+    if (seg.color) {
+      doc.setTextColor(seg.color[0], seg.color[1], seg.color[2]);
+    }
+    const renderY = seg.isSub ? baseY + subYShift : baseY;
+    doc.text(seg.text, curX, renderY);
+    curX += doc.getTextWidth(seg.text);
+  });
+
+  // Restore base font size and normal state
+  doc.setFontSize(baseFontSize);
+  return totalW;
 }
 
 /**
@@ -635,9 +698,27 @@ export async function generateOrientSolPDFReport(
   doc.setFillColor(248, 250, 252);
   doc.roundedRect(card4X, cardY, cardW, cardH, 2, 2, 'FD');
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7);
-  doc.setTextColor(100, 116, 139);
-  doc.text(isEn ? 'CELL OPERATING TEMP (TC)' : 'TEMP. CÉLULA OPERATIVA (TC)', card4X + 4, cardY + 6);
+  drawTextWithSubscripts(
+    doc,
+    isEn
+      ? [
+          { text: 'CELL OPERATING TEMP (' },
+          { text: 'T' },
+          { text: 'C', isSub: true },
+          { text: ')' }
+        ]
+      : [
+          { text: 'TEMP. CÉLULA OPERATIVA (' },
+          { text: 'T' },
+          { text: 'C', isSub: true },
+          { text: ')' }
+        ],
+    card4X + 4,
+    cardY + 6,
+    7,
+    'left',
+    true
+  );
   doc.setFontSize(16);
   doc.setTextColor(180, 83, 9);
   doc.text(`${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)} °C`, card4X + 4, cardY + 16);
@@ -1015,23 +1096,44 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(5);
   doc.setTextColor(220, 38, 38);
-  doc.text(`▲ ${isEn ? 'MAX' : 'MÁX'}: ${maxRadVal.toFixed(2)}`, xMax1, yMax1, { align: 'center' });
+  doc.text(`${isEn ? 'MAX' : 'MÁX'}: ${maxRadVal.toFixed(2)}`, xMax1, yMax1, { align: 'center' });
 
   const xMin1 = axisX + 2.0 + minRadIdx * stepX1 + 7.6;
   const yMin1 = baseY1 - (minRadVal / maxRadPlot) * plotH1 - 1.8;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(5);
   doc.setTextColor(2, 132, 199);
-  doc.text(`▼ ${isEn ? 'MIN' : 'MÍN'}: ${minRadVal.toFixed(2)}`, xMin1, yMin1, { align: 'center' });
+  doc.text(`${isEn ? 'MIN' : 'MÍN'}: ${minRadVal.toFixed(2)}`, xMin1, yMin1, { align: 'center' });
 
   // -------------------------------------------------------------
   // GRÁFICO 2: PRODUCCIÓN FV Y COMPORTAMIENTO TÉRMICO
   // -------------------------------------------------------------
   const chart2Y = c1BoxY + c1H + 6;
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(15, 23, 42);
-  doc.text(isEn ? 'PV Energy Yield (kWh) & Thermal Behavior (Tc vs Tamb)' : 'Producción de Energía FV (kWh) y Comportamiento Térmico (Tc vs Tamb)', 20, chart2Y);
+  drawTextWithSubscripts(
+    doc,
+    isEn
+      ? [
+          { text: 'PV Energy Yield (kWh) & Thermal Behavior (' },
+          { text: 'T' },
+          { text: 'C', isSub: true },
+          { text: ' vs T' },
+          { text: 'amb', isSub: true },
+          { text: ')' }
+        ]
+      : [
+          { text: 'Producción de Energía FV (kWh) y Comportamiento Térmico (' },
+          { text: 'T' },
+          { text: 'C', isSub: true },
+          { text: ' vs T' },
+          { text: 'amb', isSub: true },
+          { text: ')' }
+        ],
+    20,
+    chart2Y,
+    9,
+    'left',
+    true
+  );
 
   const c2BoxY = chart2Y + 3;
   doc.setFillColor(248, 250, 252);
@@ -1047,11 +1149,47 @@ export async function generateOrientSolPDFReport(
 
   doc.setFillColor(220, 38, 38);
   doc.circle(85, c2BoxY + 6, 2, 'F');
-  doc.text(isEn ? 'Cell Temp Tc (°C)' : 'Temp. Célula Tc (°C)', 89, c2BoxY + 7);
+  drawTextWithSubscripts(
+    doc,
+    isEn
+      ? [
+          { text: 'Cell Temp T', color: [71, 85, 105] },
+          { text: 'C', isSub: true, color: [71, 85, 105] },
+          { text: ' (°C)', color: [71, 85, 105] }
+        ]
+      : [
+          { text: 'Temp. Célula T', color: [71, 85, 105] },
+          { text: 'C', isSub: true, color: [71, 85, 105] },
+          { text: ' (°C)', color: [71, 85, 105] }
+        ],
+    89,
+    c2BoxY + 7,
+    7,
+    'left',
+    false
+  );
 
   doc.setFillColor(2, 132, 199);
   doc.circle(135, c2BoxY + 6, 2, 'F');
-  doc.text(isEn ? 'Ambient Temp (°C)' : 'Temp. Ambiente (°C)', 139, c2BoxY + 7);
+  drawTextWithSubscripts(
+    doc,
+    isEn
+      ? [
+          { text: 'Ambient Temp T', color: [71, 85, 105] },
+          { text: 'amb', isSub: true, color: [71, 85, 105] },
+          { text: ' (°C)', color: [71, 85, 105] }
+        ]
+      : [
+          { text: 'Temp. Ambiente T', color: [71, 85, 105] },
+          { text: 'amb', isSub: true, color: [71, 85, 105] },
+          { text: ' (°C)', color: [71, 85, 105] }
+        ],
+    139,
+    c2BoxY + 7,
+    7,
+    'left',
+    false
+  );
 
   const pvMonthly = res.energyYield.producida.osterwald.monthlyKwh;
   const maxPvVal = Math.max(...pvMonthly);
@@ -1148,14 +1286,14 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(5);
   doc.setTextColor(5, 150, 105);
-  doc.text(`▲ ${isEn ? 'MAX' : 'MÁX'}: ${Math.round(maxPvVal)} kWh`, xPvMax, yPvMax, { align: 'center' });
+  doc.text(`${isEn ? 'MAX' : 'MÁX'}: ${Math.round(maxPvVal)} kWh`, xPvMax, yPvMax, { align: 'center' });
 
   const xPvMin = axisX + 2.0 + minPvIdx * stepX1 + 4.1;
   const yPvMin = baseY2 - (minPvVal / maxPvPlot) * plotH2 - 1.8;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(5);
   doc.setTextColor(100, 116, 139);
-  doc.text(`▼ ${isEn ? 'MIN' : 'MÍN'}: ${Math.round(minPvVal)} kWh`, xPvMin, yPvMin, { align: 'center' });
+  doc.text(`${isEn ? 'MIN' : 'MÍN'}: ${Math.round(minPvVal)} kWh`, xPvMin, yPvMin, { align: 'center' });
 
   // Peak Cell Temperature Callout
   const tcVals = res.temperatures.cellOperating.monthlyCellTempOptimalC;
@@ -1164,10 +1302,19 @@ export async function generateOrientSolPDFReport(
   const pTcMax = tcPoints[maxTcIdx];
   doc.setFillColor(220, 38, 38);
   doc.circle(pTcMax.x, pTcMax.y, 1.4, 'F');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(5);
-  doc.setTextColor(220, 38, 38);
-  doc.text(`Tc ${isEn ? 'MAX' : 'MÁX'}: ${maxTcVal.toFixed(1)}°C`, pTcMax.x, pTcMax.y - 2.5, { align: 'center' });
+  drawTextWithSubscripts(
+    doc,
+    [
+      { text: 'T', color: [220, 38, 38] },
+      { text: 'C', isSub: true, color: [220, 38, 38] },
+      { text: ` ${isEn ? 'MAX' : 'MÁX'}: ${maxTcVal.toFixed(1)}°C`, color: [220, 38, 38] }
+    ],
+    pTcMax.x,
+    pTcMax.y - 2.5,
+    5,
+    'center',
+    true
+  );
 
   // -------------------------------------------------------------
   // CAJA DE INSIGHTS RELEVANTES RESALTADOS (Imagen 1)
@@ -1280,9 +1427,11 @@ export async function generateOrientSolPDFReport(
         : 0.0;
 
     const gainVsHoriz_c =
-      horizAnnualTotalKwh_c > 0
+      comp === 'albedo'
+        ? NaN
+        : horizAnnualTotalKwh_c > 0
         ? ((activeAnnualTotalKwh_c - horizAnnualTotalKwh_c) / horizAnnualTotalKwh_c) * 100
-        : (activeAnnualTotalKwh_c > 0 ? 100.0 : 0.0);
+        : 0.0;
 
     const pvMonthly_c = pvMonthly.map((pv, i) => {
       const gGlob = res.optimalAnnual.monthlyDailyKwh[i] || 1;
@@ -1350,7 +1499,7 @@ export async function generateOrientSolPDFReport(
     doc.text(isEn ? 'GAIN VS FIXED OPT' : 'GANANCIA S/ ÓPTIMO FIJO', op3X + 4, opBarY + 5.5);
     doc.setFontSize(13);
     doc.setTextColor(16, 185, 129);
-    doc.text(`+${gainVsOpt_c.toFixed(2)}%`, op3X + 4, opBarY + 14);
+    doc.text(`${gainVsOpt_c >= 0 ? '+' : ''}${gainVsOpt_c.toFixed(2)}%`, op3X + 4, opBarY + 14);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6);
     doc.setTextColor(100, 116, 139);
@@ -1366,11 +1515,16 @@ export async function generateOrientSolPDFReport(
     doc.text(isEn ? 'GAIN VS HORIZONTAL' : 'GANANCIA S/ HORIZONTAL', op4X + 4, opBarY + 5.5);
     doc.setFontSize(13);
     doc.setTextColor(16, 185, 129);
-    doc.text(`+${gainVsHoriz_c.toFixed(2)}%`, op4X + 4, opBarY + 14);
+    const gainVsHorizDisplay = comp === 'albedo' ? '-' : `${gainVsHoriz_c >= 0 ? '+' : ''}${gainVsHoriz_c.toFixed(2)}%`;
+    doc.text(gainVsHorizDisplay, op4X + 4, opBarY + 14);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6);
     doc.setTextColor(100, 116, 139);
-    doc.text(`+${Math.round(activeAnnualTotalKwh_c - horizAnnualTotalKwh_c)} kWh/m²·${isEn ? 'yr' : 'año'}`, op4X + 4, opBarY + 19);
+    const gainVsHorizSub =
+      comp === 'albedo'
+        ? 'Rdm(0°) = 0'
+        : `${activeAnnualTotalKwh_c - horizAnnualTotalKwh_c >= 0 ? '+' : ''}${Math.round(activeAnnualTotalKwh_c - horizAnnualTotalKwh_c)} kWh/m²·${isEn ? 'yr' : 'año'}`;
+    doc.text(gainVsHorizSub, op4X + 4, opBarY + 19);
 
     // 12 Tarjetas mensuales
     const mcY = opBarY + opCardH + 6;
@@ -1462,14 +1616,49 @@ export async function generateOrientSolPDFReport(
       `${compLabel}(0°)`,
       isEn ? 'Tilt (°)' : 'Inc (°)',
       `${compLabel} Est.`,
-      isEn ? 'Tamb (°C)' : 'Tª Amb',
-      isEn ? 'Tcell (°C)' : 'Tª Cél.',
+      '', // Rendered with subscripts below
+      '', // Rendered with subscripts below
       isEn ? 'PV Yield' : 'Prod (kWh)',
       isEn ? 'Gain vs 0°' : 'Gan. s/ 0°',
       isEn ? 'Gain vs Opt' : 'Gan. s/ Ópt',
     ];
     const colX = [22, 40, 56, 70, 88, 104, 124, 144, 168];
-    cols.forEach((c, idx) => doc.text(c, colX[idx], tblY + 4.5));
+    cols.forEach((c, idx) => {
+      if (idx === 4) {
+        drawTextWithSubscripts(
+          doc,
+          [
+            { text: 'T', color: [255, 255, 255] },
+            { text: 'amb', isSub: true, color: [255, 255, 255] },
+            { text: ' (°C)', color: [255, 255, 255] }
+          ],
+          colX[4],
+          tblY + 4.5,
+          6.5,
+          'left',
+          true
+        );
+      } else if (idx === 5) {
+        drawTextWithSubscripts(
+          doc,
+          [
+            { text: 'T', color: [255, 255, 255] },
+            { text: 'C', isSub: true, color: [255, 255, 255] },
+            { text: ' (°C)', color: [255, 255, 255] }
+          ],
+          colX[5],
+          tblY + 4.5,
+          6.5,
+          'left',
+          true
+        );
+      } else if (c) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.5);
+        doc.setTextColor(255, 255, 255);
+        doc.text(c, colX[idx], tblY + 4.5);
+      }
+    });
 
     let curRowY = tblY + 6.5;
     for (let i = 0; i < 12; i++) {
@@ -1510,9 +1699,14 @@ export async function generateOrientSolPDFReport(
       doc.setTextColor(15, 23, 42);
       doc.text(String(Math.round(pvMonthly_c[i] ?? 0)), colX[6], curRowY + 3.5);
 
-      const g0pct = radH_c[i] > 0 ? ((radAct_c[i] - radH_c[i]) / radH_c[i]) * 100 : (radAct_c[i] > 0 ? 100 : 0);
-      doc.setTextColor(g0pct >= 0 ? 16 : 220, g0pct >= 0 ? 185 : 38, g0pct >= 0 ? 129 : 38);
-      doc.text(`+${g0pct.toFixed(1)}%`, colX[7], curRowY + 3.5);
+      if (comp === 'albedo') {
+        doc.setTextColor(100, 116, 139);
+        doc.text('-', colX[7], curRowY + 3.5);
+      } else {
+        const g0pct = radH_c[i] > 0 ? ((radAct_c[i] - radH_c[i]) / radH_c[i]) * 100 : 0;
+        doc.setTextColor(g0pct >= 0 ? 16 : 220, g0pct >= 0 ? 185 : 38, g0pct >= 0 ? 129 : 38);
+        doc.text(`${g0pct >= 0 ? '+' : ''}${g0pct.toFixed(1)}%`, colX[7], curRowY + 3.5);
+      }
 
       const gOptPct = radOpt_c[i] > 0 ? ((radAct_c[i] - radOpt_c[i]) / radOpt_c[i]) * 100 : 0;
       doc.text(`${gOptPct >= 0 ? '+' : ''}${gOptPct.toFixed(1)}%`, colX[8], curRowY + 3.5);
@@ -1534,9 +1728,14 @@ export async function generateOrientSolPDFReport(
     doc.text(res.temperatures.ambient.annualMeanC.toFixed(1), colX[4], curRowY + 4);
     doc.text(res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1), colX[5], curRowY + 4);
     doc.text(String(Math.round(pvMonthly_c.reduce((a, b) => a + b, 0))), colX[6], curRowY + 4);
-    doc.setTextColor(52, 211, 153);
-    doc.text(`+${gainVsHoriz_c.toFixed(1)}%`, colX[7], curRowY + 4);
-    doc.text(`+${gainVsOpt_c.toFixed(1)}%`, colX[8], curRowY + 4);
+    if (comp === 'albedo') {
+      doc.setTextColor(148, 163, 184);
+      doc.text('-', colX[7], curRowY + 4);
+    } else {
+      doc.setTextColor(gainVsHoriz_c >= 0 ? 52 : 248, gainVsHoriz_c >= 0 ? 211 : 113, gainVsHoriz_c >= 0 ? 153 : 113);
+      doc.text(`${gainVsHoriz_c >= 0 ? '+' : ''}${gainVsHoriz_c.toFixed(1)}%`, colX[7], curRowY + 4);
+    }
+    doc.text(`${gainVsOpt_c >= 0 ? '+' : ''}${gainVsOpt_c.toFixed(1)}%`, colX[8], curRowY + 4);
 
     // Insights box
     const ins2Y = curRowY + 9;
@@ -2561,14 +2760,14 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setFontSize(8.5);
   doc.setTextColor(71, 85, 105);
   const formula1 = isEn
-    ? 'Calculation implemented according to Osterwald formula: PM = PM,STC · (G/1000) · [1 + gamma · (Tc - 25)]'
-    : 'Cálculo implementado según la fórmula de Osterwald: PM = PM,STC · (G/1000) · [1 + gamma · (Tc - 25)]';
+    ? 'Calculation implemented according to Osterwald formula: PM = PM,STC · (G/1000) · [1 + gamma · (T_C - 25)]'
+    : 'Cálculo implementado según la fórmula de Osterwald: PM = PM,STC · (G/1000) · [1 + gamma · (T_C - 25)]';
   const f1Lines = doc.splitTextToSize(sanitizePdfText(formula1), 160);
   doc.text(f1Lines, 25, 199);
 
   const formula2 = isEn
-    ? 'where cell temperature is given by: Tc = Tamb + [(NOCT - 20) / 800] · G'
-    : 'donde la temperatura de célula viene dada por: Tc = Tamb + [(TONC - 20) / 800] · G';
+    ? 'where cell temperature is given by: T_C = T_{amb} + [(NOCT - 20) / 800] · G'
+    : 'donde la temperatura de célula viene dada por: T_C = T_{amb} + [(TONC - 20) / 800] · G';
   const f2Lines = doc.splitTextToSize(sanitizePdfText(formula2), 160);
   doc.text(f2Lines, 25, 205);
 

@@ -68,8 +68,8 @@ export function exportToCSV(
       isEn ? 'Fixed Opt Rad (kWh/m2/d)' : 'Rad Fijo Opt (kWh/m2/d)',
       isEn ? 'Monthly Opt Rad (kWh/m2/d)' : 'Rad Opt Mensual (kWh/m2/d)',
       isEn ? 'Monthly Opt Tilt (deg)' : 'Angulo Opt Mensual (grados)',
-      isEn ? 'Ambient Temp (C)' : 'Temp Ambiente (C)',
-      isEn ? 'Cell Temp Tc (C)' : 'Temp Celula Tc (C)',
+      isEn ? 'Ambient Temp T_amb (C)' : 'Temp Ambiente T_amb (C)',
+      isEn ? 'Cell Temp T_C (C)' : 'Temp Celula T_C (C)',
       isEn ? 'Osterwald Yield (kWh)' : 'Prod FV Osterwald (kWh)',
       isEn ? 'Simplified Yield (kWh)' : 'Prod FV Simplificada (kWh)',
     ].join(';')

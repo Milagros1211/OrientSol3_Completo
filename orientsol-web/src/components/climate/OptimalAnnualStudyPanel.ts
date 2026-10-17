@@ -535,7 +535,8 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
     // Gains vs Horizontal
     const isAlbedo = stateTableComponent === 'albedo';
     const gainsHoriz = calculateGains(radOpt, rad0);
-    const meanFactorHoriz = meanOf(gainsHoriz.factors);
+    const meanFactorHoriz = mean0 > 0.001 ? meanOpt / mean0 : 1.0;
+    const annualGainVsHorizPct = mean0 > 0.001 ? ((meanOpt - mean0) / mean0) * 100 : 0;
     const meanPctHoriz = meanOf(gainsHoriz.pcts);
 
     // Gains vs Angle X
@@ -854,8 +855,8 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
                 <td class="td-num td-col-opt"><strong>${meanOpt.toFixed(2)}</strong></td>
                 ${stateComparisonMode ? `<td class="td-num td-col-anglex"><strong>${meanX.toFixed(2)}</strong></td>` : ''}
                 <td class="td-num td-col-temp"><strong>${tempMeanAnnual.toFixed(1)}</strong></td>
-                <td class="td-num td-gain-factor"><strong>${isAlbedo ? '-' : meanFactorHoriz.toFixed(2)}</strong></td>
-                <td class="td-num td-gain-pct ${!isAlbedo && meanPctHoriz >= 0 ? 'text-gain-pos' : !isAlbedo ? 'text-gain-neg' : ''}"><strong>${isAlbedo ? '-' : `${meanPctHoriz >= 0 ? '+' : ''}${meanPctHoriz.toFixed(2)}`}</strong></td>
+                <td class="td-num td-gain-factor" title="${isEn ? 'Annual Resource Gain Factor' : 'Factor de ganancia anual del recurso'}"><strong>${isAlbedo ? '-' : meanFactorHoriz.toFixed(2)}</strong></td>
+                <td class="td-num td-gain-pct ${!isAlbedo && annualGainVsHorizPct >= 0 ? 'text-gain-pos' : !isAlbedo ? 'text-gain-neg' : ''}" title="${isEn ? `Annual Resource Gain: ${annualGainVsHorizPct >= 0 ? '+' : ''}${annualGainVsHorizPct.toFixed(2)}% (Monthly unweighted avg: ${meanPctHoriz >= 0 ? '+' : ''}${meanPctHoriz.toFixed(2)}%)` : `Ganancia anual del recurso: ${annualGainVsHorizPct >= 0 ? '+' : ''}${annualGainVsHorizPct.toFixed(2)}% (Media mensual sin ponderar: ${meanPctHoriz >= 0 ? '+' : ''}${meanPctHoriz.toFixed(2)}%)`}"><strong>${isAlbedo ? '-' : `${annualGainVsHorizPct >= 0 ? '+' : ''}${annualGainVsHorizPct.toFixed(2)}%`}</strong></td>
                 ${
                   stateComparisonMode
                     ? `
@@ -891,8 +892,8 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
 
           <div class="kpi-mini-card kpi-horiz">
             <span class="kpi-mini-title">${isEn ? 'Gain over Horizontal (0°)' : 'Ganancia s/ Horizontal (0°)'}</span>
-            <div class="kpi-mini-main" style="color: var(--accent-cyan);">${isAlbedo ? '-' : `+${meanPctHoriz.toFixed(2)}%`}</div>
-            <span class="kpi-mini-sub">${isAlbedo ? 'Rdm(0°) = 0' : `+${Math.round((meanOpt - mean0) * 365)} kWh/m²·${isEn ? 'yr' : 'año'}`}</span>
+            <div class="kpi-mini-main" style="color: var(--accent-cyan);">${isAlbedo ? '-' : `${annualGainVsHorizPct >= 0 ? '+' : ''}${annualGainVsHorizPct.toFixed(2)}%`}</div>
+            <span class="kpi-mini-sub">${isAlbedo ? 'Rdm(0°) = 0' : `${(meanOpt - mean0) * 365 >= 0 ? '+' : ''}${Math.round((meanOpt - mean0) * 365)} kWh/m²·${isEn ? 'yr' : 'año'}`}</span>
           </div>
         </div>
 

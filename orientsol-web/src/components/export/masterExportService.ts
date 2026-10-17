@@ -99,8 +99,8 @@ export function exportOrientSolMasterExcel(
     [isEn ? 'Annual Mean Ambient Temp (°C)' : 'Temperatura Media Anual Ambiente (°C)', Number(res.temperatures.ambient.annualMeanC.toFixed(2))],
     [isEn ? 'Annual Max Ambient Temp (°C)' : 'Temperatura Máxima Anual Ambiente (°C) [Pico Estival]', Number(res.temperatures.ambient.annualMaxC.toFixed(2))],
     [isEn ? 'Annual Min Ambient Temp (°C)' : 'Temperatura Mínima Anual Ambiente (°C) [Mínima Invernal]', Number(res.temperatures.ambient.annualMinC.toFixed(2))],
-    [isEn ? 'Mean Operating Cell Temp Tc (°C)' : 'Temperatura Media Operativa de Célula Tc (°C)', Number(res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(2))],
-    [isEn ? 'Max Operating Cell Temp Tc (°C)' : 'Temperatura Máxima Operativa de Célula Tc (°C)', Number(res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(2))],
+    [isEn ? 'Mean Operating Cell Temp T_C (°C)' : 'Temperatura Media Operativa de Célula T_C (°C)', Number(res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(2))],
+    [isEn ? 'Max Operating Cell Temp T_C (°C)' : 'Temperatura Máxima Operativa de Célula T_C (°C)', Number(res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(2))],
     [],
     [isEn ? 'PHOTOVOLTAIC GENERATOR SPECIFICATIONS' : 'PARÁMETROS DEL GENERADOR FOTOVOLTAICO'],
     [isEn ? 'Installed Peak Power (kWp)' : 'Potencia Pico Instalada (kWp)', peakKw],
@@ -252,8 +252,8 @@ export function exportOrientSolMasterExcel(
         `${compTag} (75°)`,
         `${compTag} (90°)`,
         `${compTag} ${isEn ? 'Opt' : 'Ópt'} (${optAngle}°)`,
-        isEn ? 'Ambient Temp (°C)' : 'Tª Ambiente (°C)',
-        isEn ? 'Cell Temp Tc (°C)' : 'Tª Célula Tc (°C)',
+        isEn ? 'Ambient Temp T_amb (°C)' : 'Tª Ambiente T_amb (°C)',
+        isEn ? 'Cell Temp T_C (°C)' : 'Tª Célula T_C (°C)',
         isEn ? 'PV Yield Osterwald (kWh)' : 'Prod FV Osterwald (kWh)',
         isEn ? 'Gain vs Horiz (Factor)' : 'Ganancia s/ Horiz (Factor)',
         isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)',
@@ -263,8 +263,8 @@ export function exportOrientSolMasterExcel(
       for (let i = 0; i < 12; i++) {
         const g0 = r0[i];
         const gOpt = rOpt[i];
-        const factor = g0 > 0 ? gOpt / g0 : 1;
-        const pct = (factor - 1) * 100;
+        const factor = compType === 'albedo' ? '-' : (g0 > 0 ? Number((gOpt / g0).toFixed(4)) : 1);
+        const pct = compType === 'albedo' ? '-' : (g0 > 0 ? Number(((gOpt / g0 - 1) * 100).toFixed(2)) : 0);
         activeTableData.push([
           months[i],
           Number(r0[i].toFixed(2)),
@@ -278,8 +278,8 @@ export function exportOrientSolMasterExcel(
           Number(tempVals[i].toFixed(1)),
           Number(cellTemps[i].toFixed(1)),
           Math.round(res.energyYield.producida.osterwald.monthlyKwh[i] ?? 0),
-          Number(factor.toFixed(4)),
-          Number(pct.toFixed(2)),
+          factor,
+          pct,
         ]);
       }
     } else if (activeOp === 'monthly') {
@@ -288,8 +288,8 @@ export function exportOrientSolMasterExcel(
         `${compTag} (0°)`,
         isEn ? 'Optimal Tilt β (°)' : 'Inclinación Óptima β (°)',
         `${compTag} ${isEn ? 'Monthly Opt (kWh/m²/d)' : 'Óptimo Mensual (kWh/m²/d)'}`,
-        isEn ? 'Ambient Temp (°C)' : 'Tª Ambiente (°C)',
-        isEn ? 'Cell Temp Tc (°C)' : 'Tª Célula Tc (°C)',
+        isEn ? 'Ambient Temp T_amb (°C)' : 'Tª Ambiente T_amb (°C)',
+        isEn ? 'Cell Temp T_C (°C)' : 'Tª Célula T_C (°C)',
         isEn ? 'PV Yield Osterwald (kWh)' : 'Prod FV Osterwald (kWh)',
         isEn ? 'Gain vs Horiz (Factor)' : 'Ganancia s/ Horiz (Factor)',
         isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)',
@@ -302,9 +302,9 @@ export function exportOrientSolMasterExcel(
         const g0 = r0[i];
         const gOpt = getMonthlyRadiationForAngle(res, compType, tilts[i])[i];
         const gFix = rFixed[i];
-        const factor = g0 > 0 ? gOpt / g0 : 1;
-        const pctHoriz = (factor - 1) * 100;
-        const pctFix = gFix > 0 ? ((gOpt - gFix) / gFix) * 100 : 0;
+        const factor = compType === 'albedo' ? '-' : (g0 > 0 ? Number((gOpt / g0).toFixed(4)) : 1);
+        const pctHoriz = compType === 'albedo' ? '-' : (g0 > 0 ? Number(((gOpt / g0 - 1) * 100).toFixed(2)) : 0);
+        const pctFix = gFix > 0 ? Number((((gOpt - gFix) / gFix) * 100).toFixed(2)) : 0;
         activeTableData.push([
           months[i],
           Number(g0.toFixed(2)),
@@ -313,9 +313,9 @@ export function exportOrientSolMasterExcel(
           Number(tempVals[i].toFixed(1)),
           Number(cellTemps[i].toFixed(1)),
           Math.round(res.energyYield.producida.osterwald.monthlyKwh[i] ?? 0),
-          Number(factor.toFixed(4)),
-          Number(pctHoriz.toFixed(2)),
-          Number(pctFix.toFixed(2)),
+          factor,
+          pctHoriz,
+          pctFix,
         ]);
       }
     } else if (activeOp === 'seasonal') {
@@ -324,8 +324,8 @@ export function exportOrientSolMasterExcel(
         `${compTag} (0°)`,
         isEn ? 'Seasonal Angle (°)' : 'Inclinación Estacional (°)',
         `${compTag} ${isEn ? 'Seasonal' : 'Estacional'}`,
-        isEn ? 'Ambient Temp (°C)' : 'Tª Ambiente (°C)',
-        isEn ? 'Cell Temp Tc (°C)' : 'Tª Célula Tc (°C)',
+        isEn ? 'Ambient Temp T_amb (°C)' : 'Tª Ambiente T_amb (°C)',
+        isEn ? 'Cell Temp T_C (°C)' : 'Tª Célula T_C (°C)',
         isEn ? 'PV Yield Osterwald (kWh)' : 'Prod FV Osterwald (kWh)',
         isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)',
         isEn ? 'Gain vs Annual Opt (%)' : 'Ganancia s/ Ópt Anual (%)',
@@ -342,8 +342,8 @@ export function exportOrientSolMasterExcel(
         const g0 = r0[i];
         const gOpt = getMonthlyRadiationForAngle(res, compType, seasonTilts[i])[i];
         const gAnn = rAnn[i];
-        const pctHoriz = g0 > 0 ? ((gOpt - g0) / g0) * 100 : 0;
-        const pctAnn = gAnn > 0 ? ((gOpt - gAnn) / gAnn) * 100 : 0;
+        const pctHoriz = compType === 'albedo' ? '-' : (g0 > 0 ? Number((((gOpt - g0) / g0) * 100).toFixed(2)) : 0);
+        const pctAnn = gAnn > 0 ? Number((((gOpt - gAnn) / gAnn) * 100).toFixed(2)) : 0;
         activeTableData.push([
           months[i],
           Number(g0.toFixed(2)),
@@ -352,8 +352,8 @@ export function exportOrientSolMasterExcel(
           Number(tempVals[i].toFixed(1)),
           Number(cellTemps[i].toFixed(1)),
           Math.round(res.energyYield.producida.osterwald.monthlyKwh[i] ?? 0),
-          Number(pctHoriz.toFixed(2)),
-          Number(pctAnn.toFixed(2)),
+          pctHoriz,
+          pctAnn,
         ]);
       }
     } else {
@@ -371,8 +371,8 @@ export function exportOrientSolMasterExcel(
         isEn ? 'Month' : 'Mes',
         `${compTag} (0°)`,
         isEn ? `${compTag} Tracking (kWh/m²/d)` : `${compTag} Seguidor (kWh/m²/d)`,
-        isEn ? 'Ambient Temp (°C)' : 'Tª Ambiente (°C)',
-        isEn ? 'Cell Temp Tc (°C)' : 'Tª Célula Tc (°C)',
+        isEn ? 'Ambient Temp T_amb (°C)' : 'Tª Ambiente T_amb (°C)',
+        isEn ? 'Cell Temp T_C (°C)' : 'Tª Célula T_C (°C)',
         isEn ? 'PV Yield Osterwald (kWh)' : 'Prod FV Osterwald (kWh)',
         isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)',
         isEn ? 'Gain vs Annual Opt (%)' : 'Ganancia s/ Fijo Ópt Anual (%)',
@@ -407,7 +407,7 @@ export function exportOrientSolMasterExcel(
           Number(tempVals[i].toFixed(1)),
           Number(cellTemps[i].toFixed(1)),
           Math.round(res.energyYield.producida.osterwald.monthlyKwh[i] ?? 0),
-          Number((g0 > 0 ? ((p - g0) / g0) * 100 : 0).toFixed(2)),
+          compType === 'albedo' ? '-' : Number((g0 > 0 ? ((p - g0) / g0) * 100 : 0).toFixed(2)),
           Number((gAnn > 0 ? ((p - gAnn) / gAnn) * 100 : 0).toFixed(2)),
           Number((gSeas > 0 ? ((p - gSeas) / gSeas) * 100 : 0).toFixed(2)),
         ]);

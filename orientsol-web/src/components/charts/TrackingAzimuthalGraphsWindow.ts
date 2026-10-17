@@ -2,6 +2,7 @@ import { i18n } from '@/i18n';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { themeManager } from '@/services/theme/themeManager';
 import { renderWrappedSvgTitle } from './chartSvgUtils';
+import { showAlbedoWarningModal } from '@/components/modals/AlbedoWarningModal';
 
 export type TrackingGraphComponentChoice = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -348,6 +349,7 @@ export function renderTrackingAzimuthalGraphsWindow(props: TrackingAzimuthalGrap
         ];
 
         series.forEach((s, sIdx) => {
+          if (sIdx === 0 && isAlbedo) return; // Rdm(0°)=0 indeterminate
           const bx = slotX + sIdx * (barW + gap);
           const y = yBottom(s.val);
           const barY = Math.min(y, yZero);
@@ -356,11 +358,22 @@ export function renderTrackingAzimuthalGraphsWindow(props: TrackingAzimuthalGrap
         });
       }
 
+      if (isAlbedo) {
+        bottomBarsHtml += `
+          <g class="albedo-track-note">
+            <rect x="${bPad.left + 10}" y="${bPad.top + 6}" width="${bInnerW - 20}" height="22" fill="${isDark ? 'rgba(245, 158, 11, 0.15)' : '#fffbeb'}" stroke="#f59e0b" stroke-width="0.8" rx="3" />
+            <text x="${bPad.left + bInnerW / 2}" y="${bPad.top + 20}" fill="${isDark ? '#fbbf24' : '#92400e'}" font-size="9" font-weight="600" text-anchor="middle">
+              ⚠ Rdm(0º) = 0: ${isEn ? 'Gains vs horizontal plane (0°) cannot be calculated' : 'Las ganancias s/ plano horizontal (0°) no se pueden calcular'}
+            </text>
+          </g>
+        `;
+      }
+
       bottomLegendHtml = `
         <g transform="translate(${bPad.left + bInnerW + 2}, ${bPad.top + 2})">
           <rect x="0" y="0" width="92" height="96" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-          <rect x="5" y="8" width="9" height="9" fill="#0284c7" />
-          <text x="18" y="16" fill="${legendText}" font-size="7.5" font-weight="600">vs 0° (Plano hor.)</text>
+          <rect x="5" y="8" width="9" height="9" fill="${isAlbedo ? '#94a3b8' : '#0284c7'}" />
+          <text x="18" y="16" fill="${isAlbedo ? '#f59e0b' : legendText}" font-size="7.5" font-weight="${isAlbedo ? '700' : '600'}">${isAlbedo ? 'vs 0° (Indet.)' : 'vs 0° (Plano hor.)'}</text>
           <rect x="5" y="24" width="9" height="9" fill="#10b981" />
           <text x="18" y="32" fill="${legendText}" font-size="7.5" font-weight="600">vs Ópt. anu</text>
           <rect x="5" y="40" width="9" height="9" fill="#f59e0b" />
@@ -545,6 +558,9 @@ export function renderTrackingAzimuthalGraphsWindow(props: TrackingAzimuthalGrap
 
     container.querySelector<HTMLSelectElement>('#select-comp-graphs-azi')?.addEventListener('change', (e) => {
       selectedComponent = (e.target as HTMLSelectElement).value as TrackingGraphComponentChoice;
+      if (selectedComponent === 'albedo') {
+        showAlbedoWarningModal(isEn);
+      }
       renderInternal();
     });
 
