@@ -60,11 +60,11 @@ export async function fetchPvgisClimateData(
     candidateUrls.push(
       {
         url: jrcBaseUrl,
-        version: '5.3 (Electron IPC Direct)',
+        version: '5.3',
       },
       {
         url: `https://re.jrc.ec.europa.eu/api/v5_2/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
-        version: '5.2 (Electron IPC Direct)',
+        version: '5.2',
       }
     );
   } else if (!isLocalhost && isSupabaseConfigured()) {

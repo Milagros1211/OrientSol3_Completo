@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, session, net } from 'electron';
+import { app, BrowserWindow, ipcMain, session, net, dialog } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -384,9 +384,66 @@ function createWindow() {
   });
 }
 
+function setupDownloadHandler() {
+  session.defaultSession.on('will-download', (_event, item, webContents) => {
+    const defaultFileName = item.getFilename();
+    const ext = path.extname(defaultFileName).toLowerCase();
+
+    let filters = [{ name: 'Todos los archivos (*.*)', extensions: ['*'] }];
+    if (ext === '.xlsx' || ext === '.xls') {
+      filters = [
+        { name: 'Libro de Excel (*.xlsx)', extensions: ['xlsx'] },
+        { name: 'Todos los archivos (*.*)', extensions: ['*'] },
+      ];
+    } else if (ext === '.pdf') {
+      filters = [
+        { name: 'Documento PDF (*.pdf)', extensions: ['pdf'] },
+        { name: 'Todos los archivos (*.*)', extensions: ['*'] },
+      ];
+    } else if (ext === '.png') {
+      filters = [
+        { name: 'Imagen PNG (*.png)', extensions: ['png'] },
+        { name: 'Todos los archivos (*.*)', extensions: ['*'] },
+      ];
+    } else if (ext === '.csv') {
+      filters = [
+        { name: 'Valores separados por comas (*.csv)', extensions: ['csv'] },
+        { name: 'Todos los archivos (*.*)', extensions: ['*'] },
+      ];
+    } else if (ext === '.json') {
+      filters = [
+        { name: 'Archivo JSON (*.json)', extensions: ['json'] },
+        { name: 'Todos los archivos (*.*)', extensions: ['*'] },
+      ];
+    }
+
+    const defaultPath = path.join(app.getPath('downloads'), defaultFileName);
+    const windowToAttach = BrowserWindow.fromWebContents(webContents) || mainWindow;
+
+    try {
+      const chosenPath = dialog.showSaveDialogSync(windowToAttach, {
+        title: `Guardar archivo: ${defaultFileName}`,
+        defaultPath: defaultPath,
+        filters: filters,
+      });
+
+      if (chosenPath) {
+        console.log('[Electron Download] User chosen save path:', chosenPath);
+        item.setSavePath(chosenPath);
+      } else {
+        console.log('[Electron Download] User cancelled download dialog.');
+        item.cancel();
+      }
+    } catch (dialogErr) {
+      console.error('[Electron Download] Error showing save dialog:', dialogErr);
+    }
+  });
+}
+
 // App lifecycle
 app.whenReady().then(() => {
   setupIpcHandlers();
+  setupDownloadHandler();
   readOfflineCache(); // Ensure cache is created/seeded immediately
   createWindow();
 
