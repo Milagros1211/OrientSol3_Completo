@@ -1012,11 +1012,11 @@ export async function generateOrientSolPDFReport(
     curTocY += thisRowGap;
   });
 
-  // Project Parameters Summary Box (Balanced 2-column layout to avoid text collisions)
+  // Project Parameters Summary Box (Balanced 2-column layout with strict text wrapping to prevent any overflow)
   const paramsY = curTocY + (isMultiComp ? 4 : 6);
   doc.setFillColor(248, 250, 252);
   doc.setDrawColor(226, 232, 240);
-  doc.roundedRect(20, paramsY, 170, 46, 2, 2, 'FD');
+  doc.roundedRect(20, paramsY, 170, 48, 2, 2, 'FD');
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
@@ -1024,24 +1024,52 @@ export async function generateOrientSolPDFReport(
   doc.text(isEn ? 'GENERAL INSTALLATION & CLIMATIC PARAMETERS' : 'PARÁMETROS GENERALES DE LA INSTALACIÓN Y EMPLAZAMIENTO', 24, paramsY + 7);
 
   const c1LabX = 24;
-  const c1ValX = 62;
-  const c2LabX = 112;
-  const c2ValX = 152;
+  const c1ValX = 51;
+  const c2LabX = 116;
+  const c2ValX = 143;
+  const col1ValMaxW = c2LabX - c1ValX - 2; // 63 mm width
+  const col2ValMaxW = 188 - c2ValX;       // 45 mm width
+  const subLineH = 3.4;
 
   doc.setFontSize(7.5);
 
-  // Row 1
-  doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Location' : 'Localidad'}:`, c1LabX, paramsY + 15);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${res.locationName} (${formatNum(res.latitude, 2)}° N)`, c1ValX, paramsY + 15);
+  // Row 1: Location & Data Source (Fully wrapped & vertically centered if multiline)
+  const latHemisphere = res.latitude >= 0 ? 'N' : 'S';
+  const locValText = `${sanitizePdfText(res.locationName)} (${formatNum(Math.abs(res.latitude), 2)}° ${latHemisphere})`;
+  const locLines: string[] = doc.splitTextToSize(locValText, col1ValMaxW);
 
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Data Source' : 'Fuente de Datos'}:`, c2LabX, paramsY + 15);
-  doc.setFont('helvetica', 'normal');
-  doc.text(res.source.toUpperCase(), c2ValX, paramsY + 15);
+  const locLabel = `${isEn ? 'Location' : 'Localidad'}:`;
+  if (locLines.length <= 1) {
+    doc.text(locLabel, c1LabX, paramsY + 15);
+    doc.setFont('helvetica', 'normal');
+    doc.text(locLines[0] || '', c1ValX, paramsY + 15);
+  } else {
+    const startY1 = paramsY + 15 - ((locLines.length - 1) * subLineH) / 2;
+    doc.text(locLabel, c1LabX, startY1);
+    doc.setFont('helvetica', 'normal');
+    locLines.forEach((lineText: string, idx: number) => {
+      doc.text(lineText, c1ValX, startY1 + idx * subLineH);
+    });
+  }
 
-  // Row 2
+  const sourceLines: string[] = doc.splitTextToSize(sanitizePdfText(res.source.toUpperCase()), col2ValMaxW);
+  doc.setFont('helvetica', 'bold');
+  const sourceLabel = `${isEn ? 'Data Source' : 'Fuente de Datos'}:`;
+  if (sourceLines.length <= 1) {
+    doc.text(sourceLabel, c2LabX, paramsY + 15);
+    doc.setFont('helvetica', 'normal');
+    doc.text(sourceLines[0] || '', c2ValX, paramsY + 15);
+  } else {
+    const startY1Source = paramsY + 15 - ((sourceLines.length - 1) * subLineH) / 2;
+    doc.text(sourceLabel, c2LabX, startY1Source);
+    doc.setFont('helvetica', 'normal');
+    sourceLines.forEach((lineText: string, idx: number) => {
+      doc.text(lineText, c2ValX, startY1Source + idx * subLineH);
+    });
+  }
+
+  // Row 2: Peak Power & Performance Ratio
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Peak Power' : 'Potencia Pico'}:`, c1LabX, paramsY + 23);
   doc.setFont('helvetica', 'normal');
@@ -1052,27 +1080,61 @@ export async function generateOrientSolPDFReport(
   doc.setFont('helvetica', 'normal');
   doc.text(`${formatNum(pr * 100, 0)}%`, c2ValX, paramsY + 23);
 
-  // Row 3
+  // Row 3: Module NOCT & Collector Area
+  const toncValText = `${formatNum(tonc, 1)} °C (gamma: ${formatNum(coefTemp * 100, 2)}%/°C)`;
+  const toncLines: string[] = doc.splitTextToSize(toncValText, col1ValMaxW);
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Module NOCT' : 'TONC Módulos'}:`, c1LabX, paramsY + 31);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${formatNum(tonc, 1)} °C (gamma: ${formatNum(coefTemp * 100, 2)}%/°C)`, c1ValX, paramsY + 31);
+  const toncLabel = `${isEn ? 'Module NOCT' : 'TONC Módulos'}:`;
+  if (toncLines.length <= 1) {
+    doc.text(toncLabel, c1LabX, paramsY + 31);
+    doc.setFont('helvetica', 'normal');
+    doc.text(toncLines[0] || '', c1ValX, paramsY + 31);
+  } else {
+    const startY3 = paramsY + 31 - ((toncLines.length - 1) * subLineH) / 2;
+    doc.text(toncLabel, c1LabX, startY3);
+    doc.setFont('helvetica', 'normal');
+    toncLines.forEach((lineText: string, idx: number) => {
+      doc.text(lineText, c1ValX, startY3 + idx * subLineH);
+    });
+  }
 
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Collector Area' : 'Sup. Captación'}:`, c2LabX, paramsY + 31);
   drawRichText(doc, `${formatNum(res.energyYield.collectorAreaM2, 1)} m²`, c2ValX, paramsY + 31, 7);
 
-  // Row 4
+  // Row 4: Optimal Tilt & Study
+  const optValText = `${formatNum(optAngle, 1)}° (+${formatNum(res.optimalAnnual.gainOverHorizontalPct, 1)}% vs Horiz)`;
+  const optLines: string[] = doc.splitTextToSize(optValText, col1ValMaxW);
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Fixed Optimal Tilt' : 'Inclinación Óptima'}:`, c1LabX, paramsY + 39);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${formatNum(optAngle, 1)}° (+${formatNum(res.optimalAnnual.gainOverHorizontalPct, 1)}% vs Horiz)`, c1ValX, paramsY + 39);
+  const optLabel = `${isEn ? 'Fixed Optimal Tilt' : 'Inclinación Óptima'}:`;
+  if (optLines.length <= 1) {
+    doc.text(optLabel, c1LabX, paramsY + 39);
+    doc.setFont('helvetica', 'normal');
+    doc.text(optLines[0] || '', c1ValX, paramsY + 39);
+  } else {
+    const startY4 = paramsY + 39 - ((optLines.length - 1) * subLineH) / 2;
+    doc.text(optLabel, c1LabX, startY4);
+    doc.setFont('helvetica', 'normal');
+    optLines.forEach((lineText: string, idx: number) => {
+      doc.text(lineText, c1ValX, startY4 + idx * subLineH);
+    });
+  }
 
+  const studyParamsLines: string[] = doc.splitTextToSize(sanitizePdfText(cleanStudyName), col2ValMaxW);
   doc.setFont('helvetica', 'bold');
-  doc.text(`${isEn ? 'Study' : 'Estudio'}:`, c2LabX, paramsY + 39);
-  doc.setFont('helvetica', 'normal');
-  const studyParamsLines = doc.splitTextToSize(cleanStudyName, 186 - c2ValX);
-  doc.text(studyParamsLines, c2ValX, paramsY + 39);
+  const studyLabel = `${isEn ? 'Study' : 'Estudio'}:`;
+  if (studyParamsLines.length <= 1) {
+    doc.text(studyLabel, c2LabX, paramsY + 39);
+    doc.setFont('helvetica', 'normal');
+    doc.text(studyParamsLines[0] || '', c2ValX, paramsY + 39);
+  } else {
+    const startYStudy = paramsY + 39 - ((studyParamsLines.length - 1) * subLineH) / 2;
+    doc.text(studyLabel, c2LabX, startYStudy);
+    doc.setFont('helvetica', 'normal');
+    studyParamsLines.forEach((lineText: string, idx: number) => {
+      doc.text(lineText, c2ValX, startYStudy + idx * subLineH);
+    });
+  }
 
   drawPageChrome('', 1, totalPagesDyn);
 
@@ -3847,7 +3909,8 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setTextColor(15, 23, 42);
   doc.text(`${isEn ? 'Location' : 'Ciudad'}:`, 25, 146);
   doc.setFont('helvetica', 'normal');
-  doc.text(res.locationName, 55, 146);
+  const locLinesEnergy: string[] = doc.splitTextToSize(sanitizePdfText(res.locationName), 52);
+  doc.text(locLinesEnergy, 55, 146);
 
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Latitude' : 'Latitud'}:`, 110, 146);
@@ -3883,7 +3946,8 @@ export async function generateOrientSolEnergyPDFReport(
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Export timestamp' : 'Marca temporal de exportación'}:`, 25, 186);
   doc.setFont('helvetica', 'normal');
-  doc.text(`${downloadDateFormatted} (ISO: ${now.toISOString()})`, 85, 186);
+  const tsEnergyLines: string[] = doc.splitTextToSize(`${downloadDateFormatted} (ISO: ${now.toISOString()})`, 98);
+  doc.text(tsEnergyLines, 85, 186);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
