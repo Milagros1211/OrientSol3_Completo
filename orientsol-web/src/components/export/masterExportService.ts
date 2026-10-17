@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
-import { getMonthlyRadiationForAngle, type TableRadiationComponent } from '@/components/climate/OptimalAnnualStudyPanel';
+import { type TableRadiationComponent } from '@/components/climate/OptimalAnnualStudyPanel';
 import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslations';
 import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
 import { buildSeasonalComponentSheet } from '@/components/export/seasonalExportHelper';
@@ -19,15 +19,7 @@ import {
   buildMonthlyComponentSheet,
 } from '@/components/export/excelFormatHelper';
 
-const MONTHS_ES = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-];
 
-const MONTHS_EN = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
 
 export interface ExportMasterOptions {
   activeStudyOp: string;
@@ -55,7 +47,6 @@ export function exportOrientSolMasterExcel(
   const peakKw = options.peakPowerKw ?? 5.0;
   const pr = options.performanceRatio ?? 0.80;
   const tonc = options.tonc ?? 47.0;
-  const months = isEn ? MONTHS_EN : MONTHS_ES;
 
   const wb = XLSX.utils.book_new();
 
@@ -353,48 +344,7 @@ export function exportOrientSolMasterExcel(
   applySpanishNumberFormattingToWorksheet(wsCte);
   XLSX.utils.book_append_sheet(wb, wsCte, isEn ? 'CTE_DB_HE4_Losses' : 'Perdidas_CTE_DB-HE4');
 
-  // =========================================================================
-  // HOJA 5: CURVAS DE INCLINACIÓN 1° A 90° (DESARROLLO COMPLETO CONTINUO)
-  // =========================================================================
-  const anglesSheetData: (string | number)[][] = [
-    ['ORIENTSOL 4.0 - ' + (isEn ? 'CONTINUOUS RADIATION CURVES (TILT ANGLES 1° TO 90°)' : 'DESARROLLO DE RADIACIÓN EN EL RANGO DE ÁNGULOS 1° A 90°')],
-    [isEn ? 'Export Timestamp:' : 'Marca temporal de exportación:', formattedDateTime, '', isEn ? 'ISO Timestamp:' : 'Marca ISO:', isoTimestamp],
-    [sanitizeForSpreadsheet(res.locationName), isEn ? `Latitude: ${formatNum(res.latitude, 4)}°` : `Latitud: ${formatNum(res.latitude, 4)}°`, isEn ? `Annual Optimum: β = ${formatAngle(optAngle, 1)}` : `Óptimo Anual: β = ${formatAngle(optAngle, 1)}`],
-    [],
-    [
-      isEn ? 'Tilt Angle (°)' : 'Ángulo de Inclinación (°)',
-      isEn ? 'Annual Mean Gdm' : 'Media Anual Gdm (Global)',
-      isEn ? 'Annual Mean Bdm' : 'Media Anual Bdm (Directa)',
-      isEn ? 'Annual Mean Ddm' : 'Media Anual Ddm (Difusa)',
-      isEn ? 'Annual Mean Rdm' : 'Media Anual Rdm (Albedo)',
-      ...months,
-    ],
-  ];
 
-  for (let deg = 1; deg <= 90; deg++) {
-    const gdmVals = getMonthlyRadiationForAngle(res, 'global', deg);
-    const bdmVals = getMonthlyRadiationForAngle(res, 'beam', deg);
-    const ddmVals = getMonthlyRadiationForAngle(res, 'diffuse', deg);
-    const rdmVals = getMonthlyRadiationForAngle(res, 'albedo', deg);
-
-    const meanG = gdmVals.reduce((a, b) => a + b, 0) / 12;
-    const meanB = bdmVals.reduce((a, b) => a + b, 0) / 12;
-    const meanD = ddmVals.reduce((a, b) => a + b, 0) / 12;
-    const meanR = rdmVals.reduce((a, b) => a + b, 0) / 12;
-
-    anglesSheetData.push([
-      deg,
-      Number(meanG.toFixed(4)),
-      Number(meanB.toFixed(4)),
-      Number(meanD.toFixed(4)),
-      Number(meanR.toFixed(4)),
-      ...gdmVals.map((v) => Number(v.toFixed(3))),
-    ]);
-  }
-
-  const wsAngles = XLSX.utils.aoa_to_sheet(anglesSheetData);
-  applySpanishNumberFormattingToWorksheet(wsAngles);
-  XLSX.utils.book_append_sheet(wb, wsAngles, isEn ? 'Tilt_Curves_1_to_90' : 'Curvas_Angulos_1_a_90');
 
   // Standardized File Name: Operación + Emplazamiento + Componente + Timestamp
   const compSuffix = options.exportMode === 'all'
