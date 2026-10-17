@@ -1,13 +1,7 @@
-import * as XLSX from 'xlsx';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { getMonthlyRadiationForAngle, type TableRadiationComponent } from '@/components/climate/OptimalAnnualStudyPanel';
-import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
+import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { sanitizeForSpreadsheet } from '@/utils/security';
-import {
-  applySpanishNumberFormattingToWorksheet,
-  getExportFileTimestamp,
-  getStandardizedExcelFilename,
-} from '@/components/export/excelFormatHelper';
 
 const MONTH_NAMES_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -353,114 +347,19 @@ export interface PolarExportOptions {
 }
 
 /**
- * Creates and downloads the Excel workbook for Polar Single-Axis Tracking matching OrientSol 3.0 PFC.
+ * Creates and downloads the Excel workbook for Polar Single-Axis Tracking with master formatting.
  */
 export async function exportPolarExcelWorkbook(
   res: SolarBridgeSimulationResult,
   options: PolarExportOptions
 ): Promise<void> {
-  const isEn = options.isEn ?? false;
-  const wb = XLSX.utils.book_new();
-
-  const applySheetFormatting = (ws: XLSX.WorkSheet) => {
-    // Column widths:
-    // Col 0 (A): 14 (Months / Location)
-    // Col 1 (B): 16 (Gdm0 / Fc.Ganancia)
-    // Col 2 (C): 24 (Gdm(Polar) / Ganancia %)
-    // Col 3 (D): 5
-    // Col 4 (E): 16 (Fc.Ganancia Anual)
-    // Col 5 (F): 16 (Ganancia % / Temp)
-    // Col 6 (G): 5
-    // Col 7 (H): 16 (Fc.Ganancia Est)
-    // Col 8 (I): 16 (Ganancia % Est)
-    // Col 9 (J): 5
-    // Col 10 (K): 16 (Fc.Ganancia Azi)
-    // Col 11 (L): 16 (Ganancia % Azi)
-    // Col 12 (M): 5
-    // Col 13 (N): 16 (Fc.Ganancia Hor)
-    // Col 14 (O): 16 (Ganancia % Hor)
-    const colWidths = [
-      { wch: 14 },
-      { wch: 16 },
-      { wch: 24 },
-      { wch: 5 },
-      { wch: 16 },
-      { wch: 16 },
-      { wch: 5 },
-      { wch: 16 },
-      { wch: 16 },
-      { wch: 5 },
-      { wch: 16 },
-      { wch: 16 },
-      { wch: 5 },
-      { wch: 16 },
-      { wch: 16 },
-    ];
-    ws['!cols'] = colWidths;
-  };
-
-  if (options.exportMode === 'all') {
-    // Hoja1: Global
-    const gridGlobal = buildPolarComponentSheet(res, 'global', isEn);
-    const ws1 = XLSX.utils.aoa_to_sheet(gridGlobal);
-    applySheetFormatting(ws1);
-    applySpanishNumberFormattingToWorksheet(ws1);
-    XLSX.utils.book_append_sheet(wb, ws1, isEn ? 'Sheet1_Global' : 'Hoja1_Global');
-
-    // Hoja2: Directa
-    const gridBeam = buildPolarComponentSheet(res, 'beam', isEn);
-    const ws2 = XLSX.utils.aoa_to_sheet(gridBeam);
-    applySheetFormatting(ws2);
-    applySpanishNumberFormattingToWorksheet(ws2);
-    XLSX.utils.book_append_sheet(wb, ws2, isEn ? 'Sheet2_Direct' : 'Hoja2_Directa');
-
-    // Hoja3: Difusa
-    const gridDiffuse = buildPolarComponentSheet(res, 'diffuse', isEn);
-    const ws3 = XLSX.utils.aoa_to_sheet(gridDiffuse);
-    applySheetFormatting(ws3);
-    applySpanishNumberFormattingToWorksheet(ws3);
-    XLSX.utils.book_append_sheet(wb, ws3, isEn ? 'Sheet3_Diffuse' : 'Hoja3_Difusa');
-
-    // Hoja4: Albedo
-    const gridAlbedo = buildPolarComponentSheet(res, 'albedo', isEn);
-    const ws4 = XLSX.utils.aoa_to_sheet(gridAlbedo);
-    applySheetFormatting(ws4);
-    applySpanishNumberFormattingToWorksheet(ws4);
-    XLSX.utils.book_append_sheet(wb, ws4, isEn ? 'Sheet4_Albedo' : 'Hoja4_Albedo');
-  } else {
-    // Single sheet for activeComponent
-    const gridComp = buildPolarComponentSheet(res, options.activeComponent, isEn);
-    const sheetTitle = options.activeComponent === 'global'
-      ? (isEn ? 'Sheet1_Global' : 'Hoja1_Global')
-      : options.activeComponent === 'beam'
-      ? (isEn ? 'Sheet2_Direct' : 'Hoja2_Directa')
-      : options.activeComponent === 'diffuse'
-      ? (isEn ? 'Sheet3_Diffuse' : 'Hoja3_Difusa')
-      : (isEn ? 'Sheet4_Albedo' : 'Hoja4_Albedo');
-
-    const ws = XLSX.utils.aoa_to_sheet(gridComp);
-    applySheetFormatting(ws);
-    applySpanishNumberFormattingToWorksheet(ws);
-    XLSX.utils.book_append_sheet(wb, ws, sheetTitle);
-  }
-
-  // Energy Sheet (Osterwald) matching OrientSol 3.0
-  const wsEnergy = createEnergyWorksheet(res, {
-    studyTitle: isEn ? 'Polar single-axis tracking' : 'Seguimiento a un eje polar',
-    studyDailyRad: res.tracking.polarAxis.monthlyDailyKwh,
-    isEn,
+  exportOrientSolMasterExcel(res, {
+    activeStudyOp: 'polar',
+    activeComponent: options.activeComponent,
+    exportMode: options.exportMode,
+    isEn: options.isEn,
     peakPowerKw: options.peakPowerKw,
     tonc: options.tonc,
   });
-  applySpanishNumberFormattingToWorksheet(wsEnergy);
-  XLSX.utils.book_append_sheet(wb, wsEnergy, isEn ? 'Energy_Yield' : 'Energia_Generada');
-
-  // Standardized File Name: Operación + Emplazamiento + Componente + Timestamp
-  const { fileTimestamp } = getExportFileTimestamp();
-  const compSuffix = options.exportMode === 'all'
-    ? (isEn ? 'All_Components' : 'Todas_las_componentes')
-    : options.activeComponent;
-  const fileName = getStandardizedExcelFilename('polar', res.locationName, compSuffix, fileTimestamp);
-
-  XLSX.writeFile(wb, fileName);
 }
+

@@ -7,7 +7,7 @@ import {
   generateOrientSolPDFReport,
   showExportComponentChoiceModal,
 } from '@/components/export/pdfReportGenerator';
-import { exportPolarExcelWorkbook } from '@/components/export/polarExportHelper';
+import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { formatNum } from '@/utils/formatters';
 
@@ -385,12 +385,14 @@ export function renderTrackingPolarStudyPanel(props: TrackingStudyProps): HTMLEl
         exportType: 'excel',
         activeComponent: activeCompPolar,
         isEn,
-        onConfirm: async (mode) => {
-          await exportPolarExcelWorkbook(res, {
-            activeComponent: activeCompPolar as any,
+        onConfirm: (mode) => {
+          exportOrientSolMasterExcel(res, {
+            activeStudyOp: 'polar',
+            activeComponent: activeCompPolar,
             exportMode: mode,
             isEn,
             peakPowerKw: solarSyncState.getPeakPowerKw(),
+            performanceRatio: solarSyncState.getPerformanceRatio(),
             tonc: solarSyncState.getTonc(),
           });
         },
