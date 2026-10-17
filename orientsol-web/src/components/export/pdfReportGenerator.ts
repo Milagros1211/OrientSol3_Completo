@@ -929,15 +929,31 @@ export async function generateOrientSolPDFReport(
     const targetPage = item.page;
     const isSub = !!item.isSub;
 
+    // Number badge dimensions
+    const badgeW = isSub ? 7.5 : 5.5;
+    const badgeX = isSub ? 25.5 : 22;
+    const titleX = badgeX + badgeW + 3;
+
+    // Configure typography before measuring wrapped text
+    doc.setFont('helvetica', isSub ? 'normal' : 'bold');
+    doc.setFontSize(isSub ? 7.5 : 8);
+    doc.setTextColor(isSub ? 51 : 30, isSub ? 65 : 41, isSub ? 85 : 59);
+
+    // Dynamic text wrapping: ensure title never overflows into the page pill at x = 174
+    const maxTitleW = 163 - titleX;
+    const titleLines: string[] = doc.splitTextToSize(item.title, maxTitleW);
+    const lineSpacing = 3.6;
+    const extraH = (titleLines.length - 1) * lineSpacing;
+    const thisRowH = rowH + extraH;
+    const thisRowGap = rowGap + extraH;
+
     // Interactive row background with indentation for sub-items
     const rowX = isSub ? 24 : 20;
     const rowW = isSub ? 166 : 170;
     doc.setFillColor(isSub ? 241 : 248, isSub ? 245 : 250, isSub ? 249 : 252);
-    doc.roundedRect(rowX, curTocY - 4.2, rowW, rowH, 1.2, 1.2, 'F');
+    doc.roundedRect(rowX, curTocY - 4.2, rowW, thisRowH, 1.2, 1.2, 'F');
 
-    // Number badge
-    const badgeW = isSub ? 7.5 : 5.5;
-    const badgeX = isSub ? 25.5 : 22;
+    // Number badge (stays aligned with the first line)
     if (isSub) {
       doc.setFillColor(2, 132, 199); // Sky/cyan badge for sub-items
     } else {
@@ -950,35 +966,39 @@ export async function generateOrientSolPDFReport(
     const numW = doc.getTextWidth(item.num);
     doc.text(item.num, badgeX + (badgeW - numW) / 2, curTocY);
 
-    // Chapter / Component Title (clickable)
-    const titleX = badgeX + badgeW + 3;
+    // Chapter / Component Title (wrapped across lines)
     doc.setFont('helvetica', isSub ? 'normal' : 'bold');
     doc.setFontSize(isSub ? 7.5 : 8);
     doc.setTextColor(isSub ? 51 : 30, isSub ? 65 : 41, isSub ? 85 : 59);
-    const leftText = item.title;
-    doc.text(leftText, titleX, curTocY);
+    titleLines.forEach((tLine: string, lineIdx: number) => {
+      doc.text(tLine, titleX, curTocY + lineIdx * lineSpacing);
+    });
 
-    // Dotted guide line
-    const txtW = doc.getTextWidth(leftText);
-    let dotX = titleX + txtW + 3;
+    // Dotted guide line (drawn on the last line of the title connecting to the page pill)
+    const lastLineIdx = titleLines.length - 1;
+    const lastLineY = curTocY + lastLineIdx * lineSpacing;
+    const lastLineW = doc.getTextWidth(titleLines[lastLineIdx]);
+    let dotX = titleX + lastLineW + 3;
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
     doc.setTextColor(203, 213, 225);
     while (dotX < 172) {
-      doc.text('.', dotX, curTocY);
+      doc.text('.', dotX, lastLineY);
       dotX += 2.8;
     }
 
-    // Page badge pill with EXACT dynamic page number
+    // Page badge pill with EXACT dynamic page number (aligned with the last line)
+    const pillY = curTocY - 3.2 + lastLineIdx * lineSpacing;
+    const pillTextY = curTocY + lastLineIdx * lineSpacing;
     doc.setFillColor(isSub ? 240 : 224, isSub ? 249 : 242, isSub ? 255 : 254);
-    doc.roundedRect(174, curTocY - 3.2, 14, 4.6, 1, 1, 'F');
+    doc.roundedRect(174, pillY, 14, 4.6, 1, 1, 'F');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
     doc.setTextColor(2, 132, 199);
-    doc.text(`${isEn ? 'p.' : 'Pág.'} ${targetPage}`, 175.2, curTocY);
+    doc.text(`${isEn ? 'p.' : 'Pág.'} ${targetPage}`, 175.2, pillTextY);
 
     // Register Clickable Hyperlink to the EXACT target page
-    doc.link(rowX, curTocY - 4.2, rowW, rowH, { pageNumber: targetPage });
+    doc.link(rowX, curTocY - 4.2, rowW, thisRowH, { pageNumber: targetPage });
 
     // Register PDF document outline bookmark
     try {
@@ -989,14 +1009,14 @@ export async function generateOrientSolPDFReport(
       // Outline is optional
     }
 
-    curTocY += rowGap;
+    curTocY += thisRowGap;
   });
 
   // Project Parameters Summary Box (Balanced 2-column layout to avoid text collisions)
   const paramsY = curTocY + (isMultiComp ? 4 : 6);
   doc.setFillColor(248, 250, 252);
   doc.setDrawColor(226, 232, 240);
-  doc.roundedRect(20, paramsY, 170, 44, 2, 2, 'FD');
+  doc.roundedRect(20, paramsY, 170, 46, 2, 2, 'FD');
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8.5);
