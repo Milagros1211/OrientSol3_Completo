@@ -78,11 +78,11 @@ export function renderHeader(): HTMLElement {
     openSupabaseSyncModal();
   });
 
-  // Subscribe to Supabase database state updates (connection & offline queue count)
-  climateDatabaseService.subscribe(() => {
+  // Helper to re-render pill state immediately on any network/database change
+  function updatePillState() {
     const textEl = header.querySelector('#supabase-status-text');
     const dotEl = header.querySelector('#supabase-sync-pill .status-dot');
-    const pillEl = header.querySelector('#supabase-sync-pill');
+    const pillEl = header.querySelector<HTMLButtonElement>('#supabase-sync-pill');
     if (!textEl) return;
     const count = climateDatabaseService.getOfflineQueueCount();
     const configured = climateDatabaseService.isConfigured();
@@ -91,15 +91,30 @@ export function renderHeader(): HTMLElement {
 
     if (pillEl) {
       pillEl.className = `runtime-pill status-supabase ${isConn ? 'status-online' : 'status-offline'}`;
+      pillEl.title = isConn
+        ? (isEn ? 'Supabase Database: Online & Connected' : 'Base de Datos Supabase: Online y Conectada')
+        : (isEn ? 'Supabase Database: Offline (Disconnected)' : 'Base de Datos Supabase: Offline (Desconectada)');
     }
     const label = isConn
       ? (isEn ? 'Supabase: Connected' : 'Supabase: Conectado')
-      : (isEn ? 'Supabase: Disconnected' : 'Supabase: Desconectado');
+      : (isEn ? 'Offline: Disconnected' : 'Offline: Desconectado');
     textEl.innerHTML = `${label}${count > 0 ? ` <span class="pill-badge-counter">${count}</span>` : ''}`;
     if (dotEl) {
       dotEl.className = `status-dot ${isConn ? 'status-dot-active' : ''}`;
     }
+  }
+
+  // Subscribe to Supabase database state updates & network connectivity transitions
+  climateDatabaseService.subscribe(updatePillState);
+  window.addEventListener('online', () => {
+    climateDatabaseService.setOnline(true);
+    updatePillState();
   });
+  window.addEventListener('offline', () => {
+    climateDatabaseService.setOnline(false);
+    updatePillState();
+  });
+  window.addEventListener('orientsol:network-changed', updatePillState);
 
   // Attach theme toggle switcher event
   const themeBtn = header.querySelector<HTMLButtonElement>('#header-theme-toggle');

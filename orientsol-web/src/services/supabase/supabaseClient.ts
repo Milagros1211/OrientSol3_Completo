@@ -3,24 +3,31 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 const STORAGE_KEY_URL = 'orientsol_supabase_url';
 const STORAGE_KEY_KEY = 'orientsol_supabase_anon_key';
 
+const DEFAULT_SUPABASE_URL = 'https://dqdkjkcmdsolpobxfbfi.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_z10EZMPe3-XxMCE5XqVrVA_QlcJ020t';
+
 let clientInstance: SupabaseClient | null = null;
 
 /**
  * Returns the effective Supabase URL and Anon Key.
  * Prioritizes build-time environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY).
- * Falls back to localStorage only if build variables are absent.
+ * Falls back to localStorage, and finally to default verified credentials.
  */
 export function getEffectiveSupabaseConfig(): { url: string; key: string } {
   let envUrl = '';
   let envKey = '';
 
-  if (typeof import.meta.env?.VITE_SUPABASE_URL === 'string') {
-    envUrl = import.meta.env.VITE_SUPABASE_URL.trim();
-  }
+  try {
+    if (typeof import.meta.env.VITE_SUPABASE_URL === 'string') {
+      envUrl = import.meta.env.VITE_SUPABASE_URL.trim();
+    }
+  } catch {}
 
-  if (typeof import.meta.env?.VITE_SUPABASE_ANON_KEY === 'string') {
-    envKey = import.meta.env.VITE_SUPABASE_ANON_KEY.trim();
-  }
+  try {
+    if (typeof import.meta.env.VITE_SUPABASE_ANON_KEY === 'string') {
+      envKey = import.meta.env.VITE_SUPABASE_ANON_KEY.trim();
+    }
+  } catch {}
 
   // If valid environment variables were injected at build time, ALWAYS use them!
   if (
@@ -44,8 +51,8 @@ export function getEffectiveSupabaseConfig(): { url: string; key: string } {
     }
   } catch {}
 
-  const url = storageUrl || envUrl;
-  const key = storageKey || envKey;
+  const url = storageUrl || envUrl || DEFAULT_SUPABASE_URL;
+  const key = storageKey || envKey || DEFAULT_SUPABASE_ANON_KEY;
 
   return { url, key };
 }
