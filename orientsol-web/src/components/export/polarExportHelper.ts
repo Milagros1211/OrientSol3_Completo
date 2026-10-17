@@ -2,6 +2,7 @@ import * as XLSX from 'xlsx';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { getMonthlyRadiationForAngle, type TableRadiationComponent } from '@/components/climate/OptimalAnnualStudyPanel';
 import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
+import { sanitizeForSpreadsheet } from '@/utils/security';
 
 const MONTH_NAMES_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -118,7 +119,7 @@ export function buildPolarComponentSheet(
   const formattedDateTime = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 
   // Row 1 (Index 0): Jaén | Latitud | 37,7655556 | | Seguimiento a un eje polar | | Timestamp
-  grid[0][0] = res.locationName || (isEn ? 'Location' : 'Localidad');
+  grid[0][0] = sanitizeForSpreadsheet(res.locationName || (isEn ? 'Location' : 'Localidad'));
   grid[0][1] = isEn ? 'Latitude' : 'Latitud';
   grid[0][2] = res.latitude != null ? res.latitude : 0;
   grid[0][4] = isEn ? 'Polar single-axis tracking' : 'Seguimiento a un eje polar';

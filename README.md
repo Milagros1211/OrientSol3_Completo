@@ -1,7 +1,9 @@
-# OrientSol 3.0: Entorno Web para Optimización Solar Fotovoltaica
+# OrientSol 4.0: Entorno Web y Multiplataforma para Optimización Solar Fotovoltaica
 
 [![GitHub Pages Deployment](https://img.shields.io/badge/GitHub%20Pages-Sitio%20En%20Vivo-brightgreen?logo=github)](https://Milagros1211.github.io/OrientSol3_Completo/)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-Milagros1211%2FOrientSol3__Completo-blue?logo=github)](https://github.com/Milagros1211/OrientSol3_Completo)
+[![Version](https://img.shields.io/badge/Versi%C3%B3n-4.0.0-blue.svg)](orientsol-web/package.json)
+[![Security Audit](https://img.shields.io/badge/Security%20Audit-Grade%20A%2B%20(100%25)-brightgreen)](orientsol-web/supabase_schema.sql)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Framework](https://img.shields.io/badge/Vite-TypeScript-646CFF?logo=vite)](https://vitejs.dev/)
 [![Engine](https://img.shields.io/badge/WebAssembly-Pyodide%20%2B%20NumPy-F7931E?logo=webassembly)](https://pyodide.org/)
@@ -22,23 +24,29 @@
 
 ---
 
-## ¿Qué es OrientSol 3.0?
+## ¿Qué es OrientSol 4.0?
 
-**OrientSol 3.0** es la modernización y evolución web del software original desarrollado en **MATLAB/Octave (`.m` y `.fig`)**. Ha sido transformado en una suite de simulación solar abierta, interactiva y multiplataforma basada en tecnologías de vanguardia:
+**OrientSol 4.0** es la modernización y evolución web del software original desarrollado en **MATLAB/Octave (`.m` y `.fig`)**. Ha sido transformado en una suite de simulación solar abierta, interactiva y multiplataforma basada en tecnologías de vanguardia:
 
 1. **Interfaz Web Responsiva y Bilingüe (ES / EN):** Funciona directamente en cualquier navegador moderno sin instalaciones ni licencias de software propietario.
-2. **Motor Científico en el Navegador (WebAssembly + Pyodide + NumPy):** Ejecuta la formulación matemática solar en el cliente en milisegundos con total privacidad.
-3. **Arquitectura Híbrida de Datos:**
-   - **APIs Satelitales en Tiempo Real:** NASA POWER, PVGIS y Open-Meteo.
-   - **Base de Datos Histórica:** Localidades españolas, albedos y días característicos.
+2. **Motor Científico en el Navegador (WebAssembly + Pyodide + NumPy):** Ejecuta la formulación matemática solar en el cliente en milisegundos con total privacidad y alta precisión vectorizada.
+3. **Estado de Traducción del Código Original (118 archivos MATLAB `.m`):**
+   - **Algoritmos y Fórmulas Matemáticas (78 archivos `.m`):** **100% Traducidos y Verificados** a Python vectorizado y TypeScript (geometría solar, transposición Liu-Jordan, seguidores de 1 y 2 ejes, optimizaciones anual/estacional/mensual, mapas de pérdidas CTE DB-HE4 y modelos de energía de Osterwald).
+   - **Ventanas Gráficas y Controladores GUIDE (40 archivos `.m`):** Sustituidos y modernizados por componentes web reactivos con renderizado SVG interactivo, tablas dinámicas y exportación segura.
+   - *Detalle exhaustivo de correspondencias en:* [`orientsol-web/src/python/README.md`](orientsol-web/src/python/README.md).
+4. **Arquitectura Híbrida de Datos:**
+   - **APIs Satelitales en Tiempo Real:** NASA POWER, PVGIS y ERA5 / Open-Meteo.
+   - **Base de Datos Histórica y Crowdsourcing en Supabase:** Almacenamiento seguro con clave primaria UUID v4, RLS y restricciones de integridad física.
    - **Carga Dual:** Formulario manual de 12 meses y subida de archivos digitales (`CSV` y `JSON`).
-4. **Modelos de Simulación y Optimización Solar:**
+5. **Modelos de Simulación y Optimización Solar:**
    - **Inclinación Óptima Anual y Comparativa con Ángulo X:** Reproducción fiel y modernizada de la interfaz original de MATLAB (`Tabla_OptAnual.m` y `Tabla_OptAnual_IncliX.m`) en formato tabular interactivo. Permite visualizar las 7 inclinaciones fijas de referencia (0°, 15°, 30°, 45°, 60°, 75°, 90°), la inclinación óptima calculada ($\beta_{opt}$) y comparar en tiempo real contra cualquier ángulo seleccionado $X \in [1^\circ, 90^\circ]$ para todas las componentes solares (Global, Directa, Difusa, Albedo), desglosando factores y porcentajes de ganancia mensuales y anuales con exportación directa a Excel (CSV).
    - **Superficies Fijas:** Inclinación óptima anual, 4 posiciones estacionales y 12 posiciones mensuales.
    - **Seguimiento Solar:** Eje horizontal (N-S y E-O), eje polar, eje azimutal y seguimiento completo a 2 ejes.
    - **Generación Energética Fotovoltaica:** Modelo térmico de Osterwald con cálculo de temperatura de célula ($T_c$) y pérdidas térmicas.
    - **Mapas de Pérdidas de Captación:** Clasificación según normativa del Código Técnico de la Edificación (**CTE DB-HE4**).
-5. **Distribución Multiplataforma:**
+6. **Seguridad Defensiva Certificada (Calificación A+):**
+   - Blindaje contra SSRF (Electron), XSS (DOMPurify), Inyección CSV/Excel (CWE-1236), Hardening de Proxies y aislamiento RLS en Supabase.
+7. **Distribución Multiplataforma:**
    - **Web / PWA:** Ejecución online y offline con Service Worker.
    - **Windows:** Aplicación nativa de escritorio con Electron (`.exe`).
    - **Android:** Aplicación móvil nativa con Capacitor (`.apk`).

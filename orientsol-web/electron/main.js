@@ -176,13 +176,104 @@ function setupIpcHandlers() {
     return checkNetworkConnectivity();
   });
 
-  ipcMain.handle('network:fetch-url', async (_event, targetUrl) => {
+  // Whitelist of approved meteorological APIs and cloud services for OrientSol
+  const ALLOWED_METEO_HOSTS = [
+    're.jrc.ec.europa.eu',        // European Commission JRC PVGIS (v5.2, v5.3)
+    'power.larc.nasa.gov',        // NASA Langley Research Center POWER Project
+    'archive-api.open-meteo.com', // Open-Meteo Historical Climate Reanalysis
+    'api.open-meteo.com'          // Open-Meteo Weather APIs
+  ];
+
+  /**
+   * Strictly validates outbound URLs to prevent Server-Side Request Forgery (SSRF)
+   */
+  function validateOutboundUrl(targetUrl) {
+    if (typeof targetUrl !== 'string' || !targetUrl.trim()) {
+      return { allowed: false, reason: 'URL vacía o no válida.' };
+    }
+
+    let parsed;
     try {
-      const resp = await net.fetch(targetUrl);
+      parsed = new URL(targetUrl.trim());
+    } catch {
+      return { allowed: false, reason: 'Formato de URL inválido.' };
+    }
+
+    // 1. Enforce HTTPS only (prohibit file://, http://, gopher://, etc.)
+    if (parsed.protocol !== 'https:') {
+      return { allowed: false, reason: `Protocolo no permitido (${parsed.protocol}). Se exige estrictamente HTTPS.` };
+    }
+
+    // 2. Reject embedded credentials (e.g. https://user:pass@host)
+    if (parsed.username || parsed.password) {
+      return { allowed: false, reason: 'Credenciales incrustadas en URL no permitidas.' };
+    }
+
+    // 3. Prohibit non-standard ports
+    if (parsed.port && parsed.port !== '443') {
+      return { allowed: false, reason: `Puerto no estándar denegado (${parsed.port}). Solo puerto 443.` };
+    }
+
+    const hostname = parsed.hostname.toLowerCase();
+
+    // 4. Strict block for localhost, loopback, private RFC1918 subnets, and cloud metadata (169.254.x.x)
+    const privateIpPatterns = [
+      /^localhost$/,
+      /^127\./,
+      /^0\./,
+      /^10\./,
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
+      /^192\.168\./,
+      /^169\.254\./,
+      /^::1$/,
+      /^fc00:/,
+      /^fe80:/
+    ];
+    if (privateIpPatterns.some((pattern) => pattern.test(hostname))) {
+      return { allowed: false, reason: `Destino de red local o privada denegado (${hostname}).` };
+    }
+
+    // 5. Enforce approved meteorological domains or Supabase instances
+    const isApprovedHost =
+      ALLOWED_METEO_HOSTS.includes(hostname) ||
+      hostname.endsWith('.supabase.co');
+
+    if (!isApprovedHost) {
+      return { allowed: false, reason: `Dominio no autorizado (${hostname}). Solo proveedores meteorológicos verificados y Supabase.` };
+    }
+
+    return { allowed: true, url: parsed.toString() };
+  }
+
+  ipcMain.handle('network:fetch-url', async (_event, targetUrl) => {
+    const check = validateOutboundUrl(targetUrl);
+    if (!check.allowed) {
+      console.warn(`[Electron IPC Security] Intento de SSRF bloqueado: ${check.reason} (URL: ${targetUrl})`);
+      return { ok: false, status: 403, error: `Acceso denegado (SSRF Guard): ${check.reason}` };
+    }
+
+    try {
+      // 10-second request timeout via AbortController
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      const resp = await net.fetch(check.url, {
+        signal: controller.signal,
+        headers: {
+          Accept: 'application/json, text/plain, */*'
+        }
+      });
+      clearTimeout(timeoutId);
+
       const text = await resp.text();
       return { ok: resp.ok, status: resp.status, data: text };
     } catch (err) {
-      return { ok: false, status: 500, error: err.message };
+      const isTimeout = err?.name === 'AbortError';
+      return {
+        ok: false,
+        status: isTimeout ? 504 : 500,
+        error: isTimeout ? 'Tiempo de espera de conexión agotado (10s)' : (err?.message || String(err))
+      };
     }
   });
 

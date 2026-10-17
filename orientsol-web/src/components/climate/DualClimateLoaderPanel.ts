@@ -11,6 +11,7 @@ import {
   validateClimateRecordForSaving,
   formatLocationWithCountry,
 } from '@/services/supabase';
+import { escapeHtml, escapeAttr } from '@/utils/security';
 import { fetchUnifiedClimateData } from '@/services/external';
 import { i18n } from '@/i18n';
 import {
@@ -147,7 +148,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
               type="text"
               id="hist-search-input"
               class="form-input search-text-input"
-              value="${currentActiveRecordInit.locationName}"
+              value="${escapeAttr(currentActiveRecordInit.locationName)}"
               placeholder="${isEn ? 'Search location (Spanish/English letters only)...' : 'Buscar emplazamiento (solo letras castellano/inglés)...'}"
               autocomplete="off"
               spellcheck="false"
@@ -174,7 +175,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <option value="">${t.hybridLoader.manualPresetPlaceholder}</option>
           ${hybridClimateManager
             .getHistoricalLocations()
-            .map((loc) => `<option value="${loc.id}">${loc.locationName} (${loc.country})</option>`)
+            .map((loc) => `<option value="${escapeAttr(loc.id)}">${escapeHtml(loc.locationName)} (${escapeHtml(loc.country)})</option>`)
             .join('')}
         </select>
         <button id="btn-apply-manual-template" class="btn btn-secondary btn-sm">${t.hybridLoader.loadTemplate}</button>
@@ -626,10 +627,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     activeCard.innerHTML = `
       <div class="active-record-badge-bar">
         <div class="record-title-box">
-          <h4>${titleWithCountry}</h4>
-          <span class="badge badge-source">${record.source.toUpperCase()}</span>
+          <h4>${escapeHtml(titleWithCountry)}</h4>
+          <span class="badge badge-source">${escapeHtml(record.source.toUpperCase())}</span>
           ${record.metadata?.pvgisEquivalent ? `<span class="badge badge-warning" title="Base satelital ERA5 (Reanálisis oficial de PVGIS)">ERA5 PVGIS</span>` : ''}
-          ${record.metadata?.rawFormat ? `<span class="badge badge-neutral">${record.metadata.rawFormat}</span>` : ''}
+          ${record.metadata?.rawFormat ? `<span class="badge badge-neutral">${escapeHtml(String(record.metadata.rawFormat))}</span>` : ''}
         </div>
         <div class="record-meta-pills">
           <span><strong>${t.location.latitude}:</strong> ${record.latitude.toFixed(3)}°</span>
@@ -757,8 +758,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         <div class="alert-content-wrap">
           <p class="alert-text-msg">
             ${isEn
-              ? `The location "<strong>${queryText}</strong>" is not saved in cache or in the database. If you wish, please fill in the manual entry.`
-              : `El emplazamiento "<strong>${queryText}</strong>" no está guardado ni en caché ni en la base de datos. Si deseas, llena la introducción manual.`}
+              ? `The location "<strong>${escapeHtml(queryText)}</strong>" is not saved in cache or in the database. If you wish, please fill in the manual entry.`
+              : `El emplazamiento "<strong>${escapeHtml(queryText)}</strong>" no está guardado ni en caché ni en la base de datos. Si deseas, llena la introducción manual.`}
           </p>
           <button type="button" id="btn-goto-manual-tab" class="btn btn-secondary btn-sm" style="margin-top: 0.5rem; display: inline-flex; align-items: center; gap: 0.35rem;">
             <span>✍️ ${isEn ? 'Go to Manual Entry (Tab 2)' : 'Llenar Introducción Manual (Pestaña 2)'}</span>
@@ -840,11 +841,11 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
               const annualG = m.monthlyGdm0.reduce((a, b) => a + b, 0) / 12;
               const cStr = (m.country || '').trim();
               const hasParenCountry = /\([^)]+\)$/.test(m.locationName.trim()) || (Boolean(cStr) && m.locationName.toLowerCase().includes(cStr.toLowerCase()));
-              const countryBadge = cStr && !hasParenCountry ? `<span class="suggestion-country">(${cStr})</span>` : '';
+              const countryBadge = cStr && !hasParenCountry ? `<span class="suggestion-country">(${escapeHtml(cStr)})</span>` : '';
               return `
-                <div class="suggestion-item" data-id="${m.id || m.locationName}" role="option">
+                <div class="suggestion-item" data-id="${escapeAttr(m.id || m.locationName)}" role="option">
                   <div class="suggestion-main">
-                    <span class="suggestion-name"><strong>${m.locationName}</strong></span>
+                    <span class="suggestion-name"><strong>${escapeHtml(m.locationName)}</strong></span>
                     ${countryBadge}
                     <span class="suggestion-pill ${badgeClass}">${badgeText}</span>
                   </div>
@@ -1510,7 +1511,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             <span class="badge badge-neutral">${res.executionTimeMs} ms</span>
             <span class="badge badge-source">${res.source.toUpperCase()}</span>
           </div>
-          <h3>${t.results.resultsFor.replace('{location}', res.locationName).replace('{lat}', res.latitude.toFixed(2))}</h3>
+          <h3>${escapeHtml(t.results.resultsFor.replace('{location}', res.locationName).replace('{lat}', res.latitude.toFixed(2)))}</h3>
         </div>
         <div class="results-export-actions">
           <button id="btn-copy-summary" class="btn-export btn-export-copy" type="button" title="${t.results.exportCopyBtn}">
