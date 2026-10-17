@@ -6,6 +6,7 @@ import {
 } from '@/components/climate/OptimalAnnualStudyPanel';
 import { themeManager } from '@/services/theme/themeManager';
 import { renderWrappedSvgTitle } from './chartSvgUtils';
+import { showAlbedoWarningModal } from '@/components/modals/AlbedoWarningModal';
 
 export type SeasonalGraphComponentChoice = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -387,12 +388,14 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
         const g0 = gainsVs0[i];
         const gAnu = gainsVsAnu[i];
 
-        // Bar 1: vs 0° (Cyan/Blue if positive, darker blue if negative)
-        const y1 = yBottom(g0);
-        const barY1 = Math.min(y1, yZero);
-        const barH1 = Math.max(0.5, Math.abs(y1 - yZero));
-        const color1 = g0 >= 0 ? '#0284c7' : '#0369a1';
-        bottomBarsHtml += `<rect x="${slotX}" y="${barY1}" width="${barW}" height="${barH1}" fill="${color1}" stroke="#0f172a" stroke-width="0.5" rx="1" />`;
+        // Bar 1: vs 0° (Cyan/Blue if positive, darker blue if negative). Omitted if isAlbedo because Rdm(0°)=0 is indeterminate
+        if (!isAlbedo) {
+          const y1 = yBottom(g0);
+          const barY1 = Math.min(y1, yZero);
+          const barH1 = Math.max(0.5, Math.abs(y1 - yZero));
+          const color1 = g0 >= 0 ? '#0284c7' : '#0369a1';
+          bottomBarsHtml += `<rect x="${slotX}" y="${barY1}" width="${barW}" height="${barH1}" fill="${color1}" stroke="#0f172a" stroke-width="0.5" rx="1" />`;
+        }
 
         // Bar 2: vs Ópt. anual (Green if positive, red if negative)
         const y2 = yBottom(gAnu);
@@ -402,12 +405,23 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
         bottomBarsHtml += `<rect x="${slotX + barW + gap}" y="${barY2}" width="${barW}" height="${barH2}" fill="${color2}" stroke="#0f172a" stroke-width="0.5" rx="1" />`;
       }
 
+      if (isAlbedo) {
+        bottomBarsHtml += `
+          <g class="albedo-seas-note">
+            <rect x="${bPad.left + 10}" y="${bPad.top + 6}" width="${bInnerW - 20}" height="22" fill="${isDark ? 'rgba(245, 158, 11, 0.15)' : '#fffbeb'}" stroke="#f59e0b" stroke-width="0.8" rx="3" />
+            <text x="${bPad.left + bInnerW / 2}" y="${bPad.top + 20}" fill="${isDark ? '#fbbf24' : '#92400e'}" font-size="9" font-weight="600" text-anchor="middle">
+              ⚠ Rdm(0º) = 0: ${isEn ? 'Gains vs horizontal plane (0°) cannot be calculated' : 'Las ganancias s/ plano horizontal (0°) no se pueden calcular'}
+            </text>
+          </g>
+        `;
+      }
+
       bottomLegendHtml = `
         <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 4})">
           <rect x="0" y="0" width="86" height="52" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-          <rect x="6" y="8" width="10" height="10" fill="#0284c7" stroke="#0f172a" stroke-width="0.5" />
+          <rect x="6" y="8" width="10" height="10" fill="${isAlbedo ? '#94a3b8' : '#0284c7'}" stroke="#0f172a" stroke-width="0.5" />
           <text x="20" y="13" fill="${legendText}" font-size="8" font-weight="700">vs 0°</text>
-          <text x="20" y="21" fill="${legendText}" font-size="7" font-weight="500">${isEn ? '(Horiz)' : '(Plano hor.)'}</text>
+          <text x="20" y="21" fill="${isAlbedo ? '#f59e0b' : legendText}" font-size="7" font-weight="${isAlbedo ? '700' : '500'}">${isAlbedo ? 'Indet. Rdm=0' : (isEn ? '(Horiz)' : '(Plano hor.)')}</text>
           <rect x="6" y="29" width="10" height="10" fill="#10b981" stroke="#0f172a" stroke-width="0.5" />
           <text x="20" y="35" fill="${legendText}" font-size="8" font-weight="700">${isEn ? 'vs Ann.' : 'vs Ópt.'}</text>
           <text x="20" y="44" fill="${legendText}" font-size="7" font-weight="500">${isEn ? 'opt' : 'anual'}</text>
@@ -652,6 +666,9 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
 
     container.querySelector<HTMLSelectElement>('#select-comp-graphs-seas')?.addEventListener('change', (e) => {
       selectedComponent = (e.target as HTMLSelectElement).value as SeasonalGraphComponentChoice;
+      if (selectedComponent === 'albedo') {
+        showAlbedoWarningModal(isEn);
+      }
       renderInternal();
     });
 

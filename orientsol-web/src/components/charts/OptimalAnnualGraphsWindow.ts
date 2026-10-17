@@ -6,6 +6,7 @@ import {
 } from '@/components/climate/OptimalAnnualStudyPanel';
 import { themeManager } from '@/services/theme/themeManager';
 import { renderWrappedSvgTitle } from './chartSvgUtils';
+import { showAlbedoWarningModal } from '@/components/modals/AlbedoWarningModal';
 
 export type GraphComponentChoice = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 
@@ -322,28 +323,59 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
     const colWidth = bInnerW / 12;
 
     if (!isAll) {
-      // Single component bars (Figura 5.2.99 / Figura 5.2.107)
-      const barWidth = colWidth * 0.65;
-      bottomSeriesHtml = gainsPct.map((pct, i) => {
-        const cx = bPad.left + (i + 0.5) * colWidth;
-        const bx = cx - barWidth / 2;
-        const by = Math.min(yBottom(pct), zeroY);
-        const bh = Math.max(1, Math.abs(yBottom(pct) - zeroY));
-        const barFill = pct >= 0 ? '#0f766e' : '#b91c1c';
+      if (isAlbedo) {
+        // Albedo gains vs horizontal are indeterminate (Rdm(0°) = 0) - MATLAB Figura 5.2.48 / 5.2.49
+        const boxW = Math.min(380, bInnerW - 20);
+        const boxH = 50;
+        const boxX = bPad.left + (bInnerW - boxW) / 2;
+        const boxY = bPad.top + (bInnerH - boxH) / 2;
 
-        return `
-          <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${bh.toFixed(1)}" fill="${barFill}" stroke="${pct >= 0 ? '#14b8a6' : '#ef4444'}" stroke-width="0.8" />
+        bottomSeriesHtml = `
+          <g class="albedo-gain-warning-box">
+            <rect x="${boxX}" y="${boxY}" width="${boxW}" height="${boxH}" fill="${isDark ? 'rgba(245, 158, 11, 0.15)' : '#fffbeb'}" stroke="#f59e0b" stroke-width="1.2" rx="4" />
+            <path d="M${boxX + 24} ${boxY + 13} L${boxX + 11} ${boxY + 37} h26 Z" fill="#f59e0b" stroke="#b45309" stroke-width="1"/>
+            <text x="${boxX + 24}" y="${boxY + 33}" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">!</text>
+            <text x="${boxX + 44}" y="${boxY + 22}" fill="${isDark ? '#fbbf24' : '#92400e'}" font-size="10.5" font-weight="700">
+              ${isEn ? 'Indeterminate gains vs horizontal:' : 'Ganancias s/ plano horizontal indeterminadas:'}
+            </text>
+            <text x="${boxX + 44}" y="${boxY + 38}" fill="${isDark ? '#fef3c7' : '#78350f'}" font-size="9.5" font-weight="500">
+              ${isEn ? 'Rdm(0°) = 0 (division by zero not possible)' : 'Rdm(0º) = 0 (división por cero no permitida)'}
+            </text>
+          </g>
         `;
-      }).join('');
 
-      bottomLegendHtml = `
-        <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 4})">
-          <rect x="0" y="0" width="86" height="34" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
-          <rect x="6" y="11" width="12" height="12" fill="#0f766e" stroke="#14b8a6" stroke-width="0.8" />
-          <text x="22" y="15" fill="${legendText}" font-size="8.5" font-weight="700">vs 0°</text>
-          <text x="22" y="25" fill="${legendText}" font-size="7.5" font-weight="500">${isEn ? '(Horiz)' : '(Plano hor.)'}</text>
-        </g>
-      `;
+        bottomLegendHtml = `
+          <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 4})">
+            <rect x="0" y="0" width="86" height="34" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+            <rect x="6" y="11" width="12" height="12" fill="#94a3b8" stroke="#64748b" stroke-width="0.8" />
+            <text x="22" y="15" fill="${legendText}" font-size="8.5" font-weight="700">vs 0°</text>
+            <text x="22" y="25" fill="#f59e0b" font-size="7" font-weight="600">${isEn ? 'Indet. Rdm=0' : 'Indet. Rdm=0'}</text>
+          </g>
+        `;
+      } else {
+        // Single component bars (Figura 5.2.99 / Figura 5.2.107)
+        const barWidth = colWidth * 0.65;
+        bottomSeriesHtml = gainsPct.map((pct, i) => {
+          const cx = bPad.left + (i + 0.5) * colWidth;
+          const bx = cx - barWidth / 2;
+          const by = Math.min(yBottom(pct), zeroY);
+          const bh = Math.max(1, Math.abs(yBottom(pct) - zeroY));
+          const barFill = pct >= 0 ? '#0f766e' : '#b91c1c';
+
+          return `
+            <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${bh.toFixed(1)}" fill="${barFill}" stroke="${pct >= 0 ? '#14b8a6' : '#ef4444'}" stroke-width="0.8" />
+          `;
+        }).join('');
+
+        bottomLegendHtml = `
+          <g transform="translate(${bPad.left + bInnerW + 4}, ${bPad.top + 4})">
+            <rect x="0" y="0" width="86" height="34" fill="${legendBg}" stroke="${legendBorder}" rx="3" />
+            <rect x="6" y="11" width="12" height="12" fill="#0f766e" stroke="#14b8a6" stroke-width="0.8" />
+            <text x="22" y="15" fill="${legendText}" font-size="8.5" font-weight="700">vs 0°</text>
+            <text x="22" y="25" fill="${legendText}" font-size="7.5" font-weight="500">${isEn ? '(Horiz)' : '(Plano hor.)'}</text>
+          </g>
+        `;
+      }
     } else {
       // Clustered bars for Todas (Figura 5.2.110 - Image 3)
       const barW = colWidth * 0.2;
@@ -553,6 +585,9 @@ export function renderOptimalAnnualGraphsWindow(props: OptimalAnnualGraphsProps)
     const compSelect = container.querySelector<HTMLSelectElement>('#select-graph-component');
     compSelect?.addEventListener('change', () => {
       selectedComponent = (compSelect.value || 'global') as GraphComponentChoice;
+      if (selectedComponent === 'albedo') {
+        showAlbedoWarningModal(isEn);
+      }
       renderInternal();
     });
 

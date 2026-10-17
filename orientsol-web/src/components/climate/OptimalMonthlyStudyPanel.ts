@@ -9,6 +9,7 @@ import {
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { renderCaptureLossMapSection } from '@/components/climate/CaptureLossMapSection';
+import { showAlbedoWarningModal } from '@/components/modals/AlbedoWarningModal';
 
 export type MonthlyRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
 
@@ -414,7 +415,7 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
                     <td class="td-num td-col-opt" style="font-weight: 800;">${gOpt.toFixed(2)}</td>
                     <td class="td-num td-col-temp">${temp.toFixed(1)}</td>
                     <td class="td-num td-gain-factor">${displayFactH}</td>
-                    <td class="td-num td-gain-pct ${pctH >= 0 ? 'gain-pos' : 'gain-neg'}">${displayPctH}%</td>
+                    <td class="td-num td-gain-pct ${!isAlbedo && pctH >= 0 ? 'gain-pos' : !isAlbedo ? 'gain-neg' : ''}">${isAlbedo ? '-' : `${displayPctH}%`}</td>
                     <td class="td-num td-gain-factor">${factA.toFixed(2)}</td>
                     <td class="td-num td-gain-pct ${pctA >= 0 ? 'gain-pos' : 'gain-neg'}">${pctA >= 0 ? '+' : ''}${pctA.toFixed(2)}%</td>
                   </tr>
@@ -528,6 +529,9 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
     const compSelect = container.querySelector<HTMLSelectElement>('#opt-monthly-comp-select');
     compSelect?.addEventListener('change', () => {
       stateComponent = (compSelect.value || 'global') as MonthlyRadiationComponent;
+      if (stateComponent === 'albedo') {
+        showAlbedoWarningModal(isEn);
+      }
       renderInternal();
     });
 
