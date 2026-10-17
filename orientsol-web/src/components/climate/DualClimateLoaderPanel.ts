@@ -189,16 +189,16 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         </div>
         <div class="form-group">
           <label class="form-label">${t.location.latitude} [°]</label>
-          <input type="text" inputmode="decimal" id="manual-lat" class="form-input" value="37.389" autocomplete="off" required />
+          <input type="text" inputmode="decimal" id="manual-lat" class="form-input" value="${formatNum(37.389, 3)}" autocomplete="off" required />
         </div>
         <div class="form-group">
           <label class="form-label">${t.location.longitude} [°]</label>
-          <input type="text" inputmode="decimal" id="manual-lon" class="form-input" value="-5.984" autocomplete="off" required />
+          <input type="text" inputmode="decimal" id="manual-lon" class="form-input" value="${formatNum(-5.984, 3)}" autocomplete="off" required />
         </div>
         <input type="hidden" id="manual-elev" value="0" />
         <div class="form-group">
           <label class="form-label">${t.location.albedoLabel} (&rho;<sub>g</sub>)</label>
-          <input type="text" inputmode="decimal" id="manual-albedo" class="form-input" value="0.20" autocomplete="off" required />
+          <input type="text" inputmode="decimal" id="manual-albedo" class="form-input" value="${formatNum(0.20, 2)}" autocomplete="off" required />
         </div>
       </div>
 
@@ -216,13 +216,13 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
               <tr>
                 <td class="row-label">G<sub>dm</sub>(0)</td>
                 ${MONTH_NAMES.map(
-                  (_, i) => `<td><input type="text" inputmode="decimal" class="manual-g-input" data-month="${i}" value="${(2.5 + i * 0.4).toFixed(2)}" autocomplete="off" required /></td>`
+                  (_, i) => `<td><input type="text" inputmode="decimal" class="manual-g-input" data-month="${i}" value="${formatNum(2.5 + i * 0.4, 2)}" autocomplete="off" required /></td>`
                 ).join('')}
               </tr>
               <tr>
                 <td class="row-label">T<sub>amb</sub> [°C]</td>
                 ${MONTH_NAMES.map(
-                  (_, i) => `<td><input type="text" inputmode="decimal" class="manual-t-input" data-month="${i}" value="${(10 + i * 1.5).toFixed(1)}" autocomplete="off" required /></td>`
+                  (_, i) => `<td><input type="text" inputmode="decimal" class="manual-t-input" data-month="${i}" value="${formatNum(10 + i * 1.5, 1)}" autocomplete="off" required /></td>`
                 ).join('')}
               </tr>
             </tbody>
@@ -320,12 +320,12 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
         <div class="form-group">
           <label for="api-input-lat" class="form-label">${t.location.latitude} [°]</label>
-          <input type="number" id="api-input-lat" class="form-input" step="0.0001" value="40.4168" />
+          <input type="text" inputmode="decimal" id="api-input-lat" class="form-input" value="${formatNum(40.4168, 4)}" />
         </div>
 
         <div class="form-group">
           <label for="api-input-lon" class="form-label">${t.location.longitude} [°]</label>
-          <input type="number" id="api-input-lon" class="form-input" step="0.0001" value="-3.7038" />
+          <input type="text" inputmode="decimal" id="api-input-lon" class="form-input" value="${formatNum(-3.7038, 4)}" />
         </div>
       </div>
 
@@ -359,10 +359,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     <!-- Simulation Launch Banner -->
     <div class="simulation-launch-bar">
       <div class="sim-config-group">
-        <label>${t.hybridLoader.peakPowerLabel}: <input type="number" id="sim-peak-kw" class="form-input input-compact" value="5.0" step="0.5" min="0.1" /></label>
-        <label>${t.hybridLoader.prLabel}: <input type="number" id="sim-pr" class="form-input input-compact" value="0.80" step="0.05" min="0.5" max="1.0" /></label>
-        <label>${t.hybridLoader.albedoLabel}: <input type="number" id="sim-albedo" class="form-input input-compact" value="0.20" step="0.05" min="0.0" max="1.0" /></label>
-        <label>${t.hybridLoader.toncLabel}: <input type="number" id="sim-tonc" class="form-input input-compact" value="47.0" step="0.5" min="30.0" max="65.0" /></label>
+        <label>${t.hybridLoader.peakPowerLabel}: <input type="text" inputmode="decimal" id="sim-peak-kw" class="form-input input-compact" value="${formatNum(5.0, 1)}" /></label>
+        <label>${t.hybridLoader.prLabel}: <input type="text" inputmode="decimal" id="sim-pr" class="form-input input-compact" value="${formatNum(0.80, 2)}" /></label>
+        <label>${t.hybridLoader.albedoLabel}: <input type="text" inputmode="decimal" id="sim-albedo" class="form-input input-compact" value="${formatNum(0.20, 2)}" /></label>
+        <label>${t.hybridLoader.toncLabel}: <input type="text" inputmode="decimal" id="sim-tonc" class="form-input input-compact" value="${formatNum(47.0, 1)}" /></label>
       </div>
       <button id="btn-run-hybrid-simulation" class="btn btn-solar btn-lg">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
@@ -436,19 +436,19 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   const resultsContainer = container.querySelector('#hybrid-simulation-results') as HTMLElement;
 
   // Initialize values from synchronized global state
-  if (simPeakKw) simPeakKw.value = solarSyncState.getPeakPowerKw().toString();
-  if (simTonc) simTonc.value = solarSyncState.getTonc().toString();
+  if (simPeakKw) simPeakKw.value = formatNum(solarSyncState.getPeakPowerKw(), 1);
+  if (simTonc) simTonc.value = formatNum(solarSyncState.getTonc(), 1);
 
   // Real-time synchronization when typing into Climate Simulation Bar
   simPeakKw?.addEventListener('input', () => {
-    const v = parseFloat(simPeakKw.value);
+    const v = parseFloat(simPeakKw.value.replace(',', '.'));
     if (!isNaN(v) && v > 0) {
       solarSyncState.setPeakPowerKw(v, 'sim-panel');
     }
   });
 
   simTonc?.addEventListener('input', () => {
-    const v = parseFloat(simTonc.value);
+    const v = parseFloat(simTonc.value.replace(',', '.'));
     if (!isNaN(v) && v > 0) {
       solarSyncState.setTonc(v, 'sim-panel');
     }
@@ -458,10 +458,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   window.addEventListener('orientsol:solar-params-updated', (e: Event) => {
     const d = (e as CustomEvent).detail;
     if (!d || d.source === 'sim-panel') return;
-    if (d.field === 'peakPowerKw' && simPeakKw && parseFloat(simPeakKw.value) !== d.value) {
-      simPeakKw.value = d.value.toString();
-    } else if (d.field === 'tonc' && simTonc && parseFloat(simTonc.value) !== d.value) {
-      simTonc.value = d.value.toString();
+    if (d.field === 'peakPowerKw' && simPeakKw && parseFloat(simPeakKw.value.replace(',', '.')) !== d.value) {
+      simPeakKw.value = formatNum(d.value, 1);
+    } else if (d.field === 'tonc' && simTonc && parseFloat(simTonc.value.replace(',', '.')) !== d.value) {
+      simTonc.value = formatNum(d.value, 1);
     }
   });
 
@@ -514,8 +514,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       const preset = API_CITY_PRESETS[idx];
       if (preset) {
         if (apiNameInput) apiNameInput.value = preset.name;
-        apiLatInput.value = preset.lat.toFixed(4);
-        apiLonInput.value = preset.lon.toFixed(4);
+        apiLatInput.value = formatNum(preset.lat, 4);
+        apiLonInput.value = formatNum(preset.lon, 4);
       }
     }
   });
@@ -524,8 +524,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   apiFetchBtn?.addEventListener('click', async () => {
     const sourceKey = apiSourceSelect.value;
     const actualSource = sourceKey === 'nasa' ? 'nasa_power' : (sourceKey as any);
-    const lat = parseFloat(apiLatInput.value);
-    const lon = parseFloat(apiLonInput.value);
+    const lat = parseFloat(apiLatInput.value.replace(',', '.'));
+    const lon = parseFloat(apiLonInput.value.replace(',', '.'));
 
     const chosenName = apiNameInput ? apiNameInput.value.trim() : '';
     let locationName = chosenName || 'Coordenadas Personalizadas';
@@ -944,17 +944,17 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     if (!rec) return;
 
     manualName.value = `${rec.locationName} (Manual)`;
-    manualLat.value = String(rec.latitude);
-    manualLon.value = String(rec.longitude);
-    manualElev.value = String(rec.elevationM ?? 0);
+    manualLat.value = formatNum(rec.latitude, 3);
+    manualLon.value = formatNum(rec.longitude, 3);
+    manualElev.value = formatInt(rec.elevationM ?? 0);
 
     const gInputs = container.querySelectorAll<HTMLInputElement>('.manual-g-input');
     const tInputs = container.querySelectorAll<HTMLInputElement>('.manual-t-input');
     gInputs.forEach((inp, idx) => {
-      if (rec.monthlyGdm0[idx] !== undefined) inp.value = rec.monthlyGdm0[idx].toFixed(2);
+      if (rec.monthlyGdm0[idx] !== undefined) inp.value = formatNum(rec.monthlyGdm0[idx], 2);
     });
     tInputs.forEach((inp, idx) => {
-      if (rec.monthlyTemperature[idx] !== undefined) inp.value = rec.monthlyTemperature[idx].toFixed(1);
+      if (rec.monthlyTemperature[idx] !== undefined) inp.value = formatNum(rec.monthlyTemperature[idx], 1);
     });
 
     setStatus(isEn ? `Template "${rec.locationName}" applied to form.` : `Plantilla "${rec.locationName}" aplicada al formulario.`, 'info');
@@ -975,9 +975,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       min?: number;
       max?: number;
       labelName: string;
+      decimals?: number;
     }
   ) {
-    const { allowNegative = false, min, max, labelName } = options;
+    const { allowNegative = false, min, max, labelName, decimals } = options;
 
     input.addEventListener('keydown', (e: KeyboardEvent) => {
       if (
@@ -1003,8 +1004,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       }
 
       if (e.key === '.' || e.key === ',') {
-        const val = input.value.replace(',', '.');
-        if (!val.includes('.')) {
+        const val = input.value.replace(/\./g, ',');
+        if (!val.includes(',')) {
           return;
         }
       }
@@ -1013,9 +1014,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     });
 
     input.addEventListener('input', () => {
-      const raw = input.value.replace(/,/g, '.');
+      // Normalize dot to comma for standard decimal display
+      const raw = input.value.replace(/\./g, ',');
       let sanitized = '';
-      let hasDot = false;
+      let hasComma = false;
       let hasMinus = false;
 
       for (let i = 0; i < raw.length; i++) {
@@ -1025,9 +1027,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         } else if (allowNegative && ch === '-' && i === 0 && !hasMinus) {
           sanitized += ch;
           hasMinus = true;
-        } else if (ch === '.' && !hasDot) {
+        } else if (ch === ',' && !hasComma) {
           sanitized += ch;
-          hasDot = true;
+          hasComma = true;
         }
       }
 
@@ -1047,7 +1049,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           'warning'
         );
       } else {
-        const num = parseFloat(v);
+        const num = parseFloat(v.replace(',', '.'));
         if (isNaN(num)) {
           highlightErrorInput(input);
           setStatus(
@@ -1060,27 +1062,29 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           highlightErrorInput(input);
           setStatus(
             isEn
-              ? `⚠️ "${labelName}" cannot be lower than ${min}.`
-              : `⚠️ "${labelName}" no puede ser menor que ${min}.`,
+              ? `⚠️ "${labelName}" cannot be lower than ${formatNum(min, min % 1 === 0 ? 0 : 2)}.`
+              : `⚠️ "${labelName}" no puede ser menor que ${formatNum(min, min % 1 === 0 ? 0 : 2)}.`,
             'warning'
           );
         } else if (max !== undefined && num > max) {
           highlightErrorInput(input);
           setStatus(
             isEn
-              ? `⚠️ "${labelName}" cannot exceed ${max}.`
-              : `⚠️ "${labelName}" no puede ser mayor que ${max}.`,
+              ? `⚠️ "${labelName}" cannot exceed ${formatNum(max, max % 1 === 0 ? 0 : 2)}.`
+              : `⚠️ "${labelName}" no puede ser mayor que ${formatNum(max, max % 1 === 0 ? 0 : 2)}.`,
             'warning'
           );
+        } else if (decimals !== undefined) {
+          input.value = formatNum(num, decimals);
         }
       }
     });
   }
 
   // Attach locks to all manual numeric inputs
-  setupNumericLock(manualLat, { allowNegative: true, min: -90, max: 90, labelName: isEn ? 'Latitude' : 'Latitud' });
-  setupNumericLock(manualLon, { allowNegative: true, min: -180, max: 180, labelName: isEn ? 'Longitude' : 'Longitud' });
-  setupNumericLock(manualAlbedo, { allowNegative: false, min: 0.0, max: 1.0, labelName: isEn ? 'Ground Albedo' : 'Albedo del Suelo' });
+  setupNumericLock(manualLat, { allowNegative: true, min: -90, max: 90, labelName: isEn ? 'Latitude' : 'Latitud', decimals: 3 });
+  setupNumericLock(manualLon, { allowNegative: true, min: -180, max: 180, labelName: isEn ? 'Longitude' : 'Longitud', decimals: 3 });
+  setupNumericLock(manualAlbedo, { allowNegative: false, min: 0.0, max: 1.0, labelName: isEn ? 'Ground Albedo' : 'Albedo del Suelo', decimals: 2 });
 
   // Attach lock to location name
   manualName.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -1116,6 +1120,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       min: 0.01,
       max: 25.0,
       labelName: `Gdm(0) [${MONTH_NAMES[idx]}]`,
+      decimals: 2,
     });
   });
 
@@ -1125,8 +1130,16 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       min: -50.0,
       max: 65.0,
       labelName: `Tamb [${MONTH_NAMES[idx]}]`,
+      decimals: 1,
     });
   });
+
+  if (apiLatInput) setupNumericLock(apiLatInput, { allowNegative: true, min: -90, max: 90, labelName: isEn ? 'Latitude' : 'Latitud', decimals: 4 });
+  if (apiLonInput) setupNumericLock(apiLonInput, { allowNegative: true, min: -180, max: 180, labelName: isEn ? 'Longitude' : 'Longitud', decimals: 4 });
+  if (simPeakKw) setupNumericLock(simPeakKw, { allowNegative: false, min: 0.1, max: 5000.0, labelName: isEn ? 'Peak Power' : 'Potencia Pico', decimals: 1 });
+  if (simPr) setupNumericLock(simPr, { allowNegative: false, min: 0.1, max: 1.0, labelName: isEn ? 'Performance Ratio' : 'Performance Ratio', decimals: 2 });
+  if (simAlbedo) setupNumericLock(simAlbedo, { allowNegative: false, min: 0.0, max: 1.0, labelName: isEn ? 'Ground Albedo' : 'Albedo del Suelo', decimals: 2 });
+  if (simTonc) setupNumericLock(simTonc, { allowNegative: false, min: 20.0, max: 80.0, labelName: isEn ? 'NOCT / TONC' : 'TONC', decimals: 1 });
 
   function validateManualFormInputs(): ManualClimateInput | null {
     const name = manualName.value.trim();
@@ -1171,8 +1184,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       highlightErrorInput(manualAlbedo);
       setStatus(
         isEn
-          ? 'Error: Ground Albedo is empty or invalid (must be between 0.00 and 1.00).'
-          : 'Error: El Albedo del suelo está vacío o es inválido (debe ser un número entre 0.00 y 1.00).',
+          ? `Error: Ground Albedo is empty or invalid (must be between ${formatNum(0, 2)} and ${formatNum(1, 2)}).`
+          : `Error: El Albedo del suelo está vacío o es inválido (debe ser un número entre ${formatNum(0, 2)} y ${formatNum(1, 2)}).`,
         'error'
       );
       return null;
@@ -1446,10 +1459,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       return;
     }
 
-    const peakKw = parseFloat(simPeakKw.value) || solarSyncState.getPeakPowerKw();
-    const pr = parseFloat(simPr.value) || 0.80;
-    const albedo = parseFloat(simAlbedo.value) || 0.20;
-    const tonc = parseFloat(simTonc?.value) || solarSyncState.getTonc();
+    const peakKw = parseFloat(simPeakKw.value.replace(',', '.')) || solarSyncState.getPeakPowerKw();
+    const pr = parseFloat(simPr.value.replace(',', '.')) || 0.80;
+    const albedo = parseFloat(simAlbedo.value.replace(',', '.')) || 0.20;
+    const tonc = parseFloat(simTonc?.value.replace(',', '.')) || solarSyncState.getTonc();
 
     simBtn.disabled = true;
     simBtn.innerHTML = `
@@ -1634,7 +1647,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       <div class="result-card wide-card" style="margin-bottom: 1.25rem;">
         <div class="result-card-header">
           <h4>${t.results.energyBalanceTitle}</h4>
-          <span id="energy-balance-header-badge" class="badge badge-neutral">${formatNum(parseFloat(simPeakKw.value) || 5.0, 1)} kWp | PR=${formatInt(Math.round(parseFloat(simPr.value) * 100))}%</span>
+          <span id="energy-balance-header-badge" class="badge badge-neutral">${formatNum(parseFloat(simPeakKw.value.replace(',', '.')) || 5.0, 1)} kWp | PR=${formatInt(Math.round(parseFloat(simPr.value.replace(',', '.')) * 100))}%</span>
         </div>
         <div class="energy-models-grid">
           <div class="energy-box">
@@ -1646,13 +1659,12 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
               <span>${t.results.collectorArea}</span>
               <div style="display: inline-flex; align-items: center; gap: 6px;">
                 <input
-                  type="number"
+                  type="text"
+                  inputmode="decimal"
                   id="input-collector-area-interactive"
                   class="form-input form-input-sm"
                   style="width: 78px; text-align: right; padding: 2px 6px; font-weight: 700; height: 28px; border-radius: 4px; border: 1px solid var(--border-subtle); background: var(--bg-card); color: var(--text-primary); cursor: not-allowed;"
-                  value="${(res.energyYield.collectorAreaM2 ?? 25.0).toFixed(1)}"
-                  min="0.1"
-                  step="0.5"
+                  value="${formatNum(res.energyYield.collectorAreaM2 ?? 25.0, 1)}"
                   disabled
                 />
                 <strong>m²</strong>
@@ -1749,7 +1761,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       </div>
     `;
 
-    const currentPeakKw = parseFloat(simPeakKw.value) || solarSyncState.getPeakPowerKw();
+    const currentPeakKw = parseFloat(simPeakKw.value.replace(',', '.')) || solarSyncState.getPeakPowerKw();
 
     // Dynamic Study Operation Mount Manager (Prevents Endless HTML)
     const mountStudyOperation = (op: typeof cachedActiveStudyOp) => {
@@ -1871,8 +1883,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     const baseSimp = res.energyYield?.producida?.simplified?.annualKwh ?? 7215;
     const baseTherm = res.energyYield?.producida?.osterwald?.thermalLossKwh ?? -38;
     const baseThermPct = Math.abs(res.energyYield?.producida?.osterwald?.thermalLossPct ?? 0.53);
-    const basePotKw = parseFloat(simPeakKw.value) || 5.0;
-    const prPct = formatInt(Math.round(parseFloat(simPr.value) * 100));
+    const basePotKw = parseFloat(simPeakKw.value.replace(',', '.')) || 5.0;
+    const prPct = formatInt(Math.round(parseFloat(simPr.value.replace(',', '.')) * 100));
     const unitRadM2 = res.energyYield?.recibida?.annualKwhM2 ?? (baseArea > 0 ? baseRecibida / baseArea : 1806.6);
 
     const applyAreaRecalculation = (newArea: number) => {
@@ -1952,13 +1964,13 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       } else {
         // Save and Calculate
         isEditingArea = false;
-        const enteredVal = parseFloat(areaInput?.value || '') || baseArea;
+        const enteredVal = parseFloat(areaInput?.value?.replace(',', '.') || '') || baseArea;
         if (areaInput) {
           areaInput.disabled = true;
           areaInput.style.cursor = 'not-allowed';
           areaInput.style.borderColor = 'var(--border-subtle)';
           areaInput.style.background = 'var(--bg-card)';
-          areaInput.value = enteredVal.toFixed(1);
+          areaInput.value = formatNum(enteredVal, 1);
         }
         if (btnEditSave) {
           btnEditSave.style.background = '#0284c7'; // Primary Blue
@@ -1980,7 +1992,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     // Real-time recalculation as user types
     areaInput?.addEventListener('input', () => {
-      const liveVal = parseFloat(areaInput.value);
+      const liveVal = parseFloat(areaInput.value.replace(',', '.'));
       if (!isNaN(liveVal) && liveVal > 0) {
         applyAreaRecalculation(liveVal);
       }
@@ -1992,8 +2004,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     copyBtn?.addEventListener('click', async () => {
       const ok = await copyReportToClipboard(res, {
-        peakPowerKw: parseFloat(simPeakKw.value) || 5.0,
-        performanceRatio: parseFloat(simPr.value) || 0.80,
+        peakPowerKw: parseFloat(simPeakKw.value.replace(',', '.')) || 5.0,
+        performanceRatio: parseFloat(simPr.value.replace(',', '.')) || 0.80,
         isEn,
       });
       if (ok && copyLabel) {
