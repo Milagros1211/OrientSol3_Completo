@@ -12,6 +12,7 @@ import {
   formatLocationWithCountry,
 } from '@/services/supabase';
 import { escapeHtml, escapeAttr } from '@/utils/security';
+import { formatNum, formatInt } from '@/utils/formatters';
 import { fetchUnifiedClimateData } from '@/services/external';
 import { i18n } from '@/i18n';
 import {
@@ -1528,23 +1529,23 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       <div class="temperatures-overview-grid">
         <div class="temp-stat-card">
           <span class="temp-stat-title">${t.results.tempMeanAnnual}</span>
-          <div class="temp-stat-value temp-mean">${res.temperatures.ambient.annualMeanC.toFixed(1)} <small style="font-size:0.9rem">°C</small></div>
+          <div class="temp-stat-value temp-mean">${formatNum(res.temperatures.ambient.annualMeanC, 1)} <small style="font-size:0.9rem">°C</small></div>
           <span class="temp-stat-sub">${t.results.tempMeanAnnualDesc}</span>
         </div>
         <div class="temp-stat-card">
           <span class="temp-stat-title">${t.results.tempMaxAnnual}</span>
-          <div class="temp-stat-value temp-warm">${res.temperatures.ambient.annualMaxC.toFixed(1)} <small style="font-size:0.9rem">°C</small></div>
+          <div class="temp-stat-value temp-warm">${formatNum(res.temperatures.ambient.annualMaxC, 1)} <small style="font-size:0.9rem">°C</small></div>
           <span class="temp-stat-sub">${t.results.tempMaxAnnualDesc}</span>
         </div>
         <div class="temp-stat-card">
           <span class="temp-stat-title">${t.results.tempMinAnnual}</span>
-          <div class="temp-stat-value temp-cool">${res.temperatures.ambient.annualMinC.toFixed(1)} <small style="font-size:0.9rem">°C</small></div>
+          <div class="temp-stat-value temp-cool">${formatNum(res.temperatures.ambient.annualMinC, 1)} <small style="font-size:0.9rem">°C</small></div>
           <span class="temp-stat-sub">${t.results.tempMinAnnualDesc}</span>
         </div>
         <div class="temp-stat-card">
           <span class="temp-stat-title">${t.results.tempCellOperating}</span>
-          <div class="temp-stat-value temp-cell">${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)} <small style="font-size:0.9rem">°C</small></div>
-          <span class="temp-stat-sub">${isEn ? `NOCT / TONC ${(parseFloat(simTonc?.value) || 47.0).toFixed(1)}°C Model (Max: ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)}°C)` : `Modelo TONC ${(parseFloat(simTonc?.value) || 47.0).toFixed(1)}°C (Máx: ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)}°C)`}</span>
+          <div class="temp-stat-value temp-cell">${formatNum(res.temperatures.cellOperating.meanCellTempOptimalC, 1)} <small style="font-size:0.9rem">°C</small></div>
+          <span class="temp-stat-sub">${isEn ? `NOCT / TONC ${formatNum(parseFloat(simTonc?.value) || 47.0, 1)}°C Model (Max: ${formatNum(res.temperatures.cellOperating.maxCellTempOptimalC, 1)}°C)` : `Modelo TONC ${formatNum(parseFloat(simTonc?.value) || 47.0, 1)}°C (Máx: ${formatNum(res.temperatures.cellOperating.maxCellTempOptimalC, 1)}°C)`}</span>
         </div>
       </div>
 
@@ -1639,7 +1640,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <div class="energy-box">
             <span class="energy-title">${t.results.solarReceivedTitle}</span>
             <div id="solar-received-annual-val" class="energy-val-large" style="color: #fbbf24;">
-              ${Math.round(res.energyYield.recibida.annualTotalKwh).toLocaleString()} <small>kWh/${isEn ? 'yr' : 'año'}</small>
+              ${formatInt(res.energyYield.recibida.annualTotalKwh)} <small>kWh/${isEn ? 'yr' : 'año'}</small>
             </div>
             <div class="energy-details" style="display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap;">
               <span>${t.results.collectorArea}</span>
@@ -1668,30 +1669,30 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             </div>
             <div class="energy-details">
               <span>${t.results.annualIrradiationM2}</span>
-              <strong>${(res.energyYield.recibida.annualKwhM2 ?? 0).toFixed(1)} kWh/m²·${isEn ? 'yr' : 'año'}</strong>
+              <strong>${formatNum(res.energyYield.recibida.annualKwhM2 ?? 0, 1)} kWh/m²·${isEn ? 'yr' : 'año'}</strong>
             </div>
             <div class="energy-row-track">
               <span>${t.results.dailyMeanResource}</span>
-              <strong>${(res.energyYield.recibida.meanDailyKwhM2 ?? 0).toFixed(2)} kWh/m²/${isEn ? 'day' : 'día'}</strong>
+              <strong>${formatNum(res.energyYield.recibida.meanDailyKwhM2 ?? 0, 2)} kWh/m²/${isEn ? 'day' : 'día'}</strong>
             </div>
           </div>
 
           <div class="energy-box">
             <span class="energy-title">${t.results.solarProducedTitle}</span>
             <div id="solar-produced-annual-val" class="energy-val-large" style="color: #34d399;">
-              ${Math.round(res.energyYield.producida.osterwald.annualKwh ?? 0).toLocaleString()} <small>kWh/${isEn ? 'yr' : 'año'}</small>
+              ${formatInt(res.energyYield.producida.osterwald.annualKwh ?? 0)} <small>kWh/${isEn ? 'yr' : 'año'}</small>
             </div>
             <div class="energy-details">
               <span>${t.results.osterwaldModel}</span>
-              <strong>${(res.energyYield.producida.osterwald.specificYieldKwhKwp ?? 0).toFixed(0)} kWh/kWp</strong>
+              <strong>${formatInt(res.energyYield.producida.osterwald.specificYieldKwhKwp ?? 0)} kWh/kWp</strong>
             </div>
             <div class="energy-details">
               <span>${t.results.cellThermalLosses}</span>
-              <strong id="solar-thermal-losses-val" style="color: #f87171;">-${Math.abs(res.energyYield.producida.osterwald.thermalLossKwh ?? 0).toFixed(0)} kWh (-${Math.abs(res.energyYield.producida.osterwald.thermalLossPct ?? 0).toFixed(2)}%)</strong>
+              <strong id="solar-thermal-losses-val" style="color: #f87171;">-${formatInt(Math.abs(res.energyYield.producida.osterwald.thermalLossKwh ?? 0))} kWh (-${formatNum(Math.abs(res.energyYield.producida.osterwald.thermalLossPct ?? 0), 2)}%)</strong>
             </div>
             <div class="energy-row-track">
               <span>${t.results.simplifiedModel}</span>
-              <strong id="solar-produced-simplified-val">${Math.round(res.energyYield.producida.simplified.annualKwh ?? 0).toLocaleString()} kWh/${isEn ? 'yr' : 'año'}</strong>
+              <strong id="solar-produced-simplified-val">${formatInt(res.energyYield.producida.simplified.annualKwh ?? 0)} kWh/${isEn ? 'yr' : 'año'}</strong>
             </div>
           </div>
         </div>
@@ -1724,19 +1725,19 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
                 <tr class="${surf.key === 'tracking_2axis_dual' ? 'highlight-row' : ''}">
                   <td><strong>${getSurfaceDisplayName(surf, isEn)}</strong></td>
                   <td><span class="category-badge ${getBadgeClass(surf.category)}">${getCategoryBadge(surf.category, isEn)}</span></td>
-                  <td>${(surf.meanDailyKwhM2 ?? 0).toFixed(3)} kWh/m²/d</td>
-                  <td>${Math.round(surf.annualRadiationKwhM2 ?? 0).toLocaleString()} kWh/m²</td>
+                  <td>${formatNum(surf.meanDailyKwhM2 ?? 0, 3)} kWh/m²/d</td>
+                  <td>${formatInt(surf.annualRadiationKwhM2 ?? 0)} kWh/m²</td>
                   <td class="${(surf.gainOverHorizontalPct ?? 0) > 0 ? 'text-gain' : ''}">
-                    ${(surf.gainOverHorizontalPct ?? 0) >= 0 ? '+' : ''}${(surf.gainOverHorizontalPct ?? 0).toFixed(2)}%
+                    ${(surf.gainOverHorizontalPct ?? 0) >= 0 ? '+' : ''}${formatNum(surf.gainOverHorizontalPct ?? 0, 2)}%
                   </td>
                   <td class="${(surf.gainOverAnnualFixedPct ?? 0) > 0 ? 'text-gain' : ''}">
-                    ${(surf.gainOverAnnualFixedPct ?? 0) >= 0 ? '+' : ''}${(surf.gainOverAnnualFixedPct ?? 0).toFixed(2)}%
+                    ${(surf.gainOverAnnualFixedPct ?? 0) >= 0 ? '+' : ''}${formatNum(surf.gainOverAnnualFixedPct ?? 0, 2)}%
                   </td>
                   <td class="cell-val-osterwald">
-                    ${Math.round(surf.energyProducedOsterwaldKwhYear ?? 0).toLocaleString()} kWh/${isEn ? 'yr' : 'año'}
+                    ${formatInt(surf.energyProducedOsterwaldKwhYear ?? 0)} kWh/${isEn ? 'yr' : 'año'}
                   </td>
                   <td class="cell-val-temp">
-                    ${(surf.meanCellTempDegC ?? 0).toFixed(1)} °C
+                    ${formatNum(surf.meanCellTempDegC ?? 0, 1)} °C
                   </td>
                 </tr>
               `
@@ -1886,25 +1887,25 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       // 1. Update Energía Solar Recibida
       const elRecibida = resultsContainer.querySelector<HTMLElement>('#solar-received-annual-val');
       if (elRecibida) {
-        elRecibida.innerHTML = `${newRecibida.toLocaleString()} <small>kWh/${isEn ? 'yr' : 'año'}</small>`;
+        elRecibida.innerHTML = `${formatInt(newRecibida)} <small>kWh/${isEn ? 'yr' : 'año'}</small>`;
       }
 
       // 2. Update Energía Solar Producida (Osterwald)
       const elProducida = resultsContainer.querySelector<HTMLElement>('#solar-produced-annual-val');
       if (elProducida) {
-        elProducida.innerHTML = `${newOsterwald.toLocaleString()} <small>kWh/${isEn ? 'yr' : 'año'}</small>`;
+        elProducida.innerHTML = `${formatInt(newOsterwald)} <small>kWh/${isEn ? 'yr' : 'año'}</small>`;
       }
 
       // 3. Update Modelo Simplificado
       const elSimp = resultsContainer.querySelector<HTMLElement>('#solar-produced-simplified-val');
       if (elSimp) {
-        elSimp.innerHTML = `${newSimp.toLocaleString()} kWh/${isEn ? 'yr' : 'año'}`;
+        elSimp.innerHTML = `${formatInt(newSimp)} kWh/${isEn ? 'yr' : 'año'}`;
       }
 
       // 4. Update Pérdidas Térmicas Célula
       const elTherm = resultsContainer.querySelector<HTMLElement>('#solar-thermal-losses-val');
       if (elTherm) {
-        elTherm.innerHTML = `-${Math.abs(newTherm).toFixed(0)} kWh (-${baseThermPct.toFixed(2)}%)`;
+        elTherm.innerHTML = `-${formatInt(Math.abs(newTherm))} kWh (-${formatNum(Math.abs(baseThermPct), 2)}%)`;
       }
 
       // 5. Update Header Badge (Potencia Pico equivalente)
