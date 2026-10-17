@@ -237,9 +237,9 @@ export function exportOrientSolMasterExcel(
 
     activeTableData.push([
       isEn ? 'KEY STUDY METRICS' : 'MÉTRICAS CLAVE DEL ESTUDIO',
-      `${isEn ? 'Annual Mean' : 'Media Anual'}: ${activeMeanDaily.toFixed(3)} kWh/m²/d (${Math.round(activeAnnualTotal)} kWh/m²·año)`,
-      `${isEn ? 'Gain vs Fixed Opt' : 'Ganancia s/ Fijo Ópt'}: +${activeGainAnnualOptPct.toFixed(2)}%`,
-      `${isEn ? 'Gain vs Horiz (0°)' : 'Ganancia s/ Horiz (0°)'}: +${activeGainHorizPct.toFixed(2)}%`,
+      `${isEn ? 'Annual Mean' : 'Media Anual'}: ${formatNum(activeMeanDaily, 3)} kWh/m²/d (${formatInt(Math.round(activeAnnualTotal))} kWh/m²·${isEn ? 'yr' : 'año'})`,
+      `${isEn ? 'Gain vs Fixed Opt' : 'Ganancia s/ Fijo Ópt'}: +${formatPercent(activeGainAnnualOptPct, 2)}`,
+      `${isEn ? 'Gain vs Horiz (0°)' : 'Ganancia s/ Horiz (0°)'}: +${formatPercent(activeGainHorizPct, 2)}`,
     ]);
     activeTableData.push([]);
 
@@ -429,21 +429,21 @@ export function exportOrientSolMasterExcel(
         activeTableData.push([
           months[i],
           Number(r0[i].toFixed(2)),
-          'Inc: 0.0° | Ori: 0.0°',
+          isEn ? 'Inc: 0.0° | Ori: 0.0°' : 'Inc: 0,0° | Ori: 0,0°',
           Number(rAnn[i].toFixed(2)),
-          `Inc: ${optAngle.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+          `Inc: ${formatNum(optAngle, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
           Number(rSeas[i].toFixed(2)),
-          `Inc: ${seasonTilts[i].toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+          `Inc: ${formatNum(seasonTilts[i], 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
           Number(rMth[i].toFixed(2)),
-          `Inc: ${(monthlyOptTilts[i] ?? 0).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+          `Inc: ${formatNum(monthlyOptTilts[i] ?? 0, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
           Number(rPolar[i].toFixed(2)),
-          `Inc: ${res.latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+          `Inc: ${formatNum(res.latitude, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
           Number(rAzim[i].toFixed(2)),
-          `Inc: ${res.latitude.toFixed(1)}° | Ori: ${noonAzims[i].toFixed(1)}°`,
+          `Inc: ${formatNum(res.latitude, 1)}° | Ori: ${formatNum(noonAzims[i], 1)}°`,
           Number(rHoriz[i].toFixed(2)),
-          `Inc: ${horizTilts[i].toFixed(1)}° | Ori: 90.0°`,
+          `Inc: ${formatNum(horizTilts[i], 1)}° | Ori: ${isEn ? '90.0°' : '90,0°'}`,
           Number(rDual[i].toFixed(2)),
-          `Inc: ${noonDualTilts[i].toFixed(1)}° | Ori: ${noonAzims[i].toFixed(1)}°`,
+          `Inc: ${formatNum(noonDualTilts[i], 1)}° | Ori: ${formatNum(noonAzims[i], 1)}°`,
           Number(tempVals[i].toFixed(1)),
         ]);
       }
@@ -460,11 +460,11 @@ export function exportOrientSolMasterExcel(
       activeTableData.push([
         isEn ? 'ANNUAL AVERAGE' : 'PROMEDIO ANUAL',
         Number(avgComp(r0).toFixed(3)),
-        'Inc: 0.0° | Ori: 0.0°',
+        isEn ? 'Inc: 0.0° | Ori: 0.0°' : 'Inc: 0,0° | Ori: 0,0°',
         Number(avgComp(rAnn).toFixed(3)),
-        `Inc: ${optAngle.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+        `Inc: ${formatNum(optAngle, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
         Number(avgComp(rSeas).toFixed(3)),
-        `Inc: ${avgSeasonalTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+        `Inc: ${formatNum(avgSeasonalTilt, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
         Number(avgComp(rMth).toFixed(3)),
         `Inc: ${formatNum(avgMonthlyTilt, 1)}° | Ori: ${formatNum(fixedOri, 1)}°`,
         Number(avgComp(rPolar).toFixed(3)),
