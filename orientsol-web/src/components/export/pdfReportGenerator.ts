@@ -3408,24 +3408,28 @@ export async function generateOrientSolPDFReport(
   doc.setFontSize(7);
   doc.setDrawColor(37, 99, 235);
   doc.setLineWidth(1.2);
-  doc.line(40, cvBoxY + 8, 48, cvBoxY + 8);
+  doc.line(26, cvBoxY + 8, 34, cvBoxY + 8);
   doc.setTextColor(37, 99, 235);
-  doc.text(isEn ? 'Gdm Curve (1°..90°)' : 'Curva Gdm (1°..90°)', 50, cvBoxY + 9);
+  doc.text(isEn ? 'Gdm Curve (1°..90°)' : 'Curva Gdm (1°..90°)', 36, cvBoxY + 9);
 
   doc.setDrawColor(14, 165, 233);
   doc.setLineWidth(0.8);
-  doc.line(90, cvBoxY + 8, 98, cvBoxY + 8);
+  doc.line(72, cvBoxY + 8, 80, cvBoxY + 8);
   doc.setTextColor(14, 165, 233);
-  doc.text(`${isEn ? 'Horizontal Plane 0°' : 'Plano Horizontal 0°'} (${formatNum(meanRad0, 2)})`, 100, cvBoxY + 9);
+  doc.text(`${isEn ? 'Horizontal Plane 0°' : 'Plano Horizontal 0°'} (${formatNum(meanRad0, 2)})`, 82, cvBoxY + 9);
 
   doc.setDrawColor(16, 185, 129);
   doc.setLineWidth(1.0);
-  const legendStudyCurve = doc.splitTextToSize(`${cleanStudyName} (${formatNum(meanRadStudy, 2)})`, 34);
-  if (legendStudyCurve.length > 1) {
-    doc.text(legendStudyCurve[0], 155, cvBoxY + 7.5);
-    doc.text(legendStudyCurve[1], 155, cvBoxY + 10.5);
+  const legendStudyCurve = doc.splitTextToSize(`${cleanStudyName} (${formatNum(meanRadStudy, 2)})`, 56);
+  const isMultiLineStudy = legendStudyCurve.length > 1;
+  const lineYStudy = isMultiLineStudy ? cvBoxY + 8.5 : cvBoxY + 8.0;
+  doc.line(124, lineYStudy, 132, lineYStudy);
+  doc.setTextColor(16, 185, 129);
+  if (isMultiLineStudy) {
+    doc.text(legendStudyCurve[0], 134, cvBoxY + 7.2);
+    doc.text(legendStudyCurve[1], 134, cvBoxY + 10.2);
   } else {
-    doc.text(legendStudyCurve[0] || '', 155, cvBoxY + 9);
+    doc.text(legendStudyCurve[0] || '', 134, cvBoxY + 9);
   }
 
   // Key Tilts Discrete Table
