@@ -2015,18 +2015,35 @@ export async function generateOrientSolPDFReport(
       doc.setFontSize(6.5);
       doc.setTextColor(255, 255, 255);
 
-      const cols = [
-        isEn ? 'Month' : 'Mes',
-        `${compLabel}(0°)`,
-        isEn ? 'Tilt (°)' : 'Inc (°)',
-        `${compLabel} Est.`,
-        '', // Rendered with subscripts below
-        '', // Rendered with subscripts below
-        isEn ? 'PV Yield' : 'Prod (kWh)',
-        isEn ? 'Gain vs 0°' : 'Gan. s/ 0°',
-        isEn ? 'Gain vs Opt' : 'Gan. s/ Ópt',
-      ];
-      const colX = [22, 40, 56, 70, 88, 104, 124, 144, 168];
+      const isAnnualOp = studyType === 'annual';
+
+      const cols = isAnnualOp
+        ? [
+            isEn ? 'Month' : 'Mes',
+            `${compLabel}(0°)`,
+            isEn ? 'Tilt (°)' : 'Inc (°)',
+            `${compLabel} Est.`,
+            '', // Rendered with subscripts below
+            '', // Rendered with subscripts below
+            isEn ? 'PV Yield' : 'Prod (kWh)',
+            isEn ? 'Gain vs 0°' : 'Gan. s/ 0°',
+          ]
+        : [
+            isEn ? 'Month' : 'Mes',
+            `${compLabel}(0°)`,
+            isEn ? 'Tilt (°)' : 'Inc (°)',
+            `${compLabel} Est.`,
+            '', // Rendered with subscripts below
+            '', // Rendered with subscripts below
+            isEn ? 'PV Yield' : 'Prod (kWh)',
+            isEn ? 'Gain vs 0°' : 'Gan. s/ 0°',
+            isEn ? 'Gain vs Opt' : 'Gan. s/ Ópt',
+          ];
+
+      const colX = isAnnualOp
+        ? [22, 44, 66, 84, 104, 124, 146, 170]
+        : [22, 40, 56, 70, 88, 104, 124, 144, 168];
+
       cols.forEach((c, idx) => {
         if (idx === 4) {
           drawTextWithSubscripts(
@@ -2112,8 +2129,10 @@ export async function generateOrientSolPDFReport(
           doc.text(formatPercent(g0pct, 1, true), colX[7], curRowY + 3.5);
         }
 
-        const gOptPct = radOpt_c[i] > 0 ? ((radAct_c[i] - radOpt_c[i]) / radOpt_c[i]) * 100 : 0;
-        doc.text(formatPercent(gOptPct, 1, true), colX[8], curRowY + 3.5);
+        if (!isAnnualOp) {
+          const gOptPct = radOpt_c[i] > 0 ? ((radAct_c[i] - radOpt_c[i]) / radOpt_c[i]) * 100 : 0;
+          doc.text(formatPercent(gOptPct, 1, true), colX[8], curRowY + 3.5);
+        }
 
         curRowY += 5.0;
       }
@@ -2139,7 +2158,9 @@ export async function generateOrientSolPDFReport(
         doc.setTextColor(gainVsHoriz_c >= 0 ? 52 : 248, gainVsHoriz_c >= 0 ? 211 : 113, gainVsHoriz_c >= 0 ? 153 : 113);
         doc.text(formatPercent(gainVsHoriz_c, 1, true), colX[7], curRowY + 4);
       }
-      doc.text(formatPercent(gainVsOpt_c, 1, true), colX[8], curRowY + 4);
+      if (!isAnnualOp) {
+        doc.text(formatPercent(gainVsOpt_c, 1, true), colX[8], curRowY + 4);
+      }
 
       // Insights box
       const ins2Y = curRowY + 9;
