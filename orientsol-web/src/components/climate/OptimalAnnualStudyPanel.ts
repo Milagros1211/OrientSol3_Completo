@@ -13,6 +13,11 @@ import {
   generateOrientSolPDFReport,
   showExportComponentChoiceModal,
 } from '@/components/export/pdfReportGenerator';
+import {
+  applySpanishNumberFormattingToWorksheet,
+  getExportFileTimestamp,
+  getStandardizedExcelFilename,
+} from '@/components/export/excelFormatHelper';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { renderCaptureLossMapSection } from '@/components/climate/CaptureLossMapSection';
 import { formatNum, formatInt, formatPercent } from '@/utils/formatters';
@@ -407,6 +412,7 @@ async function exportOptimalAnnualToExcel(
     ]);
 
     const ws = XLSX.utils.aoa_to_sheet(sheetData);
+    applySpanishNumberFormattingToWorksheet(ws);
 
     // Configurar anchos de columna para legibilidad óptima
     const colWidths = [{ wch: 15 }, { wch: 16 }, { wch: 14 }];
@@ -437,11 +443,11 @@ async function exportOptimalAnnualToExcel(
     studyDailyRad: res.optimalAnnual.monthlyDailyKwh,
     isEn,
   });
+  applySpanishNumberFormattingToWorksheet(energyWs);
   const energySheetName = isEn ? 'Energy' : 'Energia';
   XLSX.utils.book_append_sheet(wb, energyWs, energySheetName);
 
   const excelBuf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  const cleanLoc = res.locationName.replace(/[^a-zA-Z0-9_-]/g, '_');
   const compSuffix =
     mode === 'all'
       ? (isEn ? 'All_Components' : 'Todas_las_componentes')
@@ -452,7 +458,9 @@ async function exportOptimalAnnualToExcel(
           : activeComponent === 'diffuse'
           ? 'Difusa'
           : 'Albedo');
-  const filename = `OrientSol3_Inclinacion_Optima_${cleanLoc}_${compSuffix}.xlsx`;
+
+  const { fileTimestamp } = getExportFileTimestamp();
+  const filename = getStandardizedExcelFilename('annual', res.locationName, compSuffix, fileTimestamp);
 
 
   // Native File System Access API waiting for save location
