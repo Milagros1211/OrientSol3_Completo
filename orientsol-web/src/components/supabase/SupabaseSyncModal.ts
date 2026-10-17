@@ -5,6 +5,7 @@ import {
 } from '@/services/supabase/climateDatabaseService';
 import { escapeHtml } from '@/utils/security';
 import { i18n } from '@/i18n';
+import { formatNum } from '@/utils/formatters';
 
 let activeModalEl: HTMLElement | null = null;
 
@@ -222,7 +223,7 @@ function renderQueueItemsMarkup(queue: any[], isEn: boolean): string {
             <div class="queue-item-info">
               <strong>${idx + 1}. ${escapeHtml(formatLocationWithCountry(item.locationName, item.country))}</strong>
               <span class="queue-item-meta">
-                Lat: ${item.latitude.toFixed(3)}°, Lon: ${item.longitude.toFixed(3)}° | Gdm(0): ${annualG.toFixed(2)} kWh/m²/d
+                Lat: ${formatNum(item.latitude, 3)}°, Lon: ${formatNum(item.longitude, 3)}° | Gdm(0): ${formatNum(annualG, 2)} kWh/m²/d
               </span>
             </div>
             <span class="badge badge-amber">${isEn ? 'Pending Cloud Sync' : 'Pendiente de Subida'}</span>

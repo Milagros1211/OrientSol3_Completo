@@ -1634,7 +1634,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       <div class="result-card wide-card" style="margin-bottom: 1.25rem;">
         <div class="result-card-header">
           <h4>${t.results.energyBalanceTitle}</h4>
-          <span id="energy-balance-header-badge" class="badge badge-neutral">${simPeakKw.value} kWp | PR=${(parseFloat(simPr.value) * 100).toFixed(0)}%</span>
+          <span id="energy-balance-header-badge" class="badge badge-neutral">${formatNum(parseFloat(simPeakKw.value) || 5.0, 1)} kWp | PR=${formatInt(Math.round(parseFloat(simPr.value) * 100))}%</span>
         </div>
         <div class="energy-models-grid">
           <div class="energy-box">
@@ -1872,7 +1872,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     const baseTherm = res.energyYield?.producida?.osterwald?.thermalLossKwh ?? -38;
     const baseThermPct = Math.abs(res.energyYield?.producida?.osterwald?.thermalLossPct ?? 0.53);
     const basePotKw = parseFloat(simPeakKw.value) || 5.0;
-    const prPct = (parseFloat(simPr.value) * 100).toFixed(0);
+    const prPct = formatInt(Math.round(parseFloat(simPr.value) * 100));
     const unitRadM2 = res.energyYield?.recibida?.annualKwhM2 ?? (baseArea > 0 ? baseRecibida / baseArea : 1806.6);
 
     const applyAreaRecalculation = (newArea: number) => {
@@ -1882,7 +1882,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       const newOsterwald = Math.round(baseOsterwald * ratio);
       const newSimp = Math.round(baseSimp * ratio);
       const newTherm = Math.round(baseTherm * ratio);
-      const newPotKw = (basePotKw * ratio).toFixed(1);
+      const newPotKw = formatNum(basePotKw * ratio, 1);
 
       // 1. Update Energía Solar Recibida
       const elRecibida = resultsContainer.querySelector<HTMLElement>('#solar-received-annual-val');
