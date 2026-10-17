@@ -6,18 +6,12 @@ import {
 } from '@/components/charts/OptimalAnnualCharts';
 import { renderOptimalAnnualGraphsWindow } from '@/components/charts/OptimalAnnualGraphsWindow';
 import { renderEnergyCalculationPanel } from '@/components/energy/EnergyCalculationPanel';
-import * as XLSX from 'xlsx';
-import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
+import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import {
   showPdfGenerationNoticeModal,
   generateOrientSolPDFReport,
   showExportComponentChoiceModal,
 } from '@/components/export/pdfReportGenerator';
-import {
-  applySpanishNumberFormattingToWorksheet,
-  getExportFileTimestamp,
-  getStandardizedExcelFilename,
-} from '@/components/export/excelFormatHelper';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { renderCaptureLossMapSection } from '@/components/climate/CaptureLossMapSection';
 import { formatNum, formatInt, formatPercent } from '@/utils/formatters';
@@ -255,248 +249,25 @@ export function showExcelExportModal(
 }
 
 /**
- * Generates and saves the Excel file (.xlsx) with 1 or 4 sheets strictly following
- * Figura 5.2.68 and MATLAB Tabla_OptAnual.m.
+ * Generates and saves the unified master Excel file (.xlsx) with all components,
+ * Resumen_General, Ranking_Superficie, Energia_Generada, and Mapa_Perdidas.
  */
-async function exportOptimalAnnualToExcel(
+function exportOptimalAnnualToExcel(
   res: SolarBridgeSimulationResult,
   mode: 'single' | 'all',
   activeComponent: TableRadiationComponent,
   _angleX: number,
   isEn: boolean
 ) {
-  const wb = XLSX.utils.book_new();
-  const componentsToExport: TableRadiationComponent[] =
-    mode === 'all'
-      ? ['global', 'beam', 'diffuse', 'albedo']
-      : [activeComponent];
-
-  const MONTHS = isEn
-    ? ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-
-  const optAngle = res.optimalAnnual.optimalTiltDeg;
-  const tempVals = res.temperatures.ambient.monthlyMeanC;
-
-  for (const comp of componentsToExport) {
-    const isAlbedo = comp === 'albedo';
-    const compLabel =
-      comp === 'global' ? 'Gdm' : comp === 'beam' ? 'Bdm' : comp === 'diffuse' ? 'Ddm' : 'Rdm';
-    const compTitle =
-      comp === 'global'
-        ? (isEn ? 'DAILY GLOBAL RADIATION (kWh/m²/day)' : 'RADIACIÓN GLOBAL DIARIA (kWh/m²/día)')
-        : comp === 'beam'
-        ? (isEn ? 'DAILY DIRECT RADIATION (kWh/m²/day)' : 'RADIACIÓN DIRECTA DIARIA (kWh/m²/día)')
-        : comp === 'diffuse'
-        ? (isEn ? 'DAILY DIFFUSE RADIATION (kWh/m²/day)' : 'RADIACIÓN DIFUSA DIARIA (kWh/m²/día)')
-        : (isEn ? 'DAILY ALBEDO RADIATION (kWh/m²/day)' : 'RADIACIÓN DE ALBEDO DIARIA (kWh/m²/día)');
-
-    // 1. Pre-calculate 91 angle values for all 12 months (0° to 90°)
-    const angles91Data: number[][] = []; // [deg 0..90][m 0..11]
-    for (let deg = 0; deg <= 90; deg++) {
-      angles91Data.push(getMonthlyRadiationForAngle(res, comp, deg));
-    }
-
-    const rad0 = angles91Data[0];
-    const radOpt = getMonthlyRadiationForAngle(res, comp, optAngle);
-
-    const gainsHoriz = calculateGains(radOpt, rad0);
-
-    const meanOf = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / (arr.length || 1);
-    const meanOpt = meanOf(radOpt);
-    const meanTemp = meanOf(tempVals);
-    const meanFactorHoriz = meanOf(gainsHoriz.factors);
-    const meanPctHoriz = meanOf(gainsHoriz.pcts);
-
-    // Build Sheet Data strictly matching Figura 5.2.68 & MATLAB Tabla_OptAnual.m
-    const sheetData: (string | number | null)[][] = [];
-
-    // Fila 1 (Cabecera): A1: City, B1: 'Latitud', C1: lat, E1: 'Inclinación óptima anual', G1: optAngle
-    sheetData.push([
-      res.locationName,
-      isEn ? 'Latitude' : 'Latitud',
-      Number(res.latitude.toFixed(7)),
-      '',
-      isEn ? 'Annual optimal tilt' : 'Inclinación óptima anual',
-      '',
-      optAngle,
-    ]);
-
-    // Fila 2 (Vacía)
-    sheetData.push([]);
-
-    // Fila 3 (Título del bloque de radiación en Col B)
-    sheetData.push(['', compTitle]);
-
-    // Fila 4 (Cabecera de columnas: ángulos de 0º a 90º en columnas B a CP)
-    const angleHeaders: string[] = [''];
-    for (let deg = 0; deg <= 90; deg++) {
-      angleHeaders.push(`${compLabel}(${deg}º)`);
-    }
-    sheetData.push(angleHeaders);
-
-    // Filas 5 a 16 (12 Meses con todos los valores de 0º a 90º)
-    for (let m = 0; m < 12; m++) {
-      const rowVals: (string | number)[] = [MONTHS[m]];
-      for (let deg = 0; deg <= 90; deg++) {
-        const val = angles91Data[deg][m];
-        rowVals.push(Number(val.toFixed(8)));
-      }
-      sheetData.push(rowVals);
-    }
-
-    // Fila 17 (MEDIA de cada inclinación 0º a 90º)
-    const mediaRow: (string | number)[] = [isEn ? 'MEAN' : 'MEDIA'];
-    for (let deg = 0; deg <= 90; deg++) {
-      const avgDeg = meanOf(angles91Data[deg]);
-      mediaRow.push(Number(avgDeg.toFixed(8)));
-    }
-    sheetData.push(mediaRow);
-
-    // Fila 18 (Vacía)
-    sheetData.push([]);
-
-    // Fila 19 (Cabecera bloque inferior de ganancias: E19: 'GANANCIAS', F19: 'Respecto a:')
-    sheetData.push([
-      '',
-      '',
-      '',
-      '',
-      isEn ? 'GAINS' : 'GANANCIAS',
-      isEn ? 'Respect to:' : 'Respecto a:'
-    ]);
-
-    // Fila 20 (Referencia de ganancia: F20: 'Plano horizontal')
-    sheetData.push([
-      '',
-      '',
-      '',
-      '',
-      '',
-      isEn ? 'Horizontal plane' : 'Plano horizontal'
-    ]);
-
-    // Fila 21 (Subcabeceras: B21: Gdm(Ópt.), C21: Temp.(ºC), F21: Fc.Ganancia, G21: Ganancia(%))
-    sheetData.push([
-      '',
-      isEn ? `${compLabel}(Opt.)` : `${compLabel}(Ópt.)`,
-      isEn ? 'Temp.(°C)' : 'Temp.(ºC)',
-      '',
-      '',
-      isEn ? 'Gain Factor' : 'Fc.Ganancia',
-      isEn ? 'Gain(%)' : 'Ganancia(%)'
-    ]);
-
-    // Filas 22 a 33 (12 Meses en tabla de ganancias)
-    for (let m = 0; m < 12; m++) {
-      sheetData.push([
-        MONTHS[m],
-        Number(radOpt[m].toFixed(8)),
-        Number(tempVals[m].toFixed(1)),
-        '',
-        '',
-        isAlbedo ? '-' : Number(gainsHoriz.factors[m].toFixed(8)),
-        isAlbedo ? '-' : Number(gainsHoriz.pcts[m].toFixed(7)),
-      ]);
-    }
-
-    // Fila 34 (MEDIA de valores óptimos y ganancias)
-    sheetData.push([
-      isEn ? 'MEAN' : 'MEDIA',
-      Number(meanOpt.toFixed(8)),
-      Number(meanTemp.toFixed(1)),
-      '',
-      '',
-      isAlbedo ? '-' : Number(meanFactorHoriz.toFixed(8)),
-      isAlbedo ? '-' : Number(meanPctHoriz.toFixed(7)),
-    ]);
-
-    const ws = XLSX.utils.aoa_to_sheet(sheetData);
-    applySpanishNumberFormattingToWorksheet(ws);
-
-    // Configurar anchos de columna para legibilidad óptima
-    const colWidths = [{ wch: 15 }, { wch: 16 }, { wch: 14 }];
-    for (let c = 3; c <= 92; c++) {
-      colWidths.push({ wch: 14 });
-    }
-    ws['!cols'] = colWidths;
-
-    // Sheet Name matching MATLAB Tabla_OptAnual.m (Hoja1..Hoja4)
-    let sheetName =
-      mode === 'all'
-        ? comp === 'global'
-          ? 'Hoja1_Global'
-          : comp === 'beam'
-          ? 'Hoja2_Directa'
-          : comp === 'diffuse'
-          ? 'Hoja3_Difusa'
-          : 'Hoja4_Albedo'
-        : `Hoja1_${compLabel}`;
-
-    if (sheetName.length > 31) sheetName = sheetName.substring(0, 31);
-    XLSX.utils.book_append_sheet(wb, ws, sheetName);
-  }
-
-  // Pestaña dedicada a la Energía Generada estrictamente según Figura 5.2.82 de OrientSol 3.0
-  const energyWs = createEnergyWorksheet(res, {
-    studyTitle: isEn ? 'Annual optimal tilt' : 'Inclinación óptima anual',
-    studyDailyRad: res.optimalAnnual.monthlyDailyKwh,
+  exportOrientSolMasterExcel(res, {
+    activeStudyOp: 'annual',
+    activeComponent,
+    exportMode: mode,
     isEn,
+    peakPowerKw: solarSyncState.getPeakPowerKw(),
+    performanceRatio: solarSyncState.getPerformanceRatio(),
+    tonc: solarSyncState.getTonc(),
   });
-  applySpanishNumberFormattingToWorksheet(energyWs);
-  const energySheetName = isEn ? 'Energy' : 'Energia';
-  XLSX.utils.book_append_sheet(wb, energyWs, energySheetName);
-
-  const excelBuf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  const compSuffix =
-    mode === 'all'
-      ? (isEn ? 'All_Components' : 'Todas_las_componentes')
-      : (activeComponent === 'global'
-          ? 'Global'
-          : activeComponent === 'beam'
-          ? 'Directa'
-          : activeComponent === 'diffuse'
-          ? 'Difusa'
-          : 'Albedo');
-
-  const { fileTimestamp } = getExportFileTimestamp();
-  const filename = getStandardizedExcelFilename('annual', res.locationName, compSuffix, fileTimestamp);
-
-
-  // Native File System Access API waiting for save location
-  if ('showSaveFilePicker' in window) {
-    try {
-      const handle = await (window as any).showSaveFilePicker({
-        suggestedName: filename,
-        types: [
-          {
-            description: 'Microsoft Excel (*.xlsx)',
-            accept: {
-              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-            },
-          },
-        ],
-      });
-      const writable = await handle.createWritable();
-      await writable.write(excelBuf);
-      await writable.close();
-      return;
-    } catch (err: any) {
-      if (err.name === 'AbortError') return; // User cancelled
-      console.warn('showSaveFilePicker failed or was rejected, falling back to download:', err);
-    }
-  }
-
-  // Fallback direct download
-  const blob = new Blob([excelBuf], {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
 }
 
 /**

@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { getMonthlyRadiationForAngle, type TableRadiationComponent } from '@/components/climate/OptimalAnnualStudyPanel';
 import { sanitizeForSpreadsheet } from '@/utils/security';
@@ -63,15 +63,33 @@ export function getStandardizedExcelFilename(
   return `OrientSol_${opName}_${cleanLoc}${suffix}_${fileTimestamp}.xlsx`;
 }
 
+const MONTHS_LOWER = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+  'january', 'february', 'march', 'april', 'may', 'june',
+  'july', 'august', 'september', 'october', 'november', 'december'
+];
+
 /**
- * Applies European / Spanish number formatting (comma decimal and dot thousands)
- * across all cells of a worksheet so that spreadsheets reliably display formatted numbers.
+ * Applies European / Spanish number formatting (comma decimal and dot thousands),
+ * wrapped text, center alignment (middle and center), bold styling to non-data headers,
+ * and auto-adjusts column widths and row heights.
  */
 export function applySpanishNumberFormattingToWorksheet(ws: XLSX.WorkSheet): void {
+  const range = ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']) : null;
+  const colWidths: number[] = [];
+
   for (const cellAddress in ws) {
     if (cellAddress.startsWith('!')) continue;
-    const cell = ws[cellAddress];
+    const cell = (ws as any)[cellAddress];
     if (!cell) continue;
+
+    const decoded = XLSX.utils.decode_cell(cellAddress);
+    const r = decoded.r;
+    const c = decoded.c;
+
+    let isHeader = false;
+    let textLen = 0;
 
     if (cell.t === 'n' && typeof cell.v === 'number') {
       if (Number.isInteger(cell.v)) {
@@ -85,13 +103,122 @@ export function applySpanishNumberFormattingToWorksheet(ws: XLSX.WorkSheet): voi
         cell.z = `#,##0.${zeros}`;
         cell.w = formatNum(cell.v, decCount, true);
       }
+      textLen = cell.w ? cell.w.length : String(cell.v).length;
     } else if (cell.t === 's' && typeof cell.v === 'string') {
+      const trimmed = cell.v.trim();
+      textLen = trimmed.length;
+
       // Replace decimal dot in numeric patterns like "37.7656°", "80.0%", "4.52 kWh", etc.
       cell.v = cell.v.replace(/(\d+)\.(\d+)(%|°|\s*kWh|\s*kWp|\s*ms|)/g, (match: string, p1: string, p2: string, suffix: string) => {
         if (match.includes('/') || match.includes('-')) return match;
         return `${p1},${p2}${suffix}`;
       });
+
+      const lower = trimmed.toLowerCase();
+      const isMonth = MONTHS_LOWER.includes(lower);
+
+      // Identify whether this string cell is a header, title, label or non-data text
+      if (
+        r === 0 || // Top title row
+        r === 1 || // Metadata row
+        r === 2 || // Subtitle / section row
+        r === 3 || // Column headers
+        r === 16 || // MEDIA / ANUAL row
+        r === 18 || // GANANCIAS title
+        r === 19 || // Subtitle
+        r === 20 || // Model headers
+        r === 21 || // Gain Factor / Gain(%) headers
+        (c === 0 && !isMonth) || // First column labels (unless it is a data month name)
+        lower.startsWith('orientsol') ||
+        lower.startsWith('datos') ||
+        lower.startsWith('resumen') ||
+        lower.startsWith('balance') ||
+        lower.startsWith('parámetros') ||
+        lower.startsWith('parametros') ||
+        lower.startsWith('punto') ||
+        lower.startsWith('exigencias') ||
+        lower.startsWith('cuadrícula') ||
+        lower.startsWith('cuadricula') ||
+        lower.startsWith('ranking') ||
+        lower.startsWith('comparativa') ||
+        lower.startsWith('límite') ||
+        lower.startsWith('limite') ||
+        lower.startsWith('sample') ||
+        lower.startsWith('criterio') ||
+        lower.startsWith('estudio') ||
+        lower.includes('registro') ||
+        lower.includes('marca temporal') ||
+        lower.includes('timestamp') ||
+        lower.includes('radiación') ||
+        lower.includes('radiacion') ||
+        lower.includes('temperatura') ||
+        lower.includes('ganancia') ||
+        lower.includes('pérdida') ||
+        lower.includes('perdida') ||
+        lower.includes('topología') ||
+        lower.includes('topologia') ||
+        lower.includes('superficie') ||
+        lower.includes('óptim') ||
+        lower.includes('optim') ||
+        lower.includes('factor') ||
+        lower.includes('producción') ||
+        lower.includes('produccion') ||
+        lower.includes('inclin') ||
+        lower.includes('azimut') ||
+        lower.includes('rendimiento') ||
+        lower.includes('cumplimiento') ||
+        lower.includes('conforme') ||
+        lower.includes('fuera de norma') ||
+        lower.includes('compliant') ||
+        lower.includes('non-compliant')
+      ) {
+        isHeader = true;
+      }
     }
+
+    // Apply wrapped text, center alignment (both horizontally and vertically), and bold font for headers
+    cell.s = {
+      font: {
+        name: 'Calibri',
+        sz: isHeader && (r === 0 || r === 2) ? 11 : 10,
+        bold: isHeader,
+        color: { rgb: '000000' },
+      },
+      alignment: {
+        wrapText: true,
+        vertical: 'center',
+        horizontal: 'center',
+      },
+    };
+
+    if (c >= colWidths.length) {
+      colWidths[c] = Math.max(12, Math.min(textLen + 3, 50));
+    } else {
+      colWidths[c] = Math.max(colWidths[c], Math.min(textLen + 3, 50));
+    }
+  }
+
+  // Set !cols auto-fit
+  if (range) {
+    const finalCols = [];
+    for (let c = 0; c <= range.e.c; c++) {
+      const w = colWidths[c] || 12;
+      finalCols.push({ wch: Math.max(w, 12) });
+    }
+    ws['!cols'] = finalCols;
+
+    // Set !rows heights
+    const finalRows = [];
+    for (let r = 0; r <= range.e.r; r++) {
+      if (r === 0) {
+        finalRows.push({ hpt: 26 });
+      } else if (r === 2 || r === 3 || r === 18 || r === 20 || r === 21) {
+        finalRows.push({ hpt: 24 });
+      } else {
+        finalRows.push({ hpt: 19 });
+      }
+    }
+    ws['!rows'] = finalRows;
   }
 }
 

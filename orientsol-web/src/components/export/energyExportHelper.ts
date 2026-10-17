@@ -1,5 +1,5 @@
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import { sanitizeForSpreadsheet } from '@/utils/security';
 
 const MONTHS_ES = [

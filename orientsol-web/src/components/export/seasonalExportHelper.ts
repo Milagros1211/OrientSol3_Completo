@@ -1,13 +1,7 @@
-import * as XLSX from 'xlsx';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { getMonthlyRadiationForAngle, type TableRadiationComponent } from '@/components/climate/OptimalAnnualStudyPanel';
-import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
+import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { sanitizeForSpreadsheet } from '@/utils/security';
-import {
-  applySpanishNumberFormattingToWorksheet,
-  getExportFileTimestamp,
-  getStandardizedExcelFilename,
-} from '@/components/export/excelFormatHelper';
 
 const MONTH_NAMES_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -358,99 +352,19 @@ export interface ExportSeasonalWorkbookOptions {
 }
 
 /**
- * Exports complete Excel workbook with Figures 5.2.90, 5.2.91, 5.2.92 + Osterwald Energy Yield sheet.
+ * Exports complete Excel workbook with master formatting.
  */
 export async function exportSeasonalExcelWorkbook(
   res: SolarBridgeSimulationResult,
   options: ExportSeasonalWorkbookOptions = {}
 ): Promise<void> {
-  const isEn = options.isEn ?? false;
-  const mode = options.exportMode ?? 'single';
-  const activeComp = options.activeComponent ?? 'global';
-  const peakKw = options.peakPowerKw ?? 5.0;
-  const tonc = options.tonc ?? 47.0;
-
-  const wb = XLSX.utils.book_new();
-
-  if (mode === 'all') {
-    const components: TableRadiationComponent[] = ['global', 'beam', 'diffuse', 'albedo'];
-    const sheetNames = [
-      isEn ? 'Sheet1_Global' : 'Hoja1_Global',
-      isEn ? 'Sheet2_Direct' : 'Hoja2_Directa',
-      isEn ? 'Sheet3_Diffuse' : 'Hoja3_Difusa',
-      isEn ? 'Sheet4_Albedo' : 'Hoja4_Albedo',
-    ];
-
-    components.forEach((comp, idx) => {
-      const data = buildSeasonalComponentSheet(res, comp, isEn);
-      const ws = XLSX.utils.aoa_to_sheet(data);
-      applySpanishNumberFormattingToWorksheet(ws);
-      XLSX.utils.book_append_sheet(wb, ws, sheetNames[idx]);
-    });
-  } else {
-    const data = buildSeasonalComponentSheet(res, activeComp, isEn);
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    applySpanishNumberFormattingToWorksheet(ws);
-    const sheetName =
-      activeComp === 'global'
-        ? (isEn ? 'Sheet1_Global' : 'Hoja1_Global')
-        : activeComp === 'beam'
-        ? (isEn ? 'Sheet2_Direct' : 'Hoja2_Directa')
-        : activeComp === 'diffuse'
-        ? (isEn ? 'Sheet3_Diffuse' : 'Hoja3_Difusa')
-        : (isEn ? 'Sheet4_Albedo' : 'Hoja4_Albedo');
-    XLSX.utils.book_append_sheet(wb, ws, sheetName);
-  }
-
-  // Pestaña dedicada a la Energía Generada según Figura 5.2.82 de OrientSol 3.0
-  const energyWs = createEnergyWorksheet(res, {
-    studyTitle: isEn ? 'Seasonal optimal tilt' : 'Inclinación óptima estacional',
-    studyDailyRad: res.seasonal.monthlyDailyKwh,
-    isEn,
-    peakPowerKw: peakKw,
-    tonc,
+  exportOrientSolMasterExcel(res, {
+    activeStudyOp: 'seasonal',
+    activeComponent: options.activeComponent ?? 'global',
+    exportMode: options.exportMode ?? 'single',
+    isEn: options.isEn,
+    peakPowerKw: options.peakPowerKw,
+    tonc: options.tonc,
   });
-  applySpanishNumberFormattingToWorksheet(energyWs);
-  XLSX.utils.book_append_sheet(wb, energyWs, isEn ? 'Energy_Yield' : 'Energia_Generada');
-
-  // Standardized File Name: Operación + Emplazamiento + Componente + Timestamp
-  const { fileTimestamp } = getExportFileTimestamp();
-  const compSuffix = mode === 'all'
-    ? (isEn ? 'All_Components' : 'Todas_las_componentes')
-    : activeComp;
-  const filename = getStandardizedExcelFilename('seasonal', res.locationName, compSuffix, fileTimestamp);
-
-  const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  const blob = new Blob([excelBuffer], {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  });
-
-  if ('showSaveFilePicker' in window) {
-    try {
-      const handle = await (window as any).showSaveFilePicker({
-        suggestedName: filename,
-        types: [
-          {
-            description: 'Libro de Excel (*.xlsx)',
-            accept: {
-              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-            },
-          },
-        ],
-      });
-      const writable = await handle.createWritable();
-      await writable.write(blob);
-      await writable.close();
-      return;
-    } catch (err: any) {
-      if (err.name === 'AbortError') return;
-    }
-  }
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
 }
+
