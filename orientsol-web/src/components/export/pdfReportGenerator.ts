@@ -348,27 +348,32 @@ export function drawOrientSolPageChrome(
     const exportLabel = options.isEn ? 'Exported:' : 'Exportado:';
     doc.text(`${exportLabel} ${options.formattedDateTime}`, 190, 17.5, { align: 'right' });
 
-    // 2. Left running title: wrap without cutting any phrase (max 122mm width)
+    // 2. Left running title: wrap cleanly without cutting any phrase (max 128mm width)
+    const cleanChapterTitle = sanitizePdfText(options.chapterTitle);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8.5);
+    // Scale font size slightly if title is long so it fits on one clean line whenever possible
+    const titleFontSize = cleanChapterTitle.length > 70 ? 8.0 : 8.5;
+    doc.setFontSize(titleFontSize);
     doc.setTextColor(15, 23, 42);
-    const titleLines: string[] = doc.splitTextToSize(sanitizePdfText(options.chapterTitle), 122);
+    const maxTitleChromeW = 128;
+    const titleLines: string[] = doc.splitTextToSize(cleanChapterTitle, maxTitleChromeW);
+    const titleLineHeight = titleFontSize === 8.0 ? 3.5 : 3.8;
     titleLines.forEach((line, idx) => {
-      doc.text(line, 20, 11.5 + idx * 3.8);
+      doc.text(line, 20, 11.5 + idx * titleLineHeight);
     });
 
     // 3. Left running subheader: wrap without cutting any phrase
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.2);
     doc.setTextColor(100, 116, 139);
-    const subLines: string[] = doc.splitTextToSize(sanitizePdfText(options.subHeader), 122);
-    const subStartY = 11.5 + titleLines.length * 3.8;
+    const subLines: string[] = doc.splitTextToSize(sanitizePdfText(options.subHeader), maxTitleChromeW);
+    const subStartY = 11.5 + titleLines.length * titleLineHeight;
     subLines.forEach((line, idx) => {
       doc.text(line, 20, subStartY + idx * 3.2);
     });
 
     // 4. Divider line
-    const dividerY = Math.max(22.5, subStartY + subLines.length * 3.2 + 1.5);
+    const dividerY = Math.max(22.5, subStartY + subLines.length * 3.2 + 1.8);
     doc.setDrawColor(226, 232, 240);
     doc.setLineWidth(0.4);
     doc.line(20, dividerY, 190, dividerY);
@@ -3174,24 +3179,28 @@ export async function generateOrientSolPDFReport(
         totalPagesDyn
       );
 
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
-      doc.setTextColor(15, 23, 42);
-      doc.text(
-        sanitizePdfText(
-          studyType === 'monthly'
-            ? isEn
-              ? 'CTE DB-HE4 Capture Loss Maps - 12 Monthly Positions'
-              : 'Mapas de Pérdidas de Captación CTE DB-HE4 - 12 Posiciones Mensuales'
-            : isEn
-            ? 'CTE DB-HE4 Capture Loss Maps - 4 Seasonal Positions'
-            : 'Mapas de Pérdidas de Captación CTE DB-HE4 - 4 Posiciones Estacionales'
-        ),
-        20,
-        29
+      // Title & Legend: wrap title to max 94mm so it never collides with the legend at lx = 120mm
+      const titleStr = sanitizePdfText(
+        studyType === 'monthly'
+          ? isEn
+            ? 'CTE DB-HE4 Capture Loss Maps - 12 Monthly Positions'
+            : 'Mapas de Pérdidas de Captación CTE DB-HE4 - 12 Posiciones Mensuales'
+          : isEn
+          ? 'CTE DB-HE4 Capture Loss Maps - 4 Seasonal Positions'
+          : 'Mapas de Pérdidas de Captación CTE DB-HE4 - 4 Posiciones Estacionales'
       );
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(15, 23, 42);
+      const titleLines: string[] = doc.splitTextToSize(titleStr, 94);
+      if (titleLines.length === 1) {
+        doc.text(titleLines[0], 20, 29);
+      } else {
+        doc.text(titleLines[0], 20, 27.2);
+        doc.text(titleLines[1], 20, 31.0);
+      }
 
-      // Legend
+      // Legend positioned safely to the right starting at lx = 120mm
       const legend: [string, [number, number, number]][] = [
         ['<= 10%', [134, 239, 172]],
         ['<= 20%', [253, 224, 71]],
