@@ -51,7 +51,7 @@ export async function fetchPvgisClimateData(
   if (isLocalhost) {
     candidateUrls.push({
       url: `/api-pvgis/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
-      version: '5.3 (Vite Proxy)',
+      version: '5.3',
     });
   }
 
@@ -72,7 +72,7 @@ export async function fetchPvgisClimateData(
     const { url: supabaseUrl } = getEffectiveSupabaseConfig();
     candidateUrls.push({
       url: `${supabaseUrl}/functions/v1/pvgis-proxy?lat=${roundedLat}&lon=${roundedLon}`,
-      version: '5.3 (Supabase Edge Function Secure Proxy)',
+      version: '5.3',
     });
   }
 
@@ -243,9 +243,11 @@ export async function fetchPvgisClimateData(
 
   const elevation = json.inputs?.location?.elevation;
 
+  const cleanName = locationName.replace(/\s*\([^)]*pvgis[^)]*\)/gi, '').trim();
+
   return {
     source: 'pvgis',
-    locationName: `${locationName} (PVGIS ${activeVersion})`,
+    locationName: `${cleanName} (PVGIS ${activeVersion})`,
     country: 'España',
     latitude: roundedLat,
     longitude: roundedLon,
