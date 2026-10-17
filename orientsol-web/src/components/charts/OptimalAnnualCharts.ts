@@ -1,5 +1,6 @@
 import type { RadiationComponentType } from '@/components/climate/OptimalAnnualStudyPanel';
 import { themeManager } from '@/services/theme/themeManager';
+import { formatNum } from '@/utils/formatters';
 
 export interface InclinationEvolutionChartProps {
   radiationCurve: number[]; // 91 elements (angles 0° to 90°)
@@ -200,7 +201,7 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
 
   // When representing all components or standard MATLAB, Y starts at 0 (Figure 5.2.59)
   const minRad = 0;
-  const maxRad = Math.max(1.0, Math.ceil(Math.max(...allRadValues, 1.0) * 1.15 * 10) / 10);
+  const maxRad = Math.max(1.0, Math.ceil(Math.max(...allRadValues, 1.0) * 1.20 * 10) / 10);
   const radSpan = Math.max(0.1, maxRad - minRad);
 
   const xScale = (deg: number) => padding.left + (deg / 90) * plotWidth;
@@ -217,6 +218,25 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
   const legendBoxStroke = isDark ? 'rgba(255,255,255,0.18)' : '#cbd5e1';
   const legendTextFill = isDark ? '#f8fafc' : '#0f172a';
 
+  // Badge theme styling strictly respecting Light and Dark modes
+  const badgeBoxFill = isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.97)';
+  const badgeOptStroke = isDark ? '#f59e0b' : '#d97706';
+  const badgeOptTextTitle = isDark ? '#fef08a' : '#b45309';
+  const badgeOptTextVal = isDark ? '#fef9c3' : '#78350f';
+
+  const badgeXStroke = isDark ? '#a855f7' : '#7c3aed';
+  const badgeXTextTitle = isDark ? '#f3e8ff' : '#6d28d9';
+  const badgeXTextVal = isDark ? '#faf5ff' : '#4c1d95';
+
+  const badgeBeamStroke = isDark ? '#ef4444' : '#dc2626';
+  const badgeBeamText = isDark ? '#fca5a5' : '#991b1b';
+
+  const badgeDiffStroke = isDark ? '#84cc16' : '#65a30d';
+  const badgeDiffText = isDark ? '#bef264' : '#365314';
+
+  const badgeAlbStroke = isDark ? '#f59e0b' : '#d97706';
+  const badgeAlbText = isDark ? '#fed7aa' : '#92400e';
+
   // Gridlines
   let gridLinesSvg = '';
   if (gridEnabled) {
@@ -226,7 +246,7 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
       const y = yScale(val);
       gridLinesSvg += `
         <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="${gridLineStroke}" stroke-dasharray="3,3" />
-        <text x="${padding.left - 10}" y="${y + 4}" fill="${tickTextFill}" font-size="11" text-anchor="end" font-family="monospace">${val.toFixed(1)}</text>
+        <text x="${padding.left - 10}" y="${y + 4}" fill="${tickTextFill}" font-size="11" text-anchor="end" font-family="monospace">${formatNum(val, 1)}</text>
       `;
     }
     for (let deg = 0; deg <= 90; deg += 10) {
@@ -242,7 +262,7 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
       const val = minRad + (radSpan / ySteps) * i;
       const y = yScale(val);
       gridLinesSvg += `
-        <text x="${padding.left - 10}" y="${y + 4}" fill="${tickTextFill}" font-size="11" text-anchor="end" font-family="monospace">${val.toFixed(1)}</text>
+        <text x="${padding.left - 10}" y="${y + 4}" fill="${tickTextFill}" font-size="11" text-anchor="end" font-family="monospace">${formatNum(val, 1)}</text>
       `;
     }
     for (let deg = 0; deg <= 90; deg += 15) {
@@ -289,6 +309,16 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
   const angleXDiffY = yScale(angleXDiffRad);
   const angleXAlbRad = isAll ? (albedoPts[selectedAngleX]?.rad || 0) : 0;
   const angleXAlbY = yScale(angleXAlbRad);
+
+  // Layout and collision avoidance for badges
+  const isAngleXNearOpt = selectedAngleX !== optimalAngle && Math.abs(selectedAngleX - optimalAngle) <= 12;
+  const optBadgeY = Math.max(padding.top + 34, optY - 8);
+  const angleXBadgeY = isAngleXNearOpt
+    ? (optBadgeY > padding.top + 64 ? optBadgeY - 32 : optBadgeY + 32)
+    : Math.max(padding.top + 34, angleXY - 8);
+
+  const optSubOffset = isAngleXNearOpt && selectedAngleX > optimalAngle ? -62 : 8;
+  const angleXSubOffset = isAngleXNearOpt && selectedAngleX < optimalAngle ? -62 : 8;
 
   const chartTitle = isEn
     ? 'Evolution of radiation as a function of inclination'
@@ -343,6 +373,9 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
         </filter>
         <filter id="glow-anglex" x="-50%" y="-50%" width="200%" height="200%">
           <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#a855f7" flood-opacity="0.8" />
+        </filter>
+        <filter id="badge-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="${isDark ? '#000000' : '#475569'}" flood-opacity="${isDark ? '0.6' : '0.12'}" />
         </filter>
       </defs>
 
@@ -402,10 +435,13 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
 
       <!-- Global Curve Intersection (Gdm) -->
       <circle cx="${optX}" cy="${optY}" r="6.5" fill="#00b4d8" stroke="#ffffff" stroke-width="2" filter="url(#glow-opt)" />
-      <g transform="translate(${optX}, ${Math.max(padding.top + 8, optY - 14)})">
-        <rect x="-44" y="-18" width="88" height="20" rx="4" fill="rgba(15, 23, 42, 0.9)" stroke="#f59e0b" stroke-width="1" />
-        <text x="0" y="-4" fill="#fef08a" font-size="11" font-weight="700" text-anchor="middle" font-family="monospace">
-          ${isEn ? 'Opt' : 'Ópt'}: ${optimalAngle}° (${optRad.toFixed(2)})
+      <g transform="translate(${optX}, ${optBadgeY})">
+        <rect x="-38" y="-30" width="76" height="28" rx="4" fill="${badgeBoxFill}" stroke="${badgeOptStroke}" stroke-width="1.2" filter="url(#badge-shadow)" />
+        <text x="0" y="-17" fill="${badgeOptTextTitle}" font-size="10.5" font-weight="700" text-anchor="middle" font-family="monospace">
+          ${isEn ? 'Opt' : 'Ópt'}: ${optimalAngle}°
+        </text>
+        <text x="0" y="-5" fill="${badgeOptTextVal}" font-size="10" font-weight="700" text-anchor="middle" font-family="monospace">
+          (${formatNum(optRad, 2)})
         </text>
       </g>
 
@@ -414,23 +450,23 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
           ? `
         <!-- Beam Curve Intersection (Bdm: Red) -->
         <circle cx="${optX}" cy="${optBeamY}" r="5.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.8" />
-        <g transform="translate(${optX + 8}, ${optBeamY + 3})">
-          <rect x="0" y="-9" width="48" height="15" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#ef4444" stroke-width="0.8" />
-          <text x="24" y="2" fill="#fca5a5" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">B: ${optBeamRad.toFixed(2)}</text>
+        <g transform="translate(${optX + optSubOffset}, ${optBeamY + 3})">
+          <rect x="0" y="-10" width="54" height="16" rx="3" fill="${badgeBoxFill}" stroke="${badgeBeamStroke}" stroke-width="0.9" filter="url(#badge-shadow)" />
+          <text x="27" y="2" fill="${badgeBeamText}" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">B: ${formatNum(optBeamRad, 2)}</text>
         </g>
 
         <!-- Diffuse Curve Intersection (Ddm: Lime Green) -->
         <circle cx="${optX}" cy="${optDiffY}" r="5.5" fill="#84cc16" stroke="#ffffff" stroke-width="1.8" />
-        <g transform="translate(${optX + 8}, ${optDiffY + 3})">
-          <rect x="0" y="-9" width="48" height="15" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#84cc16" stroke-width="0.8" />
-          <text x="24" y="2" fill="#bef264" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">D: ${optDiffRad.toFixed(2)}</text>
+        <g transform="translate(${optX + optSubOffset}, ${optDiffY + 3})">
+          <rect x="0" y="-10" width="54" height="16" rx="3" fill="${badgeBoxFill}" stroke="${badgeDiffStroke}" stroke-width="0.9" filter="url(#badge-shadow)" />
+          <text x="27" y="2" fill="${badgeDiffText}" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">D: ${formatNum(optDiffRad, 2)}</text>
         </g>
 
         <!-- Albedo Curve Intersection (Rdm: Orange) -->
         <circle cx="${optX}" cy="${optAlbY}" r="5.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.8" />
-        <g transform="translate(${optX + 8}, ${optAlbY + 3})">
-          <rect x="0" y="-9" width="48" height="15" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#f59e0b" stroke-width="0.8" />
-          <text x="24" y="2" fill="#fed7aa" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">R: ${optAlbRad.toFixed(2)}</text>
+        <g transform="translate(${optX + optSubOffset}, ${optAlbY + 3})">
+          <rect x="0" y="-10" width="54" height="16" rx="3" fill="${badgeBoxFill}" stroke="${badgeAlbStroke}" stroke-width="0.9" filter="url(#badge-shadow)" />
+          <text x="27" y="2" fill="${badgeAlbText}" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">R: ${formatNum(optAlbRad, 2)}</text>
         </g>
       `
           : ''
@@ -452,10 +488,13 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
 
         <!-- Global Intersection at Angle X -->
         <circle cx="${angleXX}" cy="${angleXY}" r="6" fill="#c084fc" stroke="#ffffff" stroke-width="2" filter="url(#glow-anglex)" />
-        <g transform="translate(${angleXX}, ${Math.max(padding.top + 8, angleXY - 14)})">
-          <rect x="-42" y="-18" width="84" height="20" rx="4" fill="rgba(15, 23, 42, 0.9)" stroke="#a855f7" stroke-width="1" />
-          <text x="0" y="-4" fill="#e9d5ff" font-size="11" font-weight="700" text-anchor="middle" font-family="monospace">
-            X: ${selectedAngleX}° (${angleXRad.toFixed(2)})
+        <g transform="translate(${angleXX}, ${angleXBadgeY})">
+          <rect x="-38" y="-30" width="76" height="28" rx="4" fill="${badgeBoxFill}" stroke="${badgeXStroke}" stroke-width="1.2" filter="url(#badge-shadow)" />
+          <text x="0" y="-17" fill="${badgeXTextTitle}" font-size="10.5" font-weight="700" text-anchor="middle" font-family="monospace">
+            X: ${selectedAngleX}°
+          </text>
+          <text x="0" y="-5" fill="${badgeXTextVal}" font-size="10" font-weight="700" text-anchor="middle" font-family="monospace">
+            (${formatNum(angleXRad, 2)})
           </text>
         </g>
 
@@ -464,23 +503,23 @@ export function renderInclinationEvolutionSvg(props: InclinationEvolutionChartPr
             ? `
           <!-- Beam Intersection at Angle X -->
           <circle cx="${angleXX}" cy="${angleXBeamY}" r="5" fill="#ef4444" stroke="#c084fc" stroke-width="1.8" />
-          <g transform="translate(${angleXX + 8}, ${angleXBeamY + 3})">
-            <rect x="0" y="-9" width="48" height="15" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#a855f7" stroke-width="0.8" />
-            <text x="24" y="2" fill="#fca5a5" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">B: ${angleXBeamRad.toFixed(2)}</text>
+          <g transform="translate(${angleXX + angleXSubOffset}, ${angleXBeamY + 3})">
+            <rect x="0" y="-10" width="54" height="16" rx="3" fill="${badgeBoxFill}" stroke="${badgeXStroke}" stroke-width="0.9" filter="url(#badge-shadow)" />
+            <text x="27" y="2" fill="${badgeBeamText}" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">B: ${formatNum(angleXBeamRad, 2)}</text>
           </g>
 
           <!-- Diffuse Intersection at Angle X -->
           <circle cx="${angleXX}" cy="${angleXDiffY}" r="5" fill="#84cc16" stroke="#c084fc" stroke-width="1.8" />
-          <g transform="translate(${angleXX + 8}, ${angleXDiffY + 3})">
-            <rect x="0" y="-9" width="48" height="15" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#a855f7" stroke-width="0.8" />
-            <text x="24" y="2" fill="#bef264" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">D: ${angleXDiffRad.toFixed(2)}</text>
+          <g transform="translate(${angleXX + angleXSubOffset}, ${angleXDiffY + 3})">
+            <rect x="0" y="-10" width="54" height="16" rx="3" fill="${badgeBoxFill}" stroke="${badgeXStroke}" stroke-width="0.9" filter="url(#badge-shadow)" />
+            <text x="27" y="2" fill="${badgeDiffText}" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">D: ${formatNum(angleXDiffRad, 2)}</text>
           </g>
 
           <!-- Albedo Intersection at Angle X -->
           <circle cx="${angleXX}" cy="${angleXAlbY}" r="5" fill="#f59e0b" stroke="#c084fc" stroke-width="1.8" />
-          <g transform="translate(${angleXX + 8}, ${angleXAlbY + 3})">
-            <rect x="0" y="-9" width="48" height="15" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#a855f7" stroke-width="0.8" />
-            <text x="24" y="2" fill="#fed7aa" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">R: ${angleXAlbRad.toFixed(2)}</text>
+          <g transform="translate(${angleXX + angleXSubOffset}, ${angleXAlbY + 3})">
+            <rect x="0" y="-10" width="54" height="16" rx="3" fill="${badgeBoxFill}" stroke="${badgeXStroke}" stroke-width="0.9" filter="url(#badge-shadow)" />
+            <text x="27" y="2" fill="${badgeAlbText}" font-size="9.5" font-weight="700" text-anchor="middle" font-family="monospace">R: ${formatNum(angleXAlbRad, 2)}</text>
           </g>
         `
             : ''
@@ -565,14 +604,14 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
       const y = yTopScale(v);
       topGrid += `
         <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="${gridStroke}" stroke-dasharray="3,3" />
-        <text x="${padding.left - 10}" y="${y + 4}" fill="${tickFill}" font-size="10" text-anchor="end" font-family="monospace">${v.toFixed(1)}</text>
+        <text x="${padding.left - 10}" y="${y + 4}" fill="${tickFill}" font-size="10" text-anchor="end" font-family="monospace">${formatNum(v, 1)}</text>
       `;
     }
   } else {
     for (let i = 0; i <= 4; i++) {
       const v = (maxRad / 4) * i;
       const y = yTopScale(v);
-      topGrid += `<text x="${padding.left - 10}" y="${y + 4}" fill="${tickFill}" font-size="10" text-anchor="end" font-family="monospace">${v.toFixed(1)}</text>`;
+      topGrid += `<text x="${padding.left - 10}" y="${y + 4}" fill="${tickFill}" font-size="10" text-anchor="end" font-family="monospace">${formatNum(v, 1)}</text>`;
     }
   }
 
@@ -611,7 +650,7 @@ export function renderMonthlyOptimumAndGainsSvg(props: MonthlyOptimumChartProps)
 
       return `
         <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${bh.toFixed(1)}" rx="3" fill="${color}" fill-opacity="0.85" stroke="${color}" stroke-width="1">
-          <title>${months[idx]}: ${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</title>
+          <title>${months[idx]}: ${pct >= 0 ? '+' : ''}${formatNum(pct, 2)}%</title>
         </rect>
         <text x="${cx}" y="${pct >= 0 ? by - 4 : by + bh + 12}" fill="${color}" font-size="10" font-weight="700" text-anchor="middle" font-family="monospace">
           ${pct >= 0 ? '+' : ''}${Math.round(pct)}%
