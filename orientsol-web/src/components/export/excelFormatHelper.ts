@@ -154,6 +154,45 @@ function getStudyReferences(res: SolarBridgeSimulationResult, comp: TableRadiati
 }
 
 /**
+ * Appends continuous tilt angle sweep columns (1º to 90º) into the component worksheet grid,
+ * matching the MATLAB sweep structure for each month and annual media across all exportables.
+ */
+function fillTiltSweepColumns(
+  grid: (string | number)[][],
+  res: SolarBridgeSimulationResult,
+  comp: TableRadiationComponent,
+  compSym: string,
+  startCol: number
+): void {
+  const angles91Data: number[][] = [];
+  for (let deg = 0; deg <= 90; deg++) {
+    angles91Data.push(getMonthlyRadiationForAngle(res, comp, deg));
+  }
+  const meanOf = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / (arr.length || 1);
+
+  // Headers: Gdm(1º) .. Gdm(90º) at row 3 (Index 3, Row 4 in Excel)
+  for (let deg = 1; deg <= 90; deg++) {
+    const colIdx = startCol + deg - 1;
+    grid[3][colIdx] = `${compSym}(${deg}º)`;
+  }
+
+  // 12 Months: rows 4..15 (Index 4..15, Rows 5..16 in Excel)
+  for (let m = 0; m < 12; m++) {
+    const rowIdx = 4 + m;
+    for (let deg = 1; deg <= 90; deg++) {
+      const colIdx = startCol + deg - 1;
+      grid[rowIdx][colIdx] = Number(angles91Data[deg][m].toFixed(8));
+    }
+  }
+
+  // MEDIA: row 16 (Index 16, Row 17 in Excel)
+  for (let deg = 1; deg <= 90; deg++) {
+    const colIdx = startCol + deg - 1;
+    grid[16][colIdx] = Number(meanOf(angles91Data[deg]).toFixed(8));
+  }
+}
+
+/**
  * Builds the Excel sheet data strictly conforming to:
  * MATLAB Tabla_OptAnual.m (Figura 5.2.68)
  */
@@ -304,7 +343,7 @@ export function buildAzimuthalComponentSheet(
 
   const grid: (string | number)[][] = [];
   for (let r = 0; r <= 35; r++) {
-    grid[r] = new Array(16).fill('');
+    grid[r] = new Array(110).fill('');
   }
 
   const { formattedDateTime } = getExportFileTimestamp();
@@ -341,6 +380,9 @@ export function buildAzimuthalComponentSheet(
   grid[16][1] = Number(avg(refs.rad0).toFixed(8));
   grid[16][2] = Number(avg(refs.radAzim).toFixed(8));
   grid[16][5] = Number(avg(refs.tempMean).toFixed(1));
+
+  // Barrido continuo de ángulos 1º a 90º
+  fillTiltSweepColumns(grid, res, comp, compSym, 6);
 
   // =========================================================================
   // GANANCIAS (Rows 19..35)
@@ -447,7 +489,7 @@ export function buildHorizontalComponentSheet(
 
   const grid: (string | number)[][] = [];
   for (let r = 0; r <= 35; r++) {
-    grid[r] = new Array(16).fill('');
+    grid[r] = new Array(110).fill('');
   }
 
   const { formattedDateTime } = getExportFileTimestamp();
@@ -484,6 +526,9 @@ export function buildHorizontalComponentSheet(
   grid[16][1] = Number(avg(refs.rad0).toFixed(8));
   grid[16][2] = Number(avg(refs.radHoriz).toFixed(8));
   grid[16][5] = Number(avg(refs.tempMean).toFixed(1));
+
+  // Barrido continuo de ángulos 1º a 90º
+  fillTiltSweepColumns(grid, res, comp, compSym, 6);
 
   // =========================================================================
   // GANANCIAS (Rows 19..35)
@@ -589,7 +634,7 @@ export function buildDualAxisComponentSheet(
 
   const grid: (string | number)[][] = [];
   for (let r = 0; r <= 35; r++) {
-    grid[r] = new Array(19).fill('');
+    grid[r] = new Array(110).fill('');
   }
 
   const { formattedDateTime } = getExportFileTimestamp();
@@ -626,6 +671,9 @@ export function buildDualAxisComponentSheet(
   grid[16][1] = Number(avg(refs.rad0).toFixed(8));
   grid[16][2] = Number(avg(refs.radDual).toFixed(8));
   grid[16][5] = Number(avg(refs.tempMean).toFixed(1));
+
+  // Barrido continuo de ángulos 1º a 90º
+  fillTiltSweepColumns(grid, res, comp, compSym, 6);
 
   // =========================================================================
   // GANANCIAS (Rows 19..35)
@@ -743,7 +791,7 @@ export function buildComparativeComponentSheet(
 
   const grid: (string | number)[][] = [];
   for (let r = 0; r <= 35; r++) {
-    grid[r] = new Array(20).fill('');
+    grid[r] = new Array(120).fill('');
   }
 
   const { formattedDateTime } = getExportFileTimestamp();
@@ -796,6 +844,9 @@ export function buildComparativeComponentSheet(
   grid[16][10] = Number(avg(refs.radHoriz).toFixed(8));
   grid[16][12] = Number(avg(refs.radDual).toFixed(8));
   grid[16][14] = Number(avg(refs.tempMean).toFixed(1));
+
+  // Barrido continuo de ángulos 1º a 90º
+  fillTiltSweepColumns(grid, res, comp, compSym, 15);
 
   // =========================================================================
   // GANANCIAS (Rows 19..35): Evaluación de factor de radiancia y porcentaje vs Plano Horizontal
@@ -887,7 +938,7 @@ export function buildMonthlyComponentSheet(
 
   const grid: (string | number)[][] = [];
   for (let r = 0; r <= 35; r++) {
-    grid[r] = new Array(15).fill('');
+    grid[r] = new Array(110).fill('');
   }
 
   const { formattedDateTime } = getExportFileTimestamp();
@@ -928,6 +979,9 @@ export function buildMonthlyComponentSheet(
   grid[16][2] = Number(avg(tilts).toFixed(1));
   grid[16][3] = Number(avg(radMonthlyOpt).toFixed(8));
   grid[16][5] = Number(avg(refs.tempMean).toFixed(1));
+
+  // Barrido continuo de ángulos 1º a 90º
+  fillTiltSweepColumns(grid, res, comp, compSym, 6);
 
   // =========================================================================
   // GANANCIAS (Rows 19..35)

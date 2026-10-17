@@ -110,10 +110,10 @@ export function buildPolarComponentSheet(
   // Temperature
   const tempMean: number[] = res.temperatures.ambient.monthlyMeanC;
 
-  // Initialize empty grid 36 rows x 16 columns
+  // Initialize empty grid 36 rows x 110 columns to accommodate angle sweep (1º to 90º)
   const grid: (string | number)[][] = [];
   for (let r = 0; r <= 35; r++) {
-    grid[r] = new Array(16).fill('');
+    grid[r] = new Array(110).fill('');
   }
 
   // =========================================================================
@@ -156,6 +156,29 @@ export function buildPolarComponentSheet(
   grid[16][1] = rad0.reduce((a, b) => a + b, 0) / 12;
   grid[16][2] = radPolar.reduce((a, b) => a + b, 0) / 12;
   grid[16][5] = tempMean.reduce((a, b) => a + b, 0) / 12;
+
+  // Barrido continuo de ángulos 1º a 90º
+  const angles91Data: number[][] = [];
+  for (let deg = 0; deg <= 90; deg++) {
+    angles91Data.push(getMonthlyRadiationForAngle(res, comp, deg));
+  }
+  const meanOf = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / (arr.length || 1);
+
+  for (let deg = 1; deg <= 90; deg++) {
+    const colIdx = 5 + deg;
+    grid[3][colIdx] = `${compSym}(${deg}º)`;
+  }
+  for (let m = 0; m < 12; m++) {
+    const rowIdx = 4 + m;
+    for (let deg = 1; deg <= 90; deg++) {
+      const colIdx = 5 + deg;
+      grid[rowIdx][colIdx] = Number(angles91Data[deg][m].toFixed(8));
+    }
+  }
+  for (let deg = 1; deg <= 90; deg++) {
+    const colIdx = 5 + deg;
+    grid[16][colIdx] = Number(meanOf(angles91Data[deg]).toFixed(8));
+  }
 
   // =========================================================================
   // PARTE II: FIGURA 5.2.97 (Rows 19 to 35, Index 18 to 34)
