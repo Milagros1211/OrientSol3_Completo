@@ -1,4 +1,5 @@
 import type { ClimateDataRecord } from '@/types/climate';
+import { getEffectiveSupabaseConfig, isSupabaseConfigured } from '@/services/supabase';
 
 interface PVGISMonthlyItem {
   year?: number;
@@ -66,18 +67,13 @@ export async function fetchPvgisClimateData(
         version: '5.2 (Electron IPC Direct)',
       }
     );
-  } else if (!isLocalhost) {
-    // 3. Option B: In web browser (GitHub Pages), attempt public CORS reverse proxies to JRC
-    candidateUrls.push(
-      {
-        url: `https://api.allorigins.win/raw?url=${encodeURIComponent(jrcBaseUrl)}`,
-        version: '5.3 (AllOrigins CORS Proxy)',
-      },
-      {
-        url: `https://corsproxy.io/?url=${encodeURIComponent(jrcBaseUrl)}`,
-        version: '5.3 (CORSProxy.io)',
-      }
-    );
+  } else if (!isLocalhost && isSupabaseConfigured()) {
+    // 3. In web browser: use official Supabase Edge Function proxy (secure, authenticated, CORS-enabled)
+    const { url: supabaseUrl } = getEffectiveSupabaseConfig();
+    candidateUrls.push({
+      url: `${supabaseUrl}/functions/v1/pvgis-proxy?lat=${roundedLat}&lon=${roundedLon}`,
+      version: '5.3 (Supabase Edge Function Secure Proxy)',
+    });
   }
 
   let json: PVGISResponse | null = null;
@@ -101,18 +97,35 @@ export async function fetchPvgisClimateData(
         }
       }
 
-      // 2. Standard fetch (browser or proxy) with 4s timeout
-      const response = await fetch(candidate.url, {
-        method: 'GET',
-        headers: { Accept: 'application/json' },
-        signal: typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal ? AbortSignal.timeout(4000) : undefined,
-      });
+      // 2. Standard fetch with rate-limiting backoff (HTTP 429/529) and 6s timeout
+      let response: Response | null = null;
+      let attempts = 0;
+      const MAX_ATTEMPTS = 2;
 
-      if (response.ok) {
+      while (attempts < MAX_ATTEMPTS) {
+        attempts++;
+        response = await fetch(candidate.url, {
+          method: 'GET',
+          headers: { Accept: 'application/json' },
+          signal: typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal ? AbortSignal.timeout(6000) : undefined,
+        });
+
+        // Handle rate limits or temporary overload (HTTP 429 / 529)
+        if (response.status === 429 || response.status === 529) {
+          const retryHeader = response.headers.get('Retry-After');
+          const delayMs = retryHeader ? parseInt(retryHeader, 10) * 1000 : 1500 * attempts;
+          console.warn(`[PVGIS Rate-Limit] HTTP ${response.status}. Retrying in ${delayMs}ms (attempt ${attempts}/${MAX_ATTEMPTS})...`);
+          await new Promise((r) => setTimeout(r, delayMs));
+          continue;
+        }
+        break;
+      }
+
+      if (response && response.ok) {
         json = await response.json();
         break;
       } else {
-        lastError = new Error(`PVGIS API HTTP ${response.status}: ${response.statusText}`);
+        lastError = new Error(`PVGIS API HTTP ${response?.status || 'No Response'}: ${response?.statusText || 'Failed'}`);
       }
     } catch (err: any) {
       lastError = err instanceof Error ? err : new Error(String(err));

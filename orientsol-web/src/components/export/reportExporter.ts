@@ -1,5 +1,6 @@
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslations';
+import { sanitizeForSpreadsheet } from '@/utils/security';
 
 const MONTH_NAMES_ES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const MONTH_NAMES_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -33,10 +34,10 @@ export function exportToCSV(
   lines.push('======================================================================');
   lines.push(`${isEn ? 'Download Date & Time' : 'Fecha y Hora de Descarga'};${downloadDateFormatted}`);
   lines.push(`${isEn ? 'ISO Timestamp' : 'Marca Temporal ISO'};${now.toISOString()}`);
-  lines.push(`${isEn ? 'Location' : 'Localidad'};${res.locationName}`);
+  lines.push(`${isEn ? 'Location' : 'Localidad'};${sanitizeForSpreadsheet(res.locationName)}`);
   lines.push(`${isEn ? 'Latitude' : 'Latitud'};${res.latitude.toFixed(4)}°`);
   lines.push(`${isEn ? 'Longitude' : 'Longitud'};${res.longitude.toFixed(4)}°`);
-  lines.push(`${isEn ? 'Data Source' : 'Fuente de Datos'};${res.source.toUpperCase()}`);
+  lines.push(`${isEn ? 'Data Source' : 'Fuente de Datos'};${sanitizeForSpreadsheet(res.source.toUpperCase())}`);
   lines.push(`${isEn ? 'PV Peak Power' : 'Potencia Pico FV'};${peakKw.toFixed(2)} kWp`);
   lines.push(`Performance Ratio (PR);${(pr * 100).toFixed(1)} %`);
   lines.push(`${isEn ? 'Execution Engine' : 'Motor de Simulación'};Python 3.14 (Pyodide Python WASM)`);

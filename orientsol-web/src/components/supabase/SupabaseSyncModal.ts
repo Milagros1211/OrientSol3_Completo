@@ -3,6 +3,7 @@ import {
   formatLocationWithCountry,
   type SyncSummary,
 } from '@/services/supabase/climateDatabaseService';
+import { escapeHtml } from '@/utils/security';
 import { i18n } from '@/i18n';
 
 let activeModalEl: HTMLElement | null = null;
@@ -170,7 +171,7 @@ export function openSupabaseSyncModal(): void {
             .map(
               (d) => `
             <li class="sync-detail-${d.status}">
-              ${d.status === 'inserted' ? '✓' : d.status === 'duplicate' ? 'ℹ' : '✗'} ${d.message}
+              ${d.status === 'inserted' ? '✓' : d.status === 'duplicate' ? 'ℹ' : '✗'} ${escapeHtml(d.message)}
             </li>
           `
             )
@@ -186,7 +187,7 @@ export function openSupabaseSyncModal(): void {
       syncResultsBox.classList.remove('hidden');
       syncResultsBox.innerHTML = `
         <div class="sync-summary-error">
-          <strong>${isEn ? 'Sync Failed' : 'Fallo en la Sincronización'}:</strong> ${err.message || String(err)}
+          <strong>${isEn ? 'Sync Failed' : 'Fallo en la Sincronización'}:</strong> ${escapeHtml(err?.message || String(err))}
         </div>
       `;
     } finally {
@@ -219,7 +220,7 @@ function renderQueueItemsMarkup(queue: any[], isEn: boolean): string {
           return `
           <div class="queue-item-card">
             <div class="queue-item-info">
-              <strong>${idx + 1}. ${formatLocationWithCountry(item.locationName, item.country)}</strong>
+              <strong>${idx + 1}. ${escapeHtml(formatLocationWithCountry(item.locationName, item.country))}</strong>
               <span class="queue-item-meta">
                 Lat: ${item.latitude.toFixed(3)}°, Lon: ${item.longitude.toFixed(3)}° | Gdm(0): ${annualG.toFixed(2)} kWh/m²/d
               </span>

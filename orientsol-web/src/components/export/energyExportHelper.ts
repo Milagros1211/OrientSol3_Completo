@@ -1,5 +1,6 @@
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import * as XLSX from 'xlsx';
+import { sanitizeForSpreadsheet } from '@/utils/security';
 
 const MONTHS_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -84,7 +85,7 @@ export function buildEnergySheetData(
 
   // Fila 1: Cabecera con emplazamiento, latitud, tipo de estudio y marca temporal
   sheetData.push([
-    res.locationName,
+    sanitizeForSpreadsheet(res.locationName),
     isEn ? 'Latitude' : 'Latitud',
     Number(res.latitude.toFixed(7)),
     '',

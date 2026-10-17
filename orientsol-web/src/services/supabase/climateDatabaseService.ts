@@ -175,6 +175,14 @@ export function validateClimateRecordForSaving(
         : 'El nombre del emplazamiento está vacío. Por favor, introduce un nombre válido.',
     };
   }
+  if (name.length > 200) {
+    return {
+      valid: false,
+      error: isEn
+        ? `The emplacement name is too long (${name.length} characters). Maximum allowed is 200.`
+        : `El nombre del emplazamiento es demasiado largo (${name.length} caracteres). El máximo permitido es 200.`,
+    };
+  }
 
   // 2. Latitude
   if (record.latitude === undefined || record.latitude === null || isNaN(Number(record.latitude))) {
@@ -242,6 +250,14 @@ export function validateClimateRecordForSaving(
         error: isEn
           ? `Gdm(0) radiation cannot be negative in month ${m + 1} (${num}).`
           : `La radiación Gdm(0) no puede ser negativa en el mes ${m + 1} (${num}).`,
+      };
+    }
+    if (num > 15.0) {
+      return {
+        valid: false,
+        error: isEn
+          ? `Gdm(0) radiation (${num} kWh/m²/day) in month ${m + 1} exceeds physical solar limits (max 15.0 kWh/m²/day).`
+          : `La radiación Gdm(0) (${num} kWh/m²/día) en el mes ${m + 1} excede el límite físico solar admisible (máximo 15.0 kWh/m²/día).`,
       };
     }
     totalRad += num;
@@ -666,12 +682,13 @@ export class ClimateDatabaseService {
           const tempMedia = Number((record.monthlyTemperature[idx] ?? 0).toFixed(2));
 
           monthlyRows.push({
-            nombre_emplazamiento: record.locationName,
-            latitud: record.latitude,
-            longitud: record.longitude,
+            nombre_emplazamiento: (record.locationName || '').trim().slice(0, 200),
+            latitud: Math.max(-90.0, Math.min(90.0, Number(record.latitude))),
+            longitud: Math.max(-180.0, Math.min(180.0, Number(record.longitude))),
             mes: m,
-            radiacion_media: radMensual,
-            temp_media: tempMedia,
+            radiacion_media: Math.max(0.0, Math.min(450.0, radMensual)),
+            temp_media: Math.max(-90.0, Math.min(70.0, tempMedia)),
+            es_oficial: false,
           });
         }
 
@@ -839,12 +856,13 @@ export class ClimateDatabaseService {
             const tempMedia = Number((item.monthlyTemperature[idx] ?? 0).toFixed(2));
 
             monthlyRows.push({
-              nombre_emplazamiento: item.locationName,
-              latitud: item.latitude,
-              longitud: item.longitude,
+              nombre_emplazamiento: (item.locationName || '').trim().slice(0, 200),
+              latitud: Math.max(-90.0, Math.min(90.0, Number(item.latitude))),
+              longitud: Math.max(-180.0, Math.min(180.0, Number(item.longitude))),
               mes: m,
-              radiacion_media: radMensual,
-              temp_media: tempMedia,
+              radiacion_media: Math.max(0.0, Math.min(450.0, radMensual)),
+              temp_media: Math.max(-90.0, Math.min(70.0, tempMedia)),
+              es_oficial: false,
             });
           }
 

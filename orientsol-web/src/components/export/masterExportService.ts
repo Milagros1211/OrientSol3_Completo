@@ -5,6 +5,7 @@ import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslati
 import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
 import { buildSeasonalComponentSheet } from '@/components/export/seasonalExportHelper';
 import { buildPolarComponentSheet } from '@/components/export/polarExportHelper';
+import { sanitizeForSpreadsheet } from '@/utils/security';
 
 const MONTHS_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -87,10 +88,10 @@ export function exportOrientSolMasterExcel(
     [isEn ? 'ISO 8601 Timestamp' : 'Marca Temporal Estándar ISO 8601', isoTimestamp],
     [],
     [isEn ? 'GENERAL PROJECT & CLIMATIC DATA' : 'DATOS GENERALES DEL PROYECTO Y EMPLAZAMIENTO'],
-    [isEn ? 'Location / City' : 'Localidad / Ciudad', res.locationName],
+    [isEn ? 'Location / City' : 'Localidad / Ciudad', sanitizeForSpreadsheet(res.locationName)],
     [isEn ? 'Latitude (°)' : 'Latitud (°)', Number(res.latitude.toFixed(4))],
     [isEn ? 'Longitude (°)' : 'Longitud (°)', Number(res.longitude.toFixed(4))],
-    [isEn ? 'Climatic Data Source' : 'Fuente de Datos Climáticos', res.source.toUpperCase()],
+    [isEn ? 'Climatic Data Source' : 'Fuente de Datos Climáticos', sanitizeForSpreadsheet(res.source.toUpperCase())],
     [isEn ? 'Simulation Engine' : 'Motor de Simulación', 'Python 3.14 (Pyodide WebAssembly)'],
     [isEn ? 'Calculation Engine Time' : 'Tiempo de Motor WebAssembly', `${res.executionTimeMs} ms`],
     [],
@@ -156,7 +157,7 @@ export function exportOrientSolMasterExcel(
       isoTimestamp
     ]);
     activeTableData.push([
-      res.locationName,
+      sanitizeForSpreadsheet(res.locationName),
       `Lat: ${res.latitude.toFixed(4)}°`,
       currentStudyTitle,
       `${isEn ? 'Component' : 'Componente'}: ${compLabel.toUpperCase()} (${compTag})`,
@@ -592,7 +593,7 @@ export function exportOrientSolMasterExcel(
   const anglesSheetData: (string | number)[][] = [
     ['ORIENTSOL 4.0 - ' + (isEn ? 'CONTINUOUS RADIATION CURVES (TILT ANGLES 1° TO 90°)' : 'DESARROLLO DE RADIACIÓN EN EL RANGO DE ÁNGULOS 1° A 90°')],
     [isEn ? 'Export Timestamp:' : 'Marca temporal de exportación:', formattedDateTime, '', isEn ? 'ISO Timestamp:' : 'Marca ISO:', isoTimestamp],
-    [res.locationName, isEn ? `Latitude: ${res.latitude.toFixed(4)}°` : `Latitud: ${res.latitude.toFixed(4)}°`, isEn ? `Annual Optimum: β = ${optAngle}°` : `Óptimo Anual: β = ${optAngle}°`],
+    [sanitizeForSpreadsheet(res.locationName), isEn ? `Latitude: ${res.latitude.toFixed(4)}°` : `Latitud: ${res.latitude.toFixed(4)}°`, isEn ? `Annual Optimum: β = ${optAngle}°` : `Óptimo Anual: β = ${optAngle}°`],
     [],
     [
       isEn ? 'Tilt Angle (°)' : 'Ángulo de Inclinación (°)',

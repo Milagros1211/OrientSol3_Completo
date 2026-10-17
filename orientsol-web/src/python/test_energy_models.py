@@ -37,36 +37,20 @@ try:
     from energy.simplified import calculate_simplified_energy, DAYS_PER_MONTH
     from energy.osterwald import calculate_osterwald_energy
 except ImportError:
-    try:
-        from src.python.core.constants import CHARACTERISTIC_DAYS, MONTH_NAMES_ES
-        from src.python.core.conversions import deg2rad
-        from src.python.core.declination import matriz_declinacion
-        from src.python.core.sunset_angles import angulos_salida
-        from src.python.core.hour_angles import angulos, angulos2
-        from src.python.core.solar_position import altura_solar, azimut_solar
-        from src.python.radiation.extraterrestrial import bod0
-        from src.python.radiation.horizontal_decomposition import bdm0
-        from src.python.radiation.hourly_radiation import gh0, dh0, bh0
-        from src.python.radiation.transposition import transpose_to_inclined_surfaces
-        from src.python.optimization.seasonal_optimum import optimize_seasonal_tilts
-        from src.python.tracking.dual_axis import simulate_dual_axis_tracking
-        from src.python.energy.simplified import calculate_simplified_energy, DAYS_PER_MONTH
-        from src.python.energy.osterwald import calculate_osterwald_energy
-    except ImportError:
-        from ..core.constants import CHARACTERISTIC_DAYS, MONTH_NAMES_ES
-        from ..core.conversions import deg2rad
-        from ..core.declination import matriz_declinacion
-        from ..core.sunset_angles import angulos_salida
-        from ..core.hour_angles import angulos, angulos2
-        from ..core.solar_position import altura_solar, azimut_solar
-        from ..radiation.extraterrestrial import bod0
-        from ..radiation.horizontal_decomposition import bdm0
-        from ..radiation.hourly_radiation import gh0, dh0, bh0
-        from ..radiation.transposition import transpose_to_inclined_surfaces
-        from ..optimization.seasonal_optimum import optimize_seasonal_tilts
-        from ..tracking.dual_axis import simulate_dual_axis_tracking
-        from ..energy.simplified import calculate_simplified_energy, DAYS_PER_MONTH
-        from ..energy.osterwald import calculate_osterwald_energy
+    from src.python.core.constants import CHARACTERISTIC_DAYS, MONTH_NAMES_ES
+    from src.python.core.conversions import deg2rad
+    from src.python.core.declination import matriz_declinacion
+    from src.python.core.sunset_angles import angulos_salida
+    from src.python.core.hour_angles import angulos, angulos2
+    from src.python.core.solar_position import altura_solar, azimut_solar
+    from src.python.radiation.extraterrestrial import bod0
+    from src.python.radiation.horizontal_decomposition import bdm0
+    from src.python.radiation.hourly_radiation import gh0, dh0, bh0
+    from src.python.radiation.transposition import transpose_to_inclined_surfaces
+    from src.python.optimization.seasonal_optimum import optimize_seasonal_tilts
+    from src.python.tracking.dual_axis import simulate_dual_axis_tracking
+    from src.python.energy.simplified import calculate_simplified_energy, DAYS_PER_MONTH
+    from src.python.energy.osterwald import calculate_osterwald_energy
 
 
 def run_full_energy_test(
