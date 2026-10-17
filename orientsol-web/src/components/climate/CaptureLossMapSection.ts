@@ -383,38 +383,23 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
 
       ${selectorHtml}
 
-      <!-- CTE Legend Bar with explicit explanation of the coverage percentages -->
+      <!-- CTE Legend Bar -->
       <div class="cte-legend-bar" style="margin-top: 0.85rem; padding: 0.75rem 1rem; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
         <div class="cte-legend-item" title="Porcentaje del espacio angular evaluado (0° a 90° inc, -90° a +90° ori) con pérdidas ≤ 10%">
           <span class="cte-color-box box-green"></span>
-          <span>${isEn ? 'General CTE (loss ≤ 10%):' : 'Límite General CTE (Pérdida ≤ 10%):'} <strong>${currentCteZones.generalPctCompliant}%</strong> <small style="opacity:0.8;">${isEn ? 'of angular space' : 'del espacio angular'}</small></span>
+          <span>${isEn ? 'General CTE (loss ≤ 10%):' : 'Límite General CTE (Pérdida ≤ 10%):'} <strong>${formatPercent(currentCteZones.generalPctCompliant, 1)}</strong> <small style="opacity:0.8;">${isEn ? 'of angular space' : 'del espacio angular'}</small></span>
         </div>
         <div class="cte-legend-item" title="Porcentaje del espacio angular evaluado con pérdidas ≤ 20%">
           <span class="cte-color-box box-yellow"></span>
-          <span>${isEn ? 'Superposition CTE (loss ≤ 20%):' : 'Superposición CTE (Pérdida ≤ 20%):'} <strong>${currentCteZones.superpositionPctCompliant}%</strong> <small style="opacity:0.8;">${isEn ? 'of angular space' : 'del espacio angular'}</small></span>
+          <span>${isEn ? 'Superposition CTE (loss ≤ 20%):' : 'Superposición CTE (Pérdida ≤ 20%):'} <strong>${formatPercent(currentCteZones.superpositionPctCompliant, 1)}</strong> <small style="opacity:0.8;">${isEn ? 'of angular space' : 'del espacio angular'}</small></span>
         </div>
         <div class="cte-legend-item" title="Porcentaje del espacio angular evaluado con pérdidas ≤ 40%">
           <span class="cte-color-box box-orange"></span>
-          <span>${isEn ? 'Arch. Integration (loss ≤ 40%):' : 'Integración Arquitectónica (Pérdida ≤ 40%):'} <strong>${currentCteZones.integrationPctCompliant}%</strong> <small style="opacity:0.8;">${isEn ? 'of angular space' : 'del espacio angular'}</small></span>
+          <span>${isEn ? 'Arch. Integration (loss ≤ 40%):' : 'Integración Arquitectónica (Pérdida ≤ 40%):'} <strong>${formatPercent(currentCteZones.integrationPctCompliant, 1)}</strong> <small style="opacity:0.8;">${isEn ? 'of angular space' : 'del espacio angular'}</small></span>
         </div>
         <div class="cte-legend-item" title="Porcentaje del espacio angular evaluado con pérdidas > 40%">
           <span class="cte-color-box box-red"></span>
-          <span>${isEn ? 'Non-compliant (> 40%):' : 'No conforme (> 40%):'} <strong>${nonCompliantPct}%</strong> <small style="opacity:0.8;">${isEn ? 'outside limits' : 'fuera de norma'}</small></span>
-        </div>
-      </div>
-
-      <!-- Explanatory note for the coverage percentage numbers -->
-      <div class="cte-explanation-callout" style="margin-top: 0.5rem; padding: 0.6rem 0.9rem; font-size: 0.75rem; color: var(--text-dim); background: rgba(2, 132, 199, 0.05); border-left: 3px solid var(--accent-cyan, #0284c7); border-radius: 4px; display: flex; align-items: flex-start; gap: 0.5rem; line-height: 1.4;">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 1px; color: var(--accent-cyan, #0284c7);">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="16" x2="12" y2="12"></line>
-          <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        </svg>
-        <div>
-          <strong>${isEn ? 'What do these percentages calculate?' : '¿Qué calculan estos porcentajes (17.9% / 39.6% / 87.8%)?'}</strong>
-          ${isEn
-            ? 'They quantify the <strong>angular search space coverage</strong> (all 475 combinations of tilt β ∈ [0°, 90°] and orientation α ∈ [-90°, +90°]). They indicate what fraction of geometric orientations comply with each CTE DB-HE4 regulatory category. They are <em>not</em> energy loss values, but rather allowable design area proportions.'
-            : 'Calculan la <strong>cobertura del espacio angular de búsqueda</strong> (las 475 combinaciones de inclinación β ∈ [0°, 90°] y orientación α ∈ [-90°, +90°]). Indican qué proporción de las orientaciones e inclinaciones geométricas resultan válidas para cada exigencia del CTE DB-HE4. <em>No representan un porcentaje de pérdida energética</em>, sino la proporción del área de diseño reglamentariamente admisible.'}
+          <span>${isEn ? 'Non-compliant (> 40%):' : 'No conforme (> 40%):'} <strong>${formatPercent(nonCompliantPct, 1)}</strong> <small style="opacity:0.8;">${isEn ? 'outside limits' : 'fuera de norma'}</small></span>
         </div>
       </div>
 
@@ -947,7 +932,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
             name: 'Invierno',
             months: 'Diciembre, Enero y Febrero',
             solstice: 'Solsticio de Invierno (21 de Diciembre)',
-            declination: 'δ ≈ -23.45° a -12°',
+            declination: 'δ ≈ -23,45° a -12°',
             noonAlt: Math.round(90 - lat - 23.45),
             reason: `En invierno el Sol describe su trayectoria más baja sobre el horizonte (altura solar a mediodía de ~${Math.round(90 - lat - 23.45)}°). Por eso una inclinación alta (~55°) capta el haz perpendicularmente.`,
           },
@@ -963,7 +948,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
             name: 'Verano',
             months: 'Junio, Julio y Agosto',
             solstice: 'Solsticio de Verano (21 de Junio)',
-            declination: 'δ ≈ +15° a +23.45°',
+            declination: 'δ ≈ +15° a +23,45°',
             noonAlt: Math.round(90 - lat + 23.45),
             reason: `En verano el Sol alcanza su máxima elevación (altura solar a mediodía de ~${Math.round(90 - lat + 23.45)}°). Una superficie casi horizontal (~15°–20°) capta el máximo global diario.`,
           },
