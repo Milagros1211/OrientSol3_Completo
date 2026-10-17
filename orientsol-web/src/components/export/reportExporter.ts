@@ -1,6 +1,7 @@
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslations';
 import { sanitizeForSpreadsheet } from '@/utils/security';
+import { formatNum, formatInt, formatPercent } from '@/utils/formatters';
 
 const MONTH_NAMES_ES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const MONTH_NAMES_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -48,13 +49,13 @@ export function exportToCSV(
   lines.push('----------------------------------------------------------------------');
   lines.push(isEn ? 'ANNUAL ENERGY BALANCE & THERMAL DERATING' : 'BALANCE ENERGÉTICO ANUAL Y COMPORTAMIENTO TÉRMICO');
   lines.push('----------------------------------------------------------------------');
-  lines.push(`${isEn ? 'Estimated Collector Area' : 'Superficie Captadora Estimada'};${res.energyYield.collectorAreaM2.toFixed(1)} m²`);
-  lines.push(`${isEn ? 'Total Solar Radiation Received' : 'Energía Solar Recibida Total'};${Math.round(res.energyYield.recibida.annualTotalKwh)} ${isEn ? 'kWh/yr' : 'kWh/año'} (${res.energyYield.recibida.annualKwhM2.toFixed(1)} ${isEn ? 'kWh/m²·yr' : 'kWh/m²·año'})`);
-  lines.push(`${isEn ? 'PV Energy Yield (Osterwald)' : 'Energía FV Producida (Osterwald)'};${Math.round(res.energyYield.producida.osterwald.annualKwh)} ${isEn ? 'kWh/yr' : 'kWh/año'}`);
-  lines.push(`${isEn ? 'PV Energy Yield (Simplified PR)' : 'Energía FV Producida (Simplificado)'};${Math.round(res.energyYield.producida.simplified.annualKwh)} ${isEn ? 'kWh/yr' : 'kWh/año'}`);
-  lines.push(`${isEn ? 'Specific Yield' : 'Productividad Específica'};${res.energyYield.producida.osterwald.specificYieldKwhKwp.toFixed(0)} kWh/kWp`);
-  lines.push(`${isEn ? 'Cell Thermal Losses vs STC' : 'Pérdidas Térmicas por Temperatura de Célula'};-${res.energyYield.producida.osterwald.thermalLossKwh.toFixed(0)} kWh (-${res.energyYield.producida.osterwald.thermalLossPct.toFixed(2)} %)`);
-  lines.push(`${isEn ? 'Mean Operating Cell Temperature' : 'Temperatura Media de Célula Operativa'};${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)} °C (${isEn ? 'Max' : 'Máx'}: ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)} °C)`);
+  lines.push(`${isEn ? 'Estimated Collector Area' : 'Superficie Captadora Estimada'};${formatNum(res.energyYield.collectorAreaM2, 1)} m²`);
+  lines.push(`${isEn ? 'Total Solar Radiation Received' : 'Energía Solar Recibida Total'};${formatInt(res.energyYield.recibida.annualTotalKwh)} ${isEn ? 'kWh/yr' : 'kWh/año'} (${formatNum(res.energyYield.recibida.annualKwhM2, 1)} ${isEn ? 'kWh/m²·yr' : 'kWh/m²·año'})`);
+  lines.push(`${isEn ? 'PV Energy Yield (Osterwald)' : 'Energía FV Producida (Osterwald)'};${formatInt(res.energyYield.producida.osterwald.annualKwh)} ${isEn ? 'kWh/yr' : 'kWh/año'}`);
+  lines.push(`${isEn ? 'PV Energy Yield (Simplified PR)' : 'Energía FV Producida (Simplificado)'};${formatInt(res.energyYield.producida.simplified.annualKwh)} ${isEn ? 'kWh/yr' : 'kWh/año'}`);
+  lines.push(`${isEn ? 'Specific Yield' : 'Productividad Específica'};${formatInt(res.energyYield.producida.osterwald.specificYieldKwhKwp)} kWh/kWp`);
+  lines.push(`${isEn ? 'Cell Thermal Losses vs STC' : 'Pérdidas Térmicas por Temperatura de Célula'};-${formatInt(Math.abs(res.energyYield.producida.osterwald.thermalLossKwh))} kWh (-${formatNum(Math.abs(res.energyYield.producida.osterwald.thermalLossPct), 2)} %)`);
+  lines.push(`${isEn ? 'Mean Operating Cell Temperature' : 'Temperatura Media de Célula Operativa'};${formatNum(res.temperatures.cellOperating.meanCellTempOptimalC, 1)} °C (${isEn ? 'Max' : 'Máx'}: ${formatNum(res.temperatures.cellOperating.maxCellTempOptimalC, 1)} °C)`);
   lines.push('');
 
   // 3. Monthly Breakdown Table
@@ -79,14 +80,14 @@ export function exportToCSV(
     lines.push(
       [
         months[i],
-        res.horizontal.gdm0[i]?.toFixed(3) ?? '',
-        res.optimalAnnual.monthlyDailyKwh[i]?.toFixed(3) ?? '',
-        res.monthlyOptimum12.monthlyDailyKwh[i]?.toFixed(3) ?? '',
+        res.horizontal.gdm0[i] !== undefined ? formatNum(res.horizontal.gdm0[i], 3) : '',
+        res.optimalAnnual.monthlyDailyKwh[i] !== undefined ? formatNum(res.optimalAnnual.monthlyDailyKwh[i], 3) : '',
+        res.monthlyOptimum12.monthlyDailyKwh[i] !== undefined ? formatNum(res.monthlyOptimum12.monthlyDailyKwh[i], 3) : '',
         String(res.monthlyOptimum12.optimalTiltsDeg[i] ?? ''),
-        res.temperatures.ambient.monthlyMeanC[i]?.toFixed(1) ?? '',
-        res.temperatures.cellOperating.monthlyCellTempOptimalC[i]?.toFixed(1) ?? '',
-        Math.round(res.energyYield.producida.osterwald.monthlyKwh[i] ?? 0),
-        Math.round(res.energyYield.producida.simplified.monthlyKwh[i] ?? 0),
+        res.temperatures.ambient.monthlyMeanC[i] !== undefined ? formatNum(res.temperatures.ambient.monthlyMeanC[i], 1) : '',
+        res.temperatures.cellOperating.monthlyCellTempOptimalC[i] !== undefined ? formatNum(res.temperatures.cellOperating.monthlyCellTempOptimalC[i], 1) : '',
+        formatInt(res.energyYield.producida.osterwald.monthlyKwh[i] ?? 0),
+        formatInt(res.energyYield.producida.simplified.monthlyKwh[i] ?? 0),
       ].join(';')
     );
   }
@@ -173,23 +174,23 @@ export async function copyReportToClipboard(
 ======================================================================
 ORIENTSOL 4.0 - ${isEn ? 'TECHNICAL SOLAR SIMULATION SUMMARY' : 'RESUMEN TÉCNICO DE SIMULACIÓN SOLAR'}
 ======================================================================
-${isEn ? 'Location' : 'Localidad'}: ${res.locationName} (${res.latitude.toFixed(2)}°, ${res.longitude.toFixed(2)}°)
+${isEn ? 'Location' : 'Localidad'}: ${res.locationName} (${formatNum(res.latitude, 2)}°, ${formatNum(res.longitude, 2)}°)
 ${isEn ? 'Data Source' : 'Fuente'}: ${res.source.toUpperCase()}
-${isEn ? 'PV Peak Power' : 'Potencia Pico'}: ${peakKw.toFixed(2)} kWp | PR: ${(pr * 100).toFixed(0)}%
+${isEn ? 'PV Peak Power' : 'Potencia Pico'}: ${formatNum(peakKw, 2)} kWp | PR: ${formatPercent(pr * 100, 0)}
 
 1. ${isEn ? 'OPTIMAL FIXED TILT' : 'INCLINACIÓN FIJA ÓPTIMA'}:
-   • ${isEn ? 'Annual Optimum' : 'Óptimo Anual'}: ${res.optimalAnnual.optimalTiltDeg}° (+${res.optimalAnnual.gainOverHorizontalPct.toFixed(1)}% ${isEn ? 'vs Horiz' : 's/ Horizontal'})
-   • ${isEn ? 'Daily Resource' : 'Recurso Medio Diario'}: ${res.optimalAnnual.annualMeanDailyKwh.toFixed(2)} kWh/m²/día (${Math.round(res.optimalAnnual.annualTotalKwh)} kWh/m²·año)
+   • ${isEn ? 'Annual Optimum' : 'Óptimo Anual'}: ${res.optimalAnnual.optimalTiltDeg}° (+${formatNum(res.optimalAnnual.gainOverHorizontalPct, 1)}% ${isEn ? 'vs Horiz' : 's/ Horizontal'})
+   • ${isEn ? 'Daily Resource' : 'Recurso Medio Diario'}: ${formatNum(res.optimalAnnual.annualMeanDailyKwh, 2)} kWh/m²/día (${formatInt(res.optimalAnnual.annualTotalKwh)} kWh/m²·año)
 
 2. ${isEn ? 'ENERGY YIELD BALANCE' : 'BALANCE ENERGÉTICO'}:
-   • ${isEn ? 'Received Solar Energy' : 'Energía Solar Recibida'}: ${Math.round(res.energyYield.recibida.annualTotalKwh).toLocaleString()} kWh/año
-   • ${isEn ? 'Osterwald PV Production' : 'Producción FV Osterwald'}: ${Math.round(res.energyYield.producida.osterwald.annualKwh).toLocaleString()} kWh/año
-   • ${isEn ? 'Specific Yield' : 'Productividad Específica'}: ${res.energyYield.producida.osterwald.specificYieldKwhKwp.toFixed(0)} kWh/kWp
-   • ${isEn ? 'Thermal Losses vs STC' : 'Pérdidas Térmicas'}: -${res.energyYield.producida.osterwald.thermalLossKwh.toFixed(0)} kWh (-${res.energyYield.producida.osterwald.thermalLossPct.toFixed(2)}%)
-   • ${isEn ? 'Operating Cell Temp' : 'Temp. Célula Operativa'}: ${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)} °C (Máx: ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)} °C)
+   • ${isEn ? 'Received Solar Energy' : 'Energía Solar Recibida'}: ${formatInt(res.energyYield.recibida.annualTotalKwh)} kWh/año
+   • ${isEn ? 'Osterwald PV Production' : 'Producción FV Osterwald'}: ${formatInt(res.energyYield.producida.osterwald.annualKwh)} kWh/año
+   • ${isEn ? 'Specific Yield' : 'Productividad Específica'}: ${formatInt(res.energyYield.producida.osterwald.specificYieldKwhKwp)} kWh/kWp
+   • ${isEn ? 'Thermal Losses vs STC' : 'Pérdidas Térmicas'}: -${formatInt(Math.abs(res.energyYield.producida.osterwald.thermalLossKwh))} kWh (-${formatNum(Math.abs(res.energyYield.producida.osterwald.thermalLossPct), 2)}%)
+   • ${isEn ? 'Operating Cell Temp' : 'Temp. Célula Operativa'}: ${formatNum(res.temperatures.cellOperating.meanCellTempOptimalC, 1)} °C (Máx: ${formatNum(res.temperatures.cellOperating.maxCellTempOptimalC, 1)} °C)
 
 3. ${isEn ? 'SURFACES BENCHMARK RANKING' : 'RANKING DE RENDIMIENTO DE SUPERFICIES'}:
-${res.surfaceComparison.map((s, idx) => `   ${idx + 1}. ${getSurfaceDisplayName(s, isEn)}: ${s.meanDailyKwhM2.toFixed(3)} kWh/m²/d (${Math.round(s.annualRadiationKwhM2)} kWh/m²) | +${s.gainOverHorizontalPct.toFixed(1)}% | Prod: ${Math.round(s.energyProducedOsterwaldKwhYear).toLocaleString()} kWh/${isEn ? 'yr' : 'año'}`).join('\n')}
+${res.surfaceComparison.map((s, idx) => `   ${idx + 1}. ${getSurfaceDisplayName(s, isEn)}: ${formatNum(s.meanDailyKwhM2, 3)} kWh/m²/d (${formatInt(s.annualRadiationKwhM2)} kWh/m²) | +${formatNum(s.gainOverHorizontalPct, 1)}% | Prod: ${formatInt(s.energyProducedOsterwaldKwhYear)} kWh/${isEn ? 'yr' : 'año'}`).join('\n')}
 
 ======================================================================
 OrientSol 4.0 Web • ${new Date().toLocaleDateString()}

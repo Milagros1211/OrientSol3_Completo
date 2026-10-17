@@ -6,6 +6,7 @@ import { createEnergyWorksheet } from '@/components/export/energyExportHelper';
 import { buildSeasonalComponentSheet } from '@/components/export/seasonalExportHelper';
 import { buildPolarComponentSheet } from '@/components/export/polarExportHelper';
 import { sanitizeForSpreadsheet } from '@/utils/security';
+import { getNoonAzimuthDeg, getDualAxisNoonTiltDeg, getHorizontalTrackerDailyMeanTiltDeg } from '@/services/solarGeometryAngles';
 
 const MONTHS_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -356,8 +357,127 @@ export function exportOrientSolMasterExcel(
           pctAnn,
         ]);
       }
+    } else if (activeOp === 'comparative') {
+      // Option 8: Complete Comparative Matrix Table matching Figura 5.2.98 & Web with Angles
+      activeTableData.push([
+        isEn ? 'Month' : 'Mes',
+        `${compTag} (0°)`,
+        isEn ? 'Angles (0°)' : 'Ángulos (0°)',
+        isEn ? `${compTag} Fixed Opt` : `${compTag} Ópt. Anual`,
+        isEn ? 'Angles Fixed Opt' : 'Ángulos Ópt. Anual',
+        isEn ? `${compTag} Seasonal Opt` : `${compTag} Ópt. Estac.`,
+        isEn ? 'Angles Seasonal' : 'Ángulos Ópt. Estac.',
+        isEn ? `${compTag} Monthly Opt` : `${compTag} Ópt. Mens.`,
+        isEn ? 'Angles Monthly' : 'Ángulos Ópt. Mens.',
+        isEn ? `${compTag} Polar 1-Axis` : `${compTag} Eje Polar`,
+        isEn ? 'Angles Polar' : 'Ángulos Eje Polar',
+        isEn ? `${compTag} Azimuthal 1-Axis` : `${compTag} Eje Azimutal`,
+        isEn ? 'Angles Azimuthal' : 'Ángulos Eje Azimutal',
+        isEn ? `${compTag} Horizontal 1-Axis` : `${compTag} Eje Horizontal`,
+        isEn ? 'Angles Horizontal' : 'Ángulos Eje Horizontal',
+        isEn ? `${compTag} Two-Axis (Dual)` : `${compTag} Dos Ejes`,
+        isEn ? 'Angles Two-Axis' : 'Ángulos Dos Ejes',
+        isEn ? 'Mean Ambient Temp (°C)' : 'Tª Ambiente Media (°C)',
+      ]);
+
+      const r0 = getMonthlyRadiationForAngle(res, compType, 0);
+      const rAnn = getMonthlyRadiationForAngle(res, compType, optAngle);
+      const seasonTilts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => {
+        if (i === 11 || i === 0 || i === 1) {
+          return res.seasonal?.winterTiltDeg ?? 60;
+        } else if (i === 2 || i === 3 || i === 4) {
+          return res.seasonal?.springTiltDeg ?? 35;
+        } else if (i === 5 || i === 6 || i === 7) {
+          return res.seasonal?.summerTiltDeg ?? 15;
+        }
+        return res.seasonal?.autumnTiltDeg ?? 35;
+      });
+      const rSeas = new Array(12).fill(0);
+      for (let i = 0; i < 12; i++) {
+        rSeas[i] = getMonthlyRadiationForAngle(res, compType, seasonTilts[i])[i];
+      }
+
+      const monthlyOptTilts = res.monthlyOptimum12?.optimalTiltsDeg ?? [];
+      const rMth = new Array(12).fill(0);
+      for (let i = 0; i < 12; i++) {
+        rMth[i] = getMonthlyRadiationForAngle(res, compType, monthlyOptTilts[i] ?? optAngle)[i];
+      }
+
+      const getCompVals = (
+        compObj: { global?: number[]; beam?: number[]; diffuse?: number[]; albedo?: number[] } | undefined,
+        fallback: number[]
+      ) => {
+        if (compType === 'global') return fallback;
+        if (compObj && compObj[compType]) return compObj[compType]!;
+        if (compType === 'beam') return res.horizontal.bdm0;
+        if (compType === 'diffuse') return res.horizontal.ddm0;
+        return new Array(12).fill(0.0);
+      };
+
+      const rPolar = getCompVals(res.tracking.polarAxis.components, res.tracking.polarAxis.monthlyDailyKwh);
+      const rAzim = getCompVals(res.tracking.azimuthalAxis.components, res.tracking.azimuthalAxis.monthlyDailyKwh);
+      const rHoriz = getCompVals(res.tracking.horizontalAxis.components, res.tracking.horizontalAxis.monthlyDailyKwh);
+      const rDual = getCompVals(res.tracking.dualAxis.components, res.tracking.dualAxis.monthlyDailyKwh);
+
+      const noonDualTilts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => getDualAxisNoonTiltDeg(res.latitude, i));
+      const noonAzims = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => getNoonAzimuthDeg(res.latitude, i));
+      const horizTilts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => getHorizontalTrackerDailyMeanTiltDeg(res.latitude, i));
+      const fixedOri = res.latitude >= 0 ? 0.0 : 180.0;
+
+      for (let i = 0; i < 12; i++) {
+        activeTableData.push([
+          months[i],
+          Number(r0[i].toFixed(2)),
+          'Inc: 0.0° | Ori: 0.0°',
+          Number(rAnn[i].toFixed(2)),
+          `Inc: ${optAngle.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+          Number(rSeas[i].toFixed(2)),
+          `Inc: ${seasonTilts[i].toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+          Number(rMth[i].toFixed(2)),
+          `Inc: ${(monthlyOptTilts[i] ?? 0).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+          Number(rPolar[i].toFixed(2)),
+          `Inc: ${res.latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+          Number(rAzim[i].toFixed(2)),
+          `Inc: ${res.latitude.toFixed(1)}° | Ori: ${noonAzims[i].toFixed(1)}°`,
+          Number(rHoriz[i].toFixed(2)),
+          `Inc: ${horizTilts[i].toFixed(1)}° | Ori: 90.0°`,
+          Number(rDual[i].toFixed(2)),
+          `Inc: ${noonDualTilts[i].toFixed(1)}° | Ori: ${noonAzims[i].toFixed(1)}°`,
+          Number(tempVals[i].toFixed(1)),
+        ]);
+      }
+
+      // Average row for comparative
+      const avgComp = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / 12;
+      const avgSeasonalTilt = avgComp(seasonTilts);
+      const avgMonthlyTilt = monthlyOptTilts.length ? avgComp(monthlyOptTilts) : 0;
+      const avgDualTilt = avgComp(noonDualTilts);
+      const avgDualAzim = avgComp(noonAzims);
+      const avgHorizTilt = avgComp(horizTilts);
+
+      activeTableData.push([]);
+      activeTableData.push([
+        isEn ? 'ANNUAL AVERAGE' : 'PROMEDIO ANUAL',
+        Number(avgComp(r0).toFixed(3)),
+        'Inc: 0.0° | Ori: 0.0°',
+        Number(avgComp(rAnn).toFixed(3)),
+        `Inc: ${optAngle.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+        Number(avgComp(rSeas).toFixed(3)),
+        `Inc: ${avgSeasonalTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+        Number(avgComp(rMth).toFixed(3)),
+        `Inc: ${avgMonthlyTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+        Number(avgComp(rPolar).toFixed(3)),
+        `Inc: ${res.latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°`,
+        Number(avgComp(rAzim).toFixed(3)),
+        `Inc: ${res.latitude.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`,
+        Number(avgComp(rHoriz).toFixed(3)),
+        `Inc: ${avgHorizTilt.toFixed(1)}° | Ori: 90.0°`,
+        Number(avgComp(rDual).toFixed(3)),
+        `Inc: ${avgDualTilt.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°`,
+        Number(res.temperatures.ambient.annualMeanC.toFixed(2)),
+      ]);
     } else {
-      // Tracking (polar, azimuthal, horizontal, dual, comparative)
+      // Tracking (polar, azimuthal, horizontal, dual)
       const radStudy =
         activeOp === 'polar'
           ? res.tracking.polarAxis.monthlyDailyKwh

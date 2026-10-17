@@ -10,6 +10,7 @@ import { exportOrientSolMasterExcel } from '@/components/export/masterExportServ
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { renderCaptureLossMapSection } from '@/components/climate/CaptureLossMapSection';
 import { showAlbedoWarningModal } from '@/components/modals/AlbedoWarningModal';
+import { formatNum, formatInt } from '@/utils/formatters';
 
 export type MonthlyRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
 
@@ -222,7 +223,7 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
             <div class="monthly-tilt-badge">
               <span class="monthly-tilt-name">${months[idx]}</span>
               <span class="monthly-tilt-angle">${deg}°</span>
-              <span class="monthly-tilt-rad">${radMonthlyOpt[idx].toFixed(2)} <small>kWh/m²/d</small></span>
+              <span class="monthly-tilt-rad">${formatNum(radMonthlyOpt[idx], 2)} <small>kWh/m²/d</small></span>
             </div>
           `).join('')}
         </div>
@@ -231,20 +232,20 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
         <div class="opt-kpis-summary-grid">
           <div class="kpi-mini-card kpi-optimal">
             <span class="kpi-mini-title">${isEn ? 'Annual Mean (12 Tilts)' : 'Media Anual (12 Inclinaciones)'}</span>
-            <div class="kpi-mini-main">${meanMonthlyOpt.toFixed(2)} <small>kWh/m²/d</small></div>
-            <span class="kpi-mini-sub">${Math.round(meanMonthlyOpt * 365).toLocaleString()} kWh/m²·${isEn ? 'yr' : 'año'}</span>
+            <div class="kpi-mini-main">${formatNum(meanMonthlyOpt, 2)} <small>kWh/m²/d</small></div>
+            <span class="kpi-mini-sub">${formatInt(meanMonthlyOpt * 365)} kWh/m²·${isEn ? 'yr' : 'año'}</span>
           </div>
 
           <div class="kpi-mini-card kpi-anglex">
             <span class="kpi-mini-title">${isEn ? 'Mean Optimal Tilt' : 'Inclinación Media'}</span>
-            <div class="kpi-mini-main">${meanTilt.toFixed(1)}°</div>
+            <div class="kpi-mini-main">${formatNum(meanTilt, 1)}°</div>
             <span class="kpi-mini-sub">Min: ${Math.min(...optTilts)}° | Max: ${Math.max(...optTilts)}°</span>
           </div>
 
           <div class="kpi-mini-card kpi-gain">
             <span class="kpi-mini-title">${isEn ? 'Gain vs Optimal Annual' : 'Ganancia s/ Óptimo Anual Fijo'}</span>
-            <div class="kpi-mini-main text-gain">+${meanGainAnnualPct.toFixed(2)}%</div>
-            <span class="kpi-mini-sub">+${Math.round((meanMonthlyOpt - meanAnnualOpt) * 365)} kWh/m²·${isEn ? 'yr' : 'año'}</span>
+            <div class="kpi-mini-main text-gain">+${formatNum(meanGainAnnualPct, 2)}%</div>
+            <span class="kpi-mini-sub">+${formatInt((meanMonthlyOpt - meanAnnualOpt) * 365)} kWh/m²·${isEn ? 'yr' : 'año'}</span>
           </div>
 
           <div class="kpi-mini-card kpi-horiz">

@@ -3,6 +3,8 @@ import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalcula
 import { getMonthlyRadiationForAngle, type TableRadiationComponent } from '@/components/climate/OptimalAnnualStudyPanel';
 import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslations';
 import { showExportComponentChoiceModal, type ExportComponentChoice } from './exportModalHelper';
+import { getNoonAzimuthDeg, getDualAxisNoonTiltDeg, getHorizontalTrackerDailyMeanTiltDeg } from '@/services/solarGeometryAngles';
+import { formatNum, formatInt, formatAngle, formatPercent } from '@/utils/formatters';
 
 export { showExportComponentChoiceModal, type ExportComponentChoice };
 
@@ -655,7 +657,7 @@ export async function generateOrientSolPDFReport(
   doc.text(isEn ? 'ANNUAL MEAN TEMP' : 'TEMP. MEDIA ANUAL', 24, cardY + 6);
   doc.setFontSize(16);
   doc.setTextColor(15, 23, 42);
-  doc.text(`${res.temperatures.ambient.annualMeanC.toFixed(1)} °C`, 24, cardY + 16);
+  doc.text(`${formatNum(res.temperatures.ambient.annualMeanC, 1)} °C`, 24, cardY + 16);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6.5);
   doc.setTextColor(100, 116, 139);
@@ -671,7 +673,7 @@ export async function generateOrientSolPDFReport(
   doc.text(isEn ? 'ANNUAL MAX TEMP' : 'TEMP. MÁXIMA ANUAL', card2X + 4, cardY + 6);
   doc.setFontSize(16);
   doc.setTextColor(220, 38, 38);
-  doc.text(`${res.temperatures.ambient.annualMaxC.toFixed(1)} °C`, card2X + 4, cardY + 16);
+  doc.text(`${formatNum(res.temperatures.ambient.annualMaxC, 1)} °C`, card2X + 4, cardY + 16);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6.5);
   doc.setTextColor(100, 116, 139);
@@ -687,45 +689,45 @@ export async function generateOrientSolPDFReport(
   doc.text(isEn ? 'ANNUAL MIN TEMP' : 'TEMP. MÍNIMA ANUAL', card3X + 4, cardY + 6);
   doc.setFontSize(16);
   doc.setTextColor(2, 132, 199);
-  doc.text(`${res.temperatures.ambient.annualMinC.toFixed(1)} °C`, card3X + 4, cardY + 16);
+  doc.text(`${formatNum(res.temperatures.ambient.annualMinC, 1)} °C`, card3X + 4, cardY + 16);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(6.5);
   doc.setTextColor(100, 116, 139);
   doc.text(isEn ? 'Winter absolute low' : 'Mínima invernal absoluta', card3X + 4, cardY + 22);
 
-  // Tarjeta 4: Temp Célula Operativa Tc
+  // Tarjeta 4: Temp Célula Operativa Tc con WRAPPED TEXT (Línea 1 + Línea 2 con subíndice Tc)
   const card4X = card3X + cardW + cardGap;
   doc.setFillColor(248, 250, 252);
   doc.roundedRect(card4X, cardY, cardW, cardH, 2, 2, 'FD');
   doc.setFont('helvetica', 'bold');
+  doc.setFontSize(6.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text(isEn ? 'CELL OPERATING TEMP' : 'TEMP. CÉLULA OPERATIVA', card4X + 4, cardY + 5.2);
   drawTextWithSubscripts(
     doc,
-    isEn
-      ? [
-          { text: 'CELL OPERATING TEMP (' },
-          { text: 'T' },
-          { text: 'C', isSub: true },
-          { text: ')' }
-        ]
-      : [
-          { text: 'TEMP. CÉLULA OPERATIVA (' },
-          { text: 'T' },
-          { text: 'C', isSub: true },
-          { text: ')' }
-        ],
+    [
+      { text: '(', color: [100, 116, 139] },
+      { text: 'T', color: [100, 116, 139] },
+      { text: 'C', isSub: true, color: [100, 116, 139] },
+      { text: ')', color: [100, 116, 139] }
+    ],
     card4X + 4,
-    cardY + 6,
-    7,
+    cardY + 8.4,
+    6.2,
     'left',
     true
   );
   doc.setFontSize(16);
   doc.setTextColor(180, 83, 9);
-  doc.text(`${res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1)} °C`, card4X + 4, cardY + 16);
+  doc.text(`${formatNum(res.temperatures.cellOperating.meanCellTempOptimalC, 1)} °C`, card4X + 4, cardY + 16);
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(6.5);
+  doc.setFontSize(6.2);
   doc.setTextColor(100, 116, 139);
-  doc.text(`TONC ${tonc.toFixed(1)}°C (Máx: ${res.temperatures.cellOperating.maxCellTempOptimalC.toFixed(1)}°C)`, card4X + 4, cardY + 22);
+  doc.text(
+    `TONC ${formatNum(tonc, 1)}°C (${isEn ? 'Max' : 'Máx'}: ${formatNum(res.temperatures.cellOperating.maxCellTempOptimalC, 1)}°C)`,
+    card4X + 4,
+    cardY + 22
+  );
 
   // -------------------------------------------------------------
   // TABLA DE CONTENIDOS DEL INFORME (Matching Figura 5.2.72)
@@ -961,10 +963,10 @@ export async function generateOrientSolPDFReport(
   doc.setTextColor(180, 83, 9);
   doc.text(isEn ? 'INCIDENT SOLAR ENERGY RECEIVED' : 'ENERGÍA SOLAR INCIDENTE RECIBIDA', 24, bmY + 6);
   doc.setFontSize(14);
-  doc.text(`${Math.round(res.energyYield.recibida.annualTotalKwh).toLocaleString()} kWh/${isEn ? 'yr' : 'año'}`, 24, bmY + 16);
+  doc.text(`${formatInt(res.energyYield.recibida.annualTotalKwh)} kWh/${isEn ? 'yr' : 'año'}`, 24, bmY + 16);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
-  doc.text(`${res.energyYield.recibida.annualKwhM2.toFixed(1)} kWh/m²·${isEn ? 'yr' : 'año'} • ${res.energyYield.recibida.meanDailyKwhM2.toFixed(2)} kWh/m²/${isEn ? 'day' : 'día'}`, 24, bmY + 23);
+  doc.text(`${formatNum(res.energyYield.recibida.annualKwhM2, 1)} kWh/m²·${isEn ? 'yr' : 'año'} • ${formatNum(res.energyYield.recibida.meanDailyKwhM2, 2)} kWh/m²/${isEn ? 'day' : 'día'}`, 24, bmY + 23);
 
   doc.setFillColor(209, 250, 229);
   doc.roundedRect(108, bmY, 82, 28, 2, 2, 'F');
@@ -973,10 +975,10 @@ export async function generateOrientSolPDFReport(
   doc.setTextColor(4, 120, 87);
   doc.text(isEn ? 'PRODUCED PV ENERGY (OSTERWALD)' : 'ENERGÍA FV GENERADA (OSTERWALD)', 112, bmY + 6);
   doc.setFontSize(14);
-  doc.text(`${Math.round(res.energyYield.producida.osterwald.annualKwh).toLocaleString()} kWh/${isEn ? 'yr' : 'año'}`, 112, bmY + 16);
+  doc.text(`${formatInt(res.energyYield.producida.osterwald.annualKwh)} kWh/${isEn ? 'yr' : 'año'}`, 112, bmY + 16);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7);
-  doc.text(`${isEn ? 'Specific Yield' : 'Rendimiento'}: ${res.energyYield.producida.osterwald.specificYieldKwhKwp.toFixed(0)} kWh/kWp • ${isEn ? 'Simplified' : 'Simplif'}: ${Math.round(res.energyYield.producida.simplified.annualKwh).toLocaleString()} kWh`, 112, bmY + 23);
+  doc.text(`${isEn ? 'Specific Yield' : 'Rendimiento'}: ${formatInt(res.energyYield.producida.osterwald.specificYieldKwhKwp)} kWh/kWp • ${isEn ? 'Simplified' : 'Simplif'}: ${formatInt(res.energyYield.producida.simplified.annualKwh)} kWh`, 112, bmY + 23);
 
   // -------------------------------------------------------------
   // GRÁFICO 1: RADIACIÓN SOLAR MENSUAL POR SUPERFICIE
@@ -1535,10 +1537,31 @@ export async function generateOrientSolPDFReport(
       const mDual_val = avgArr(radDual_comp);
       const mTemp_val = res.temperatures.ambient.annualMeanC;
 
-      // 1. Top 4 KPI Summary Cards (y = 28, height = 22, width = 39.5)
+      // Exact angles for each study configuration across months
+      const seasonTilts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => {
+        if (i === 11 || i === 0 || i === 1) {
+          return res.seasonal?.winterTiltDeg ?? 60;
+        } else if (i === 2 || i === 3 || i === 4) {
+          return res.seasonal?.springTiltDeg ?? 35;
+        } else if (i === 5 || i === 6 || i === 7) {
+          return res.seasonal?.summerTiltDeg ?? 15;
+        }
+        return res.seasonal?.autumnTiltDeg ?? 35;
+      });
+      const avgSeasonalTilt = avgArr(seasonTilts);
+      const avgMonthlyTilt = monthlyOptTilts.length ? avgArr(monthlyOptTilts) : 0;
+      const noonDualTilts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => getDualAxisNoonTiltDeg(res.latitude, i));
+      const noonAzims = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => getNoonAzimuthDeg(res.latitude, i));
+      const horizTilts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => getHorizontalTrackerDailyMeanTiltDeg(res.latitude, i));
+      const avgDualTilt = avgArr(noonDualTilts);
+      const avgDualAzim = avgArr(noonAzims);
+      const avgHorizTilt = avgArr(horizTilts);
+      const fixedOri = res.latitude >= 0 ? 0.0 : 180.0;
+
+      // 1. Top 4 KPI Summary Cards (y = 28, height = 20, width = 39.5)
       const opBarY = 28;
       const opCardW = 39.5;
-      const opCardH = 22;
+      const opCardH = 20;
 
       // Card 1: Horizontal (0°)
       doc.setFillColor(248, 250, 252);
@@ -1547,14 +1570,14 @@ export async function generateOrientSolPDFReport(
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(6.5);
       doc.setTextColor(100, 116, 139);
-      doc.text(isEn ? 'HORIZONTAL (0°)' : 'PLANO HORIZONTAL (0°)', 24, opBarY + 5.5);
-      doc.setFontSize(13);
+      doc.text(isEn ? 'HORIZONTAL (0°)' : 'PLANO HORIZONTAL (0°)', 24, opBarY + 5.0);
+      doc.setFontSize(12);
       doc.setTextColor(15, 23, 42);
-      doc.text(`${m0_val.toFixed(2)} kWh/m²/d`, 24, opBarY + 14);
+      doc.text(`${formatNum(m0_val, 2)} kWh/m²/d`, 24, opBarY + 12.5);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
-      doc.text(`${Math.round(m0_val * 365)} kWh/m²·${isEn ? 'yr' : 'año'}`, 24, opBarY + 19);
+      doc.text(`${formatInt(m0_val * 365)} kWh/m²·${isEn ? 'yr' : 'año'}`, 24, opBarY + 17.5);
 
       // Card 2: Fixed Optimum
       const op2X = 20 + opCardW + cardGap;
@@ -1563,15 +1586,15 @@ export async function generateOrientSolPDFReport(
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(6.5);
       doc.setTextColor(100, 116, 139);
-      doc.text(isEn ? `FIXED OPT (${optAngle}°)` : `ÓPTIMO FIJO (${optAngle}°)`, op2X + 4, opBarY + 5.5);
-      doc.setFontSize(13);
+      doc.text(isEn ? `FIXED OPT (${optAngle}°)` : `ÓPTIMO FIJO (${optAngle}°)`, op2X + 4, opBarY + 5.0);
+      doc.setFontSize(12);
       doc.setTextColor(2, 132, 199);
-      doc.text(`${mAnn_val.toFixed(2)} kWh/m²/d`, op2X + 4, opBarY + 14);
+      doc.text(`${formatNum(mAnn_val, 2)} kWh/m²/d`, op2X + 4, opBarY + 12.5);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
-      const subAnn = comp === 'albedo' ? 'Rdm(0°) = 0' : `+${(((mAnn_val - m0_val) / (m0_val || 1)) * 100).toFixed(1)}% ${isEn ? 'vs horiz' : 's/ horiz'}`;
-      doc.text(subAnn, op2X + 4, opBarY + 19);
+      const subAnn = comp === 'albedo' ? 'Rdm(0°) = 0' : `+${formatNum(((mAnn_val - m0_val) / (m0_val || 1)) * 100, 1)}% ${isEn ? 'vs horiz' : 's/ horiz'}`;
+      doc.text(subAnn, op2X + 4, opBarY + 17.5);
 
       // Card 3: Monthly Optimum (12 positions)
       const op3X = op2X + opCardW + cardGap;
@@ -1580,15 +1603,15 @@ export async function generateOrientSolPDFReport(
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(6.5);
       doc.setTextColor(100, 116, 139);
-      doc.text(isEn ? 'MONTHLY OPT (12 POS)' : 'ÓPTIMO MENSUAL (12 POS)', op3X + 4, opBarY + 5.5);
-      doc.setFontSize(13);
+      doc.text(isEn ? 'MONTHLY OPT (12 POS)' : 'ÓPTIMO MENSUAL (12 POS)', op3X + 4, opBarY + 5.0);
+      doc.setFontSize(12);
       doc.setTextColor(16, 185, 129);
-      doc.text(`${mMth_val.toFixed(2)} kWh/m²/d`, op3X + 4, opBarY + 14);
+      doc.text(`${formatNum(mMth_val, 2)} kWh/m²/d`, op3X + 4, opBarY + 12.5);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
-      const subMth = comp === 'albedo' ? 'Rdm(0°) = 0' : `+${(((mMth_val - m0_val) / (m0_val || 1)) * 100).toFixed(1)}% ${isEn ? 'vs horiz' : 's/ horiz'}`;
-      doc.text(subMth, op3X + 4, opBarY + 19);
+      const subMth = comp === 'albedo' ? 'Rdm(0°) = 0' : `+${formatNum(((mMth_val - m0_val) / (m0_val || 1)) * 100, 1)}% ${isEn ? 'vs horiz' : 's/ horiz'}`;
+      doc.text(subMth, op3X + 4, opBarY + 17.5);
 
       // Card 4: Two-Axis Tracking
       const op4X = op3X + opCardW + cardGap;
@@ -1597,18 +1620,18 @@ export async function generateOrientSolPDFReport(
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(6.5);
       doc.setTextColor(100, 116, 139);
-      doc.text(isEn ? 'TWO-AXIS CONTINUOUS' : 'SEGUIM. A DOS EJES', op4X + 4, opBarY + 5.5);
-      doc.setFontSize(13);
+      doc.text(isEn ? 'TWO-AXIS TRACKING' : 'SEGUIM. A DOS EJES', op4X + 4, opBarY + 5.0);
+      doc.setFontSize(12);
       doc.setTextColor(5, 150, 105);
-      doc.text(`${mDual_val.toFixed(2)} kWh/m²/d`, op4X + 4, opBarY + 14);
+      doc.text(`${formatNum(mDual_val, 2)} kWh/m²/d`, op4X + 4, opBarY + 12.5);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
-      const subDual = comp === 'albedo' ? 'Rdm(0°) = 0' : `+${(((mDual_val - m0_val) / (m0_val || 1)) * 100).toFixed(1)}% ${isEn ? 'vs horiz' : 's/ horiz'}`;
-      doc.text(subDual, op4X + 4, opBarY + 19);
+      const subDual = comp === 'albedo' ? 'Rdm(0°) = 0' : `+${formatNum(((mDual_val - m0_val) / (m0_val || 1)) * 100, 1)}% ${isEn ? 'vs horiz' : 's/ horiz'}`;
+      doc.text(subDual, op4X + 4, opBarY + 17.5);
 
       // 2. Table Section Title
-      const compTblHeaderY = opBarY + opCardH + 6;
+      const compTblHeaderY = opBarY + opCardH + 5;
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(8.5);
       doc.setTextColor(15, 23, 42);
@@ -1620,10 +1643,10 @@ export async function generateOrientSolPDFReport(
         compTblHeaderY
       );
 
-      // 3. The 10-Column Comparative Table Matching Figura 5.2.98
+      // 3. The 10-Column Comparative Table Matching Figura 5.2.98 & Web Option 8 with Angles
       const tblCompY = compTblHeaderY + 3;
       doc.setFillColor(30, 41, 59);
-      doc.rect(20, tblCompY, 170, 7.0, 'F');
+      doc.rect(20, tblCompY, 170, 6.5, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(5.8);
       doc.setTextColor(255, 255, 255);
@@ -1652,87 +1675,139 @@ export async function generateOrientSolPDFReport(
               { text: ' (°C)', color: [255, 255, 255] }
             ],
             colCompX[9],
-            tblCompY + 4.8,
+            tblCompY + 4.5,
             5.8,
             'left',
             true
           );
         } else if (c) {
-          doc.text(c, colCompX[idx], tblCompY + 4.8);
+          doc.text(c, colCompX[idx], tblCompY + 4.5);
         }
       });
 
-      let curCompRowY = tblCompY + 7.0;
+      const compRowH = 6.2;
+      let curCompRowY = tblCompY + 6.5;
+
       for (let i = 0; i < 12; i++) {
         if (i % 2 === 1) {
           doc.setFillColor(248, 250, 252);
-          doc.rect(20, curCompRowY, 170, 5.0, 'F');
+          doc.rect(20, curCompRowY, 170, compRowH, 'F');
         }
         // Subtle highlight on Dual Axis column
         doc.setFillColor(240, 253, 250);
-        doc.rect(colCompX[8] - 1.5, curCompRowY, 16.5, 5.0, 'F');
+        doc.rect(colCompX[8] - 1.5, curCompRowY, 16.5, compRowH, 'F');
 
+        // Month name
         doc.setFont('helvetica', 'normal');
-        doc.setFontSize(6.2);
+        doc.setFontSize(5.8);
         doc.setTextColor(30, 41, 59);
-        doc.text(mFull[i], colCompX[0], curCompRowY + 3.5);
+        doc.text(mFull[i], colCompX[0], curCompRowY + 3.8);
 
-        doc.text(rad0_comp[i].toFixed(2), colCompX[1], curCompRowY + 3.5);
-        doc.text(radOptAnn_comp[i].toFixed(2), colCompX[2], curCompRowY + 3.5);
-        doc.text(radOptSeas_comp[i].toFixed(2), colCompX[3], curCompRowY + 3.5);
-        doc.text(radOptMonthly_comp[i].toFixed(2), colCompX[4], curCompRowY + 3.5);
-        doc.text(radPolar_comp[i].toFixed(2), colCompX[5], curCompRowY + 3.5);
-        doc.text(radAzim_comp[i].toFixed(2), colCompX[6], curCompRowY + 3.5);
-        doc.text(radHorizTrack_comp[i].toFixed(2), colCompX[7], curCompRowY + 3.5);
+        // Helper to render cell with radiation value (line 1) and angles (line 2)
+        const drawCompCell = (
+          x: number,
+          val: number,
+          tilt: number,
+          azim: number,
+          isDual: boolean = false
+        ) => {
+          // Line 1: Radiation Value
+          doc.setFont('helvetica', isDual ? 'bold' : 'normal');
+          doc.setFontSize(5.6);
+          if (isDual) {
+            doc.setTextColor(4, 120, 87);
+          } else {
+            doc.setTextColor(30, 41, 59);
+          }
+          doc.text(formatNum(val, 2), x, curCompRowY + 2.7);
 
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(4, 120, 87);
-        doc.text(radDual_comp[i].toFixed(2), colCompX[8], curCompRowY + 3.5);
+          // Line 2: Orientation & Inclination angles (Image 2)
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(4.0);
+          if (isDual) {
+            doc.setTextColor(5, 150, 105);
+          } else {
+            doc.setTextColor(100, 116, 139);
+          }
+          const angleStr = `Inc: ${formatNum(tilt, 1)}° | Ori: ${formatNum(azim, 1)}°`;
+          doc.text(angleStr, x, curCompRowY + 5.1);
+        };
 
+        drawCompCell(colCompX[1], rad0_comp[i], 0.0, 0.0);
+        drawCompCell(colCompX[2], radOptAnn_comp[i], optAngle, fixedOri);
+        drawCompCell(colCompX[3], radOptSeas_comp[i], seasonTilts[i], fixedOri);
+        drawCompCell(colCompX[4], radOptMonthly_comp[i], monthlyOptTilts[i] ?? 0, fixedOri);
+        drawCompCell(colCompX[5], radPolar_comp[i], res.latitude, fixedOri);
+        drawCompCell(colCompX[6], radAzim_comp[i], res.latitude, noonAzims[i]);
+        drawCompCell(colCompX[7], radHorizTrack_comp[i], horizTilts[i], 90.0);
+        drawCompCell(colCompX[8], radDual_comp[i], noonDualTilts[i], noonAzims[i], true);
+
+        // Col 9: Mean Ambient Temperature
         doc.setFont('helvetica', 'normal');
+        doc.setFontSize(5.8);
         doc.setTextColor(71, 85, 105);
-        doc.text(tempMean_comp[i].toFixed(1), colCompX[9], curCompRowY + 3.5);
+        doc.text(formatNum(tempMean_comp[i], 1), colCompX[9], curCompRowY + 3.8);
 
-        curCompRowY += 5.0;
+        curCompRowY += compRowH;
       }
 
-      // Comparative Table Row of Means (PROMEDIO)
+      // Comparative Table Row of Means (PROMEDIO) with average angles
       doc.setFillColor(15, 23, 42);
-      doc.rect(20, curCompRowY, 170, 5.5, 'F');
+      doc.rect(20, curCompRowY, 170, compRowH, 'F');
+
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(6.2);
+      doc.setFontSize(5.8);
       doc.setTextColor(56, 189, 248);
-      doc.text(isEn ? 'AVERAGE' : 'PROMEDIO', colCompX[0], curCompRowY + 4);
+      doc.text(isEn ? 'AVERAGE' : 'PROMEDIO', colCompX[0], curCompRowY + 3.8);
 
+      const drawPromedioCell = (
+        x: number,
+        val: number,
+        avgTilt: number,
+        avgOri: number,
+        isDual: boolean = false
+      ) => {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(5.6);
+        doc.setTextColor(isDual ? 52 : 255, isDual ? 211 : 255, isDual ? 153 : 255);
+        doc.text(formatNum(val, 2), x, curCompRowY + 2.7);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(4.0);
+        doc.setTextColor(isDual ? 167 : 148, isDual ? 243 : 163, isDual ? 208 : 184);
+        const angleStr = `Inc: ${formatNum(avgTilt, 1)}° | Ori: ${formatNum(avgOri, 1)}°`;
+        doc.text(angleStr, x, curCompRowY + 5.1);
+      };
+
+      drawPromedioCell(colCompX[1], m0_val, 0.0, 0.0);
+      drawPromedioCell(colCompX[2], mAnn_val, optAngle, fixedOri);
+      drawPromedioCell(colCompX[3], mSeas_val, avgSeasonalTilt, fixedOri);
+      drawPromedioCell(colCompX[4], mMth_val, avgMonthlyTilt, fixedOri);
+      drawPromedioCell(colCompX[5], mPolar_val, res.latitude, fixedOri);
+      drawPromedioCell(colCompX[6], mAzim_val, res.latitude, avgDualAzim);
+      drawPromedioCell(colCompX[7], mHoriz_val, avgHorizTilt, 90.0);
+      drawPromedioCell(colCompX[8], mDual_val, avgDualTilt, avgDualAzim, true);
+
+      // Col 9: Annual Mean Ambient Temp
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(5.8);
       doc.setTextColor(255, 255, 255);
-      doc.text(m0_val.toFixed(2), colCompX[1], curCompRowY + 4);
-      doc.text(mAnn_val.toFixed(2), colCompX[2], curCompRowY + 4);
-      doc.text(mSeas_val.toFixed(2), colCompX[3], curCompRowY + 4);
-      doc.text(mMth_val.toFixed(2), colCompX[4], curCompRowY + 4);
-      doc.text(mPolar_val.toFixed(2), colCompX[5], curCompRowY + 4);
-      doc.text(mAzim_val.toFixed(2), colCompX[6], curCompRowY + 4);
-      doc.text(mHoriz_val.toFixed(2), colCompX[7], curCompRowY + 4);
-
-      doc.setTextColor(52, 211, 153);
-      doc.text(mDual_val.toFixed(2), colCompX[8], curCompRowY + 4);
-
-      doc.setTextColor(255, 255, 255);
-      doc.text(mTemp_val.toFixed(1), colCompX[9], curCompRowY + 4);
+      doc.text(formatNum(mTemp_val, 1), colCompX[9], curCompRowY + 3.8);
 
       // 4. Insights Box for Comparative Study
-      const insCompY = curCompRowY + 8;
-      const gainDualVs0 = comp === 'albedo' ? '-' : `+${(((mDual_val - m0_val) / (m0_val || 1)) * 100).toFixed(1)}%`;
-      const gainDualVsAnn = `+${(((mDual_val - mAnn_val) / (mAnn_val || 1)) * 100).toFixed(1)}%`;
-      const gainMthVsAnn = `+${(((mMth_val - mAnn_val) / (mAnn_val || 1)) * 100).toFixed(1)}%`;
+      const insCompY = curCompRowY + 7.5;
+      const gainDualVs0 = comp === 'albedo' ? '-' : `+${formatNum(((mDual_val - m0_val) / (m0_val || 1)) * 100, 1)}%`;
+      const gainDualVsAnn = `+${formatNum(((mDual_val - mAnn_val) / (mAnn_val || 1)) * 100, 1)}%`;
+      const gainMthVsAnn = `+${formatNum(((mMth_val - mAnn_val) / (mAnn_val || 1)) * 100, 1)}%`;
 
       const compInsightPoints = isEn
         ? [
-            `Two-Axis Tracking Superiority: Continuous dual-axis tracking maximizes incident energy collection (${mDual_val.toFixed(2)} kWh/m²/d annual mean), yielding ${gainDualVs0} over a horizontal surface and ${gainDualVsAnn} over the optimal fixed annual tilt.`,
-            `Multi-Position Fixed Optimization: Seasonal (4 tilts) and monthly (12 tilts) adjustments achieve ${mSeas_val.toFixed(2)} and ${mMth_val.toFixed(2)} kWh/m²/d respectively, leveling winter capture by ${gainMthVsAnn} over fixed tilt without motorized mechanisms.`
+            `Two-Axis Tracking Superiority: Continuous dual-axis tracking maximizes incident energy collection (${formatNum(mDual_val, 2)} kWh/m²/d annual mean), yielding ${gainDualVs0} over a horizontal surface and ${gainDualVsAnn} over the optimal fixed annual tilt.`,
+            `Multi-Position Fixed Optimization: Seasonal (4 tilts) and monthly (12 tilts) adjustments achieve ${formatNum(mSeas_val, 2)} and ${formatNum(mMth_val, 2)} kWh/m²/d respectively, leveling winter capture by ${gainMthVsAnn} over fixed tilt without motorized mechanisms.`
           ]
         : [
-            `Superioridad del Seguimiento a Dos Ejes: El seguimiento continuo a dos ejes maximiza la captación (${mDual_val.toFixed(2)} kWh/m²/d de media anual), proporcionando una ganancia de ${gainDualVs0} frente a superficie horizontal y del ${gainDualVsAnn} frente al óptimo fijo anual.`,
-            `Optimización Multi-Posición Fija: La adaptación estacional (4 posiciones) y mensual (12 posiciones) alcanzan ${mSeas_val.toFixed(2)} y ${mMth_val.toFixed(2)} kWh/m²/d respectivamente, reforzando la captación invernal en un ${gainMthVsAnn} sobre la inclinación fija anual.`
+            `Superioridad del Seguimiento a Dos Ejes: El seguimiento continuo a dos ejes maximiza la captación (${formatNum(mDual_val, 2)} kWh/m²/d de media anual), proporcionando una ganancia de ${gainDualVs0} frente a superficie horizontal y del ${gainDualVsAnn} frente al óptimo fijo anual.`,
+            `Optimización Multi-Posición Fija: La adaptación estacional (4 posiciones) y mensual (12 posiciones) alcanzan ${formatNum(mSeas_val, 2)} y ${formatNum(mMth_val, 2)} kWh/m²/d respectivamente, reforzando la captación invernal en un ${gainMthVsAnn} sobre la inclinación fija anual.`
           ];
 
       drawInsightBox(
@@ -1743,7 +1818,7 @@ export async function generateOrientSolPDFReport(
         20,
         insCompY,
         170,
-        30
+        28
       );
     } else {
       // Operational metrics bar (Imagen 3)
@@ -1761,11 +1836,11 @@ export async function generateOrientSolPDFReport(
       doc.text(isEn ? 'ANNUAL MEAN RESOURCE' : 'MEDIA ANUAL (RECURSO)', 24, opBarY + 5.5);
       doc.setFontSize(13);
       doc.setTextColor(15, 23, 42);
-      doc.text(`${activeMeanDailyKwh_c.toFixed(2)} kWh/m²/d`, 24, opBarY + 14);
+      doc.text(`${formatNum(activeMeanDailyKwh_c, 2)} kWh/m²/d`, 24, opBarY + 14);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
-      doc.text(`${Math.round(activeAnnualTotalKwh_c)} kWh/m²·${isEn ? 'yr' : 'año'}`, 24, opBarY + 19);
+      doc.text(`${formatInt(activeAnnualTotalKwh_c)} kWh/m²·${isEn ? 'yr' : 'año'}`, 24, opBarY + 19);
 
       // Metric 2: Inclinación Media / Rango
       const op2X = 20 + opCardW + cardGap;
@@ -1779,10 +1854,10 @@ export async function generateOrientSolPDFReport(
       doc.setTextColor(2, 132, 199);
       const tiltAvg =
         studyType === 'monthly'
-          ? `${(res.monthlyOptimum12.optimalTiltsDeg.reduce((a, b) => a + b, 0) / 12).toFixed(1)}°`
+          ? `${formatNum(res.monthlyOptimum12.optimalTiltsDeg.reduce((a, b) => a + b, 0) / 12, 1)}°`
           : studyType === 'seasonal'
           ? `${Math.round((res.seasonal.winterTiltDeg + res.seasonal.summerTiltDeg) / 2)}°`
-          : `${optAngle}°`;
+          : `${formatAngle(optAngle, 0)}`;
       doc.text(tiltAvg, op2X + 4, opBarY + 14);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
@@ -1807,11 +1882,11 @@ export async function generateOrientSolPDFReport(
       doc.text(isEn ? 'GAIN VS FIXED OPT' : 'GANANCIA S/ ÓPTIMO FIJO', op3X + 4, opBarY + 5.5);
       doc.setFontSize(13);
       doc.setTextColor(16, 185, 129);
-      doc.text(`${gainVsOpt_c >= 0 ? '+' : ''}${gainVsOpt_c.toFixed(2)}%`, op3X + 4, opBarY + 14);
+      doc.text(formatPercent(gainVsOpt_c, 2, true), op3X + 4, opBarY + 14);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
-      doc.text(`+${Math.max(0, Math.round(activeAnnualTotalKwh_c - optAnnualTotalKwh_c))} kWh/m²·${isEn ? 'yr' : 'año'}`, op3X + 4, opBarY + 19);
+      doc.text(`+${formatInt(Math.max(0, activeAnnualTotalKwh_c - optAnnualTotalKwh_c))} kWh/m²·${isEn ? 'yr' : 'año'}`, op3X + 4, opBarY + 19);
 
       // Metric 4: Ganancia s/ Horizontal
       const op4X = op3X + opCardW + cardGap;
@@ -1823,15 +1898,16 @@ export async function generateOrientSolPDFReport(
       doc.text(isEn ? 'GAIN VS HORIZONTAL' : 'GANANCIA S/ HORIZONTAL', op4X + 4, opBarY + 5.5);
       doc.setFontSize(13);
       doc.setTextColor(16, 185, 129);
-      const gainVsHorizDisplay = comp === 'albedo' ? '-' : `${gainVsHoriz_c >= 0 ? '+' : ''}${gainVsHoriz_c.toFixed(2)}%`;
+      const gainVsHorizDisplay = comp === 'albedo' ? '-' : formatPercent(gainVsHoriz_c, 2, true);
       doc.text(gainVsHorizDisplay, op4X + 4, opBarY + 14);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
+      const gainDiff = activeAnnualTotalKwh_c - horizAnnualTotalKwh_c;
       const gainVsHorizSub =
         comp === 'albedo'
           ? 'Rdm(0°) = 0'
-          : `${activeAnnualTotalKwh_c - horizAnnualTotalKwh_c >= 0 ? '+' : ''}${Math.round(activeAnnualTotalKwh_c - horizAnnualTotalKwh_c)} kWh/m²·${isEn ? 'yr' : 'año'}`;
+          : `${gainDiff >= 0 ? '+' : ''}${formatInt(gainDiff)} kWh/m²·${isEn ? 'yr' : 'año'}`;
       doc.text(gainVsHorizSub, op4X + 4, opBarY + 19);
 
       // 12 Tarjetas mensuales
@@ -1978,7 +2054,7 @@ export async function generateOrientSolPDFReport(
         doc.setFontSize(6.5);
         doc.setTextColor(30, 41, 59);
         doc.text(mFull[i], colX[0], curRowY + 3.5);
-        doc.text(radH_c[i].toFixed(2), colX[1], curRowY + 3.5);
+        doc.text(formatNum(radH_c[i], 2), colX[1], curRowY + 3.5);
 
         const seasonalTiltDeg =
           i === 11 || i === 0 || i === 1
@@ -1998,14 +2074,14 @@ export async function generateOrientSolPDFReport(
         doc.text(tiltStr, colX[2], curRowY + 3.5);
 
         doc.setTextColor(2, 132, 199);
-        doc.text(radAct_c[i].toFixed(2), colX[3], curRowY + 3.5);
+        doc.text(formatNum(radAct_c[i], 2), colX[3], curRowY + 3.5);
 
         doc.setTextColor(71, 85, 105);
-        doc.text(res.temperatures.ambient.monthlyMeanC[i].toFixed(1), colX[4], curRowY + 3.5);
-        doc.text(res.temperatures.cellOperating.monthlyCellTempOptimalC[i].toFixed(1), colX[5], curRowY + 3.5);
+        doc.text(formatNum(res.temperatures.ambient.monthlyMeanC[i], 1), colX[4], curRowY + 3.5);
+        doc.text(formatNum(res.temperatures.cellOperating.monthlyCellTempOptimalC[i], 1), colX[5], curRowY + 3.5);
 
         doc.setTextColor(15, 23, 42);
-        doc.text(String(Math.round(pvMonthly_c[i] ?? 0)), colX[6], curRowY + 3.5);
+        doc.text(formatInt(pvMonthly_c[i] ?? 0), colX[6], curRowY + 3.5);
 
         if (comp === 'albedo') {
           doc.setTextColor(100, 116, 139);
@@ -2013,11 +2089,11 @@ export async function generateOrientSolPDFReport(
         } else {
           const g0pct = radH_c[i] > 0 ? ((radAct_c[i] - radH_c[i]) / radH_c[i]) * 100 : 0;
           doc.setTextColor(g0pct >= 0 ? 16 : 220, g0pct >= 0 ? 185 : 38, g0pct >= 0 ? 129 : 38);
-          doc.text(`${g0pct >= 0 ? '+' : ''}${g0pct.toFixed(1)}%`, colX[7], curRowY + 3.5);
+          doc.text(formatPercent(g0pct, 1, true), colX[7], curRowY + 3.5);
         }
 
         const gOptPct = radOpt_c[i] > 0 ? ((radAct_c[i] - radOpt_c[i]) / radOpt_c[i]) * 100 : 0;
-        doc.text(`${gOptPct >= 0 ? '+' : ''}${gOptPct.toFixed(1)}%`, colX[8], curRowY + 3.5);
+        doc.text(formatPercent(gOptPct, 1, true), colX[8], curRowY + 3.5);
 
         curRowY += 5.0;
       }
@@ -2030,20 +2106,20 @@ export async function generateOrientSolPDFReport(
       doc.setTextColor(56, 189, 248);
       doc.text(isEn ? 'AVERAGE' : 'PROMEDIO', colX[0], curRowY + 4);
       doc.setTextColor(255, 255, 255);
-      doc.text(horizMeanDailyKwh_c.toFixed(2), colX[1], curRowY + 4);
+      doc.text(formatNum(horizMeanDailyKwh_c, 2), colX[1], curRowY + 4);
       doc.text('-', colX[2], curRowY + 4);
-      doc.text(activeMeanDailyKwh_c.toFixed(2), colX[3], curRowY + 4);
-      doc.text(res.temperatures.ambient.annualMeanC.toFixed(1), colX[4], curRowY + 4);
-      doc.text(res.temperatures.cellOperating.meanCellTempOptimalC.toFixed(1), colX[5], curRowY + 4);
-      doc.text(String(Math.round(pvMonthly_c.reduce((a, b) => a + b, 0))), colX[6], curRowY + 4);
+      doc.text(formatNum(activeMeanDailyKwh_c, 2), colX[3], curRowY + 4);
+      doc.text(formatNum(res.temperatures.ambient.annualMeanC, 1), colX[4], curRowY + 4);
+      doc.text(formatNum(res.temperatures.cellOperating.meanCellTempOptimalC, 1), colX[5], curRowY + 4);
+      doc.text(formatInt(pvMonthly_c.reduce((a, b) => a + b, 0)), colX[6], curRowY + 4);
       if (comp === 'albedo') {
         doc.setTextColor(148, 163, 184);
         doc.text('-', colX[7], curRowY + 4);
       } else {
         doc.setTextColor(gainVsHoriz_c >= 0 ? 52 : 248, gainVsHoriz_c >= 0 ? 211 : 113, gainVsHoriz_c >= 0 ? 153 : 113);
-        doc.text(`${gainVsHoriz_c >= 0 ? '+' : ''}${gainVsHoriz_c.toFixed(1)}%`, colX[7], curRowY + 4);
+        doc.text(formatPercent(gainVsHoriz_c, 1, true), colX[7], curRowY + 4);
       }
-      doc.text(`${gainVsOpt_c >= 0 ? '+' : ''}${gainVsOpt_c.toFixed(1)}%`, colX[8], curRowY + 4);
+      doc.text(formatPercent(gainVsOpt_c, 1, true), colX[8], curRowY + 4);
 
       // Insights box
       const ins2Y = curRowY + 9;

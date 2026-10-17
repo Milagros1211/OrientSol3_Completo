@@ -15,6 +15,7 @@ import {
 } from '@/components/export/pdfReportGenerator';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { renderCaptureLossMapSection } from '@/components/climate/CaptureLossMapSection';
+import { formatNum, formatInt } from '@/utils/formatters';
 
 export type RadiationComponentType = 'global' | 'beam' | 'diffuse' | 'albedo' | 'all';
 export type TableRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
@@ -812,29 +813,29 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
                 const pctX = gainsX.pcts[idx];
 
                 // For Albedo radiation, display hyphens (-) matching MATLAB Figura 5.2.49
-                const displayFactH = isAlbedo ? '-' : factH.toFixed(2);
-                const displayPctH = isAlbedo ? '-' : `${pctH >= 0 ? '+' : ''}${pctH.toFixed(2)}`;
+                const displayFactH = isAlbedo ? '-' : formatNum(factH, 2);
+                const displayPctH = isAlbedo ? '-' : `${pctH >= 0 ? '+' : ''}${formatNum(pctH, 2)}`;
 
                 return `
                   <tr>
                     <td class="td-month-name"><strong>${monthName}</strong></td>
-                    <td class="td-num">${g0.toFixed(2)}</td>
-                    <td class="td-num">${g15.toFixed(2)}</td>
-                    <td class="td-num">${g30.toFixed(2)}</td>
-                    <td class="td-num">${g45.toFixed(2)}</td>
-                    <td class="td-num">${g60.toFixed(2)}</td>
-                    <td class="td-num">${g75.toFixed(2)}</td>
-                    <td class="td-num">${g90.toFixed(2)}</td>
-                    <td class="td-num td-col-opt"><strong>${gOpt.toFixed(2)}</strong></td>
-                    ${stateComparisonMode ? `<td class="td-num td-col-anglex"><strong>${gX.toFixed(2)}</strong></td>` : ''}
-                    <td class="td-num td-col-temp">${temp.toFixed(1)}</td>
+                    <td class="td-num">${formatNum(g0, 2)}</td>
+                    <td class="td-num">${formatNum(g15, 2)}</td>
+                    <td class="td-num">${formatNum(g30, 2)}</td>
+                    <td class="td-num">${formatNum(g45, 2)}</td>
+                    <td class="td-num">${formatNum(g60, 2)}</td>
+                    <td class="td-num">${formatNum(g75, 2)}</td>
+                    <td class="td-num">${formatNum(g90, 2)}</td>
+                    <td class="td-num td-col-opt"><strong>${formatNum(gOpt, 2)}</strong></td>
+                    ${stateComparisonMode ? `<td class="td-num td-col-anglex"><strong>${formatNum(gX, 2)}</strong></td>` : ''}
+                    <td class="td-num td-col-temp">${formatNum(temp, 1)}</td>
                     <td class="td-num td-gain-factor">${displayFactH}</td>
                     <td class="td-num td-gain-pct ${!isAlbedo && pctH >= 0 ? 'text-gain-pos' : !isAlbedo ? 'text-gain-neg' : ''}">${displayPctH}</td>
                     ${
                       stateComparisonMode
                         ? `
-                      <td class="td-num td-gain-factor-x">${factX.toFixed(2)}</td>
-                      <td class="td-num td-gain-pct-x ${pctX >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${pctX >= 0 ? '+' : ''}${pctX.toFixed(2)}</td>
+                      <td class="td-num td-gain-factor-x">${formatNum(factX, 2)}</td>
+                      <td class="td-num td-gain-pct-x ${pctX >= 0 ? 'text-gain-pos' : 'text-gain-neg'}">${pctX >= 0 ? '+' : ''}${formatNum(pctX, 2)}</td>
                     `
                         : ''
                     }
@@ -845,23 +846,23 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
             <tfoot>
               <tr class="table-media-row">
                 <td class="td-media-label"><strong>${t.results.annualMeanRow}</strong></td>
-                <td class="td-num"><strong>${mean0.toFixed(2)}</strong></td>
-                <td class="td-num"><strong>${mean15.toFixed(2)}</strong></td>
-                <td class="td-num"><strong>${mean30.toFixed(2)}</strong></td>
-                <td class="td-num"><strong>${mean45.toFixed(2)}</strong></td>
-                <td class="td-num"><strong>${mean60.toFixed(2)}</strong></td>
-                <td class="td-num"><strong>${mean75.toFixed(2)}</strong></td>
-                <td class="td-num"><strong>${mean90.toFixed(2)}</strong></td>
-                <td class="td-num td-col-opt"><strong>${meanOpt.toFixed(2)}</strong></td>
-                ${stateComparisonMode ? `<td class="td-num td-col-anglex"><strong>${meanX.toFixed(2)}</strong></td>` : ''}
-                <td class="td-num td-col-temp"><strong>${tempMeanAnnual.toFixed(1)}</strong></td>
-                <td class="td-num td-gain-factor" title="${isEn ? 'Annual Resource Gain Factor' : 'Factor de ganancia anual del recurso'}"><strong>${isAlbedo ? '-' : meanFactorHoriz.toFixed(2)}</strong></td>
-                <td class="td-num td-gain-pct ${!isAlbedo && annualGainVsHorizPct >= 0 ? 'text-gain-pos' : !isAlbedo ? 'text-gain-neg' : ''}" title="${isEn ? `Annual Resource Gain: ${annualGainVsHorizPct >= 0 ? '+' : ''}${annualGainVsHorizPct.toFixed(2)}% (Monthly unweighted avg: ${meanPctHoriz >= 0 ? '+' : ''}${meanPctHoriz.toFixed(2)}%)` : `Ganancia anual del recurso: ${annualGainVsHorizPct >= 0 ? '+' : ''}${annualGainVsHorizPct.toFixed(2)}% (Media mensual sin ponderar: ${meanPctHoriz >= 0 ? '+' : ''}${meanPctHoriz.toFixed(2)}%)`}"><strong>${isAlbedo ? '-' : `${annualGainVsHorizPct >= 0 ? '+' : ''}${annualGainVsHorizPct.toFixed(2)}%`}</strong></td>
+                <td class="td-num"><strong>${formatNum(mean0, 2)}</strong></td>
+                <td class="td-num"><strong>${formatNum(mean15, 2)}</strong></td>
+                <td class="td-num"><strong>${formatNum(mean30, 2)}</strong></td>
+                <td class="td-num"><strong>${formatNum(mean45, 2)}</strong></td>
+                <td class="td-num"><strong>${formatNum(mean60, 2)}</strong></td>
+                <td class="td-num"><strong>${formatNum(mean75, 2)}</strong></td>
+                <td class="td-num"><strong>${formatNum(mean90, 2)}</strong></td>
+                <td class="td-num td-col-opt"><strong>${formatNum(meanOpt, 2)}</strong></td>
+                ${stateComparisonMode ? `<td class="td-num td-col-anglex"><strong>${formatNum(meanX, 2)}</strong></td>` : ''}
+                <td class="td-num td-col-temp"><strong>${formatNum(tempMeanAnnual, 1)}</strong></td>
+                <td class="td-num td-gain-factor" title="${isEn ? 'Annual Resource Gain Factor' : 'Factor de ganancia anual del recurso'}"><strong>${isAlbedo ? '-' : formatNum(meanFactorHoriz, 2)}</strong></td>
+                <td class="td-num td-gain-pct ${!isAlbedo && annualGainVsHorizPct >= 0 ? 'text-gain-pos' : !isAlbedo ? 'text-gain-neg' : ''}" title="${isEn ? `Annual Resource Gain: ${annualGainVsHorizPct >= 0 ? '+' : ''}${annualGainVsHorizPct.toFixed(2)}% (Monthly unweighted avg: ${meanPctHoriz >= 0 ? '+' : ''}${meanPctHoriz.toFixed(2)}%)` : `Ganancia anual del recurso: ${annualGainVsHorizPct >= 0 ? '+' : ''}${annualGainVsHorizPct.toFixed(2)}% (Media mensual sin ponderar: ${meanPctHoriz >= 0 ? '+' : ''}${meanPctHoriz.toFixed(2)}%)`}"><strong>${isAlbedo ? '-' : `${annualGainVsHorizPct >= 0 ? '+' : ''}${formatNum(annualGainVsHorizPct, 2)}%`}</strong></td>
                 ${
                   stateComparisonMode
                     ? `
-                  <td class="td-num td-gain-factor-x"><strong>${meanFactorX.toFixed(2)}</strong></td>
-                  <td class="td-num td-gain-pct-x ${meanPctX >= 0 ? 'text-gain-pos' : 'text-gain-neg'}"><strong>${meanPctX >= 0 ? '+' : ''}${meanPctX.toFixed(2)}</strong></td>
+                  <td class="td-num td-gain-factor-x"><strong>${formatNum(meanFactorX, 2)}</strong></td>
+                  <td class="td-num td-gain-pct-x ${meanPctX >= 0 ? 'text-gain-pos' : 'text-gain-neg'}"><strong>${meanPctX >= 0 ? '+' : ''}${formatNum(meanPctX, 2)}</strong></td>
                 `
                     : ''
                 }
@@ -874,26 +875,26 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
         <div class="opt-comparative-kpi-grid">
           <div class="kpi-mini-card kpi-optimal">
             <span class="kpi-mini-title">${isEn ? `Optimal Tilt (β = ${optAngle}°)` : `Inclinación Óptima (β = ${optAngle}°)`}</span>
-            <div class="kpi-mini-main">${meanOpt.toFixed(2)} <small>kWh/m²/d</small></div>
-            <span class="kpi-mini-sub">${Math.round(meanOpt * 365).toLocaleString()} kWh/m²·${isEn ? 'yr' : 'año'}</span>
+            <div class="kpi-mini-main">${formatNum(meanOpt, 2)} <small>kWh/m²/d</small></div>
+            <span class="kpi-mini-sub">${formatInt(meanOpt * 365)} kWh/m²·${isEn ? 'yr' : 'año'}</span>
           </div>
 
           <div class="kpi-mini-card kpi-anglex">
             <span class="kpi-mini-title">${isEn ? `Selected Angle X (β = ${stateAngleX}°)` : `Ángulo Seleccionado X (β = ${stateAngleX}°)`}</span>
-            <div class="kpi-mini-main">${meanX.toFixed(2)} <small>kWh/m²/d</small></div>
-            <span class="kpi-mini-sub">${Math.round(meanX * 365).toLocaleString()} kWh/m²·${isEn ? 'yr' : 'año'}</span>
+            <div class="kpi-mini-main">${formatNum(meanX, 2)} <small>kWh/m²/d</small></div>
+            <span class="kpi-mini-sub">${formatInt(meanX * 365)} kWh/m²·${isEn ? 'yr' : 'año'}</span>
           </div>
 
           <div class="kpi-mini-card kpi-gain">
             <span class="kpi-mini-title">${isEn ? 'Net Gain (Optimal vs Angle X)' : 'Ganancia Neta (Óptimo vs Ángulo X)'}</span>
-            <div class="kpi-mini-main text-gain">${diffPct >= 0 ? '+' : ''}${diffPct.toFixed(2)}%</div>
-            <span class="kpi-mini-sub">${diffAnnualKwh >= 0 ? '+' : ''}${Math.round(diffAnnualKwh)} kWh/m²·${isEn ? 'yr' : 'año'}</span>
+            <div class="kpi-mini-main text-gain">${diffPct >= 0 ? '+' : ''}${formatNum(diffPct, 2)}%</div>
+            <span class="kpi-mini-sub">${diffAnnualKwh >= 0 ? '+' : ''}${formatInt(diffAnnualKwh)} kWh/m²·${isEn ? 'yr' : 'año'}</span>
           </div>
 
           <div class="kpi-mini-card kpi-horiz">
             <span class="kpi-mini-title">${isEn ? 'Gain over Horizontal (0°)' : 'Ganancia s/ Horizontal (0°)'}</span>
-            <div class="kpi-mini-main" style="color: var(--accent-cyan);">${isAlbedo ? '-' : `${annualGainVsHorizPct >= 0 ? '+' : ''}${annualGainVsHorizPct.toFixed(2)}%`}</div>
-            <span class="kpi-mini-sub">${isAlbedo ? 'Rdm(0°) = 0' : `${(meanOpt - mean0) * 365 >= 0 ? '+' : ''}${Math.round((meanOpt - mean0) * 365)} kWh/m²·${isEn ? 'yr' : 'año'}`}</span>
+            <div class="kpi-mini-main" style="color: var(--accent-cyan);">${isAlbedo ? '-' : `${annualGainVsHorizPct >= 0 ? '+' : ''}${formatNum(annualGainVsHorizPct, 2)}%`}</div>
+            <span class="kpi-mini-sub">${isAlbedo ? 'Rdm(0°) = 0' : `${(meanOpt - mean0) * 365 >= 0 ? '+' : ''}${formatInt((meanOpt - mean0) * 365)} kWh/m²·${isEn ? 'yr' : 'año'}`}</span>
           </div>
         </div>
 

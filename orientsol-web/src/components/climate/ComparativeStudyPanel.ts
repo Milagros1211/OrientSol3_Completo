@@ -10,6 +10,7 @@ import {
 import { exportOrientSolMasterExcel } from '@/components/export/masterExportService';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { getNoonAzimuthDeg, getDualAxisNoonTiltDeg, getHorizontalTrackerDailyMeanTiltDeg } from '@/services/solarGeometryAngles';
+import { formatNum } from '@/utils/formatters';
 
 export type ComparativeRadiationComponent = 'global' | 'beam' | 'diffuse' | 'albedo';
 
@@ -137,7 +138,7 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
               </span>
               <span style="margin-left: 1.5rem;">
                 <strong>${isEn ? 'Latitude (°):' : 'Latitud (°):'}</strong>
-                <span class="meta-val" style="font-weight: 700; margin-left: 0.35rem;">${latitude.toFixed(2)}°</span>
+                <span class="meta-val" style="font-weight: 700; margin-left: 0.35rem;">${formatNum(latitude, 2)}°</span>
               </span>
             </div>
             <div class="opt-tracking-study-title-row">
@@ -209,53 +210,53 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
                   <td class="td-track-month"><strong>${mName}</strong></td>
                   <td class="td-comp-val-cell">
                     <div class="comp-cell-flex">
-                      <span class="comp-val-main">${rad0[i].toFixed(2)}</span>
-                      <span class="comp-angle-chip">Inc: 0.0° | Ori: 0.0°</span>
+                      <span class="comp-val-main">${formatNum(rad0[i], 2)}</span>
+                      <span class="comp-angle-chip">Inc: 0,0° | Ori: 0,0°</span>
                     </div>
                   </td>
                   <td class="td-comp-val-cell">
                     <div class="comp-cell-flex">
-                      <span class="comp-val-main">${radOptAnnual[i].toFixed(2)}</span>
-                      <span class="comp-angle-chip">Inc: ${optTiltAnn.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                      <span class="comp-val-main">${formatNum(radOptAnnual[i], 2)}</span>
+                      <span class="comp-angle-chip">Inc: ${formatNum(optTiltAnn, 1)}° | Ori: ${formatNum(fixedOri, 1)}°</span>
                     </div>
                   </td>
                   <td class="td-comp-val-cell">
                     <div class="comp-cell-flex">
-                      <span class="comp-val-main">${radOptSeasonal[i].toFixed(2)}</span>
-                      <span class="comp-angle-chip">Inc: ${seasonTilts[i].toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                      <span class="comp-val-main">${formatNum(radOptSeasonal[i], 2)}</span>
+                      <span class="comp-angle-chip">Inc: ${formatNum(seasonTilts[i], 1)}° | Ori: ${formatNum(fixedOri, 1)}°</span>
                     </div>
                   </td>
                   <td class="td-comp-val-cell">
                     <div class="comp-cell-flex">
-                      <span class="comp-val-main">${radOptMonthly[i].toFixed(2)}</span>
-                      <span class="comp-angle-chip">Inc: ${(monthlyOptTilts[i] ?? 0).toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                      <span class="comp-val-main">${formatNum(radOptMonthly[i], 2)}</span>
+                      <span class="comp-angle-chip">Inc: ${formatNum(monthlyOptTilts[i] ?? 0, 1)}° | Ori: ${formatNum(fixedOri, 1)}°</span>
                     </div>
                   </td>
                   <td class="td-comp-val-cell">
                     <div class="comp-cell-flex">
-                      <span class="comp-val-main">${radPolar[i].toFixed(2)}</span>
-                      <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                      <span class="comp-val-main">${formatNum(radPolar[i], 2)}</span>
+                      <span class="comp-angle-chip">Inc: ${formatNum(latitude, 1)}° | Ori: ${formatNum(fixedOri, 1)}°</span>
                     </div>
                   </td>
                   <td class="td-comp-val-cell">
                     <div class="comp-cell-flex">
-                      <span class="comp-val-main">${radAzim[i].toFixed(2)}</span>
-                      <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${noonAzims[i].toFixed(1)}°</span>
+                      <span class="comp-val-main">${formatNum(radAzim[i], 2)}</span>
+                      <span class="comp-angle-chip">Inc: ${formatNum(latitude, 1)}° | Ori: ${formatNum(noonAzims[i], 1)}°</span>
                     </div>
                   </td>
                   <td class="td-comp-val-cell">
                     <div class="comp-cell-flex">
-                      <span class="comp-val-main">${radHorizTrack[i].toFixed(2)}</span>
-                      <span class="comp-angle-chip">Inc: ${horizTilts[i].toFixed(1)}° | Ori: 90.0°</span>
+                      <span class="comp-val-main">${formatNum(radHorizTrack[i], 2)}</span>
+                      <span class="comp-angle-chip">Inc: ${formatNum(horizTilts[i], 1)}° | Ori: 90,0°</span>
                     </div>
                   </td>
                   <td class="td-track-dual td-comp-val-cell">
                     <div class="comp-cell-flex">
-                      <span class="comp-val-main"><strong>${radDual[i].toFixed(2)}</strong></span>
-                      <span class="comp-angle-chip chip-dual">Inc: ${noonDualTilts[i].toFixed(1)}° | Ori: ${noonAzims[i].toFixed(1)}°</span>
+                      <span class="comp-val-main"><strong>${formatNum(radDual[i], 2)}</strong></span>
+                      <span class="comp-angle-chip chip-dual">Inc: ${formatNum(noonDualTilts[i], 1)}° | Ori: ${formatNum(noonAzims[i], 1)}°</span>
                     </div>
                   </td>
-                  <td class="td-track-temp-val"><strong>${tempMean[i].toFixed(1)}</strong></td>
+                  <td class="td-track-temp-val"><strong>${formatNum(tempMean[i], 1)}</strong></td>
                 </tr>
                 `;
               }).join('')}
@@ -265,53 +266,53 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
                 <td class="td-track-month"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
-                    <span class="comp-val-main"><strong>${m0.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: 0.0° | Ori: 0.0°</span>
+                    <span class="comp-val-main"><strong>${formatNum(m0, 2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: 0,0° | Ori: 0,0°</span>
                   </div>
                 </td>
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
-                    <span class="comp-val-main"><strong>${mOptAnnual.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: ${res.optimalAnnual.optimalTiltDeg.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                    <span class="comp-val-main"><strong>${formatNum(mOptAnnual, 2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: ${formatNum(res.optimalAnnual.optimalTiltDeg, 1)}° | Ori: ${formatNum(fixedOri, 1)}°</span>
                   </div>
                 </td>
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
-                    <span class="comp-val-main"><strong>${mOptSeasonal.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: ${avgSeasonalTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                    <span class="comp-val-main"><strong>${formatNum(mOptSeasonal, 2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: ${formatNum(avgSeasonalTilt, 1)}° | Ori: ${formatNum(fixedOri, 1)}°</span>
                   </div>
                 </td>
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
-                    <span class="comp-val-main"><strong>${mOptMonthly.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: ${avgMonthlyTilt.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                    <span class="comp-val-main"><strong>${formatNum(mOptMonthly, 2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: ${formatNum(avgMonthlyTilt, 1)}° | Ori: ${formatNum(fixedOri, 1)}°</span>
                   </div>
                 </td>
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
-                    <span class="comp-val-main"><strong>${mPolar.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${fixedOri.toFixed(1)}°</span>
+                    <span class="comp-val-main"><strong>${formatNum(mPolar, 2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: ${formatNum(latitude, 1)}° | Ori: ${formatNum(fixedOri, 1)}°</span>
                   </div>
                 </td>
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
-                    <span class="comp-val-main"><strong>${mAzim.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: ${latitude.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°</span>
+                    <span class="comp-val-main"><strong>${formatNum(mAzim, 2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: ${formatNum(latitude, 1)}° | Ori: ${formatNum(avgDualAzim, 1)}°</span>
                   </div>
                 </td>
                 <td class="td-comp-val-cell">
                   <div class="comp-cell-flex">
-                    <span class="comp-val-main"><strong>${mHorizTrack.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip">Inc: ${avgHorizTilt.toFixed(1)}° | Ori: 90.0°</span>
+                    <span class="comp-val-main"><strong>${formatNum(mHorizTrack, 2)}</strong></span>
+                    <span class="comp-angle-chip">Inc: ${formatNum(avgHorizTilt, 1)}° | Ori: 90,0°</span>
                   </div>
                 </td>
                 <td class="td-track-dual td-comp-val-cell">
                   <div class="comp-cell-flex">
-                    <span class="comp-val-main"><strong>${mDual.toFixed(2)}</strong></span>
-                    <span class="comp-angle-chip chip-dual">Inc: ${avgDualTilt.toFixed(1)}° | Ori: ${avgDualAzim.toFixed(1)}°</span>
+                    <span class="comp-val-main"><strong>${formatNum(mDual, 2)}</strong></span>
+                    <span class="comp-angle-chip chip-dual">Inc: ${formatNum(avgDualTilt, 1)}° | Ori: ${formatNum(avgDualAzim, 1)}°</span>
                   </div>
                 </td>
-                <td class="td-track-temp-val"><strong>${mTemp.toFixed(1)}</strong></td>
+                <td class="td-track-temp-val"><strong>${formatNum(mTemp, 1)}</strong></td>
               </tr>
             </tfoot>
           </table>
