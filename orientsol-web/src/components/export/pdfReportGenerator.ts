@@ -156,21 +156,21 @@ function sanitizePdfText(text: string): string {
     .replace(/≤/g, '<=')
     .replace(/≥/g, '>=')
     .replace(/∈/g, 'en')
-    .replace(/★/g, '*')
-    .replace(/²/g, '^2')
-    .replace(/³/g, '^3');
+    .replace(/★/g, '*');
 }
 
 export interface TextSubscriptSegment {
   text: string;
   isSub?: boolean;
+  isSuper?: boolean;
   color?: [number, number, number];
   bold?: boolean;
 }
 
 /**
- * Draws text segments with true visual subscripts in jsPDF.
- * Accurately scales font size, shifts baseline downwards, and supports left/center/right alignment.
+ * Draws text segments with true visual subscripts and superscripts in jsPDF.
+ * Accurately scales font size, shifts baseline downwards (sub) or upwards (super),
+ * and supports left/center/right alignment.
  */
 function drawTextWithSubscripts(
   doc: jsPDF,
@@ -182,10 +182,11 @@ function drawTextWithSubscripts(
   defaultFontBold: boolean = false
 ): number {
   const currentFontName = doc.getFont().fontName || 'helvetica';
-  const subRatio = 0.72;
-  const subFontSize = baseFontSize * subRatio;
-  // In jsPDF mm units: baseline shift for subscript is ~28% of base font size in mm (1 pt = 0.3528 mm)
+  const scriptRatio = 0.68;
+  const scriptFontSize = baseFontSize * scriptRatio;
+  // In jsPDF mm units: baseline shift for subscript is downwards (~28%), superscript is upwards (~34%)
   const subYShift = baseFontSize * 0.3528 * 0.28;
+  const superYShift = -baseFontSize * 0.3528 * 0.34;
 
   // Sanitize all text segments before measurement and rendering to guarantee clean ASCII output
   const cleanSegments = segments.map((seg) => ({
@@ -198,7 +199,7 @@ function drawTextWithSubscripts(
   cleanSegments.forEach((seg) => {
     const isBold = seg.bold !== undefined ? seg.bold : defaultFontBold;
     doc.setFont(currentFontName, isBold ? 'bold' : 'normal');
-    doc.setFontSize(seg.isSub ? subFontSize : baseFontSize);
+    doc.setFontSize((seg.isSub || seg.isSuper) ? scriptFontSize : baseFontSize);
     totalW += doc.getTextWidth(seg.text);
   });
 
@@ -214,11 +215,11 @@ function drawTextWithSubscripts(
   cleanSegments.forEach((seg) => {
     const isBold = seg.bold !== undefined ? seg.bold : defaultFontBold;
     doc.setFont(currentFontName, isBold ? 'bold' : 'normal');
-    doc.setFontSize(seg.isSub ? subFontSize : baseFontSize);
+    doc.setFontSize((seg.isSub || seg.isSuper) ? scriptFontSize : baseFontSize);
     if (seg.color) {
       doc.setTextColor(seg.color[0], seg.color[1], seg.color[2]);
     }
-    const renderY = seg.isSub ? baseY + subYShift : baseY;
+    const renderY = seg.isSub ? baseY + subYShift : seg.isSuper ? baseY + superYShift : baseY;
     doc.text(seg.text, curX, renderY);
     curX += doc.getTextWidth(seg.text);
   });
@@ -226,6 +227,46 @@ function drawTextWithSubscripts(
   // Restore base font size and normal state
   doc.setFontSize(baseFontSize);
   return totalW;
+}
+
+/**
+ * Universal rich text renderer: Automatically detects and renders superscripts (m², m^2, m³, m^3)
+ * with proportional font sizing and elevated baseline, matching the user's requested subíndice superior style.
+ */
+function drawRichText(
+  doc: jsPDF,
+  text: string,
+  x: number,
+  y: number,
+  fontSize: number = 7,
+  align: 'left' | 'center' | 'right' = 'left',
+  bold: boolean = false,
+  color?: [number, number, number]
+): number {
+  if (!text) return 0;
+  if (!/[²³\^]/.test(text)) {
+    doc.setFont('helvetica', bold ? 'bold' : 'normal');
+    doc.setFontSize(fontSize);
+    if (color) doc.setTextColor(color[0], color[1], color[2]);
+    const clean = sanitizePdfText(text);
+    doc.text(clean, x, y, { align });
+    return doc.getTextWidth(clean);
+  }
+
+  const parts = text.split(/(²|\^2|³|\^3)/g);
+  const segments: TextSubscriptSegment[] = [];
+  for (const part of parts) {
+    if (!part) continue;
+    if (part === '²' || part === '^2') {
+      segments.push({ text: '2', isSuper: true, color, bold });
+    } else if (part === '³' || part === '^3') {
+      segments.push({ text: '3', isSuper: true, color, bold });
+    } else {
+      segments.push({ text: part, isSuper: false, isSub: false, color, bold });
+    }
+  }
+
+  return drawTextWithSubscripts(doc, segments, x, y, fontSize, align, bold);
 }
 
 /**
@@ -999,8 +1040,7 @@ export async function generateOrientSolPDFReport(
 
   doc.setFont('helvetica', 'bold');
   doc.text(`${isEn ? 'Collector Area' : 'Sup. Captación'}:`, c2LabX, paramsY + 31);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${formatNum(res.energyYield.collectorAreaM2, 1)} m²`, c2ValX, paramsY + 31);
+  drawRichText(doc, `${formatNum(res.energyYield.collectorAreaM2, 1)} m²`, c2ValX, paramsY + 31, 7);
 
   // Row 4
   doc.setFont('helvetica', 'bold');
@@ -1032,9 +1072,7 @@ export async function generateOrientSolPDFReport(
   doc.text(isEn ? 'INCIDENT SOLAR ENERGY RECEIVED' : 'ENERGÍA SOLAR INCIDENTE RECIBIDA', 24, bmY + 6);
   doc.setFontSize(14);
   doc.text(`${formatInt(res.energyYield.recibida.annualTotalKwh)} kWh/${isEn ? 'yr' : 'año'}`, 24, bmY + 16);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7);
-  doc.text(`${formatNum(res.energyYield.recibida.annualKwhM2, 1)} kWh/m²·${isEn ? 'yr' : 'año'} • ${formatNum(res.energyYield.recibida.meanDailyKwhM2, 2)} kWh/m²/${isEn ? 'day' : 'día'}`, 24, bmY + 23);
+  drawRichText(doc, `${formatNum(res.energyYield.recibida.annualKwhM2, 1)} kWh/m²·${isEn ? 'yr' : 'año'} • ${formatNum(res.energyYield.recibida.meanDailyKwhM2, 2)} kWh/m²/${isEn ? 'day' : 'día'}`, 24, bmY + 23, 7, 'left', false, [180, 83, 9]);
 
   doc.setFillColor(209, 250, 229);
   doc.roundedRect(108, bmY, 82, 28, 2, 2, 'F');
@@ -1053,10 +1091,7 @@ export async function generateOrientSolPDFReport(
   // (Horizontal vs Fijo Óptimo vs 12 Óptimos Mensuales / Operación)
   // -------------------------------------------------------------
   const chart1Y = 60;
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(15, 23, 42);
-  doc.text(isEn ? 'Monthly Solar Radiation by Surface (kWh/m²/day)' : 'Radiación Solar Mensual por Superficie (kWh/m²/día)', 20, chart1Y);
+  drawRichText(doc, isEn ? 'Monthly Solar Radiation by Surface (kWh/m²/day)' : 'Radiación Solar Mensual por Superficie (kWh/m²/día)', 20, chart1Y, 9, 'left', true, [15, 23, 42]);
 
   const c1W = 170;
   const c1H = 50;
@@ -1117,7 +1152,7 @@ export async function generateOrientSolPDFReport(
   doc.setFontSize(5);
   doc.setTextColor(148, 163, 184);
   doc.text('0', axisX - 1.5, baseY1 + 1, { align: 'right' });
-  doc.text('kWh/m²·d', axisX - 1.5, baseY1 - plotH1 - 1, { align: 'right' });
+  drawRichText(doc, 'kWh/m²·d', axisX - 1.5, baseY1 - plotH1 - 1, 5, 'right', false, [148, 163, 184]);
 
   radTicks.forEach((tv) => {
     const yT = baseY1 - (tv / maxRadPlot) * plotH1;
@@ -1639,13 +1674,12 @@ export async function generateOrientSolPDFReport(
       doc.setFontSize(6.5);
       doc.setTextColor(100, 116, 139);
       doc.text(isEn ? 'HORIZONTAL (0°)' : 'PLANO HORIZONTAL (0°)', 24, opBarY + 5.0);
-      doc.setFontSize(12);
       doc.setTextColor(15, 23, 42);
-      doc.text(`${formatNum(m0_val, 2)} kWh/m²/d`, 24, opBarY + 12.5);
+      drawRichText(doc, `${formatNum(m0_val, 2)} kWh/m²/d`, 24, opBarY + 12.5, 12, 'left', true, [15, 23, 42]);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
-      doc.text(`${formatInt(m0_val * 365)} kWh/m²·${isEn ? 'yr' : 'año'}`, 24, opBarY + 17.5);
+      drawRichText(doc, `${formatInt(m0_val * 365)} kWh/m²·${isEn ? 'yr' : 'año'}`, 24, opBarY + 17.5, 6, 'left', false, [100, 116, 139]);
 
       // Card 2: Fixed Optimum
       const op2X = 20 + opCardW + cardGap;
@@ -1655,9 +1689,7 @@ export async function generateOrientSolPDFReport(
       doc.setFontSize(6.5);
       doc.setTextColor(100, 116, 139);
       doc.text(isEn ? `FIXED OPT (${optAngle}°)` : `ÓPTIMO FIJO (${optAngle}°)`, op2X + 4, opBarY + 5.0);
-      doc.setFontSize(12);
-      doc.setTextColor(2, 132, 199);
-      doc.text(`${formatNum(mAnn_val, 2)} kWh/m²/d`, op2X + 4, opBarY + 12.5);
+      drawRichText(doc, `${formatNum(mAnn_val, 2)} kWh/m²/d`, op2X + 4, opBarY + 12.5, 12, 'left', true, [2, 132, 199]);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
@@ -1672,9 +1704,7 @@ export async function generateOrientSolPDFReport(
       doc.setFontSize(6.5);
       doc.setTextColor(100, 116, 139);
       doc.text(isEn ? 'MONTHLY OPT (12 POS)' : 'ÓPTIMO MENSUAL (12 POS)', op3X + 4, opBarY + 5.0);
-      doc.setFontSize(12);
-      doc.setTextColor(16, 185, 129);
-      doc.text(`${formatNum(mMth_val, 2)} kWh/m²/d`, op3X + 4, opBarY + 12.5);
+      drawRichText(doc, `${formatNum(mMth_val, 2)} kWh/m²/d`, op3X + 4, opBarY + 12.5, 12, 'left', true, [16, 185, 129]);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
@@ -1689,9 +1719,7 @@ export async function generateOrientSolPDFReport(
       doc.setFontSize(6.5);
       doc.setTextColor(100, 116, 139);
       doc.text(isEn ? 'TWO-AXIS TRACKING' : 'SEGUIM. A DOS EJES', op4X + 4, opBarY + 5.0);
-      doc.setFontSize(12);
-      doc.setTextColor(5, 150, 105);
-      doc.text(`${formatNum(mDual_val, 2)} kWh/m²/d`, op4X + 4, opBarY + 12.5);
+      drawRichText(doc, `${formatNum(mDual_val, 2)} kWh/m²/d`, op4X + 4, opBarY + 12.5, 12, 'left', true, [5, 150, 105]);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
@@ -1904,11 +1932,11 @@ export async function generateOrientSolPDFReport(
       doc.text(isEn ? 'ANNUAL MEAN RESOURCE' : 'MEDIA ANUAL (RECURSO)', 24, opBarY + 5.5);
       doc.setFontSize(13);
       doc.setTextColor(15, 23, 42);
-      doc.text(`${formatNum(activeMeanDailyKwh_c, 2)} kWh/m²/d`, 24, opBarY + 14);
+      drawRichText(doc, `${formatNum(activeMeanDailyKwh_c, 2)} kWh/m²/d`, 24, opBarY + 14, 13, 'left', true, [15, 23, 42]);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
-      doc.text(`${formatInt(activeAnnualTotalKwh_c)} kWh/m²·${isEn ? 'yr' : 'año'}`, 24, opBarY + 19);
+      drawRichText(doc, `${formatInt(activeAnnualTotalKwh_c)} kWh/m²·${isEn ? 'yr' : 'año'}`, 24, opBarY + 19, 6, 'left', false, [100, 116, 139]);
 
       // Metric 2: Inclinación Media / Rango
       const op2X = 20 + opCardW + cardGap;
@@ -1954,7 +1982,7 @@ export async function generateOrientSolPDFReport(
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6);
       doc.setTextColor(100, 116, 139);
-      doc.text(`+${formatInt(Math.max(0, activeAnnualTotalKwh_c - optAnnualTotalKwh_c))} kWh/m²·${isEn ? 'yr' : 'año'}`, op3X + 4, opBarY + 19);
+      drawRichText(doc, `+${formatInt(Math.max(0, activeAnnualTotalKwh_c - optAnnualTotalKwh_c))} kWh/m²·${isEn ? 'yr' : 'año'}`, op3X + 4, opBarY + 19, 6, 'left', false, [100, 116, 139]);
 
       // Metric 4: Ganancia s/ Horizontal
       const op4X = op3X + opCardW + cardGap;
@@ -1976,7 +2004,7 @@ export async function generateOrientSolPDFReport(
         comp === 'albedo'
           ? 'Rdm(0°) = 0'
           : `${gainDiff >= 0 ? '+' : ''}${formatInt(gainDiff)} kWh/m²·${isEn ? 'yr' : 'año'}`;
-      doc.text(gainVsHorizSub, op4X + 4, opBarY + 19);
+      drawRichText(doc, gainVsHorizSub, op4X + 4, opBarY + 19, 6, 'left', false, [100, 116, 139]);
 
       // 12 Tarjetas mensuales
       const mcY = opBarY + opCardH + 6;
@@ -2037,10 +2065,8 @@ export async function generateOrientSolPDFReport(
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(6);
         doc.setTextColor(15, 23, 42);
-        doc.text(`${radM.toFixed(2)}`, mx + 2, mCardBaseY + 15);
-        doc.setFontSize(4.5);
-        doc.setTextColor(148, 163, 184);
-        doc.text('kWh/m²/d', mx + 2, mCardBaseY + 18);
+        doc.text(`${formatNum(radM, 2)}`, mx + 2, mCardBaseY + 15);
+        drawRichText(doc, 'kWh/m²/d', mx + 2, mCardBaseY + 18, 4.5, 'left', false, [148, 163, 184]);
       }
 
       // Tabla detallada
@@ -2392,7 +2418,7 @@ export async function generateOrientSolPDFReport(
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(5.8);
     doc.setTextColor(100, 116, 139);
-    doc.text(isEn ? '800 W/m² | Tamb = 20°C' : '800 W/m² | Tamb = 20°C', se3X + 4, seCardY + 17.2);
+    drawRichText(doc, '800 W/m² | Tamb = 20°C', se3X + 4, seCardY + 17.2, 5.8, 'left', false, [100, 116, 139]);
 
     // Card 4: Producción Anual
     const se4X = se3X + seCardW + cardGap;
@@ -2400,17 +2426,20 @@ export async function generateOrientSolPDFReport(
     doc.setDrawColor(167, 243, 208);
     doc.roundedRect(se4X, seCardY, seCardW, seCardH, 2, 2, 'FD');
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6.5);
+    doc.setFontSize(6.0);
     doc.setTextColor(4, 120, 87);
-    doc.text(isEn ? 'ANNUAL GENERATION' : 'PRODUCCIÓN ANUAL (ESTUDIO)', se4X + 4, seCardY + 5.0);
-    doc.setFontSize(12);
+    doc.text(isEn ? 'ANNUAL GENERATION' : 'PRODUCCIÓN ANUAL', se4X + 3.5, seCardY + 4.5);
+    doc.setFontSize(5.4);
+    doc.text(isEn ? '(STUDY)' : '(ESTUDIO)', se4X + 3.5, seCardY + 7.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11.5);
     doc.setTextColor(5, 150, 105);
-    doc.text(`${formatInt(energyData.e_anual)} kWh`, se4X + 4, seCardY + 12.5);
+    doc.text(`${formatInt(energyData.e_anual)} kWh`, se4X + 3.5, seCardY + 12.8);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(5.8);
     doc.setTextColor(4, 120, 87);
     const gainPct = energyData.e0_anual > 0 ? (energyData.ganancia_anual / energyData.e0_anual) * 100 : 0;
-    doc.text(`${energyData.ganancia_anual >= 0 ? '+' : ''}${formatInt(energyData.ganancia_anual)} kWh (+${formatNum(gainPct, 1)}%)`, se4X + 4, seCardY + 17.2);
+    doc.text(`${energyData.ganancia_anual >= 0 ? '+' : ''}${formatInt(energyData.ganancia_anual)} kWh (+${formatNum(gainPct, 1)}%)`, se4X + 3.5, seCardY + 17.2);
 
     // 4. The 5-Column Table Matching Screenshot
     const tblEnerY = seCardY + seCardH + 5;
@@ -2675,11 +2704,11 @@ export async function generateOrientSolPDFReport(
     const nomY = btmBoxY + 23.5;
     const nomLineGap = 4.8;
     doc.text(`• PM: ${isEn ? 'Maximum power at MPP (W)' : 'Potencia máxima en el MPP (W)'} | PM,STC: ${isEn ? 'STC power (W)' : 'Potencia en STC (W)'}`, 24, nomY);
-    doc.text(`• G: ${isEn ? 'Incident global irradiance (W/m²)' : 'Irradiancia global incidente (W/m²)'} | GSTC = 1.000 W/m²`, 24, nomY + nomLineGap);
+    drawRichText(doc, `• G: ${isEn ? 'Incident global irradiance (W/m²)' : 'Irradiancia global incidente (W/m²)'} | GSTC = 1.000 W/m²`, 24, nomY + nomLineGap, 5.0, 'left', false, [51, 65, 85]);
     doc.text(`• TC: ${isEn ? 'Operating cell temperature (°C)' : 'Temperatura de la célula (°C)'} | Tamb: ${isEn ? 'Ambient temperature (°C)' : 'Temperatura ambiente (°C)'}`, 24, nomY + nomLineGap * 2);
     doc.text(`• gamma: ${isEn ? 'Power temperature coefficient' : 'Coeficiente térmico de potencia'} (${formatNum(coefTemp, 4)} 1/°C)`, 24, nomY + nomLineGap * 3);
     doc.text(`• TONC: ${isEn ? 'Nominal operating cell temperature' : 'Temperatura de operación nominal'} (${formatNum(tonc, 1)} °C)`, 24, nomY + nomLineGap * 4);
-    doc.text(isEn ? '  (measured at 800 W/m², 20 °C Tamb, AM 1.5, wind 1 m/s)' : '  (medida a 800 W/m², Tamb = 20 °C, espectro AM 1,5, viento 1 m/s)', 24, nomY + nomLineGap * 5);
+    drawRichText(doc, isEn ? '  (measured at 800 W/m², 20 °C Tamb, AM 1.5, wind 1 m/s)' : '  (medida a 800 W/m², Tamb = 20 °C, espectro AM 1,5, viento 1 m/s)', 24, nomY + nomLineGap * 5, 5.0, 'left', false, [51, 65, 85]);
 
     // Right Box: Technical Insights (using drawInsightBox)
     const maxMonthIdx = energyData.e_mes.indexOf(Math.max(...energyData.e_mes));
@@ -2692,12 +2721,12 @@ export async function generateOrientSolPDFReport(
       isEn
         ? [
             `Annual Energy Harvest: The ${cleanStudyName} configuration generates ${formatInt(energyData.e_anual)} kWh/yr (${formatInt(energyData.e_anual / peakKw)} kWh/kWp), obtaining a net gain of ${energyData.ganancia_anual >= 0 ? '+' : ''}${formatInt(energyData.ganancia_anual)} kWh/yr (+${formatNum(gainPct, 1)}%) over a horizontal plane.`,
-            `Seasonal Leveling: Winter collection is substantially boosted by angular tilting, bridging the seasonal gap (peak: ${mFull[maxMonthIdx]} with ${formatInt(maxMonthKwh)} kWh; minimum: ${mFull[minMonthIdx]} with ${formatInt(minMonthKwh)} kWh; ratio: ${(maxMonthKwh / (minMonthKwh || 1)).toFixed(2)}x).`,
+            `Seasonal Leveling: Winter collection is substantially boosted by angular tilting, bridging the seasonal gap (peak: ${mFull[maxMonthIdx]} with ${formatInt(maxMonthKwh)} kWh; minimum: ${mFull[minMonthIdx]} with ${formatInt(minMonthKwh)} kWh; ratio: ${formatNum(maxMonthKwh / (minMonthKwh || 1), 2)}x).`,
             `Thermal Derating Impact: Summer operating cell temperature reaches high values, where gamma (${formatNum(coefTemp, 4)} 1/°C) modulates maximum power, while spring conditions offer optimal conversion efficiency.`
           ]
         : [
             `Balance Anual de Producción: La configuración ${cleanStudyName} produce ${formatInt(energyData.e_anual)} kWh/año (${formatInt(energyData.e_anual / peakKw)} kWh/kWp), obteniendo una ganancia neta de ${energyData.ganancia_anual >= 0 ? '+' : ''}${formatInt(energyData.ganancia_anual)} kWh/año (+${formatNum(gainPct, 1)}%) frente a superficie horizontal.`,
-            `Nivelación Estacional: En los meses fríos la adaptación angular refuerza la captación directa frente a superficie plana (pico: ${mFull[maxMonthIdx]} con ${formatInt(maxMonthKwh)} kWh; mínimo: ${mFull[minMonthIdx]} con ${formatInt(minMonthKwh)} kWh; factor estacional: ${(maxMonthKwh / (minMonthKwh || 1)).toFixed(2)}x).`,
+            `Nivelación Estacional: En los meses fríos la adaptación angular refuerza la captación directa frente a superficie plana (pico: ${mFull[maxMonthIdx]} con ${formatInt(maxMonthKwh)} kWh; mínimo: ${mFull[minMonthIdx]} con ${formatInt(minMonthKwh)} kWh; factor estacional: ${formatNum(maxMonthKwh / (minMonthKwh || 1), 2)}x).`,
             `Impacto del Derating Térmico: En verano la elevación de temperatura de célula modula la potencia máxima mediante el coeficiente gamma (${formatNum(coefTemp, 4)} 1/°C), situando el punto de mayor rendimiento relativo en primavera con insolación alta y temperatura moderada.`
           ],
       btmRightX,
@@ -2718,10 +2747,7 @@ export async function generateOrientSolPDFReport(
 
 
   // Ranking Bar Chart (Matching Imagen 2)
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(15, 23, 42);
-  doc.text(isEn ? 'Surfaces Performance Ranking & Annual Irradiation (kWh/m²·yr)' : 'Comparativa y Ranking de Rendimiento de Superficies (kWh/m²·año)', 20, 28);
+  drawRichText(doc, isEn ? 'Surfaces Performance Ranking & Annual Irradiation (kWh/m²·yr)' : 'Comparativa y Ranking de Rendimiento de Superficies (kWh/m²·año)', 20, 28, 9, 'left', true, [15, 23, 42]);
 
   const sortedSurfs = [...res.surfaceComparison].sort(
     (a, b) => b.annualRadiationKwhM2 - a.annualRadiationKwhM2
@@ -2764,10 +2790,7 @@ export async function generateOrientSolPDFReport(
     doc.roundedRect(74, barRowY, barWidth, 4.8, 1, 1, 'F');
 
     // Value text
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6.5);
-    doc.setTextColor(15, 23, 42);
-    doc.text(`${Math.round(s.annualRadiationKwhM2)} kWh/m²`, 74 + barWidth + 2.5, barRowY + 3.8);
+    drawRichText(doc, `${formatInt(Math.round(s.annualRadiationKwhM2))} kWh/m²`, 74 + barWidth + 2.5, barRowY + 3.8, 6.5, 'left', true, [15, 23, 42]);
 
     // Percentage Gain text (In a prominent, dedicated visible position at X = 154mm)
     doc.setFont('helvetica', 'bold');
@@ -2829,18 +2852,18 @@ export async function generateOrientSolPDFReport(
 
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(30, 41, 59);
-    doc.text(`${surf.meanDailyKwhM2.toFixed(3)} kWh`, x8[2], cur8Y + 3.5);
-    doc.text(`${Math.round(surf.annualRadiationKwhM2)} kWh`, x8[3], cur8Y + 3.5);
+    doc.text(`${formatNum(surf.meanDailyKwhM2, 3)} kWh`, x8[2], cur8Y + 3.5);
+    doc.text(`${formatInt(Math.round(surf.annualRadiationKwhM2))} kWh`, x8[3], cur8Y + 3.5);
 
     doc.setTextColor(surf.gainOverHorizontalPct > 0 ? 16 : 100, surf.gainOverHorizontalPct > 0 ? 185 : 116, surf.gainOverHorizontalPct > 0 ? 129 : 139);
-    doc.text(`+${surf.gainOverHorizontalPct.toFixed(1)}%`, x8[4], cur8Y + 3.5);
+    doc.text(`+${formatNum(surf.gainOverHorizontalPct, 1)}%`, x8[4], cur8Y + 3.5);
 
     doc.setTextColor(surf.gainOverAnnualFixedPct >= 0 ? 16 : 220, surf.gainOverAnnualFixedPct >= 0 ? 185 : 38, surf.gainOverAnnualFixedPct >= 0 ? 129 : 38);
-    doc.text(`${surf.gainOverAnnualFixedPct >= 0 ? '+' : ''}${surf.gainOverAnnualFixedPct.toFixed(1)}%`, x8[5], cur8Y + 3.5);
+    doc.text(`${surf.gainOverAnnualFixedPct >= 0 ? '+' : ''}${formatNum(surf.gainOverAnnualFixedPct, 1)}%`, x8[5], cur8Y + 3.5);
 
     doc.setTextColor(15, 23, 42);
-    doc.text(`${Math.round(surf.energyProducedOsterwaldKwhYear)} kWh`, x8[6], cur8Y + 3.5);
-    doc.text(`${surf.meanCellTempDegC.toFixed(1)} °C`, x8[7], cur8Y + 3.5);
+    doc.text(`${formatInt(Math.round(surf.energyProducedOsterwaldKwhYear))} kWh`, x8[6], cur8Y + 3.5);
+    doc.text(`${formatNum(surf.meanCellTempDegC, 1)} °C`, x8[7], cur8Y + 3.5);
 
     cur8Y += 5.0;
   });
@@ -2878,16 +2901,10 @@ export async function generateOrientSolPDFReport(
   doc.setFillColor(209, 250, 229);
   doc.setDrawColor(52, 211, 153);
   doc.roundedRect(20, cteTopY, 170, 14, 2, 2, 'FD');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8.5);
-  doc.setTextColor(4, 120, 87);
-  doc.text(
-    isEn
-      ? `Absolute Capture Optimum (CTE DB-HE4): Tilt: ${res.captureLossMap.optimalPoint.betaDeg}°, Azimuth: ${res.captureLossMap.optimalPoint.alphaDeg}° | ${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} kWh/m²/day (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} kWh/m²·yr)`
-      : `Óptimo Absoluto de Captación (CTE DB-HE4): Inclinación: ${res.captureLossMap.optimalPoint.betaDeg}°, Orientación: ${res.captureLossMap.optimalPoint.alphaDeg}° | ${res.captureLossMap.optimalPoint.maxDailyRadiationKwh.toFixed(3)} kWh/m²/día (${Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2)} kWh/m²·año)`,
-    24,
-    cteTopY + 8.5
-  );
+  const optTitle = isEn
+    ? `Absolute Capture Optimum (CTE DB-HE4): Tilt: ${formatNum(res.captureLossMap.optimalPoint.betaDeg, 0, false)}°, Azimuth: ${formatNum(res.captureLossMap.optimalPoint.alphaDeg, 0, false)}° | ${formatNum(res.captureLossMap.optimalPoint.maxDailyRadiationKwh, 3)} kWh/m²/day (${formatInt(Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2))} kWh/m²·yr)`
+    : `Óptimo Absoluto de Captación (CTE DB-HE4): Inclinación: ${formatNum(res.captureLossMap.optimalPoint.betaDeg, 0, false)}°, Orientación: ${formatNum(res.captureLossMap.optimalPoint.alphaDeg, 0, false)}° | ${formatNum(res.captureLossMap.optimalPoint.maxDailyRadiationKwh, 3)} kWh/m²/día (${formatInt(Math.round(res.captureLossMap.optimalPoint.maxAnnualRadiationKwhM2))} kWh/m²·año)`;
+  drawRichText(doc, optTitle, 24, cteTopY + 8.5, 8.5, 'left', true, [4, 120, 87]);
 
   // 4 CTE Limits Cards (Matching Imagen 4)
   const lCardY = cteTopY + 18;
@@ -3080,13 +3097,15 @@ export async function generateOrientSolPDFReport(
     doc.setTextColor(100, 116, 139);
     doc.text(sanitizePdfText(m.sub), x + w - 3, y + 5.5, { align: 'right' });
 
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6.5);
-    doc.setTextColor(4, 120, 87);
-    doc.text(
-      sanitizePdfText(`${isEn ? 'Optimum: Tilt' : 'Optimo: Inc'} = ${m.betaDeg.toFixed(0)}°, ${isEn ? 'Az' : 'Ori'} = ${m.alphaDeg.toFixed(0)}° | ${m.maxDaily.toFixed(2)} kWh/m²/d`),
+    drawRichText(
+      doc,
+      `${isEn ? 'Optimum: Tilt' : 'Optimo: Inc'} = ${formatNum(m.betaDeg, 0, false)}°, ${isEn ? 'Az' : 'Ori'} = ${formatNum(m.alphaDeg, 0, false)}° | ${formatNum(m.maxDaily, 2)} kWh/m²/d`,
       x + 3,
-      y + 10
+      y + 10,
+      6.5,
+      'left',
+      true,
+      [4, 120, 87]
     );
 
     // Heatmap area
@@ -3151,11 +3170,11 @@ export async function generateOrientSolPDFReport(
     doc.setFontSize(6);
     const sy = y + h - 4;
     doc.setTextColor(22, 101, 52);
-    doc.text(sanitizePdfText(`<=10%: ${m.zones.generalPctCompliant}%`), x + 3, sy);
+    doc.text(sanitizePdfText(`<=10%: ${formatNum(m.zones.generalPctCompliant, 1)}%`), x + 3, sy);
     doc.setTextColor(133, 77, 14);
-    doc.text(sanitizePdfText(`<=20%: ${m.zones.superpositionPctCompliant}%`), x + w / 2, sy, { align: 'center' });
+    doc.text(sanitizePdfText(`<=20%: ${formatNum(m.zones.superpositionPctCompliant, 1)}%`), x + w / 2, sy, { align: 'center' });
     doc.setTextColor(154, 52, 18);
-    doc.text(sanitizePdfText(`<=40%: ${m.zones.integrationPctCompliant}%`), x + w - 3, sy, { align: 'right' });
+    doc.text(sanitizePdfText(`<=40%: ${formatNum(m.zones.integrationPctCompliant, 1)}%`), x + w - 3, sy, { align: 'right' });
   };
 
   if (extraMapPages > 0) {
@@ -3312,10 +3331,8 @@ export async function generateOrientSolPDFReport(
   doc.setLineWidth(0.5);
   doc.line(optPx, optPy, optPx, cvBoxY + cvH - 12);
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
-  doc.setTextColor(220, 38, 38);
-  doc.text(`* ${isEn ? 'Optimal Tilt: Tilt' : 'Inclinación Óptima: Inc'} = ${optClamped}° (${radCurve1to90[optClamped - 1].toFixed(2)} kWh/m²/d)`, optPx - 15, optPy - 4);
+  const optCurveText = `* ${isEn ? 'Optimal Tilt: Tilt' : 'Inclinación Óptima: Inc'} = ${optClamped}° (${formatNum(radCurve1to90[optClamped - 1], 2)} kWh/m²/d)`;
+  drawRichText(doc, optCurveText, optPx - 15, optPy - 4, 7.5, 'left', true, [220, 38, 38]);
 
   // Axis Ticks
   doc.setFont('helvetica', 'normal');
@@ -3372,7 +3389,7 @@ export async function generateOrientSolPDFReport(
     isEn ? 'Loss vs Opt (%)' : 'Pérdida vs Óptimo (%)',
   ];
   const dtX = [24, 56, 95, 133, 162];
-  dtCols.forEach((col, idx) => doc.text(col, dtX[idx], dtBoxY + 4));
+  dtCols.forEach((col, idx) => drawRichText(doc, col, dtX[idx], dtBoxY + 4, 6.5, 'left', true, [255, 255, 255]));
 
   const sampleDegs = [0, 15, 30, 45, 60, 75, 90, optAngle];
   const uniqueDegs = Array.from(new Set(sampleDegs)).sort((a, b) => a - b);
@@ -3400,15 +3417,17 @@ export async function generateOrientSolPDFReport(
       curDtY + 3.5
     );
 
-    doc.setTextColor(deg === optAngle ? 220 : 30, deg === optAngle ? 38 : 41, deg === optAngle ? 38 : 59);
-    doc.text(`${val.toFixed(3)} kWh/m²/d`, dtX[1], curDtY + 3.5);
-    doc.text(`${Math.round(ann)} kWh/m²`, dtX[2], curDtY + 3.5);
+    const valColor: [number, number, number] = deg === optAngle ? [220, 38, 38] : [30, 41, 59];
+    drawRichText(doc, `${formatNum(val, 3)} kWh/m²/d`, dtX[1], curDtY + 3.5, 6.5, 'left', deg === optAngle, valColor);
+    drawRichText(doc, `${formatInt(Math.round(ann))} kWh/m²`, dtX[2], curDtY + 3.5, 6.5, 'left', deg === optAngle, valColor);
 
+    doc.setFont('helvetica', deg === optAngle ? 'bold' : 'normal');
+    doc.setFontSize(6.5);
     doc.setTextColor(gainH >= 0 ? 16 : 220, gainH >= 0 ? 185 : 38, gainH >= 0 ? 129 : 38);
-    doc.text(`${gainH >= 0 ? '+' : ''}${gainH.toFixed(2)}%`, dtX[3], curDtY + 3.5);
+    doc.text(`${gainH >= 0 ? '+' : ''}${formatNum(gainH, 2)}%`, dtX[3], curDtY + 3.5);
 
     doc.setTextColor(lossOpt <= 0.05 ? 16 : lossOpt <= 10 ? 234 : 220, lossOpt <= 0.05 ? 185 : lossOpt <= 10 ? 179 : 38, lossOpt <= 0.05 ? 129 : lossOpt <= 10 ? 8 : 38);
-    doc.text(lossOpt <= 0.05 ? (isEn ? '0.00% (Max)' : '0.00% (Máx)') : `-${lossOpt.toFixed(2)}%`, dtX[4], curDtY + 3.5);
+    doc.text(lossOpt <= 0.05 ? (isEn ? '0.00% (Max)' : '0,00% (Máx)') : `-${formatNum(lossOpt, 2)}%`, dtX[4], curDtY + 3.5);
 
     curDtY += 5.0;
   });
