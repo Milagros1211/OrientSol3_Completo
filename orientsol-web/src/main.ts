@@ -146,8 +146,8 @@ function renderAboutView(isEn: boolean): HTMLElement {
                 : 'Serie histórica <strong>ERA5T</strong> actualizada <strong>diariamente con 5 días de latencia</strong>. Archivo consolidado ERA5 definitivo actualizado <strong>mensualmente</strong> (desfase 2 a 3 meses).'}<br/>
               • <strong>${isEn ? 'Retrieved Variables & Unit Conversion:' : 'Variables extraídas y conversión:'}</strong>
                 ${isEn
-                  ? 'Daily incident solar radiation <code>shortwave_radiation_sum</code> (in MJ/m²/day, converted to kWh/m²/day by dividing by 3.6 and averaged to 12 monthly values for Gdm(0)), 2m temperature <code>temperature_2m_mean</code> (°C), and elevation (m).'
-                  : 'Radiación diaria incidente <code>shortwave_radiation_sum</code> (en MJ/m²/día, convertida a kWh/m²/día dividiendo por 3.6 y promediada a 12 meses para Gdm(0)) y temperatura a 2m <code>temperature_2m_mean</code> (°C), además de altitud (m).'}<br/>
+                  ? 'Daily incident solar radiation <code>shortwave_radiation_sum</code> (in MJ/m²/day, converted to kWh/m²/day by dividing by 3,6 and averaged to 12 monthly values for Gdm(0)), 2m temperature <code>temperature_2m_mean</code> (°C), and elevation (m).'
+                  : 'Radiación diaria incidente <code>shortwave_radiation_sum</code> (en MJ/m²/día, convertida a kWh/m²/día dividiendo por 3,6 y promediada a 12 meses para Gdm(0)) y temperatura a 2m <code>temperature_2m_mean</code> (°C), además de altitud (m).'}<br/>
               • <em>${isEn ? 'Technical Note:' : 'Nota técnica:'}</em> ${isEn
                 ? 'Open-access API with high availability and no restrictive quotas for global PV modeling.'
                 : 'Acceso abierto de alta disponibilidad sin cuotas restrictivas para modelado fotovoltaico mundial.'}
