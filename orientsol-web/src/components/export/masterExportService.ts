@@ -107,7 +107,7 @@ export function exportOrientSolMasterExcel(
     [isEn ? 'Installed Peak Power (kWp)' : 'Potencia Pico Instalada (kWp)', peakKw],
     [isEn ? 'Performance Ratio (PR)' : 'Factor de Rendimiento Global (PR)', `${(pr * 100).toFixed(1)}%`],
     [isEn ? 'Nominal Cell Operating Temp (TONC / NOCT) (°C)' : 'TONC / NOCT de los Módulos (°C)', tonc],
-    [isEn ? 'Power Temperature Coefficient γ (%/°C)' : 'Coeficiente de Temperatura de Potencia γ (%/°C)', '-0.40%/°C'],
+    [isEn ? 'Power Temperature Coefficient gamma (%/°C)' : 'Coeficiente de Temperatura de Potencia gamma (%/°C)', '-0,40%/°C'],
     [isEn ? 'Estimated Collector Surface Area (m²)' : 'Superficie de Captación Estimada (m²)', Number(res.energyYield.collectorAreaM2.toFixed(2))],
     [],
     [isEn ? 'ANNUAL ENERGY BALANCE: INCIDENT VS PRODUCED' : 'BALANCE ENERGÉTICO ANUAL: ENERGÍA RECIBIDA VS PRODUCIDA'],
