@@ -7,3 +7,5 @@ export * from './common/Badge';
 export * from './climate/ClimateIntegrationPanel';
 export * from './climate/DualClimateLoaderPanel';
 export * from './supabase/SupabaseSyncModal';
+export * from './modals/LegalPoliciesModal';
+export * from './common/CookieBanner';
