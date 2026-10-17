@@ -3,6 +3,7 @@ import type {
   MonthlyCaptureLossMap,
   SeasonalCaptureLossMap,
 } from '../../services/bridge/solarCalculationBridge';
+import { formatNum, formatInt, formatPercent } from '../../utils/formatters';
 
 const MONTH_NAMES_ES: string[] = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -295,15 +296,15 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
 
     const optBadgeText = mode === 'annual'
       ? (isEn
-          ? `Optimal: Inc = ${Number(currentOptPoint.betaDeg).toFixed(1)}°, Ori = ${Number(currentOptPoint.alphaDeg).toFixed(1)}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/day`
-          : `Óptimo Anual: Inc = ${Number(currentOptPoint.betaDeg).toFixed(1)}°, Ori = ${Number(currentOptPoint.alphaDeg).toFixed(1)}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día`)
+          ? `Optimal: Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(currentOptPoint.alphaDeg), 1)}° | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/day`
+          : `Óptimo Anual: Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(currentOptPoint.alphaDeg), 1)}° | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/día`)
       : mode === 'monthly'
       ? (isEn
-          ? `Month Optimum (${monthNames[selectedMonthIdx]}): Inc = ${Number(currentOptPoint.betaDeg).toFixed(1)}°, Ori = ${Number(currentOptPoint.alphaDeg).toFixed(1)}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/day`
-          : `Óptimo del mes (${monthNames[selectedMonthIdx]}): Inc = ${Number(currentOptPoint.betaDeg).toFixed(1)}°, Ori = ${Number(currentOptPoint.alphaDeg).toFixed(1)}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día`)
+          ? `Month Optimum (${monthNames[selectedMonthIdx]}): Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(currentOptPoint.alphaDeg), 1)}° | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/day`
+          : `Óptimo del mes (${monthNames[selectedMonthIdx]}): Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(currentOptPoint.alphaDeg), 1)}° | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/día`)
       : (isEn
-          ? `Season Optimum (${activeSeasonName}): Inc = ${Number(currentOptPoint.betaDeg).toFixed(1)}°, Ori = ${Number(currentOptPoint.alphaDeg).toFixed(1)}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/day`
-          : `Óptimo Estacional (${activeSeasonName}): Inc = ${Number(currentOptPoint.betaDeg).toFixed(1)}°, Ori = ${Number(currentOptPoint.alphaDeg).toFixed(1)}° | ${currentOptPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día`);
+          ? `Season Optimum (${activeSeasonName}): Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(currentOptPoint.alphaDeg), 1)}° | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/day`
+          : `Óptimo Estacional (${activeSeasonName}): Inc = ${formatNum(Number(currentOptPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(currentOptPoint.alphaDeg), 1)}° | ${formatNum(currentOptPoint.maxDailyRadiationKwh, 2)} kWh/m²/día`);
 
     let selectorHtml = '';
     if (mode === 'monthly') {
@@ -315,7 +316,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
           <select id="loss-map-month-select" class="form-select form-select-sm loss-map-month-dropdown" style="width: auto; min-width: 170px; font-weight: 600;">
             ${monthNames.map((name: string, i: number) => `
               <option value="${i}" ${i === selectedMonthIdx ? 'selected' : ''}>
-                ${i + 1}. ${name} (Inc = ${lossMap.monthlyMaps ? Number(lossMap.monthlyMaps[i].optimalPoint.betaDeg).toFixed(1) : '0.0'}°)
+                ${i + 1}. ${name} (Inc = ${lossMap.monthlyMaps ? formatNum(Number(lossMap.monthlyMaps[i].optimalPoint.betaDeg), 1) : '0,0'}°)
               </option>
             `).join('')}
           </select>
@@ -346,7 +347,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
               const sMonths = isEn ? s.monthsEn : s.monthsEs;
               return `
                 <option value="${i}" ${i === selectedSeasonIdx ? 'selected' : ''}>
-                  ${sName} (${sMonths}) — Ópt: Inc = ${Number(optBeta).toFixed(1)}°, Ori = ${Number(optAlpha).toFixed(1)}°
+                  ${sName} (${sMonths}) — Ópt: Inc = ${formatNum(Number(optBeta), 1)}°, Ori = ${formatNum(Number(optAlpha), 1)}°
                 </option>
               `;
             }).join('')}
@@ -544,7 +545,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
                         ? 'border: 2px solid var(--accent-cyan, #0284c7) !important; box-shadow: inset 0 0 8px rgba(2, 132, 199, 0.4); font-weight: 800; transform: scale(1.08);'
                         : '';
                       const starText = isOptimalCell ? ' ★' : '';
-                      return `<td class="${cls}" style="${optStyle}" title="β=${b}°, α=${a}°: Pérdida ${loss.toFixed(1)}% (${rad.toFixed(2)} kWh/m²/d)">${loss.toFixed(1)}%${starText}</td>`;
+                      return `<td class="${cls}" style="${optStyle}" title="β=${b}°, α=${a}°: Pérdida ${formatPercent(loss, 1)} (${formatNum(rad, 2)} kWh/m²/d)">${formatPercent(loss, 1)}${starText}</td>`;
                     })
                     .join('');
                   return `<tr><td class="row-header-beta">${b}°</td>${cells}</tr>`;
@@ -800,7 +801,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       ctx!.fill();
 
       // Optimal Point badge
-      const optLabel = `★ ÓPTIMO: β=${Number(optPoint.betaDeg).toFixed(1)}°, α=${Number(optPoint.alphaDeg).toFixed(1)}°`;
+      const optLabel = `★ ÓPTIMO: β=${formatNum(Number(optPoint.betaDeg), 1)}°, α=${formatNum(Number(optPoint.alphaDeg), 1)}°`;
       ctx!.font = 'bold 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       const textMetrics = ctx!.measureText(optLabel);
       const bW = textMetrics.width + 12;
@@ -863,7 +864,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       ctx!.fill();
 
       // Floating reticle badge with exact values
-      const reticleLabel = `β = ${evaluatedBeta}°, α = ${evaluatedAlpha > 0 ? '+' : ''}${evaluatedAlpha}° | Pérdida: ${evaluatedLoss.toFixed(1)}% (${evaluatedRad.toFixed(2)} kWh/m²/d)`;
+      const reticleLabel = `β = ${evaluatedBeta}°, α = ${evaluatedAlpha > 0 ? '+' : ''}${evaluatedAlpha}° | Pérdida: ${formatPercent(evaluatedLoss, 1)} (${formatNum(evaluatedRad, 2)} kWh/m²/d)`;
       ctx!.font = 'bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       const reticleMetrics = ctx!.measureText(reticleLabel);
       const rW = reticleMetrics.width + 16;
@@ -993,9 +994,9 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
                 Math.abs(evaluatedBeta - optPoint.betaDeg) < 3 && Math.abs(evaluatedAlpha - optPoint.alphaDeg) < 3
                   ? 'Captación óptima frontal respecto a los rayos solares de esta estación.'
                   : evaluatedBeta < optPoint.betaDeg - 8
-                  ? `El captador está demasiado plano (${evaluatedBeta}° frente a los ${Number(optPoint.betaDeg).toFixed(1)}° óptimos), perdiendo captación frente a la trayectoria baja del sol en esta época.`
+                  ? `El captador está demasiado plano (${evaluatedBeta}° frente a los ${formatNum(Number(optPoint.betaDeg), 1)}° óptimos), perdiendo captación frente a la trayectoria baja del sol en esta época.`
                   : evaluatedBeta > optPoint.betaDeg + 8
-                  ? `El captador está demasiado inclinado (${evaluatedBeta}° frente a los ${Number(optPoint.betaDeg).toFixed(1)}° óptimos), sufriendo incidencia oblicua en las horas centrales.`
+                  ? `El captador está demasiado inclinado (${evaluatedBeta}° frente a los ${formatNum(Number(optPoint.betaDeg), 1)}° óptimos), sufriendo incidencia oblicua en las horas centrales.`
                   : ''
               }
               ${
@@ -1013,8 +1014,8 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
         whenSolarPhysics = `
           <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.4rem;">
             <div>• <strong>Periodo evaluado:</strong> Mes completo de ${mName}, evaluado mediante el día característico de Klein y el modelo de irradiación Liu-Jordan & Klein.</div>
-            <div>• <strong>Rendimiento angular:</strong> El ángulo óptimo para este mes es <strong>Inc = ${Number(optPoint.betaDeg).toFixed(1)}°, Ori = ${Number(optPoint.alphaDeg).toFixed(1)}°</strong> (Radiación máxima: ${optPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día).</div>
-            <div>• <strong>Efecto en el punto seleccionado:</strong> Con β=${evaluatedBeta}° y α=${evaluatedAlpha}°, se capta <strong>${radiation.toFixed(2)} kWh/m²/día</strong>, lo que representa una pérdida de <strong>${loss.toFixed(1)}%</strong> frente al óptimo mensual.</div>
+            <div>• <strong>Rendimiento angular:</strong> El ángulo óptimo para este mes es <strong>Inc = ${formatNum(Number(optPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(optPoint.alphaDeg), 1)}°</strong> (Radiación máxima: ${formatNum(optPoint.maxDailyRadiationKwh, 2)} kWh/m²/día).</div>
+            <div>• <strong>Efecto en el punto seleccionado:</strong> Con β=${evaluatedBeta}° y α=${evaluatedAlpha}°, se capta <strong>${formatNum(radiation, 2)} kWh/m²/día</strong>, lo que representa una pérdida de <strong>${formatPercent(loss, 1)}</strong> frente al óptimo mensual.</div>
           </div>
         `;
       } else {
@@ -1022,8 +1023,8 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
         whenSolarPhysics = `
           <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.4rem;">
             <div>• <strong>Periodo evaluado:</strong> Integración anual completa (365 días) combinando solsticios y equinoccios con la distribución de radiación horizontal de la localidad.</div>
-            <div>• <strong>Óptimo anual global:</strong> Situado en <strong>Inc = ${Number(optPoint.betaDeg).toFixed(1)}°, Ori = ${Number(optPoint.alphaDeg).toFixed(1)}°</strong> (${optPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día de media anual).</div>
-            <div>• <strong>Efecto en el punto seleccionado:</strong> Una instalación fija con β=${evaluatedBeta}° y α=${evaluatedAlpha}° produce anualmente ~${(radiation * 365).toFixed(0)} kWh/m²/año frente a los ${(optPoint.maxDailyRadiationKwh * 365).toFixed(0)} kWh/m²/año del óptimo (pérdida anual acumulada del <strong>${loss.toFixed(1)}%</strong>).</div>
+            <div>• <strong>Óptimo anual global:</strong> Situado en <strong>Inc = ${formatNum(Number(optPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(optPoint.alphaDeg), 1)}°</strong> (${formatNum(optPoint.maxDailyRadiationKwh, 2)} kWh/m²/día de media anual).</div>
+            <div>• <strong>Efecto en el punto seleccionado:</strong> Una instalación fija con β=${evaluatedBeta}° y α=${evaluatedAlpha}° produce anualmente ~${formatInt(Math.round(radiation * 365))} kWh/m²/año frente a los ${formatInt(Math.round(optPoint.maxDailyRadiationKwh * 365))} kWh/m²/año del óptimo (pérdida anual acumulada del <strong>${formatPercent(loss, 1)}</strong>).</div>
           </div>
         `;
       }
@@ -1047,7 +1048,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
               ${isEn ? 'Loss vs Optimum' : 'Pérdida vs Óptimo'}
             </span>
             <div style="font-size: 1.6rem; font-weight: 900; color: ${loss <= 10 ? '#10b981' : loss <= 20 ? '#f59e0b' : loss <= 40 ? '#f97316' : '#ef4444'}; font-family: var(--font-mono); line-height: 1;">
-              ${loss.toFixed(1)}%
+              ${formatPercent(loss, 1)}
             </div>
           </div>
         </div>
@@ -1073,11 +1074,11 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
               ${isEn ? 'Captured Radiation' : 'Radiación Incidente'}
             </div>
             <div style="font-size: 1rem; font-weight: 800; color: var(--accent-cyan, #0284c7); margin-top: 0.15rem; font-family: var(--font-mono);">
-              ${radiation.toFixed(2)} kWh/m²/día
+              ${formatNum(radiation, 2)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/día'}
             </div>
             <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem;">
-              Óptimo: ${optPoint.maxDailyRadiationKwh.toFixed(2)} kWh/m²/día<br/>
-              Diferencia: -${(optPoint.maxDailyRadiationKwh - radiation).toFixed(2)} kWh/m²/día
+              ${isEn ? 'Optimum:' : 'Óptimo:'} ${formatNum(optPoint.maxDailyRadiationKwh, 2)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/día'}<br/>
+              ${isEn ? 'Difference:' : 'Diferencia:'} ${Math.abs(optPoint.maxDailyRadiationKwh - radiation) < 0.005 ? `0,00 ${isEn ? 'kWh/m²/day' : 'kWh/m²/día'}` : `-${formatNum(optPoint.maxDailyRadiationKwh - radiation, 2)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/día'}`}
             </div>
           </div>
 

@@ -247,8 +247,8 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
       studyBadge = isEn ? '12 Monthly Angles' : '12 Inclinaciones';
     } else if (isSeasonal && seasonalData) {
       studyColTitle = isEn
-        ? `Performed study (Seasonal: ${seasonalData.winterTiltDeg.toFixed(1)}° / ${seasonalData.springTiltDeg.toFixed(1)}° / ${seasonalData.summerTiltDeg.toFixed(1)}° / ${seasonalData.autumnTiltDeg.toFixed(1)}°)`
-        : `Estudio realizado (Estacional: ${seasonalData.winterTiltDeg.toFixed(1)}° / ${seasonalData.springTiltDeg.toFixed(1)}° / ${seasonalData.summerTiltDeg.toFixed(1)}° / ${seasonalData.autumnTiltDeg.toFixed(1)}°)`;
+        ? `Performed study (Seasonal: ${formatNum(seasonalData.winterTiltDeg, 1)}° / ${formatNum(seasonalData.springTiltDeg, 1)}° / ${formatNum(seasonalData.summerTiltDeg, 1)}° / ${formatNum(seasonalData.autumnTiltDeg, 1)}°)`
+        : `Estudio realizado (Estacional: ${formatNum(seasonalData.winterTiltDeg, 1)}° / ${formatNum(seasonalData.springTiltDeg, 1)}° / ${formatNum(seasonalData.summerTiltDeg, 1)}° / ${formatNum(seasonalData.autumnTiltDeg, 1)}°)`;
       studyBadge = isEn ? 'Seasonal Tilts' : 'Inclinación Estacional';
     } else if (studyType === 'polar') {
       studyColTitle = isEn
@@ -272,9 +272,9 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
       studyBadge = isEn ? '2-Axis Tracking' : '2 Ejes';
     } else {
       studyColTitle = isEn
-        ? `Performed study (Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${latitude >= 0 ? '0.0°' : '180.0°'})`
-        : `Estudio realizado (Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${latitude >= 0 ? '0.0°' : '180.0°'})`;
-      studyBadge = `Inc: ${Number(optTiltAnnual).toFixed(1)}° | Ori: ${latitude >= 0 ? '0.0°' : '180.0°'}`;
+        ? `Performed study (Inc: ${formatNum(Number(optTiltAnnual), 1)}° | Ori: ${latitude >= 0 ? '0,0°' : '180,0°'})`
+        : `Estudio realizado (Inc: ${formatNum(Number(optTiltAnnual), 1)}° | Ori: ${latitude >= 0 ? '0,0°' : '180,0°'})`;
+      studyBadge = `Inc: ${formatNum(Number(optTiltAnnual), 1)}° | Ori: ${latitude >= 0 ? '0,0°' : '180,0°'}`;
     }
 
     // Run Osterwald calculation
@@ -296,7 +296,7 @@ export function renderEnergyCalculationPanel(props: EnergyCalculationProps): HTM
               <span class="meta-label"><strong>${isEn ? 'City:' : 'Ciudad:'}</strong> ${locationName}</span>
               <span class="meta-label" style="margin-left: 2.5rem;">
                 <strong>${isEn ? 'Latitude (°):' : 'Latitud (°):'}</strong>
-                <span style="color: #38bdf8; font-weight: 700;">${latitude.toFixed(2)}</span>
+                <span style="color: #38bdf8; font-weight: 700;">${formatNum(latitude, 2)}</span>
               </span>
             </div>
             <div class="opt-energy-study-row">
