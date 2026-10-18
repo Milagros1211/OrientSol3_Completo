@@ -243,7 +243,7 @@ function renderPrivacyContent(isEn: boolean): string {
         En caso de que el usuario decida voluntariamente guardar o consultar registros climáticos en la nube:
       </p>
       <ul class="legal-list">
-        <li><strong>Datos Tratados:</strong> Únicamente valores técnicos meteorológicos (nombre de localidad o estación, latitud, longitud y 12 valores mensuales de radiación horizontal $G_{dm}(0)$ y temperatura). Ningún dato de carácter personal queda vinculado al registro.</li>
+        <li><strong>Datos Tratados:</strong> Únicamente valores técnicos meteorológicos (nombre de localidad o estación, latitud, longitud y 12 valores mensuales de radiación horizontal G<sub>dm</sub>(0) y temperatura). Ningún dato de carácter personal queda vinculado al registro.</li>
         <li><strong>Seguridad en Reposo y Tránsito:</strong> Base de datos PostgreSQL alojada en centros de datos de la Unión Europea (Supabase EU), con políticas estrictas de seguridad por filas (Row Level Security - RLS) y cifrado TLS 1.3 en tránsito.</li>
         <li><strong>Base Jurídica:</strong> Consentimiento libre, inequívoco y voluntario del usuario (Art. 6.1.a RGPD) e interés legítimo de investigación científica y difusión del conocimiento abierto (Art. 6.1.f RGPD).</li>
       </ul>
