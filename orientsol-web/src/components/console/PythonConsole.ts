@@ -68,6 +68,7 @@ export function renderPythonConsole(): HTMLElement {
     spatialRes: string;
     comments: string;
     fetchedAt: string;
+    isOffline?: boolean;
   } | null = null;
   let showPvgisComparison = false;
 
@@ -1091,36 +1092,38 @@ export function renderPythonConsole(): HTMLElement {
               </div>
             </div>
 
-            <!-- Climatological Reference Context Callout (16-Year Multiannual Normal) -->
-            <div style="margin-top: 0.75rem; padding: 0.75rem 0.95rem; background: rgba(16, 185, 129, 0.05); border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.25);">
-              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem;">
-                <div style="font-weight: 700; color: #059669; font-size: 0.78rem; display: flex; align-items: center; gap: 0.4rem;">
-                  <span>📊</span>
-                  <span>${isEn ? 'Official Multiannual PVGIS Climatology (2005–2020: 16-Year Average)' : 'Climatología Multianual Oficial de PVGIS (2005–2020: 16 Años Promediados)'}</span>
-                </div>
-                <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; font-size: 0.7rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3);">
-                  ✓ MAPE ${formatPercent(mape, 1)} (${isEn ? '100% WMO Class 1' : '100% Conforme OMM'})
-                </span>
-              </div>
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.65rem; font-size: 0.72rem; line-height: 1.45;">
-                <div style="background: var(--bg-card); padding: 0.55rem 0.7rem; border-radius: 5px; border: 1px solid var(--border-subtle);">
-                  <strong style="color: var(--text-main); display: block; margin-bottom: 0.2rem;">📍 ${isEn ? 'Where do these reference data come from?' : '¿De dónde sale esta serie de referencia?'}</strong>
-                  <span style="color: var(--text-muted);">
-                    ${isEn
-                      ? 'Official solar radiation records computed by the European Commission (JRC PVGIS 5.3) averaging 16 consecutive years at Campus Las Lagunillas (University of Jaén, 37.77°N) and Madrid Retiro (40.42°N).'
-                      : 'Son los datos oficiales de radiación solar calculados por la Comisión Europea (JRC PVGIS 5.3) promediando 16 años consecutivos en el Campus Las Lagunillas de la Universidad de Jaén (37,77°N) y Parque del Retiro de Madrid (40,42°N).'}
+            <!-- Climatological Reference Context Callout (16-Year Multiannual Normal) - ONLY VISIBLE IN OFFLINE MODE -->
+            ${pvgisData.isOffline ? `
+              <div style="margin-top: 0.75rem; padding: 0.75rem 0.95rem; background: rgba(16, 185, 129, 0.05); border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.25);">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem;">
+                  <div style="font-weight: 700; color: #059669; font-size: 0.78rem; display: flex; align-items: center; gap: 0.4rem;">
+                    <span>📊</span>
+                    <span>${isEn ? 'Official Multiannual PVGIS Climatology (2005–2020: 16-Year Average)' : 'Climatología Multianual Oficial de PVGIS (2005–2020: 16 Años Promediados)'}</span>
+                  </div>
+                  <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; font-size: 0.7rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3);">
+                    ✓ MAPE ${formatPercent(mape, 1)} (${isEn ? '100% WMO Class 1' : '100% Conforme OMM'})
                   </span>
                 </div>
-                <div style="background: var(--bg-card); padding: 0.55rem 0.7rem; border-radius: 5px; border: 1px solid var(--border-subtle);">
-                  <strong style="color: var(--text-main); display: block; margin-bottom: 0.2rem;">🎯 ${isEn ? 'Why does it match OrientSol so closely?' : '¿Por qué coincide tanto con OrientSol?'}</strong>
-                  <span style="color: var(--text-muted);">
-                    ${isEn
-                      ? 'Being a 16-year average, isolated cloud anomalies, seasonal heatwaves, or drought swings balance out, proving the strict physical and mathematical accuracy of OrientSol.'
-                      : 'Al ser una media de 16 años, las fluctuaciones de nubes, sequías u olas de calor se equilibran, demostrando la exactitud matemática y física del modelo de OrientSol.'}
-                  </span>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.65rem; font-size: 0.72rem; line-height: 1.45;">
+                  <div style="background: var(--bg-card); padding: 0.55rem 0.7rem; border-radius: 5px; border: 1px solid var(--border-subtle);">
+                    <strong style="color: var(--text-main); display: block; margin-bottom: 0.2rem;">📍 ${isEn ? 'Where do these reference data come from?' : '¿De dónde sale esta serie de referencia?'}</strong>
+                    <span style="color: var(--text-muted);">
+                      ${isEn
+                        ? 'Official solar radiation records computed by the European Commission (JRC PVGIS 5.3) averaging 16 consecutive years at Campus Las Lagunillas (University of Jaén, 37.77°N) and Madrid Retiro (40.42°N).'
+                        : 'Son los datos oficiales de radiación solar calculados por la Comisión Europea (JRC PVGIS 5.3) promediando 16 años consecutivos en el Campus Las Lagunillas de la Universidad de Jaén (37,77°N) y Parque del Retiro de Madrid (40,42°N).'}
+                    </span>
+                  </div>
+                  <div style="background: var(--bg-card); padding: 0.55rem 0.7rem; border-radius: 5px; border: 1px solid var(--border-subtle);">
+                    <strong style="color: var(--text-main); display: block; margin-bottom: 0.2rem;">🎯 ${isEn ? 'Why does it match OrientSol so closely?' : '¿Por qué coincide tanto con OrientSol?'}</strong>
+                    <span style="color: var(--text-muted);">
+                      ${isEn
+                        ? 'Being a 16-year average, isolated cloud anomalies, seasonal heatwaves, or drought swings balance out, proving the strict physical and mathematical accuracy of OrientSol.'
+                        : 'Al ser una media de 16 años, las fluctuaciones de nubes, sequías u olas de calor se equilibran, demostrando la exactitud matemática y física del modelo de OrientSol.'}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            ` : ''}
 
             <!-- WMO Calibration Legend & Defense Justification -->
             <div style="margin-top: 0.75rem; padding: 0.65rem; background: rgba(37, 99, 235, 0.04); border-radius: 6px; border: 1px solid rgba(37, 99, 235, 0.15);">
@@ -1749,6 +1752,7 @@ export function renderPythonConsole(): HTMLElement {
           spatialRes: res.metadata?.spatialRes || '0.05° x 0.05° (~5 km)',
           comments: res.metadata?.comments || 'In PVGIS 5.3, default DB for Europe, Central Asia, Africa and South America (partly)',
           fetchedAt: res.fetchedAt || new Date().toISOString(),
+          isOffline: false,
         };
         showPvgisComparison = true;
         pvgisJustSynchronized = true;
@@ -1793,6 +1797,7 @@ export function renderPythonConsole(): HTMLElement {
           spatialRes: '0.05° x 0.05° (~5 km)',
           comments: 'In PVGIS 5.2, default DB for Europe, Asia, Africa and South America (below 20 S)',
           fetchedAt: new Date().toISOString(),
+          isOffline: true,
         };
       } else {
         pvgisData = {
@@ -1808,6 +1813,7 @@ export function renderPythonConsole(): HTMLElement {
           spatialRes: '0.05° x 0.05° (~5 km)',
           comments: 'In PVGIS 5.2, default DB for Europe, Asia, Africa and South America (below 20 S)',
           fetchedAt: new Date().toISOString(),
+          isOffline: true,
         };
       }
       showPvgisComparison = true;
