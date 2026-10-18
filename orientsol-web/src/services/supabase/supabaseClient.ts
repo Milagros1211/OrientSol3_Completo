@@ -1,4 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { platformSecureStorage, platformSecureStorageAdapter } from '@/services/storage/platformSecureStorage';
+
 
 const STORAGE_KEY_URL = 'orientsol_supabase_url';
 const STORAGE_KEY_KEY = 'orientsol_supabase_anon_key';
@@ -89,6 +91,7 @@ export function getSupabaseClient(): SupabaseClient | null {
     try {
       clientInstance = createClient(url, key, {
         auth: {
+          storage: platformSecureStorageAdapter,
           persistSession: false,
           autoRefreshToken: false,
           detectSessionInUrl: false,
@@ -180,17 +183,16 @@ export function isBackendProxyConfigured(): boolean {
 }
 
 /**
- * Sets or updates the custom backend API proxy URL in local storage.
+ * Sets or updates the custom backend API proxy URL in platform secure storage.
  */
 export function setBackendApiUrl(url: string): void {
   try {
-    if (typeof localStorage !== 'undefined') {
-      if (url.trim()) {
-        localStorage.setItem(STORAGE_KEY_BACKEND_URL, url.trim());
-      } else {
-        localStorage.removeItem(STORAGE_KEY_BACKEND_URL);
-      }
+    if (url.trim()) {
+      platformSecureStorage.setItem(STORAGE_KEY_BACKEND_URL, url.trim()).catch(() => {});
+    } else {
+      platformSecureStorage.removeItem(STORAGE_KEY_BACKEND_URL).catch(() => {});
     }
   } catch {}
 }
+
 

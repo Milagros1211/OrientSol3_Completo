@@ -355,9 +355,16 @@ themeManager.subscribe(() => {
 registerServiceWorker();
 
 import { securityAuditLogger } from '@/services/monitoring/securityAuditLogger';
+import { platformSecureStorage } from '@/services/storage/platformSecureStorage';
 
 // Initialize Security Audit Logger and CSP violation monitoring
 securityAuditLogger.init();
+
+// Initialize Platform Secure Storage (Keystore on Android, Keychain on iOS)
+platformSecureStorage.init().catch((err) => {
+  console.warn('[OrientSol Secure Storage] Init warning:', err);
+});
+
 
 // Global Production Error Shield: Catch unhandled errors and log details privately
 window.addEventListener('error', (event) => {
