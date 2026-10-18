@@ -337,8 +337,9 @@ export function renderPythonConsole(): HTMLElement {
           <button type="button" class="verif-tab-btn ${activeTab === 'baseline' ? 'active' : ''}" data-tab="baseline">
             📅 ${isEn ? '2. 12-Month Baseline' : '2. Línea Base 12 Meses'}
           </button>
-          <button type="button" class="verif-tab-btn ${activeTab === 'radiation' ? 'active' : ''}" data-tab="radiation">
-            🌐 ${isEn ? '3. Radiation & Transposition' : '3. Radiación & Transposición'}
+          <button type="button" class="verif-tab-btn ${activeTab === 'radiation' ? 'active' : ''}" data-tab="radiation" style="display: flex; align-items: center; gap: 0.35rem;">
+            <span>🌐 ${isEn ? '3. Radiation & PVGIS' : '3. Radiación & PVGIS'}</span>
+            <span style="background: #0284c7; color: #fff; font-size: 0.65rem; padding: 0.1rem 0.4rem; border-radius: 999px; font-weight: 700;">Live JRC</span>
           </button>
           <button type="button" class="verif-tab-btn ${activeTab === 'tracking' ? 'active' : ''}" data-tab="tracking">
             🔄 ${isEn ? '4. Tracking & Seasonal' : '4. Seguimiento & Estacional'}
@@ -684,13 +685,18 @@ export function renderPythonConsole(): HTMLElement {
 
       return `
         <div class="verif-table-card">
-          <div class="verif-table-title-bar">
-            <span class="verif-table-title">
-              📅 ${isEn
-                ? `12-Month Baseline (Klein Characteristic Days, Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})`
-                : `Línea Base 12 Meses (Días Intermedios de Klein, Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}
-            </span>
-            <span class="badge-status-valid">✓ CoeficienteCalculos.m Verified</span>
+          <div class="verif-table-title-bar" style="flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="verif-table-title">
+                📅 ${isEn
+                  ? `12-Month Baseline (Klein Characteristic Days, Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})`
+                  : `Línea Base 12 Meses (Días Intermedios de Klein, Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}
+              </span>
+              <span class="badge-status-valid">✓ CoeficienteCalculos.m</span>
+            </div>
+            <button type="button" class="btn btn-xs btn-primary btn-goto-pvgis" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; background: #0284c7; color: #fff; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 0.35rem;">
+              🌐 ${isEn ? 'Go to Tab 3: PVGIS Validation ➔' : 'Ir a Pestaña 3: Validación PVGIS ➔'}
+            </button>
           </div>
 
           <div class="verif-table-wrap">
@@ -1620,6 +1626,14 @@ export function renderPythonConsole(): HTMLElement {
     container.querySelector('#btn-dismiss-pvgis-error')?.addEventListener('click', () => {
       pvgisFetchError = null;
       renderView();
+    });
+
+    container.querySelectorAll('.btn-goto-pvgis').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeTab = 'radiation';
+        showPvgisComparison = true;
+        renderView();
+      });
     });
 
     // 7. Run Verification in Pyodide WASM (without stdout raw console)
