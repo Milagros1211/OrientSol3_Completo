@@ -6,6 +6,8 @@ import {
 import type { ClimateDataRecord } from '@/types/climate';
 import { LOCATIONS_DATABASE } from '@/database/locations';
 import { i18n } from '@/i18n';
+import { securityAuditLogger } from '@/services/monitoring/securityAuditLogger';
+
 
 const LOCAL_STORAGE_CACHE_KEY = 'orientsol_climate_datasets_cache';
 const OFFLINE_SYNC_QUEUE_KEY = 'orientsol_supabase_offline_queue';
@@ -183,6 +185,17 @@ export function validateClimateRecordForSaving(
         : `El nombre del emplazamiento es demasiado largo (${name.length} caracteres). El máximo permitido es 200.`,
     };
   }
+
+  // Suspicious pattern check (SQLi, XSS, Path Traversal)
+  if (securityAuditLogger.inspectInputForSuspiciousActivity(name, 'climate-emplacement-name')) {
+    return {
+      valid: false,
+      error: isEn
+        ? 'Suspicious or invalid characters detected in the emplacement name.'
+        : 'Se han detectado caracteres o patrones no permitidos en el nombre del emplazamiento.',
+    };
+  }
+
 
   // 2. Latitude
   if (record.latitude === undefined || record.latitude === null || isNaN(Number(record.latitude))) {

@@ -354,17 +354,41 @@ themeManager.subscribe(() => {
 // Register PWA Service Worker for offline and mobile execution
 registerServiceWorker();
 
+import { securityAuditLogger } from '@/services/monitoring/securityAuditLogger';
+
+// Initialize Security Audit Logger and CSP violation monitoring
+securityAuditLogger.init();
+
 // Global Production Error Shield: Catch unhandled errors and log details privately
 window.addEventListener('error', (event) => {
-  console.error('[OrientSol Unhandled Error Caught Privately]:', event.error || event.message);
+  securityAuditLogger.log({
+    level: 'ERROR',
+    category: 'SYSTEM',
+    source: 'window.onerror',
+    message: event.message || 'Unhandled script error',
+    metadata: {
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    },
+  });
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('[OrientSol Unhandled Rejection Caught Privately]:', event.reason);
+  securityAuditLogger.log({
+    level: 'ERROR',
+    category: 'SYSTEM',
+    source: 'window.unhandledrejection',
+    message: String(event.reason?.message || event.reason || 'Unhandled promise rejection'),
+    metadata: {
+      reason: event.reason,
+    },
+  });
 });
 
 // Automatically start background loading of Pyodide runtime
 pyodideService.initialize().catch((err) => {
   console.warn('[OrientSol] Pyodide background pre-load note:', err);
 });
+
 

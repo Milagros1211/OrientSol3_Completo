@@ -40,14 +40,27 @@ export function sanitizeForSpreadsheet(value: any): string {
   return str;
 }
 
+import { securityAuditLogger } from '@/services/monitoring/securityAuditLogger';
+
 /**
  * Strips internal stack traces, system paths, or credential details from error messages.
  * Logs the full error privately in the developer console while returning a friendly,
  * generic error message for user-facing UI notifications.
  */
 export function formatSafeUserErrorMessage(error: any, fallbackSpanish: string, fallbackEnglish?: string): string {
-  // 1. Log full technical details privately for debugging
-  console.error('[OrientSol Internal Error Trace]:', error);
+  // 1. Log to centralized security audit logger (which redacts secrets and persists safely)
+  try {
+    securityAuditLogger.log({
+      level: 'ERROR',
+      category: 'SYSTEM',
+      source: 'error-handler',
+      message: typeof error === 'string' ? error : error?.message || 'Application error captured',
+      metadata: { error: String(error) },
+    });
+  } catch (_) {
+    console.error('[OrientSol Internal Error Trace]:', error);
+  }
+
 
   const isEn = typeof document !== 'undefined' && document.documentElement.lang === 'en';
   const defaultMsg = isEn ? (fallbackEnglish || 'An unexpected error occurred. Please try again.') : fallbackSpanish;

@@ -9745,7 +9745,8 @@ body.theme-dark .loss-map-matrix-table tbody td:first-child {
 /* ==========================================================================
    Legal Compliance Modal, Terms, Privacy, Cookies & Security Styles
    ========================================================================== */
-.modal-dialog.legal-dialog {
+.modal-dialog.legal-dialog,
+.modal-dialog.audit-dialog {
   background: var(--bg-card);
   border: 1px solid var(--border-highlight);
   border-radius: var(--radius-lg);

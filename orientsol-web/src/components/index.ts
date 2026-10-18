@@ -8,4 +8,6 @@ export * from './climate/ClimateIntegrationPanel';
 export * from './climate/DualClimateLoaderPanel';
 export * from './supabase/SupabaseSyncModal';
 export * from './modals/LegalPoliciesModal';
+export * from './modals/SecurityAuditModal';
 export * from './common/CookieBanner';
+
