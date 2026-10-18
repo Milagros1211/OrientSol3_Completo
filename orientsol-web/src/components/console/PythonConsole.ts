@@ -1318,12 +1318,13 @@ export function renderPythonConsole(): HTMLElement {
 
             <!-- Mode Switcher & PVGIS Action Buttons -->
             <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
-              ${pvgisData ? `
-                <button type="button" id="btn-pvgis-view-standard" class="btn btn-xs ${!showPvgisComparison ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; ${!showPvgisComparison ? 'background: #059669; color: #fff; border-color: #10b981;' : ''}">
-                  📊 ${isEn ? 'Liu-Jordan Model' : 'Descomposición Liu-Jordan'}
+              ${showPvgisComparison ? `
+                <button type="button" id="btn-pvgis-view-standard" class="btn btn-xs btn-secondary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 4px; cursor: pointer;" title="${isEn ? 'Return to OrientSol Liu-Jordan decomposition table' : 'Volver a la tabla de descomposición Liu-Jordan de OrientSol'}">
+                  📊 ${isEn ? 'Back to Liu-Jordan' : 'Volver a Liu-Jordan'}
                 </button>
-                <button type="button" id="btn-pvgis-view-diff" class="btn btn-xs ${showPvgisComparison ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; ${showPvgisComparison ? 'background: #0284c7; color: #fff; border-color: #0ea5e9;' : ''}">
-                  🛰️ ${isEn ? 'PVGIS Cross-Validation' : 'Validación Cruzada PVGIS'}
+              ` : pvgisData ? `
+                <button type="button" id="btn-pvgis-view-diff" class="btn btn-xs btn-secondary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 4px; cursor: pointer;" title="${isEn ? 'View PVGIS Cross-Validation comparison table' : 'Ver tabla comparativa de validación cruzada con PVGIS'}">
+                  🛰️ ${isEn ? 'View PVGIS Comparison' : 'Ver Comparativa PVGIS'}
                 </button>
               ` : ''}
 
