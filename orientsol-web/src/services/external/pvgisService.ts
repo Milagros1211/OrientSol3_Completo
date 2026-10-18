@@ -83,6 +83,12 @@ export async function fetchPvgisClimateData(
       url: `${supabaseUrl}/functions/v1/pvgis-proxy?lat=${roundedLat}&lon=${roundedLon}`,
       version: '5.3',
     });
+  } else if (!isLocalhost && !electronAPI?.fetchExternalUrl) {
+    // 4. In web browser without Supabase: attempt direct JRC endpoint
+    candidateUrls.push({
+      url: jrcBaseUrl,
+      version: '5.3',
+    });
   }
 
   let json: PVGISResponse | null = null;

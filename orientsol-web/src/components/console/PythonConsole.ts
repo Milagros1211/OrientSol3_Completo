@@ -759,12 +759,7 @@ export function renderPythonConsole(): HTMLElement {
 
     if (activeTab === 'radiation') {
       const simRes = solarSyncState.getLastSimulationResult();
-      const isJaen = Math.abs(stateLat - 37.77) < 0.6;
-      const isMadrid = Math.abs(stateLat - 40.42) < 0.6;
-      const canonicalJaenGdm0 = [2.47, 3.18, 4.72, 5.34, 6.62, 7.18, 7.04, 6.22, 4.98, 3.77, 2.50, 2.10];
-      const canonicalMadridGdm0 = [2.00, 2.73, 4.48, 5.17, 6.58, 7.24, 7.32, 6.41, 4.97, 3.36, 2.15, 1.64];
-      const canonicalJaenGdmOpt = [3.91, 4.39, 5.53, 5.57, 6.62, 7.19, 7.06, 6.37, 5.62, 5.01, 3.66, 3.43];
-      const canonicalMadridGdmOpt = [3.35, 3.98, 5.32, 5.48, 6.68, 7.28, 7.38, 6.62, 5.71, 4.65, 3.31, 2.82];
+      const hasSimForLat = Boolean(simRes?.horizontal?.gdm0 && Math.abs(simRes.latitude - stateLat) < 0.6);
 
       const radRows = DIA_INTER.map((dayNum, idx) => {
         const dec = getMonthlyDeclinationDeg(idx);
@@ -779,28 +774,56 @@ export function renderPythonConsole(): HTMLElement {
           (Math.cos(latR) * Math.cos(decR) * Math.sin(ws) + ws * Math.sin(latR) * Math.sin(decR))
         );
 
-        // OrientSol Historical Methodology:
-        // Prioritizes active simulation result (if matched with current latitude) or canonical OrientSol BBDD.xlsx baseline
-        const g0 = (simRes?.horizontal?.gdm0 && Math.abs(simRes.latitude - stateLat) < 0.6)
-          ? simRes.horizontal.gdm0[idx]
-          : (isJaen ? canonicalJaenGdm0[idx] : (isMadrid ? canonicalMadridGdm0[idx] : Math.max(1.2, g0d * 0.58)));
+        // OrientSol Live Radiation:
+        // Prioritizes active simulation result or live PVGIS data or live physical formulation
+        const g0 = hasSimForLat
+          ? simRes!.horizontal.gdm0[idx]
+          : (showPvgisComparison && pvgisData?.monthlyGdm0?.[idx] !== undefined
+            ? pvgisData.monthlyGdm0[idx]
+            : Math.round(g0d * (0.54 + 0.08 * Math.cos(decR) * Math.cos(latR)) * 100) / 100);
 
-        // Canonical OrientSol Liu-Jordan decomposition from Bdm0.m:
+        // Canonical OrientSol Liu-Jordan decomposition from Bdm0.m (calculated live):
         // Ktm = Gdm0 / G0d
         // Kdm = 1.0 - (1.13 * Ktm)
         // Ddm = Kdm * Gdm0
         // Bdm = Gdm0 - Ddm
-        const ktm = Math.min(1.0, Math.max(0.0, g0 / g0d));
+        const ktm = Math.min(1.0, Math.max(0.01, g0 / g0d));
         const kdm = Math.min(1.0, Math.max(0.0, 1.0 - 1.13 * ktm));
-        const ddm = simRes?.horizontal?.ddm0 ? simRes.horizontal.ddm0[idx] : Math.round(g0 * kdm * 100) / 100;
-        const bdm = simRes?.horizontal?.bdm0 ? simRes.horizontal.bdm0[idx] : Math.round((g0 - ddm) * 100) / 100;
-        const optTilt = simRes?.monthlyOptimum12?.optimalTiltsDeg ? simRes.monthlyOptimum12.optimalTiltsDeg[idx] : Math.max(1, Math.min(85, Math.abs(stateLat - dec)));
-        const gOpt = (simRes?.monthlyOptimum12?.monthlyDailyKwh && Math.abs(simRes.latitude - stateLat) < 0.6)
-          ? simRes.monthlyOptimum12.monthlyDailyKwh[idx]
-          : (simRes?.optimalAnnual?.monthlyDailyKwh && Math.abs(simRes.latitude - stateLat) < 0.6)
-            ? simRes.optimalAnnual.monthlyDailyKwh[idx]
-            : (isJaen ? canonicalJaenGdmOpt[idx] : (isMadrid ? canonicalMadridGdmOpt[idx] : Math.round(g0 * 1.185 * 100) / 100));
-        const gain = g0 > 0 ? ((gOpt - g0) / g0) * 100 : 0;
+        const ddm = hasSimForLat && simRes!.horizontal.ddm0
+          ? simRes!.horizontal.ddm0[idx]
+          : Math.round(g0 * kdm * 100) / 100;
+        const bdm = hasSimForLat && simRes!.horizontal.bdm0
+          ? simRes!.horizontal.bdm0[idx]
+          : Math.round((g0 - ddm) * 100) / 100;
+
+        // Discretized sweep beta in [0..90] to calculate live optimal tilt and maximum inclined radiation
+        let optTilt = 0;
+        let gOpt = g0;
+        if (hasSimForLat && simRes!.monthlyOptimum12?.monthlyDailyKwh?.[idx] !== undefined) {
+          optTilt = simRes!.monthlyOptimum12.optimalTiltsDeg[idx];
+          gOpt = simRes!.monthlyOptimum12.monthlyDailyKwh[idx];
+        } else {
+          // Live calculation via Liu & Jordan isotropic transposition
+          const den = Math.cos(latR) * Math.cos(decR) * Math.sin(ws) + ws * Math.sin(latR) * Math.sin(decR);
+          let maxGd = g0;
+          let bestTilt = 0;
+          for (let beta = 0; beta <= 90; beta++) {
+            const betaR = (beta * Math.PI) / 180;
+            const cosWsp = -Math.tan(latR - betaR) * Math.tan(decR);
+            const wsp = Math.min(ws, Math.acos(Math.max(-1, Math.min(1, cosWsp))));
+            const num = Math.cos(latR - betaR) * Math.cos(decR) * Math.sin(wsp) + wsp * Math.sin(latR - betaR) * Math.sin(decR);
+            const rb = den > 0 ? Math.max(0, num / den) : 0;
+            const gd = bdm * rb + ddm * ((1 + Math.cos(betaR)) / 2) + g0 * 0.20 * ((1 - Math.cos(betaR)) / 2);
+            if (gd > maxGd) {
+              maxGd = gd;
+              bestTilt = beta;
+            }
+          }
+          optTilt = bestTilt;
+          gOpt = Math.round(maxGd * 100) / 100;
+        }
+
+        const gain = g0 > 0 ? Math.round(((gOpt - g0) / g0) * 1000) / 10 : 0;
 
         // Dynamic physical verification assertions:
         // 1. Extraterrestrial ceiling: Gdm(0) <= G0d (+ tolerance for numerical discretization)
@@ -901,6 +924,9 @@ export function renderPythonConsole(): HTMLElement {
             month: r.month,
             isSelectedMonth: r.isSelectedMonth,
             g0: r.g0,
+            bdm: r.bdm,
+            ddm: r.ddm,
+            optTilt: r.optTilt,
             gOpt: r.gOpt,
             gain: r.gain,
             gPvgis,
@@ -1049,8 +1075,11 @@ export function renderPythonConsole(): HTMLElement {
                 ${pvgisCompareMetric === 'both' ? `
                   <tr>
                     <th>${isEn ? 'Month' : 'Mes'}</th>
-                    <th style="text-align: right;">${isEn ? 'OrientSol Gdm(0)' : 'OrientSol Gdm(0) (kWh/m²·d)'}</th>
-                    <th style="text-align: right; color: #059669; background: rgba(16, 185, 129, 0.08); font-weight: 800;">${isEn ? 'OrientSol Gdm Opt' : 'OrientSol Gdm Óptimo (kWh/m²·d)'}</th>
+                    <th style="text-align: right;">${isEn ? 'OrientSol Gdm(0)' : 'Gdm(0) Horiz (kWh/m²·d)'}</th>
+                    <th style="text-align: right;">${isEn ? 'Direct Bdm' : 'Directa Bdm (kWh/m²·d)'}</th>
+                    <th style="text-align: right;">${isEn ? 'Diffuse Ddm' : 'Difusa Ddm (kWh/m²·d)'}</th>
+                    <th style="text-align: right;">${isEn ? 'Opt Tilt (°)' : 'Inc. Óptima (°)'}</th>
+                    <th style="text-align: right; color: #059669; background: rgba(16, 185, 129, 0.08); font-weight: 800;">${isEn ? 'OrientSol Gdm Opt' : 'Gdm Óptimo (kWh/m²·d)'}</th>
                     <th style="text-align: right; color: #059669;">${isEn ? 'Opt Gain (%)' : 'Ganancia Ópt. (%)'}</th>
                     <th style="text-align: right; color: #0284c7;">${isEn ? 'PVGIS JRC Gdm(0)' : 'PVGIS JRC Gdm(0) (kWh/m²·d)'}</th>
                     <th style="text-align: right;">${isEn ? 'Diff Horiz' : 'Diferencia Horiz (kWh/m²·d)'}</th>
@@ -1095,6 +1124,9 @@ export function renderPythonConsole(): HTMLElement {
                       <tr style="${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
                         <td><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★ (Selected)' : '★ (Consultado)') : ''}</strong></td>
                         <td class="td-num"><strong>${formatNum(r.g0, 2)}</strong></td>
+                        <td class="td-num">${formatNum(r.bdm, 2)}</td>
+                        <td class="td-num">${formatNum(r.ddm, 2)}</td>
+                        <td class="td-num">${formatAngle(r.optTilt, 1)}</td>
                         <td class="td-num" style="color: #059669; font-weight: 800; background: rgba(16,185,129,0.05);"><strong>${formatNum(r.gOpt, 2)}</strong></td>
                         <td class="td-num" style="color: #059669; font-weight: 600;">+${formatPercent(r.gain, 1)}</td>
                         <td class="td-num" style="color: #0284c7; font-weight: 600;">${formatNum(r.gPvgis, 2)}</td>
@@ -1143,6 +1175,9 @@ export function renderPythonConsole(): HTMLElement {
                   <tr class="table-media-row verif-media-row">
                     <td><strong>${isEn ? 'ANNUAL MEAN' : 'MEDIA ANUAL'}</strong></td>
                     <td class="td-num"><strong>${formatNum(meanG0, 2)}</strong></td>
+                    <td class="td-num"><strong>${formatNum(meanBdm, 2)}</strong></td>
+                    <td class="td-num"><strong>${formatNum(meanDdm, 2)}</strong></td>
+                    <td class="td-num"><strong>Inc: ${formatAngle(meanTilt, 1)}</strong></td>
                     <td class="td-num" style="color: #059669; font-weight: 800; background: rgba(16,185,129,0.06);"><strong>${formatNum(meanGOpt, 2)}</strong></td>
                     <td class="td-num" style="color: #059669;"><strong>+${formatPercent(meanGain, 1)}</strong></td>
                     <td class="td-num" style="color: #0284c7;"><strong>${formatNum(meanPvgis, 2)}</strong></td>
@@ -1363,39 +1398,30 @@ export function renderPythonConsole(): HTMLElement {
         rDualAnnual = simRes!.tracking.dualAxis.annualMeanDailyKwh;
         optTiltAnnual = simRes!.optimalAnnual.optimalTiltDeg;
         seasTiltAnnual = (simRes!.seasonal.winterTiltDeg + simRes!.seasonal.springTiltDeg + simRes!.seasonal.summerTiltDeg + simRes!.seasonal.autumnTiltDeg) / 4;
-      } else if (isMadrid) {
-        // Canonical OrientSol BBDD.xlsx baseline for Madrid (lat 40.42°, Gdm0 = [2.00, 2.73, 4.48, 5.17, 6.58, 7.24, 7.32, 6.41, 4.97, 3.36, 2.15, 1.64])
-        rHorizAnnual = 4.50;
-        rOptAnnual = 5.14;
-        rSeasAnnual = 5.30;
-        rPolAnnual = 6.51;
-        rAzimAnnual = 6.33;
-        rHTrkAnnual = 5.87;
-        rDualAnnual = 6.68;
-        optTiltAnnual = 30.0;
-        seasTiltAnnual = 30.0;
-      } else if (isJaen) {
-        // Canonical OrientSol BBDD.xlsx baseline for Jaén (lat 37.77°, Gdm0 = [2.47, 3.18, 4.72, 5.34, 6.62, 7.18, 7.04, 6.22, 4.98, 3.77, 2.50, 2.10])
-        rHorizAnnual = 4.68;
-        rOptAnnual = 5.11;
-        rSeasAnnual = 5.30;
-        rPolAnnual = 6.51;
-        rAzimAnnual = 6.33;
-        rHTrkAnnual = 6.03;
-        rDualAnnual = 6.68;
-        optTiltAnnual = 30.0;
-        seasTiltAnnual = 30.0;
       } else {
-        // Extraterrestrial scaling for other latitudes
-        rHorizAnnual = simRes?.horizontal?.annualMeanDailyKwh ?? 4.50;
-        rOptAnnual = simRes?.optimalAnnual?.annualMeanDailyKwh ?? (rHorizAnnual * 1.142);
-        rSeasAnnual = simRes?.seasonal?.annualMeanDailyKwh ?? (rHorizAnnual * 1.178);
-        rPolAnnual = simRes?.tracking?.polarAxis?.annualMeanDailyKwh ?? (rHorizAnnual * 1.447);
-        rAzimAnnual = simRes?.tracking?.azimuthalAxis?.annualMeanDailyKwh ?? (rHorizAnnual * 1.407);
-        rHTrkAnnual = simRes?.tracking?.horizontalAxis?.annualMeanDailyKwh ?? (rHorizAnnual * 1.304);
-        rDualAnnual = simRes?.tracking?.dualAxis?.annualMeanDailyKwh ?? (rHorizAnnual * 1.484);
+        // Dynamic physical computation based on live mean radiation for current latitude:
+        const liveRows = DIA_INTER.map((dayNum, idx) => {
+          const dec = getMonthlyDeclinationDeg(idx);
+          const lR = (stateLat * Math.PI) / 180;
+          const dR = (dec * Math.PI) / 180;
+          const cosW = -Math.tan(lR) * Math.tan(dR);
+          const ws = Math.acos(Math.max(-1, Math.min(1, cosW)));
+          const g0d = Math.max(
+            0.8,
+            (24 / Math.PI) * 1.367 * (1 + 0.033 * Math.cos((2 * Math.PI * dayNum) / 365)) *
+            (Math.cos(lR) * Math.cos(dR) * Math.sin(ws) + ws * Math.sin(lR) * Math.sin(dR))
+          );
+          return g0d * (0.54 + 0.08 * Math.cos(dR) * Math.cos(lR));
+        });
+        rHorizAnnual = liveRows.reduce((a, b) => a + b, 0) / 12;
         optTiltAnnual = Math.max(10, Math.min(65, Math.round(Math.abs(stateLat) * 0.88)));
         seasTiltAnnual = optTiltAnnual;
+        rOptAnnual = rHorizAnnual * 1.142;
+        rSeasAnnual = rHorizAnnual * 1.178;
+        rPolAnnual = rHorizAnnual * 1.447;
+        rAzimAnnual = rHorizAnnual * 1.407;
+        rHTrkAnnual = rHorizAnnual * 1.304;
+        rDualAnnual = rHorizAnnual * 1.484;
       }
 
       // 2. Day/Month specific values for Consulted date inspection
