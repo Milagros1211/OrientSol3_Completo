@@ -1,6 +1,6 @@
 /**
  * Solar Geometry Angles Calculation
- * Based on OrientSol 4.0 (Ec. 4.30, Ec. 4.31 and Page 220 of PFC Thesis)
+ * Based on OrientSol 4.0 (Ec. 4.30, Ec. 4.31 and Page 220 of TFM Thesis)
  * Provides monthly computed tilt and orientation angles in degrees without Greek symbols.
  */
 
@@ -17,7 +17,7 @@ export function getMonthlyDeclinationDeg(monthIdx: number): number {
 }
 
 /**
- * Solar azimuth at solar noon (12:00 solar) according to Ec. 4.31 and Page 220 of PFC OrientSol:
+ * Solar azimuth at solar noon (12:00 solar) according to Ec. 4.31 and Page 220 of TFM OrientSol:
  * - Origin: 0° at South (positive in the afternoon to West, negative in the morning to East).
  * - At 12h:
  *   - Northern Hemisphere (lat >= 23.45°): 0.0°

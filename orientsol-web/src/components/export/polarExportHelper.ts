@@ -17,7 +17,7 @@ const MONTH_NAMES_EN = [
  * Builds the Excel sheet data strictly conforming to:
  * - Figura 5.2.96: Datos exportados de radiación para el seguimiento a un eje polar (I/II)
  * - Figura 5.2.97: Datos exportados de radiación para el seguimiento a un eje polar (II/II)
- * (MATLAB Tabla_EjePolar.m / Ganancias_Gd_Polar.m en OrientSol 3.0 PFC)
+ * (MATLAB Tabla_EjePolar.m / Ganancias_Gd_Polar.m en OrientSol 3.0 TFM)
  */
 export function buildPolarComponentSheet(
   res: SolarBridgeSimulationResult,

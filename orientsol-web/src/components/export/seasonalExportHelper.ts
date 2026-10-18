@@ -18,7 +18,7 @@ const MONTH_NAMES_EN = [
  * - Figura 5.2.90: Datos exportados de radiación para inclinación óptima estacional (I/III)
  * - Figura 5.2.91: Datos exportados de radiación para inclinación óptima estacional (II/III)
  * - Figura 5.2.92: Datos exportados de radiación para inclinación óptima estacional (III/III)
- * (MATLAB Tabla_OptEstacional.m en OrientSol 3.0 PFC)
+ * (MATLAB Tabla_OptEstacional.m en OrientSol 3.0 TFM)
  */
 export function buildSeasonalComponentSheet(
   res: SolarBridgeSimulationResult,

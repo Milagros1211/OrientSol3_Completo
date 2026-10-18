@@ -43,7 +43,7 @@ export const PV_MODULE_DATABASE: PVModuleConfig[] = [
   },
   {
     id: 'classic-poly-330',
-    name: 'Polycrystalline 72-Cell 330W (Legacy PFC)',
+    name: 'Polycrystalline 72-Cell 330W (Legacy TFM)',
     nominalPowerWp: 330,
     vocV: 46.2,
     iscA: 9.25,

@@ -68,7 +68,7 @@ def solar_azimuth(
     valid_mask = np.abs(ratio) <= 1.0
     azimuth[valid_mask] = np.arccos(np.clip(ratio[valid_mask], -1.0, 1.0))
 
-    # Boundary cases from Ec. (4.31) y Pág. 220 (PFC OrientSol):
+    # Boundary cases from Ec. (4.31) y Pág. 220 (TFM OrientSol):
     invalid_mask = ~valid_mask
     if np.any(invalid_mask):
         decli_arr = np.broadcast_to(dec_rad, ratio.shape)
@@ -196,7 +196,7 @@ def azimut_solar(
             if abs(ratio) <= 1.0:
                 azimut_solar_mat[i, j] = np.arccos(np.clip(ratio, -1.0, 1.0))
             else:
-                # Reglas exactas de la Ec. (4.31) y Pág. 220 (PFC OrientSol):
+                # Reglas exactas de la Ec. (4.31) y Pág. 220 (TFM OrientSol):
                 # A las 12 horas o cruce cenital:
                 tropic_rad = 23.45 * np.pi / 180.0
                 decli = val_decli[i]

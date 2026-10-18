@@ -1441,7 +1441,7 @@ export function renderPythonConsole(): HTMLElement {
               <p style="margin-top: 0.5rem; margin-bottom: 0; font-size: 0.72rem; color: var(--text-dim);">
                 ${isEn
                   ? '<strong>Tribunal Defense Note:</strong> 100% of OrientSol monthly values conform strictly to World Meteorological Organization standards and JRC satellite confidence envelopes, demonstrating rigorous mathematical and physical validity.'
-                  : '<strong>Blindaje Metodológico para Tribunal (TFM/PFC):</strong> El 100% de los valores mensuales de OrientSol se encuentra estrictamente dentro de los límites de la Organización Meteorológica Mundial y las envolventes de confianza del JRC, demostrando una total validez física y matemática.'}
+                  : '<strong>Blindaje Metodológico para Tribunal (TFM):</strong> El 100% de los valores mensuales de OrientSol se encuentra estrictamente dentro de los límites de la Organización Meteorológica Mundial y las envolventes de confianza del JRC, demostrando una total validez física y matemática.'}
               </p>
             </div>
           </div>
