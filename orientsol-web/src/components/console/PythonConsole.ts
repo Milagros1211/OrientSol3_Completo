@@ -1012,7 +1012,6 @@ export function renderPythonConsole(): HTMLElement {
           ${pvgisJustSynchronized ? `
             <div style="padding: 0.65rem 1.15rem; background: rgba(16, 185, 129, 0.12); border-bottom: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.77rem; color: #059669; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
               <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <span style="font-size: 1.2rem;">⚡</span>
                 <span>
                   ${isEn
                     ? `Live PVGIS API successfully synchronized! Database: <strong>${pvgisData.database}</strong> (${pvgisData.dbType}) • Coverage: <strong>${pvgisData.startYear}–${pvgisData.endYear}</strong> (Last DB update: <strong>Year ${pvgisData.endYear}</strong>) • Spatial res: <strong>${pvgisData.spatialRes}</strong> • Source: European Commission JRC PVGIS 5.3.`
@@ -1029,7 +1028,6 @@ export function renderPythonConsole(): HTMLElement {
           <div style="padding: 0.85rem 1.15rem; background: rgba(37, 99, 235, 0.05); border-bottom: 1px solid rgba(37, 99, 235, 0.2); display: flex; flex-direction: column; gap: 0.65rem;">
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem;">
               <div style="display: flex; align-items: center; gap: 0.65rem;">
-                <span style="font-size: 1.4rem;">🛰️</span>
                 <div>
                   <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
                     <strong style="color: var(--text-main); font-size: 0.86rem;">
@@ -1091,7 +1089,7 @@ export function renderPythonConsole(): HTMLElement {
           <div style="padding: 0.55rem 1rem; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
             <div style="display: flex; align-items: center; gap: 0.45rem;">
               <span style="font-size: 0.76rem; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 0.35rem;">
-                📊 ${isEn ? 'Complete PVGIS Inter-Comparison (Horizontal + Optimal Tilt)' : 'Validación Cruzada Completa (Horizontal + Inclinación Óptima)'}
+                ${isEn ? 'Complete PVGIS Inter-Comparison (Horizontal + Optimal Tilt)' : 'Validación Cruzada Completa (Horizontal + Inclinación Óptima)'}
               </span>
             </div>
             <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.71rem; flex-wrap: wrap;">
@@ -1187,7 +1185,7 @@ export function renderPythonConsole(): HTMLElement {
           <div style="padding: 0.85rem 1.15rem; background: rgba(2, 132, 199, 0.05); border-top: 1px solid var(--border-subtle); font-size: 0.76rem; color: var(--text-dim); line-height: 1.5;">
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.4rem;">
               <span style="font-weight: 700; color: var(--accent-cyan, #0284c7); font-size: 0.82rem;">
-                🔬 ${isEn ? 'TFM Scientific Validation Metrics (Complete Analysis vs European PVGIS Reference)' : 'Métricas Estadísticas de Validación para TFM (Análisis Completo vs Referencia PVGIS)'}
+                ${isEn ? 'TFM Scientific Validation Metrics (Complete Analysis vs European PVGIS Reference)' : 'Métricas Estadísticas de Validación para TFM (Análisis Completo vs Referencia PVGIS)'}
               </span>
               <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-size: 0.72rem; font-weight: 700;">
                 ${pvgisData.provider}
@@ -1232,7 +1230,6 @@ export function renderPythonConsole(): HTMLElement {
               <div style="margin-top: 0.75rem; padding: 0.75rem 0.95rem; background: rgba(16, 185, 129, 0.05); border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.25);">
                 <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem;">
                   <div style="font-weight: 700; color: #059669; font-size: 0.78rem; display: flex; align-items: center; gap: 0.4rem;">
-                    <span>📊</span>
                     <span>${isEn ? 'Official Multiannual PVGIS Climatology (2005–2023: PVGIS-SARAH3 / ERA5)' : 'Climatología Multianual Oficial de PVGIS (Serie 2005–2023: PVGIS-SARAH3 / ERA5)'}</span>
                   </div>
                   <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; font-size: 0.7rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3);">
@@ -1241,7 +1238,7 @@ export function renderPythonConsole(): HTMLElement {
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.65rem; font-size: 0.72rem; line-height: 1.45;">
                   <div style="background: var(--bg-card); padding: 0.55rem 0.7rem; border-radius: 5px; border: 1px solid var(--border-subtle);">
-                    <strong style="color: var(--text-main); display: block; margin-bottom: 0.2rem;">📍 ${isEn ? 'Where do these reference data come from?' : '¿De dónde sale esta serie de referencia?'}</strong>
+                    <strong style="color: var(--text-main); display: block; margin-bottom: 0.2rem;">${isEn ? 'Where do these reference data come from?' : '¿De dónde sale esta serie de referencia?'}</strong>
                     <span style="color: var(--text-muted);">
                       ${isEn
                         ? 'Official solar radiation records computed by the European Commission (JRC PVGIS 5.3, PVGIS-SARAH3) across 2005–2023 at Campus Las Lagunillas (University of Jaén, 37.77°N) and Madrid Retiro (40.42°N).'
@@ -1249,7 +1246,7 @@ export function renderPythonConsole(): HTMLElement {
                     </span>
                   </div>
                   <div style="background: var(--bg-card); padding: 0.55rem 0.7rem; border-radius: 5px; border: 1px solid var(--border-subtle);">
-                    <strong style="color: var(--text-main); display: block; margin-bottom: 0.2rem;">🎯 ${isEn ? 'Why does it match OrientSol so closely?' : '¿Por qué coincide tanto con OrientSol?'}</strong>
+                    <strong style="color: var(--text-main); display: block; margin-bottom: 0.2rem;">${isEn ? 'Why does it match OrientSol so closely?' : '¿Por qué coincide tanto con OrientSol?'}</strong>
                     <span style="color: var(--text-muted);">
                       ${isEn
                         ? 'Being a multi-year climatological average, isolated cloud anomalies, seasonal heatwaves, or drought swings balance out, proving the strict physical and mathematical accuracy of OrientSol.'
@@ -1263,7 +1260,7 @@ export function renderPythonConsole(): HTMLElement {
             <!-- WMO Calibration Legend & Defense Justification -->
             <div style="margin-top: 0.75rem; padding: 0.65rem; background: rgba(37, 99, 235, 0.04); border-radius: 6px; border: 1px solid rgba(37, 99, 235, 0.15);">
               <div style="font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem; font-size: 0.75rem;">
-                📖 ${isEn ? 'WMO-No. 8 Standard Metrological Criteria Legend:' : 'Criterios Metrológicos de Calibración OMM Nº 8 (Guía de Instrumentos de la OMM):'}
+                ${isEn ? 'WMO-No. 8 Standard Metrological Criteria Legend:' : 'Criterios Metrológicos de Calibración OMM Nº 8 (Guía de Instrumentos de la OMM):'}
               </div>
               <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.72rem; color: var(--text-muted); line-height: 1.45;">
                 <li><strong style="color: #059669;">≤ 5% (${isEn ? 'WMO Class 1' : 'Conforme OMM Alta Precisión'}):</strong> ${isEn ? 'Concordance within Secondary Standard precision pyranometers.' : 'Concordancia dentro del margen de piranómetros de estándar secundario de alta precisión.'}</li>
@@ -1292,27 +1289,27 @@ export function renderPythonConsole(): HTMLElement {
               <span class="verif-table-title">
                 ${showPvgisComparison && pvgisData
                   ? (pvgisData.isOffline
-                      ? `📍 ${isEn ? `PVGIS Official Climatology Offline (${pvgisData.locationName}, Lat ${formatAngle(stateLat, 2)})` : `Validación Cruzada con PVGIS JRC Offline (${pvgisData.locationName}, Latitud ${formatAngle(stateLat, 2)})`}`
-                      : `🛰️ ${isEn ? `PVGIS JRC Live Cross-Validation (${pvgisData.locationName}, Lat ${formatAngle(stateLat, 2)})` : `Validación Cruzada con PVGIS JRC (En vivo) (${pvgisData.locationName}, Latitud ${formatAngle(stateLat, 2)})`}`)
-                  : `🌐 ${isEn ? `Monthly Radiative Decomposition & Transposition (Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})` : `Descomposición Radiativa y Transposición Liu-Jordan (Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}`}
+                      ? `${isEn ? `PVGIS Official Climatology Offline (${pvgisData.locationName}, Lat ${formatAngle(stateLat, 2)})` : `Validación Cruzada con PVGIS JRC Offline (${pvgisData.locationName}, Latitud ${formatAngle(stateLat, 2)})`}`
+                      : `${isEn ? `PVGIS JRC Live Cross-Validation (${pvgisData.locationName}, Lat ${formatAngle(stateLat, 2)})` : `Validación Cruzada con PVGIS JRC (En vivo) (${pvgisData.locationName}, Latitud ${formatAngle(stateLat, 2)})`}`)
+                  : `${isEn ? `Monthly Radiative Decomposition & Transposition (Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})` : `Descomposición Radiativa y Transposición Liu-Jordan (Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}`}
               </span>
               <span class="badge-status-valid">${showPvgisComparison && pvgisData ? (pvgisData.isOffline ? '✓ PVGIS-SARAH3 Offline' : '✓ JRC v5.3 / ERA5') : '✓ Bod0, Bdm0, Ddm0, GdBeta'}</span>
             </div>
 
             <!-- Mode Switcher & PVGIS Action Buttons: Always 3 Persistent Buttons -->
             <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
-              <button type="button" id="btn-pvgis-view-standard" class="btn btn-xs ${isLiuActive ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; border-radius: 4px; cursor: pointer; ${isLiuActive ? 'background: #059669; color: #fff; border: 1px solid #059669; font-weight: 700;' : ''}" title="${isEn ? 'Return to OrientSol Liu-Jordan decomposition table' : 'Volver al análisis Liu-Jordan de OrientSol'}">
-                📊 ${isEn ? 'Liu-Jordan Analysis' : 'Volver a Liu-Jordan'}
+              <button type="button" id="btn-pvgis-view-standard" class="btn btn-xs ${isLiuActive ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; border-radius: 4px; cursor: pointer; ${isLiuActive ? 'background: #059669; color: #fff; border: 1px solid #059669; font-weight: 700;' : ''}" title="${isEn ? 'View OrientSol Liu-Jordan radiative decomposition' : 'Ver análisis mediante Método de Liu-Jordan'}">
+                ${isEn ? 'Liu-Jordan Method' : 'Método de Liu-Jordan'}
               </button>
 
               <button type="button" id="btn-fetch-pvgis" class="btn btn-xs ${isPvgisLiveActive ? 'btn-primary' : 'btn-secondary'}" ${isFetchingPvgis ? 'disabled' : ''} style="font-size: 0.72rem; padding: 0.25rem 0.6rem; ${isPvgisLiveActive ? 'background: #0284c7; color: #fff; border: 1px solid #0284c7; font-weight: 700;' : ''} border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 0.35rem;" title="${isEn ? 'Query European Commission PVGIS 5.3 Live API' : 'Consultar API en vivo de PVGIS 5.3 de la Comisión Europea'}">
                 ${isFetchingPvgis
-                  ? `⏳ ${isEn ? 'Querying PVGIS JRC...' : 'Consultando PVGIS JRC...'}`
-                  : `🌐 ${isEn ? 'Query PVGIS JRC (Live)' : 'Consultar PVGIS JRC (En vivo)'}`}
+                  ? `${isEn ? 'Querying PVGIS JRC...' : 'Consultando PVGIS JRC...'}`
+                  : `${isEn ? 'Query PVGIS JRC (Live)' : 'Consultar PVGIS JRC (En vivo)'}`}
               </button>
 
               <button type="button" id="btn-pvgis-benchmark" class="btn btn-xs ${isPvgisOfflineActive ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; ${isPvgisOfflineActive ? 'background: #059669; color: #fff; border: 1px solid #059669; font-weight: 700;' : ''} border-radius: 4px; cursor: pointer;" title="${isEn ? 'Load Official PVGIS Reference Data (Offline)' : 'Cargar Datos Oficiales PVGIS de Referencia (Sin Internet)'}">
-                📍 ${isEn ? 'Official PVGIS (Offline)' : 'Datos Oficiales PVGIS (Offline)'}
+                ${isEn ? 'Official PVGIS (Offline)' : 'Datos Oficiales PVGIS (Offline)'}
               </button>
             </div>
           </div>
@@ -1325,7 +1322,7 @@ export function renderPythonConsole(): HTMLElement {
               </div>
               <div style="display: flex; align-items: center; gap: 0.4rem;">
                 <button type="button" id="btn-pvgis-benchmark-err" class="btn btn-xs btn-primary" style="font-size: 0.7rem; padding: 0.15rem 0.5rem; background: #2563eb; color: #fff; border: none; border-radius: 3px; cursor: pointer;">
-                  📍 ${isEn ? 'Load Reference Data (Jaén / Madrid)' : 'Cargar Datos Oficiales (Jaén / Madrid)'}
+                  ${isEn ? 'Load Reference Data (Jaén / Madrid)' : 'Cargar Datos Oficiales (Jaén / Madrid)'}
                 </button>
                 <button type="button" id="btn-dismiss-pvgis-error" class="btn btn-xs btn-secondary" style="font-size: 0.7rem; padding: 0.15rem 0.4rem; cursor: pointer;">
                   ✕
