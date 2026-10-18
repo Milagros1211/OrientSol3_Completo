@@ -356,6 +356,7 @@ registerServiceWorker();
 
 import { securityAuditLogger } from '@/services/monitoring/securityAuditLogger';
 import { platformSecureStorage } from '@/services/storage/platformSecureStorage';
+import { deepLinkSecurityManager } from '@/services/deeplink/deepLinkSecurityManager';
 
 // Initialize Security Audit Logger and CSP violation monitoring
 securityAuditLogger.init();
@@ -364,6 +365,10 @@ securityAuditLogger.init();
 platformSecureStorage.init().catch((err) => {
   console.warn('[OrientSol Secure Storage] Init warning:', err);
 });
+
+// Initialize Secure Deep Link Manager (OWASP Mobile M8 & CWE-939 mitigation)
+deepLinkSecurityManager.init();
+
 
 
 // Global Production Error Shield: Catch unhandled errors and log details privately

@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@aparajita/capacitor-secure-storage": "^8.0.1",
+    "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.5.2",
     "@supabase/supabase-js": "^2.117.2",
     "jspdf": "^4.2.1",
