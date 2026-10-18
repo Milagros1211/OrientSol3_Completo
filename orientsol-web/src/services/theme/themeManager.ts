@@ -66,6 +66,10 @@ class ThemeManager {
       body?.classList.add('theme-light');
       body?.classList.remove('theme-dark');
     }
+    // Propagate theme attribute to any active modal backdrops
+    document.querySelectorAll('.modal-backdrop').forEach((modal) => {
+      modal.setAttribute('data-theme', theme);
+    });
   }
 }
 

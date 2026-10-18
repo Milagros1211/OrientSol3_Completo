@@ -1,5 +1,6 @@
 import { i18n } from '@/i18n';
 import { escapeHtml } from '@/utils/security';
+import { themeManager } from '@/services/theme/themeManager';
 
 export interface DeepLinkActionDetails {
   actionType: 'REGISTER_CLIMATE' | 'SYNC_DATABASE' | 'CLEAR_DATA' | 'CONFIG_BACKEND';
@@ -18,6 +19,7 @@ export function promptDeepLinkActionConfirmation(
     const modal = document.createElement('div');
     modal.className = 'modal-backdrop deeplink-modal-backdrop';
     modal.id = 'deeplink-confirmation-modal';
+    modal.setAttribute('data-theme', themeManager.getTheme());
     modal.style.zIndex = '10000';
 
     const paramEntries = Object.entries(details.parameters);

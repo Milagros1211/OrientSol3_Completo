@@ -1,4 +1,5 @@
 import { i18n } from '@/i18n';
+import { themeManager } from '@/services/theme/themeManager';
 
 export type LegalTabId = 'privacy' | 'terms' | 'cookies' | 'security';
 
@@ -16,6 +17,7 @@ export function openLegalPoliciesModal(initialTab: LegalTabId = 'privacy'): void
   const modal = document.createElement('div');
   modal.className = 'modal-backdrop legal-modal-backdrop';
   modal.id = 'legal-policies-modal';
+  modal.setAttribute('data-theme', themeManager.getTheme());
 
   function renderContent(): void {
     modal.innerHTML = `

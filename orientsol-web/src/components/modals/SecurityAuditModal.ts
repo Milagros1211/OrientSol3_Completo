@@ -1,6 +1,7 @@
 import { securityAuditLogger } from '@/services/monitoring/securityAuditLogger';
 import { i18n } from '@/i18n';
 import { escapeHtml } from '@/utils/security';
+import { themeManager } from '@/services/theme/themeManager';
 
 let activeAuditModalEl: HTMLElement | null = null;
 
@@ -18,6 +19,7 @@ export function openSecurityAuditModal(): void {
   const modal = document.createElement('div');
   modal.className = 'modal-backdrop audit-modal-backdrop';
   modal.id = 'security-audit-modal';
+  modal.setAttribute('data-theme', themeManager.getTheme());
 
   function renderContent(): void {
     const counts = securityAuditLogger.getSummaryCounts();

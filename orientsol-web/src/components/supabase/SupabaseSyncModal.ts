@@ -6,6 +6,7 @@ import {
 import { escapeHtml, formatSafeUserErrorMessage } from '@/utils/security';
 import { i18n } from '@/i18n';
 import { formatNum } from '@/utils/formatters';
+import { themeManager } from '@/services/theme/themeManager';
 
 let activeModalEl: HTMLElement | null = null;
 
@@ -18,6 +19,7 @@ export function openSupabaseSyncModal(): void {
   const modal = document.createElement('div');
   modal.className = 'modal-backdrop';
   modal.id = 'supabase-sync-modal';
+  modal.setAttribute('data-theme', themeManager.getTheme());
 
   const isOnline = climateDatabaseService.isOnline();
   const isConfigured = climateDatabaseService.isConfigured();
