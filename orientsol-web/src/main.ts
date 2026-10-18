@@ -373,6 +373,14 @@ deepLinkSecurityManager.init();
 
 // Global Production Error Shield: Catch unhandled errors and log details privately
 window.addEventListener('error', (event) => {
+  // Ignore harmless browser layout notifications (W3C standard benign ResizeObserver loop)
+  if (event.message && (
+    event.message.includes('ResizeObserver loop') ||
+    event.message.includes('ResizeObserver')
+  )) {
+    return;
+  }
+
   securityAuditLogger.log({
     level: 'ERROR',
     category: 'SYSTEM',

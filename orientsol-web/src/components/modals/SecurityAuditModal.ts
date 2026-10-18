@@ -62,9 +62,9 @@ export function openSecurityAuditModal(): void {
           <button type="button" class="btn-close" id="btn-close-audit-modal" aria-label="${isEn ? 'Close' : 'Cerrar'}">&times;</button>
         </div>
 
-        <div class="modal-body audit-modal-body" style="padding: 1.25rem; max-height: 75vh; overflow-y: auto;">
+        <div class="modal-body audit-modal-body" style="padding: 1.25rem; max-height: 80vh; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem;">
           <!-- Telemetry Destination Banner -->
-          <div class="result-card highlight-card" style="margin-bottom: 1rem; border-left: 4px solid var(--accent-cyan, #0284c7); padding: 0.85rem;">
+          <div class="result-card highlight-card" style="margin-bottom: 0; border-left: 4px solid var(--accent-cyan, #0284c7); padding: 0.85rem;">
             <h4 style="margin: 0 0 0.4rem 0; font-size: 0.92rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
               <span>📍 ${isEn ? 'Where logs are stored & monitored' : 'Destino y Almacenamiento de los Registros'}</span>
             </h4>
@@ -161,8 +161,8 @@ export function openSecurityAuditModal(): void {
           </div>
 
           <!-- Table of Events -->
-          <div style="overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
-            <table class="legal-table" style="font-size: 0.8rem; margin: 0; width: 100%;">
+          <div style="overflow-x: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); min-height: 240px; flex: 1; flex-shrink: 0; background: var(--bg-card);">
+            <table class="legal-table" style="font-size: 0.8rem; margin: 0; width: 100%; min-width: 680px;">
               <thead>
                 <tr>
                   <th style="width: 130px;">${isEn ? 'Timestamp' : 'Fecha / Hora'}</th>

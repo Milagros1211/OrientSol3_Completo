@@ -272,10 +272,18 @@ class SecurityAuditManager {
     source: string;
     message: string;
     metadata?: Record<string, any>;
-  }): AuditEvent {
+  }): AuditEvent | null {
     // 1. Redact all potential secrets from message and metadata
     const safeMessage = redactSecrets(entry.message);
     const safeMetadata = entry.metadata ? redactSecrets(entry.metadata) : undefined;
+
+    // Filter out harmless browser layout engine notifications (W3C standard ResizeObserver loop)
+    if (safeMessage && (
+      safeMessage.includes('ResizeObserver loop') ||
+      safeMessage.includes('ResizeObserver')
+    )) {
+      return null as any;
+    }
 
     const event: AuditEvent = {
       id: `audit_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
@@ -376,7 +384,9 @@ class SecurityAuditManager {
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed)) {
-            this.inMemoryLogs = parsed;
+            this.inMemoryLogs = parsed.filter(
+              (e: any) => !String(e?.message || '').includes('ResizeObserver')
+            );
           }
         }
       }
