@@ -1164,21 +1164,31 @@ export function renderPythonConsole(): HTMLElement {
           ` : ''}
         `;
 
+        const pvgisTilt = pvgisData.optimalTilt ?? Math.max(15, Math.min(60, Math.round(Math.abs(stateLat) * 0.88)));
+
         const comparisonMetricSelector = `
           <div style="padding: 0.55rem 1rem; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
             <div style="display: flex; align-items: center; gap: 0.45rem;">
               <span style="font-size: 0.76rem; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 0.35rem;">
-                ${isEn ? 'Complete PVGIS Inter-Comparison (Horizontal + Optimal Tilt)' : 'Validación Cruzada Completa (Horizontal + Inclinación Óptima)'}
+                ${isEn ? 'Complete PVGIS Inter-Comparison (Beam/Diffuse Components + Optimal Tilt)' : 'Validación Cruzada Completa (Componentes Directa/Difusa + Inclinación Óptima)'}
               </span>
             </div>
-            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.71rem; flex-wrap: wrap;">
-              <span style="color: var(--text-muted);">${isEn ? 'Horiz Mean:' : 'Media Horiz:'}</span>
-              <strong style="color: #0284c7; font-weight: 800; font-family: var(--font-mono); background: rgba(2,132,199,0.1); padding: 0.1rem 0.45rem; border-radius: 4px; border: 1px solid rgba(2,132,199,0.25);">
+            <div style="display: flex; align-items: center; gap: 0.55rem; font-size: 0.70rem; flex-wrap: wrap;">
+              <span style="color: var(--text-muted);">${isEn ? 'Beam/Diff:' : 'Directa/Difusa:'}</span>
+              <strong style="color: var(--text-main); font-weight: 800; font-family: var(--font-mono); background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 4px; border: 1px solid var(--border-subtle);">
+                ${formatNum(meanBdm, 2)} / ${formatNum(meanDdm, 2)}
+              </strong>
+              <span style="color: var(--text-muted);">${isEn ? 'Horiz:' : 'Horiz:'}</span>
+              <strong style="color: #0284c7; font-weight: 800; font-family: var(--font-mono); background: rgba(2,132,199,0.1); padding: 0.1rem 0.4rem; border-radius: 4px; border: 1px solid rgba(2,132,199,0.25);">
                 ${formatNum(meanG0, 2)} vs ${formatNum(meanPvgis, 2)}
               </strong>
-              <span style="color: var(--text-muted);">${isEn ? 'Optimum Mean:' : 'Media Óptimo:'}</span>
-              <strong style="color: #059669; font-weight: 800; font-family: var(--font-mono); background: rgba(16,185,129,0.1); padding: 0.1rem 0.45rem; border-radius: 4px; border: 1px solid rgba(16,185,129,0.25);">
+              <span style="color: var(--text-muted);">${isEn ? 'Optimum:' : 'Óptimo:'}</span>
+              <strong style="color: #059669; font-weight: 800; font-family: var(--font-mono); background: rgba(16,185,129,0.1); padding: 0.1rem 0.4rem; border-radius: 4px; border: 1px solid rgba(16,185,129,0.25);">
                 ${formatNum(meanGOpt, 2)} vs ${formatNum(meanPvgisOpt, 2)} kWh/m²·d
+              </strong>
+              <span style="color: var(--text-muted);">${isEn ? 'Tilt:' : 'Inclinación:'}</span>
+              <strong style="color: #059669; font-weight: 800; font-family: var(--font-mono); background: rgba(16,185,129,0.08); padding: 0.1rem 0.4rem; border-radius: 4px; border: 1px solid rgba(16,185,129,0.2);">
+                ${formatAngle(meanTilt, 1)} (OS) vs ${pvgisTilt}° (PVGIS)
               </strong>
             </div>
           </div>
@@ -1188,18 +1198,19 @@ export function renderPythonConsole(): HTMLElement {
           ${wmoComplianceNotice}
           ${comparisonMetricSelector}
           <div class="verif-table-wrap" style="overflow-x: hidden !important; overflow-y: auto !important; max-height: 480px; width: 100% !important; border: 1px solid var(--border-subtle); border-radius: 4px;">
-            <table class="verif-data-table" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.66rem; margin: 0;">
+            <table class="verif-data-table" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.65rem; margin: 0;">
               <thead>
                 <tr>
-                  <th style="width: 8%; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'Month' : 'Mes'}</th>
-                  <th style="width: 11%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'OrientSol<br/>Gdm(0)' : 'OrientSol<br/>Gdm(0)'}</th>
-                  <th style="width: 11%; text-align: right; color: #0284c7; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'PVGIS JRC<br/>Gdm(0)' : 'PVGIS JRC<br/>Gdm(0)'}</th>
-                  <th style="width: 10%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'Diff Horiz<br/>(kWh/m²·d)' : 'Dif. Horiz<br/>(kWh/m²·d)'}</th>
-                  <th style="width: 11%; text-align: right; color: #059669; background: rgba(16, 185, 129, 0.08); font-weight: 800; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'OrientSol<br/>Gdm Opt' : 'OrientSol<br/>Gdm Ópt.'}</th>
-                  <th style="width: 11%; text-align: right; color: #0284c7; background: rgba(2, 132, 199, 0.08); font-weight: 800; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'PVGIS JRC<br/>Gdm Opt' : 'PVGIS JRC<br/>Gdm Ópt.'}</th>
-                  <th style="width: 10%; text-align: right; color: #059669; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'Diff Opt<br/>(kWh/m²·d)' : 'Dif. Ópt.<br/>(kWh/m²·d)'}</th>
-                  <th style="width: 10%; text-align: right; color: #059669; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'Rel. Dev<br/>Opt (%)' : 'Desv. Ópt.<br/>(%)'}</th>
-                  <th style="width: 18%; text-align: center; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'WMO<br/>Validation' : 'Validación<br/>Norma OMM'}</th>
+                  <th style="width: 7%; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.62rem;">${isEn ? 'Month' : 'Mes'}</th>
+                  <th style="width: 9%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.62rem;">${isEn ? 'Direct<br/>Bdm' : 'Directa<br/>Bdm'}</th>
+                  <th style="width: 9%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.62rem;">${isEn ? 'Diffuse<br/>Ddm' : 'Difusa<br/>Ddm'}</th>
+                  <th style="width: 10%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.62rem;">${isEn ? 'OrientSol<br/>Gdm(0)' : 'OrientSol<br/>Gdm(0)'}</th>
+                  <th style="width: 10%; text-align: right; color: #0284c7; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.62rem;">${isEn ? 'PVGIS JRC<br/>Gdm(0)' : 'PVGIS JRC<br/>Gdm(0)'}</th>
+                  <th style="width: 11%; text-align: center; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.62rem;">${isEn ? 'Tilt (β)<br/>OS / PVGIS' : 'Inclinación<br/>OS / PVGIS'}</th>
+                  <th style="width: 11%; text-align: right; color: #059669; background: rgba(16, 185, 129, 0.08); font-weight: 800; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.62rem;">${isEn ? 'OrientSol<br/>Gdm Opt' : 'OrientSol<br/>Gdm Ópt.'}</th>
+                  <th style="width: 11%; text-align: right; color: #0284c7; background: rgba(2, 132, 199, 0.08); font-weight: 800; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.62rem;">${isEn ? 'PVGIS JRC<br/>Gdm Opt' : 'PVGIS JRC<br/>Gdm Ópt.'}</th>
+                  <th style="width: 11%; text-align: right; color: #059669; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.62rem;">${isEn ? 'Diff Opt<br/>(Dev %)' : 'Dif. Ópt.<br/>(Desv %)'}</th>
+                  <th style="width: 11%; text-align: center; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.62rem;">${isEn ? 'WMO<br/>Validation' : 'Validación<br/>Norma OMM'}</th>
                 </tr>
               </thead>
               <tbody>
@@ -1217,19 +1228,19 @@ export function renderPythonConsole(): HTMLElement {
 
                   return `
                     <tr style="${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
-                      <td style="padding: 0.35rem 0.15rem; font-size: 0.66rem; white-space: normal !important; word-break: break-word !important;"><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★' : '★') : ''}</strong></td>
-                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; white-space: normal !important; word-break: break-word !important;"><strong>${formatNum(r.g0, 2)}</strong></td>
-                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; color: #0284c7; font-weight: 600; white-space: normal !important; word-break: break-word !important;">${formatNum(r.gPvgis, 2)}</td>
-                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; color: ${r.diffAbs >= 0 ? '#059669' : '#dc2626'}; font-weight: 600; white-space: normal !important; word-break: break-word !important;">
-                        ${r.diffAbs >= 0 ? `+${formatNum(r.diffAbs, 2)}` : formatNum(r.diffAbs, 2)}
+                      <td style="padding: 0.35rem 0.15rem; font-size: 0.65rem; white-space: normal !important; word-break: break-word !important;"><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★' : '★') : ''}</strong></td>
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.65rem; white-space: normal !important; word-break: break-word !important;">${formatNum(r.bdm, 2)}</td>
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.65rem; white-space: normal !important; word-break: break-word !important;">${formatNum(r.ddm, 2)}</td>
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.65rem; white-space: normal !important; word-break: break-word !important;"><strong>${formatNum(r.g0, 2)}</strong></td>
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.65rem; color: #0284c7; font-weight: 600; white-space: normal !important; word-break: break-word !important;">${formatNum(r.gPvgis, 2)}</td>
+                      <td style="padding: 0.35rem 0.15rem; font-size: 0.65rem; text-align: center; font-weight: 600; white-space: normal !important; word-break: break-word !important;">
+                        <span style="color: #059669;">${formatAngle(r.optTilt, 0)}</span> / <span style="color: #0284c7;">${pvgisTilt}°</span>
                       </td>
-                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; color: #059669; font-weight: 800; background: rgba(16,185,129,0.05); white-space: normal !important; word-break: break-word !important;"><strong>${formatNum(r.gOpt, 2)}</strong></td>
-                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; color: #0284c7; font-weight: 800; background: rgba(2,132,199,0.05); white-space: normal !important; word-break: break-word !important;"><strong>${formatNum(r.gPvgisOpt, 2)}</strong></td>
-                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; color: ${r.diffOptAbs >= 0 ? '#059669' : '#dc2626'}; font-weight: 700; white-space: normal !important; word-break: break-word !important;">
-                        ${r.diffOptAbs >= 0 ? `+${formatNum(r.diffOptAbs, 2)}` : formatNum(r.diffOptAbs, 2)}
-                      </td>
-                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; color: ${r.diffOptPct >= 0 ? '#059669' : '#dc2626'}; font-weight: 700; white-space: normal !important; word-break: break-word !important;">
-                        ${formatPercent(r.diffOptPct, 1, true)}
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.65rem; color: #059669; font-weight: 800; background: rgba(16,185,129,0.05); white-space: normal !important; word-break: break-word !important;"><strong>${formatNum(r.gOpt, 2)}</strong></td>
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.65rem; color: #0284c7; font-weight: 800; background: rgba(2,132,199,0.05); white-space: normal !important; word-break: break-word !important;"><strong>${formatNum(r.gPvgisOpt, 2)}</strong></td>
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.65rem; color: ${r.diffOptAbs >= 0 ? '#059669' : '#dc2626'}; font-weight: 700; white-space: normal !important; word-break: break-word !important; line-height: 1.15;">
+                        ${r.diffOptAbs >= 0 ? `+${formatNum(r.diffOptAbs, 2)}` : formatNum(r.diffOptAbs, 2)}<br/>
+                        <span style="font-size: 0.58rem; opacity: 0.9;">(${formatPercent(r.diffOptPct, 1, true)})</span>
                       </td>
                       <td style="padding: 0.35rem 0.15rem; text-align: center; white-space: normal !important; word-break: break-word !important;">${ratingBadge}</td>
                     </tr>
@@ -1238,22 +1249,22 @@ export function renderPythonConsole(): HTMLElement {
               </tbody>
               <tfoot>
                 <tr class="table-media-row verif-media-row" style="background: rgba(2, 132, 199, 0.05); font-weight: 700;">
-                  <td style="padding: 0.4rem 0.15rem; font-size: 0.65rem; white-space: normal !important; word-break: break-word !important;"><strong>${isEn ? 'ANNUAL' : 'MEDIA'}</strong></td>
-                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; white-space: normal !important;"><strong>${formatNum(meanG0, 2)}</strong></td>
-                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; color: #0284c7; white-space: normal !important;"><strong>${formatNum(meanPvgis, 2)}</strong></td>
-                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; color: ${meanDiff >= 0 ? '#059669' : '#dc2626'}; white-space: normal !important;">
-                    <strong>${meanDiff >= 0 ? `+${formatNum(meanDiff, 2)}` : formatNum(meanDiff, 2)}</strong>
+                  <td style="padding: 0.4rem 0.15rem; font-size: 0.64rem; white-space: normal !important; word-break: break-word !important;"><strong>${isEn ? 'ANNUAL' : 'MEDIA'}</strong></td>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.64rem; white-space: normal !important;"><strong>${formatNum(meanBdm, 2)}</strong></td>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.64rem; white-space: normal !important;"><strong>${formatNum(meanDdm, 2)}</strong></td>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.64rem; white-space: normal !important;"><strong>${formatNum(meanG0, 2)}</strong></td>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.64rem; color: #0284c7; white-space: normal !important;"><strong>${formatNum(meanPvgis, 2)}</strong></td>
+                  <td style="padding: 0.4rem 0.15rem; font-size: 0.64rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
+                    <strong style="color: #059669;">${formatAngle(meanTilt, 1)}</strong> / <strong style="color: #0284c7;">${pvgisTilt}°</strong>
                   </td>
-                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; color: #059669; font-weight: 800; background: rgba(16,185,129,0.06); white-space: normal !important;"><strong>${formatNum(meanGOpt, 2)}</strong></td>
-                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; color: #0284c7; font-weight: 800; background: rgba(2,132,199,0.06); white-space: normal !important;"><strong>${formatNum(meanPvgisOpt, 2)}</strong></td>
-                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; color: ${meanDiffOpt >= 0 ? '#059669' : '#dc2626'}; white-space: normal !important;">
-                    <strong>${meanDiffOpt >= 0 ? `+${formatNum(meanDiffOpt, 2)}` : formatNum(meanDiffOpt, 2)}</strong>
-                  </td>
-                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; color: ${mapeOpt <= 5.0 ? '#059669' : '#2563eb'}; white-space: normal !important;">
-                    <strong>MAPE ${formatPercent(mapeOpt, 1)}</strong>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.64rem; color: #059669; font-weight: 800; background: rgba(16,185,129,0.06); white-space: normal !important;"><strong>${formatNum(meanGOpt, 2)}</strong></td>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.64rem; color: #0284c7; font-weight: 800; background: rgba(2,132,199,0.06); white-space: normal !important;"><strong>${formatNum(meanPvgisOpt, 2)}</strong></td>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.64rem; color: ${meanDiffOpt >= 0 ? '#059669' : '#dc2626'}; white-space: normal !important; line-height: 1.15;">
+                    <strong>${meanDiffOpt >= 0 ? `+${formatNum(meanDiffOpt, 2)}` : formatNum(meanDiffOpt, 2)}</strong><br/>
+                    <span style="font-size: 0.58rem; color: ${mapeOpt <= 5.0 ? '#059669' : '#2563eb'};">MAPE ${formatPercent(mapeOpt, 1)}</span>
                   </td>
                   <td style="padding: 0.4rem 0.15rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
-                    <span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.3rem;">✓ OMM</span>
+                    <span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;">✓ OMM</span>
                   </td>
                 </tr>
               </tfoot>
