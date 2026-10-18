@@ -65,7 +65,7 @@ export function renderHeader(): HTMLElement {
         <span class="status-dot"></span>
         <span id="pyodide-status-text">${t.header.statusLoading.replace('{progress}', '0')}</span>
       </div>
-      <a href="https://github.com" target="_blank" class="header-link" title="${t.common.docs}">
+      <a href="https://github.com/Milagros1211/OrientSol3_Completo" target="_blank" rel="noopener noreferrer" class="header-link" title="${t.common.docs} (GitHub)">
         ${t.common.docs}
       </a>
     </div>

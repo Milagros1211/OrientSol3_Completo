@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, session, net, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, session, net, dialog, shell } from 'electron';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -318,6 +318,14 @@ function createWindow() {
   });
 
   console.log('[Electron Main] BrowserWindow created, window ID:', mainWindow.id);
+
+  // Safely open external links (e.g. GitHub documentation) in the user's default OS browser
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https:') || url.startsWith('http:')) {
+      shell.openExternal(url);
+    }
+    return { action: 'deny' };
+  });
 
   mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
     console.error('[Electron Main] Failed to load:', errorCode, errorDescription, validatedURL);
