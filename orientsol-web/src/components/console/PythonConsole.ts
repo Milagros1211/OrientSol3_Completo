@@ -438,42 +438,42 @@ export function renderPythonConsole(): HTMLElement {
                   <td><code>δ = 23,45 · ${isEn ? 'sin' : 'sen'}(2π · (n + 284) / 365)</code></td>
                   <td class="td-num">${decDeg > 0 ? `+${formatAngle(decDeg, 2)}` : formatAngle(decDeg, 2)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
-                  <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
+                  <td style="text-align: center;">${Math.abs(decDeg) <= 23.5 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">⚠️ ${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Sunset Hour Angle' : 'Ángulo Horario de Salida / Puesta'} (ωs)</strong></td>
                   <td><code>cos(ωs) = -tan(φ) · tan(δ)</code></td>
                   <td class="td-num">${formatAngle(sunsetDeg, 2)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
-                  <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
+                  <td style="text-align: center;">${sunsetDeg >= 0 && sunsetDeg <= 180 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">⚠️ ${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Daylight Length' : 'Duración Solar del Día'} (S0)</strong></td>
                   <td><code>S0 = (2 · ωs) / 15°</code></td>
                   <td class="td-num">${formatNum(dayLengthHours, 2)} h</td>
                   <td>${isEn ? 'hours' : 'horas'}</td>
-                  <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
+                  <td style="text-align: center;">${dayLengthHours >= 0 && dayLengthHours <= 24 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">⚠️ ${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Solar Altitude at Noon' : 'Altura Solar al Mediodía (12:00h)'} (γs)</strong></td>
                   <td><code>γs = 90° - |φ - δ|</code></td>
                   <td class="td-num">${formatAngle(noonAltDeg, 2)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
-                  <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
+                  <td style="text-align: center;">${noonAltDeg >= 0 && noonAltDeg <= 90 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">⚠️ ${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Solar Azimuth / Orientation at Noon' : 'Orientación / Azimut Solar al Mediodía (12:00h)'}</strong></td>
                   <td><code>cos(αs) = (${isEn ? 'sin' : 'sen'}(γs) · ${isEn ? 'sin' : 'sen'}(φ) - ${isEn ? 'sin' : 'sen'}(δ)) / (cos(γs) · cos(φ))</code></td>
                   <td class="td-num">${formatAngle(noonAzimDeg, 1)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
-                  <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
+                  <td style="text-align: center;">${!isNaN(noonAzimDeg) ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">⚠️ NaN</span>`}</td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Dual-Axis Tracker Tilt at Noon' : 'Inclinación Colector 2-Ejes al Mediodía'}</strong></td>
                   <td><code>θz = 90° - γs = |φ - δ|</code></td>
                   <td class="td-num">${formatAngle(noonDualTiltDeg, 1)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
-                  <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
+                  <td style="text-align: center;">${noonDualTiltDeg >= 0 && noonDualTiltDeg <= 90 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">⚠️ ${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
               </tbody>
             </table>
@@ -746,8 +746,18 @@ export function renderPythonConsole(): HTMLElement {
         const bdm = simRes?.horizontal?.bdm0 ? simRes.horizontal.bdm0[idx] : g0 * 0.58;
         const ddm = simRes?.horizontal?.ddm0 ? simRes.horizontal.ddm0[idx] : g0 * 0.42;
         const optTilt = simRes?.monthlyOptimum12?.optimalTiltsDeg ? simRes.monthlyOptimum12.optimalTiltsDeg[idx] : Math.max(1, Math.min(85, Math.abs(stateLat - dec)));
-        const gOpt = simRes?.optimalAnnual?.monthlyDailyKwh ? simRes.optimalAnnual.monthlyDailyKwh[idx] : g0 * 1.185;
+        const gOpt = simRes?.monthlyOptimum12?.monthlyDailyKwh ? simRes.monthlyOptimum12.monthlyDailyKwh[idx] : (simRes?.optimalAnnual?.monthlyDailyKwh ? simRes.optimalAnnual.monthlyDailyKwh[idx] : g0 * 1.185);
         const gain = g0 > 0 ? ((gOpt - g0) / g0) * 100 : 0;
+
+        // Dynamic physical verification assertions:
+        // 1. Extraterrestrial ceiling: Gdm(0) <= G0d (+ tolerance for numerical discretization)
+        // 2. Closure relation: Bdm + Ddm ≈ Gdm(0) within 0.05 kWh/m²·d
+        // 3. Optimization bound: Gdm(opt) >= Gdm(0) - 0.02 (optimal tilt collects >= horizontal)
+        const isCeilingValid = g0 > 0 && g0 <= (g0d + 0.05);
+        const isClosureValid = Math.abs((bdm + ddm) - g0) < 0.05;
+        const isOptimumValid = gOpt >= (g0 - 0.02);
+        const isPhysicalValid = isCeilingValid && isClosureValid && isOptimumValid;
+
         return {
           month: months[idx],
           g0,
@@ -756,6 +766,7 @@ export function renderPythonConsole(): HTMLElement {
           optTilt,
           gOpt,
           gain,
+          isPhysicalValid,
           isSelectedMonth: idx === (stateMonth - 1)
         };
       });
@@ -766,6 +777,7 @@ export function renderPythonConsole(): HTMLElement {
       const meanTilt = radRows.reduce((acc, r) => acc + r.optTilt, 0) / 12;
       const meanGOpt = radRows.reduce((acc, r) => acc + r.gOpt, 0) / 12;
       const meanGain = meanG0 > 0 ? ((meanGOpt - meanG0) / meanG0) * 100 : 0;
+      const allRowsValid = radRows.every(r => r.isPhysicalValid);
 
       return `
         <div class="verif-table-card">
@@ -789,7 +801,7 @@ export function renderPythonConsole(): HTMLElement {
                   <th style="text-align: right;">${isEn ? 'Opt Tilt Inc (°)' : 'Inclinación Óptima Inc (°)'}</th>
                   <th style="text-align: right;">${isEn ? 'Gdm Opt' : 'Gdm Óptimo (kWh/m²·d)'}</th>
                   <th style="text-align: right;">${isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)'}</th>
-                  <th style="text-align: center;">${isEn ? 'Status' : 'Estado'}</th>
+                  <th style="text-align: center;">${isEn ? 'Physical Validation' : 'Validación Física'}</th>
                 </tr>
               </thead>
               <tbody>
@@ -801,8 +813,12 @@ export function renderPythonConsole(): HTMLElement {
                     <td class="td-num">${formatNum(r.ddm, 2)}</td>
                     <td class="td-num">Inc: ${formatAngle(r.optTilt, 1)}</td>
                     <td class="td-num">${formatNum(r.gOpt, 2)}</td>
-                    <td class="td-num" style="color: #059669;">+${formatPercent(r.gain, 1)}</td>
-                    <td style="text-align: center;"><span class="badge-status-valid">✓ Verificado</span></td>
+                    <td class="td-num" style="color: ${r.gain >= 0 ? '#059669' : '#dc2626'}; font-weight: 600;">${formatPercent(r.gain, 1, true)}</td>
+                    <td style="text-align: center;">
+                      ${r.isPhysicalValid
+                        ? `<span class="badge-status-valid">✓ ${isEn ? 'Verified' : 'Verificado'}</span>`
+                        : `<span class="badge-status-warn">⚠️ ${isEn ? 'Deviation' : 'Desviación'}</span>`}
+                    </td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -814,8 +830,12 @@ export function renderPythonConsole(): HTMLElement {
                   <td class="td-num"><strong>${formatNum(meanDdm, 2)}</strong></td>
                   <td class="td-num"><strong>Inc: ${formatAngle(meanTilt, 1)}</strong></td>
                   <td class="td-num"><strong>${formatNum(meanGOpt, 2)}</strong></td>
-                  <td class="td-num" style="color: #059669;"><strong>+${formatPercent(meanGain, 1)}</strong></td>
-                  <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
+                  <td class="td-num" style="color: ${meanGain >= 0 ? '#059669' : '#dc2626'};"><strong>${formatPercent(meanGain, 1, true)}</strong></td>
+                  <td style="text-align: center;">
+                    ${allRowsValid
+                      ? `<span class="badge-status-valid">✓ ${isEn ? '100% Consistent' : '100% Consistente'}</span>`
+                      : `<span class="badge-status-warn">⚠️ ${isEn ? 'Check Bounds' : 'Revisar Límites'}</span>`}
+                  </td>
                 </tr>
               </tfoot>
             </table>
@@ -1184,7 +1204,11 @@ export function renderPythonConsole(): HTMLElement {
                     <td class="td-num"><strong>${formatInt(r.eOster)} kWh</strong></td>
                     <td class="td-num">${formatInt(r.eSimp)} kWh</td>
                     <td class="td-num" style="color: #dc2626;">${r.thLoss < 0 ? formatPercent(r.thLoss, 2) : `+${formatPercent(Math.abs(r.thLoss), 2)}`}</td>
-                    <td style="text-align: center;"><span class="badge-status-valid">✓ OK</span></td>
+                    <td style="text-align: center;">
+                      ${r.eOster > 0 && r.tc >= (r.tAmb - 2) && r.thLoss <= 5
+                        ? `<span class="badge-status-valid">✓ ${isEn ? 'Consistent' : 'Coherente'}</span>`
+                        : `<span class="badge-status-warn">⚠️ ${isEn ? 'Review' : 'Revisar'}</span>`}
+                    </td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -1196,7 +1220,11 @@ export function renderPythonConsole(): HTMLElement {
                   <td class="td-num"><strong>${formatInt(Math.round(meanEOster))} kWh</strong></td>
                   <td class="td-num"><strong>${formatInt(Math.round(meanESimp))} kWh</strong></td>
                   <td class="td-num" style="color: #dc2626;"><strong>${formatPercent(meanThLoss, 2)}</strong></td>
-                  <td style="text-align: center;"><span class="badge-status-valid">✓ 100% OK</span></td>
+                  <td style="text-align: center;">
+                    ${energyRows.every(r => r.eOster > 0 && r.tc >= (r.tAmb - 2))
+                      ? `<span class="badge-status-valid">✓ ${isEn ? '100% Consistent' : '100% Coherente'}</span>`
+                      : `<span class="badge-status-warn">⚠️ ${isEn ? 'Review' : 'Revisar'}</span>`}
+                  </td>
                 </tr>
               </tfoot>
             </table>
