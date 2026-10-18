@@ -7,7 +7,7 @@ import {
 import type { ClimateDataRecord, ClimateSourceType } from '@/types/climate';
 import { i18n } from '@/i18n';
 import { formatNum, formatInt } from '@/utils/formatters';
-import { escapeHtml } from '@/utils/security';
+import { escapeHtml, formatSafeUserErrorMessage } from '@/utils/security';
 
 const CITY_PRESETS = [
   { name: 'Madrid (España)', lat: 40.4168, lon: -3.7038 },
@@ -194,7 +194,12 @@ export function renderClimateIntegrationPanel(): HTMLElement {
       saveBtn.disabled = false;
     } catch (err: any) {
       console.error('[OrientSol API] Error:', err);
-      setStatus(`Error al consultar datos climáticos: ${err.message || String(err)}`, 'error');
+      const safeMsg = formatSafeUserErrorMessage(
+        err,
+        'Error al consultar el servicio de datos climáticos externos.',
+        'Error querying external climate data service.'
+      );
+      setStatus(safeMsg, 'error');
       runBtn.disabled = true;
       saveBtn.disabled = true;
     } finally {
@@ -235,7 +240,12 @@ export function renderClimateIntegrationPanel(): HTMLElement {
         );
       }
     } catch (err: any) {
-      setStatus(`Error al guardar en Supabase: ${err.message}`, 'error');
+      const safeMsg = formatSafeUserErrorMessage(
+        err,
+        'Error al registrar los datos en el servidor.',
+        'Error saving data to the server.'
+      );
+      setStatus(`${isEn ? 'Error:' : 'Error:'} ${safeMsg}`, 'error');
     } finally {
       saveBtn.disabled = false;
     }
@@ -263,7 +273,12 @@ export function renderClimateIntegrationPanel(): HTMLElement {
       renderSimulationResults(results);
     } catch (err: any) {
       console.error('[OrientSol Simulation] Execution Error:', err);
-      setStatus(`Error de simulación en Pyodide: ${err.message || String(err)}`, 'error');
+      const safeMsg = formatSafeUserErrorMessage(
+        err,
+        'Error durante la simulación de cálculo solar en Pyodide.',
+        'Error during solar simulation calculation in Pyodide.'
+      );
+      setStatus(safeMsg, 'error');
     } finally {
       setSimulationRunning(false);
     }

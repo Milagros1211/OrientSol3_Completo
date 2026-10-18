@@ -473,9 +473,11 @@ export class ClimateDatabaseService {
         const PAGE_SIZE = 1000;
 
         while (true) {
+          // Consulta explícita y recortada (Principio de mínima exposición de datos: OWASP API3:2023)
+          // Se solicitan estrictamente las columnas requeridas por el modelo de cálculo y visualización
           const { data: page, error: pageErr } = await supabase
             .from('datos_mensuales')
-            .select('*')
+            .select('nombre_emplazamiento, latitud, longitud, mes, radiacion_media, temp_media, es_oficial, creado_en')
             .range(from, from + PAGE_SIZE - 1);
 
           if (pageErr || !page || page.length === 0) break;

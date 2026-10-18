@@ -89,8 +89,9 @@ export function getSupabaseClient(): SupabaseClient | null {
     try {
       clientInstance = createClient(url, key, {
         auth: {
-          persistSession: true,
-          autoRefreshToken: true,
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
         },
       });
     } catch (err) {
@@ -100,35 +101,6 @@ export function getSupabaseClient(): SupabaseClient | null {
   }
 
   return clientInstance;
-}
-
-/**
- * Saves new Supabase credentials to localStorage and re-initializes client.
- */
-export function setSupabaseCredentials(url: string, key: string): void {
-  try {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY_URL, url.trim());
-      localStorage.setItem(STORAGE_KEY_KEY, key.trim());
-    }
-  } catch {}
-
-  // Invalidate previous client instance
-  clientInstance = null;
-}
-
-/**
- * Clears user-saved Supabase credentials from localStorage.
- */
-export function clearSupabaseCredentials(): void {
-  try {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem(STORAGE_KEY_URL);
-      localStorage.removeItem(STORAGE_KEY_KEY);
-    }
-  } catch {}
-
-  clientInstance = null;
 }
 
 /**

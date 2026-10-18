@@ -354,7 +354,17 @@ themeManager.subscribe(() => {
 // Register PWA Service Worker for offline and mobile execution
 registerServiceWorker();
 
+// Global Production Error Shield: Catch unhandled errors and log details privately
+window.addEventListener('error', (event) => {
+  console.error('[OrientSol Unhandled Error Caught Privately]:', event.error || event.message);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('[OrientSol Unhandled Rejection Caught Privately]:', event.reason);
+});
+
 // Automatically start background loading of Pyodide runtime
 pyodideService.initialize().catch((err) => {
   console.warn('[OrientSol] Pyodide background pre-load note:', err);
 });
+

@@ -11,7 +11,7 @@ import {
   validateClimateRecordForSaving,
   formatLocationWithCountry,
 } from '@/services/supabase';
-import { escapeHtml, escapeAttr } from '@/utils/security';
+import { escapeHtml, escapeAttr, formatSafeUserErrorMessage } from '@/utils/security';
 import { formatNum, formatInt } from '@/utils/formatters';
 import { fetchUnifiedClimateData } from '@/services/external';
 import { i18n } from '@/i18n';
@@ -591,7 +591,12 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       }
     } catch (err: any) {
       console.error('[API Fetch Error]', err);
-      setStatus(`Error al consultar API: ${err.message || String(err)}`, 'error');
+      const safeMsg = formatSafeUserErrorMessage(
+        err,
+        'Error al consultar el servicio meteorológico externo.',
+        'Error querying external meteorological service.'
+      );
+      setStatus(safeMsg, 'error');
     } finally {
       apiFetchBtn.disabled = false;
     }
@@ -632,7 +637,12 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         setStatus(`${uploadPermissionStatus} ${reg.message}`, 'success');
       }
     } catch (err: any) {
-      setStatus(`${isEn ? 'Error saving to Supabase:' : 'Error al guardar en Supabase:'} ${err.message || String(err)}`, 'error');
+      const safeMsg = formatSafeUserErrorMessage(
+        err,
+        'No se pudo completar el registro en el servidor.',
+        'Could not complete registration on the server.'
+      );
+      setStatus(`${isEn ? 'Error:' : 'Error:'} ${safeMsg}`, 'error');
     } finally {
       apiSaveBtn.disabled = false;
     }
@@ -1347,7 +1357,12 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         'success'
       );
     } catch (err: any) {
-      setStatus(`Error: ${err.message}`, 'error');
+      const safeMsg = formatSafeUserErrorMessage(
+        err,
+        'Los parámetros introducidos no son válidos.',
+        'The entered parameters are invalid.'
+      );
+      setStatus(safeMsg, 'error');
     }
   });
 
@@ -1373,7 +1388,12 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         setStatus(`${uploadPermissionStatus} ${reg.message}`, 'success');
       }
     } catch (err: any) {
-      setStatus(`${isEn ? 'Error:' : 'Error:'} ${err.message}`, 'error');
+      const safeMsg = formatSafeUserErrorMessage(
+        err,
+        'No se pudo completar el registro en el servidor.',
+        'Could not complete registration on the server.'
+      );
+      setStatus(`${isEn ? 'Error:' : 'Error:'} ${safeMsg}`, 'error');
     } finally {
       saveManualBtn.disabled = false;
     }
@@ -1475,7 +1495,12 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         }
       }
     } catch (err: any) {
-      setStatus(`Error: ${err.message}`, 'error');
+      const safeMsg = formatSafeUserErrorMessage(
+        err,
+        'Ocurrió un error al procesar el archivo o guardar en el servidor.',
+        'An error occurred while processing the file or saving to the server.'
+      );
+      setStatus(`${isEn ? 'Error:' : 'Error:'} ${safeMsg}`, 'error');
     } finally {
       saveUploadBtn.disabled = false;
     }
@@ -1593,7 +1618,12 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       renderResults(result, true);
     } catch (err: any) {
       console.error('[OrientSol Hybrid Simulation] Error:', err);
-      setStatus(`Error en la ejecución de Pyodide: ${err.message || String(err)}`, 'error');
+      const safeMsg = formatSafeUserErrorMessage(
+        err,
+        'Error durante el cálculo de simulación solar. Compruebe los parámetros de entrada.',
+        'Error during solar simulation calculation. Please verify input parameters.'
+      );
+      setStatus(safeMsg, 'error');
     } finally {
       simBtn.disabled = false;
       simBtn.innerHTML = `

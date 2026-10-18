@@ -3,7 +3,7 @@ import {
   formatLocationWithCountry,
   type SyncSummary,
 } from '@/services/supabase/climateDatabaseService';
-import { escapeHtml } from '@/utils/security';
+import { escapeHtml, formatSafeUserErrorMessage } from '@/utils/security';
 import { i18n } from '@/i18n';
 import { formatNum } from '@/utils/formatters';
 
@@ -186,9 +186,14 @@ export function openSupabaseSyncModal(): void {
       if (queueBadge) queueBadge.textContent = `${newQueue.length} ${isEn ? 'pending' : 'pendientes'}`;
     } catch (err: any) {
       syncResultsBox.classList.remove('hidden');
+      const safeMsg = formatSafeUserErrorMessage(
+        err,
+        'No se pudo completar la sincronización con el servidor. Compruebe su conexión a internet.',
+        'Could not complete server synchronization. Please check your internet connection.'
+      );
       syncResultsBox.innerHTML = `
         <div class="sync-summary-error">
-          <strong>${isEn ? 'Sync Failed' : 'Fallo en la Sincronización'}:</strong> ${escapeHtml(err?.message || String(err))}
+          <strong>${isEn ? 'Sync Notice' : 'Aviso de Sincronización'}:</strong> ${escapeHtml(safeMsg)}
         </div>
       `;
     } finally {

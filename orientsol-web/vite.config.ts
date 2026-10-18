@@ -30,6 +30,10 @@ export default defineConfig({
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp',
+      'X-Frame-Options': 'DENY',
+      'X-Content-Type-Options': 'nosniff',
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
     },
   },
   preview: {
@@ -37,9 +41,19 @@ export default defineConfig({
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp',
+      'X-Frame-Options': 'DENY',
+      'X-Content-Type-Options': 'nosniff',
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
     },
   },
   build: {
     target: 'esnext',
+    sourcemap: false, // 🛑 No exportar Source Maps (.map) públicamente en producción
+    minify: true,     // Minificación y ofuscación de código de producción
+    esbuild: {
+      drop: ['debugger'], // Elimina sentencias debugger automáticamente
+      pure: ['console.debug'], // Elimina llamadas console.debug en producción
+    },
   },
 });
