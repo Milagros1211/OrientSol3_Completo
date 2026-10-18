@@ -923,8 +923,8 @@ export function renderPythonConsole(): HTMLElement {
                 <span style="font-size: 1.15rem;">⚡</span>
                 <span>
                   ${isEn
-                    ? `Live PVGIS database synchronized successfully! Last DB update timestamp: <strong>${formatFetchDate(pvgisData.fetchedAt)}</strong> • Baseline verified under OrientSol historical methodology.`
-                    : `¡Base de datos PVGIS en vivo sincronizada con éxito! Fecha y hora de última actualización de la DB: <strong>${formatFetchDate(pvgisData.fetchedAt)}</strong> • Línea base verificada bajo la metodología histórica de OrientSol.`}
+                    ? `Live PVGIS API successfully synchronized! Last API update timestamp: <strong>${formatFetchDate(pvgisData.fetchedAt)}</strong> • Source: European Commission JRC PVGIS 5.3.`
+                    : `¡API PVGIS en vivo sincronizada con éxito! Fecha y hora de actualización de la API: <strong>${formatFetchDate(pvgisData.fetchedAt)}</strong> • Fuente: Comisión Europea JRC PVGIS 5.3.`}
                 </span>
               </div>
               <button type="button" id="btn-dismiss-sync-banner" class="btn btn-xs btn-secondary" style="font-size: 0.68rem; padding: 0.15rem 0.45rem; cursor: pointer;">
@@ -934,18 +934,18 @@ export function renderPythonConsole(): HTMLElement {
           ` : ''}
           <div style="padding: 0.7rem 1.15rem; background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.22); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem; font-size: 0.77rem;">
             <div style="display: flex; align-items: center; gap: 0.6rem;">
-              <span style="font-size: 1.25rem;">🕒</span>
+              <span style="font-size: 1.25rem;">🌐</span>
               <div>
                 <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
-                  <strong style="color: var(--text-main); font-size: 0.8rem;">${isEn ? 'Last Database / API Update:' : 'Última actualización de datos (DB / API):'}</strong>
+                  <strong style="color: var(--text-main); font-size: 0.8rem;">${isEn ? 'Last PVGIS API Update:' : 'Última actualización (Fuente API PVGIS JRC):'}</strong>
                   <span style="color: #2563eb; font-weight: 800; font-size: 0.82rem; background: rgba(37,99,235,0.12); padding: 0.1rem 0.45rem; border-radius: 4px; border: 1px solid rgba(37,99,235,0.25);">
                     ${formatFetchDate(pvgisData.fetchedAt)}
                   </span>
                 </div>
                 <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem;">
                   ${isEn
-                    ? 'Evaluated against OrientSol Historical Methodology (BBDD.xlsx baseline & Liu-Jordan Bdm0.m)'
-                    : 'Evaluado contra la Metodología Histórica de OrientSol (Línea base BBDD.xlsx y descomposición Liu-Jordan Bdm0.m)'}
+                    ? 'Inter-comparison: OrientSol (Liu & Jordan Model) vs European Commission JRC PVGIS 5.3'
+                    : 'Intercomparación: OrientSol (Modelo Liu & Jordan) vs Comisión Europea JRC PVGIS 5.3'}
                 </div>
               </div>
             </div>
@@ -967,7 +967,7 @@ export function renderPythonConsole(): HTMLElement {
               <thead>
                 <tr>
                   <th>${isEn ? 'Month' : 'Mes'}</th>
-                  <th style="text-align: right;">${isEn ? 'OrientSol Gdm(0) (kWh/m²·d)<br><span style="font-size:0.65rem;font-weight:400;color:var(--text-muted);">(OrientSol BBDD.xlsx)</span>' : 'OrientSol Gdm(0) (kWh/m²·d)<br><span style="font-size:0.65rem;font-weight:400;color:var(--text-muted);">(Metodología BBDD.xlsx)</span>'}</th>
+                  <th style="text-align: right;">${isEn ? 'OrientSol Gdm(0) (kWh/m²·d)' : 'OrientSol Gdm(0) (kWh/m²·d)'}</th>
                   <th style="text-align: right;">${isEn ? 'PVGIS JRC Gdm(0) (kWh/m²·d)' : 'PVGIS JRC Gdm(0) (kWh/m²·d)'}</th>
                   <th style="text-align: right;">${isEn ? 'Difference (kWh/m²·d)' : 'Diferencia (kWh/m²·d)'}</th>
                   <th style="text-align: right;">${isEn ? 'Rel. Deviation (%)' : 'Desviación Relativa (%)'}</th>
