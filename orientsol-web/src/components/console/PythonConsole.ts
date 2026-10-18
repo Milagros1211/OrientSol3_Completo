@@ -108,7 +108,6 @@ export function renderPythonConsole(): HTMLElement {
   let pvgisFetchError: string | null = null;
   let pvgisData: PVGISRecord | null = null;
   let showPvgisComparison = false;
-  let pvgisCompareMetric: 'both' | 'optimal' | 'horizontal' = 'both';
 
   function renderView() {
     const doy = dateToDayOfYear(stateDay, stateMonth);
@@ -1061,26 +1060,26 @@ export function renderPythonConsole(): HTMLElement {
             </div>
 
             <!-- OFFICIAL PVGIS SPECIFICATION TABLE (European Commission JRC Reference) -->
-            <div style="overflow-x: auto; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border-subtle); padding: 0.35rem 0.55rem;">
-              <table style="width: 100%; border-collapse: collapse; font-size: 0.71rem; text-align: left;">
+            <div style="overflow-x: hidden; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border-subtle); padding: 0.35rem 0.55rem;">
+              <table style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.67rem; text-align: left;">
                 <thead>
-                  <tr style="border-bottom: 1px solid var(--border-subtle); color: var(--text-dim); text-transform: uppercase; font-size: 0.64rem;">
-                    <th style="padding: 0.25rem 0.45rem;">Database</th>
-                    <th style="padding: 0.25rem 0.45rem;">Type</th>
-                    <th style="padding: 0.25rem 0.45rem; text-align: center;">Start Year</th>
-                    <th style="padding: 0.25rem 0.45rem; text-align: center; color: #059669; font-weight: 800;">End Year (Última Act.)</th>
-                    <th style="padding: 0.25rem 0.45rem;">Spatial res.</th>
-                    <th style="padding: 0.25rem 0.45rem;">Comments</th>
+                  <tr style="border-bottom: 1px solid var(--border-subtle); color: var(--text-dim); text-transform: uppercase; font-size: 0.63rem;">
+                    <th style="padding: 0.25rem 0.35rem; width: 18%;">Database</th>
+                    <th style="padding: 0.25rem 0.35rem; width: 11%;">Type</th>
+                    <th style="padding: 0.25rem 0.35rem; text-align: center; width: 11%;">Start Year</th>
+                    <th style="padding: 0.25rem 0.35rem; text-align: center; color: #059669; font-weight: 800; width: 14%;">End Year (Última Act.)</th>
+                    <th style="padding: 0.25rem 0.35rem; width: 15%;">Spatial res.</th>
+                    <th style="padding: 0.25rem 0.35rem; width: 31%; white-space: normal; word-break: break-word;">Comments</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr style="background: rgba(2, 132, 199, 0.05); font-weight: 600;">
-                    <td style="padding: 0.35rem 0.45rem; color: #0284c7; font-weight: 700;">${pvgisData.database}</td>
-                    <td style="padding: 0.35rem 0.45rem;">${pvgisData.dbType}</td>
-                    <td style="padding: 0.35rem 0.45rem; text-align: center;">${pvgisData.startYear}</td>
-                    <td style="padding: 0.35rem 0.45rem; text-align: center; color: #059669; font-weight: 800;">✓ ${pvgisData.endYear}</td>
-                    <td style="padding: 0.35rem 0.45rem;">${pvgisData.spatialRes}</td>
-                    <td style="padding: 0.35rem 0.45rem; color: var(--text-muted); font-size: 0.68rem;">${pvgisData.comments}</td>
+                    <td style="padding: 0.3rem 0.35rem; color: #0284c7; font-weight: 700;">${pvgisData.database}</td>
+                    <td style="padding: 0.3rem 0.35rem;">${pvgisData.dbType}</td>
+                    <td style="padding: 0.3rem 0.35rem; text-align: center;">${pvgisData.startYear}</td>
+                    <td style="padding: 0.3rem 0.35rem; text-align: center; color: #059669; font-weight: 800;">✓ ${pvgisData.endYear}</td>
+                    <td style="padding: 0.3rem 0.35rem;">${pvgisData.spatialRes}</td>
+                    <td style="padding: 0.3rem 0.35rem; color: var(--text-muted); font-size: 0.65rem; white-space: normal; word-break: break-word; line-height: 1.25;">${pvgisData.comments}</td>
                   </tr>
                 </tbody>
               </table>
@@ -1089,22 +1088,13 @@ export function renderPythonConsole(): HTMLElement {
         `;
 
         const comparisonMetricSelector = `
-          <div style="padding: 0.55rem 1.15rem; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
-              <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">
-                ${isEn ? 'Comparison Mode:' : 'Modo de Comparativa:'}
+          <div style="padding: 0.55rem 1rem; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.45rem;">
+              <span style="font-size: 0.76rem; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 0.35rem;">
+                📊 ${isEn ? 'Complete PVGIS Inter-Comparison (Horizontal + Optimal Tilt)' : 'Validación Cruzada Completa (Horizontal + Inclinación Óptima)'}
               </span>
-              <button type="button" id="btn-pvgis-metric-both" class="btn btn-xs ${pvgisCompareMetric === 'both' ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.2rem 0.65rem; ${pvgisCompareMetric === 'both' ? 'background: #0284c7; color: #fff; font-weight: 700;' : ''}" title="${isEn ? 'Compare both Horizontal and Optimal Tilt radiation side by side' : 'Comparar tanto radiación horizontal como óptima inclinada lado a lado'}">
-                📊 ${isEn ? 'Complete View (Gdm0 + Gdm Optimum)' : 'Vista Completa (Gdm0 + Gdm Óptimo)'}
-              </button>
-              <button type="button" id="btn-pvgis-metric-opt" class="btn btn-xs ${pvgisCompareMetric === 'optimal' ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.2rem 0.65rem; ${pvgisCompareMetric === 'optimal' ? 'background: #059669; color: #fff; font-weight: 700;' : ''}" title="${isEn ? 'Direct comparison of OrientSol Optimal Tilt radiation against PVGIS' : 'Comparativa directa de Gdm Óptimo de OrientSol contra PVGIS'}">
-                ⚡ ${isEn ? 'Gdm Optimum vs PVGIS' : 'Gdm Óptimo vs PVGIS'}
-              </button>
-              <button type="button" id="btn-pvgis-metric-horiz" class="btn btn-xs ${pvgisCompareMetric === 'horizontal' ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.2rem 0.65rem; ${pvgisCompareMetric === 'horizontal' ? 'background: #2563eb; color: #fff; font-weight: 700;' : ''}" title="${isEn ? 'Strict Horizontal Gdm(0) baseline comparison' : 'Comparativa estricta horizontal Gdm(0)'}">
-                🌐 ${isEn ? 'Gdm(0) Horizontal vs PVGIS' : 'Gdm(0) Horizontal vs PVGIS'}
-              </button>
             </div>
-            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.72rem; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.71rem; flex-wrap: wrap;">
               <span style="color: var(--text-muted);">${isEn ? 'Horiz Mean:' : 'Media Horiz:'}</span>
               <strong style="color: #0284c7; font-weight: 800; font-family: var(--font-mono); background: rgba(2,132,199,0.1); padding: 0.1rem 0.45rem; border-radius: 4px; border: 1px solid rgba(2,132,199,0.25);">
                 ${formatNum(meanG0, 2)} vs ${formatNum(meanPvgis, 2)}
@@ -1120,160 +1110,75 @@ export function renderPythonConsole(): HTMLElement {
         pvgisTableHtml = `
           ${wmoComplianceNotice}
           ${comparisonMetricSelector}
-          <div class="verif-table-wrap">
-            <table class="verif-data-table">
+          <div class="verif-table-wrap" style="overflow-x: hidden !important; overflow-y: auto !important; max-height: 480px; width: 100% !important; border: 1px solid var(--border-subtle); border-radius: 4px;">
+            <table class="verif-data-table" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.66rem; margin: 0;">
               <thead>
-                ${pvgisCompareMetric === 'both' ? `
-                  <tr>
-                    <th>${isEn ? 'Month' : 'Mes'}</th>
-                    <th style="text-align: right;">${isEn ? 'OrientSol Gdm(0)' : 'OrientSol Gdm(0) (kWh/m²·d)'}</th>
-                    <th style="text-align: right; color: #0284c7;">${isEn ? 'PVGIS JRC Gdm(0)' : 'PVGIS JRC Gdm(0) (kWh/m²·d)'}</th>
-                    <th style="text-align: right;">${isEn ? 'Diff Horiz' : 'Dif. Horiz (kWh/m²·d)'}</th>
-                    <th style="text-align: right; color: #059669; background: rgba(16, 185, 129, 0.08); font-weight: 800;">${isEn ? 'OrientSol Gdm Opt' : 'OrientSol Gdm Óptimo (kWh/m²·d)'}</th>
-                    <th style="text-align: right; color: #0284c7; background: rgba(2, 132, 199, 0.08); font-weight: 800;">${isEn ? 'PVGIS JRC Gdm Opt' : 'PVGIS JRC Gdm Óptimo (kWh/m²·d)'}</th>
-                    <th style="text-align: right; color: #059669;">${isEn ? 'Diff Opt' : 'Dif. Óptimo (kWh/m²·d)'}</th>
-                    <th style="text-align: right; color: #059669;">${isEn ? 'Rel. Dev Opt (%)' : 'Desv. Ópt (%)'}</th>
-                    <th style="text-align: center;">${isEn ? 'WMO Validation' : 'Validación Norma OMM Nº 8'}</th>
-                  </tr>
-                ` : pvgisCompareMetric === 'optimal' ? `
-                  <tr>
-                    <th>${isEn ? 'Month' : 'Mes'}</th>
-                    <th style="text-align: right; color: #059669; font-weight: 800;">${isEn ? 'OrientSol Gdm Opt (kWh/m²·d)' : 'OrientSol Gdm Óptimo (kWh/m²·d)'}</th>
-                    <th style="text-align: right; color: #0284c7; font-weight: 800;">${isEn ? 'PVGIS JRC Gdm Opt (kWh/m²·d)' : 'PVGIS JRC Gdm Óptimo (kWh/m²·d)'}</th>
-                    <th style="text-align: right; color: #059669;">${isEn ? 'Difference (kWh/m²·d)' : 'Diferencia Óptimo (kWh/m²·d)'}</th>
-                    <th style="text-align: right; color: #059669;">${isEn ? 'Rel. Deviation (%)' : 'Desviación Relativa (%)'}</th>
-                    <th style="text-align: center;">${isEn ? 'WMO-No. 8 Validation' : 'Validación Norma OMM Nº 8'}</th>
-                  </tr>
-                ` : `
-                  <tr>
-                    <th>${isEn ? 'Month' : 'Mes'}</th>
-                    <th style="text-align: right;">${isEn ? 'OrientSol Gdm(0) (kWh/m²·d)' : 'OrientSol Gdm(0) (kWh/m²·d)'}</th>
-                    <th style="text-align: right; color: #0284c7;">${isEn ? 'PVGIS JRC Gdm(0) (kWh/m²·d)' : 'PVGIS JRC Gdm(0) (kWh/m²·d)'}</th>
-                    <th style="text-align: right;">${isEn ? 'Difference (kWh/m²·d)' : 'Diferencia (kWh/m²·d)'}</th>
-                    <th style="text-align: right;">${isEn ? 'Rel. Deviation (%)' : 'Desviación Relativa (%)'}</th>
-                    <th style="text-align: center;">${isEn ? 'WMO-No. 8 Validation' : 'Validación Norma OMM Nº 8'}</th>
-                  </tr>
-                `}
+                <tr>
+                  <th style="width: 8%; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'Month' : 'Mes'}</th>
+                  <th style="width: 11%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'OrientSol<br/>Gdm(0)' : 'OrientSol<br/>Gdm(0)'}</th>
+                  <th style="width: 11%; text-align: right; color: #0284c7; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'PVGIS JRC<br/>Gdm(0)' : 'PVGIS JRC<br/>Gdm(0)'}</th>
+                  <th style="width: 10%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'Diff Horiz<br/>(kWh/m²·d)' : 'Dif. Horiz<br/>(kWh/m²·d)'}</th>
+                  <th style="width: 11%; text-align: right; color: #059669; background: rgba(16, 185, 129, 0.08); font-weight: 800; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'OrientSol<br/>Gdm Opt' : 'OrientSol<br/>Gdm Ópt.'}</th>
+                  <th style="width: 11%; text-align: right; color: #0284c7; background: rgba(2, 132, 199, 0.08); font-weight: 800; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'PVGIS JRC<br/>Gdm Opt' : 'PVGIS JRC<br/>Gdm Ópt.'}</th>
+                  <th style="width: 10%; text-align: right; color: #059669; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'Diff Opt<br/>(kWh/m²·d)' : 'Dif. Ópt.<br/>(kWh/m²·d)'}</th>
+                  <th style="width: 10%; text-align: right; color: #059669; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'Rel. Dev<br/>Opt (%)' : 'Desv. Ópt.<br/>(%)'}</th>
+                  <th style="width: 18%; text-align: center; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.63rem;">${isEn ? 'WMO<br/>Validation' : 'Validación<br/>Norma OMM'}</th>
+                </tr>
               </thead>
               <tbody>
                 ${pvgisRows.map((r) => {
-                  const devToCheck = pvgisCompareMetric === 'optimal' ? r.absDiffOptPct : r.absDiffPct;
                   let ratingBadge = '';
-                  if (devToCheck <= 5.0) {
-                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(16,185,129,0.12); color:#059669; border-color: rgba(16,185,129,0.3);" title="${isEn ? 'WMO High precision / Secondary standard agreement (<= 5%)' : 'Conforme OMM Alta Precisión (<= 5%)'}">✓ ${isEn ? 'WMO Class 1 (<5%)' : 'Conforme OMM (<5%)'}</span>`;
-                  } else if (devToCheck <= 10.0) {
-                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(37,99,235,0.12); color:#2563eb; border-color: rgba(37,99,235,0.3);" title="${isEn ? 'Within WMO-No. 8 First Class pyranometer uncertainty band (<= 10%)' : 'Dentro de la incertidumbre instrumental de la Norma OMM Nº 8 (<= 10%)'}">✓ ${isEn ? 'WMO Standard (<10%)' : 'Norma OMM (<10%)'}</span>`;
-                  } else if (devToCheck <= 25.0) {
-                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(2,132,199,0.12); color:#0284c7; border-color: rgba(2,132,199,0.3);" title="${isEn ? 'Admissible seasonal variability (<= 25%)' : 'Variabilidad estacional admisible OMM (<= 25%)'}">✓ ${isEn ? 'WMO Seasonal (<25%)' : 'Var. Estacional (<25%)'}</span>`;
+                  if (r.absDiffOptPct <= 5.0) {
+                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(16,185,129,0.12); color:#059669; border: 1px solid rgba(16,185,129,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'WMO High precision / Secondary standard agreement (<= 5%)' : 'Conforme OMM Alta Precisión (<= 5%)'}">✓ OMM (&lt;5%)</span>`;
+                  } else if (r.absDiffOptPct <= 10.0) {
+                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(37,99,235,0.12); color:#2563eb; border: 1px solid rgba(37,99,235,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Within WMO-No. 8 First Class pyranometer uncertainty band (<= 10%)' : 'Dentro de la incertidumbre instrumental de la Norma OMM Nº 8 (<= 10%)'}">✓ OMM (&lt;10%)</span>`;
+                  } else if (r.absDiffOptPct <= 25.0) {
+                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(2,132,199,0.12); color:#0284c7; border: 1px solid rgba(2,132,199,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Admissible seasonal variability (<= 25%)' : 'Variabilidad estacional admisible OMM (<= 25%)'}">✓ Var. Estacional</span>`;
                   } else {
-                    ratingBadge = `<span class="badge-status-warn" style="background: rgba(217,119,6,0.12); color:#d97706; border-color: rgba(217,119,6,0.3);" title="${isEn ? 'Exceeds standard meteorological uncertainty' : 'Supera la tolerancia meteorológica estándar'}">⚠️ ${isEn ? 'Atypical Deviation (>25%)' : 'Desviación Atípica (>25%)'}</span>`;
+                    ratingBadge = `<span class="badge-status-warn" style="background: rgba(217,119,6,0.12); color:#d97706; border: 1px solid rgba(217,119,6,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Exceeds standard meteorological uncertainty' : 'Supera la tolerancia meteorológica estándar'}">⚠️ &gt;25%</span>`;
                   }
 
-                  if (pvgisCompareMetric === 'both') {
-                    return `
-                      <tr style="${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
-                        <td><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★ (Selected)' : '★ (Consultado)') : ''}</strong></td>
-                        <td class="td-num"><strong>${formatNum(r.g0, 2)}</strong></td>
-                        <td class="td-num" style="color: #0284c7; font-weight: 600;">${formatNum(r.gPvgis, 2)}</td>
-                        <td class="td-num" style="color: ${r.diffAbs >= 0 ? '#059669' : '#dc2626'}; font-weight: 600;">
-                          ${r.diffAbs >= 0 ? `+${formatNum(r.diffAbs, 2)}` : formatNum(r.diffAbs, 2)}
-                        </td>
-                        <td class="td-num" style="color: #059669; font-weight: 800; background: rgba(16,185,129,0.05);"><strong>${formatNum(r.gOpt, 2)}</strong></td>
-                        <td class="td-num" style="color: #0284c7; font-weight: 800; background: rgba(2,132,199,0.05);"><strong>${formatNum(r.gPvgisOpt, 2)}</strong></td>
-                        <td class="td-num" style="color: ${r.diffOptAbs >= 0 ? '#059669' : '#dc2626'}; font-weight: 700;">
-                          ${r.diffOptAbs >= 0 ? `+${formatNum(r.diffOptAbs, 2)}` : formatNum(r.diffOptAbs, 2)}
-                        </td>
-                        <td class="td-num" style="color: ${r.diffOptPct >= 0 ? '#059669' : '#dc2626'}; font-weight: 700;">
-                          ${formatPercent(r.diffOptPct, 1, true)}
-                        </td>
-                        <td style="text-align: center;">${ratingBadge}</td>
-                      </tr>
-                    `;
-                  } else if (pvgisCompareMetric === 'optimal') {
-                    return `
-                      <tr style="${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
-                        <td><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★ (Selected)' : '★ (Consultado)') : ''}</strong></td>
-                        <td class="td-num" style="color: #059669; font-weight: 800; background: rgba(16,185,129,0.05);"><strong>${formatNum(r.gOpt, 2)}</strong></td>
-                        <td class="td-num" style="color: #0284c7; font-weight: 800; background: rgba(2,132,199,0.05);"><strong>${formatNum(r.gPvgisOpt, 2)}</strong></td>
-                        <td class="td-num" style="color: ${r.diffOptAbs >= 0 ? '#059669' : '#dc2626'}; font-weight: 700;">
-                          ${r.diffOptAbs >= 0 ? `+${formatNum(r.diffOptAbs, 2)}` : formatNum(r.diffOptAbs, 2)}
-                        </td>
-                        <td class="td-num" style="color: ${r.diffOptPct >= 0 ? '#059669' : '#dc2626'}; font-weight: 700;">
-                          ${formatPercent(r.diffOptPct, 1, true)}
-                        </td>
-                        <td style="text-align: center;">${ratingBadge}</td>
-                      </tr>
-                    `;
-                  } else {
-                    return `
-                      <tr style="${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
-                        <td><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★ (Selected)' : '★ (Consultado)') : ''}</strong></td>
-                        <td class="td-num"><strong>${formatNum(r.g0, 2)}</strong></td>
-                        <td class="td-num" style="color: #0284c7; font-weight: 600;">${formatNum(r.gPvgis, 2)}</td>
-                        <td class="td-num" style="color: ${r.diffAbs >= 0 ? '#059669' : '#dc2626'}; font-weight: 600;">
-                          ${r.diffAbs >= 0 ? `+${formatNum(r.diffAbs, 2)}` : formatNum(r.diffAbs, 2)}
-                        </td>
-                        <td class="td-num" style="color: ${r.diffPct >= 0 ? '#059669' : '#dc2626'}; font-weight: 700;">
-                          ${formatPercent(r.diffPct, 1, true)}
-                        </td>
-                        <td style="text-align: center;">${ratingBadge}</td>
-                      </tr>
-                    `;
-                  }
+                  return `
+                    <tr style="${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
+                      <td style="padding: 0.35rem 0.15rem; font-size: 0.66rem; white-space: normal !important; word-break: break-word !important;"><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★' : '★') : ''}</strong></td>
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; white-space: normal !important; word-break: break-word !important;"><strong>${formatNum(r.g0, 2)}</strong></td>
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; color: #0284c7; font-weight: 600; white-space: normal !important; word-break: break-word !important;">${formatNum(r.gPvgis, 2)}</td>
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; color: ${r.diffAbs >= 0 ? '#059669' : '#dc2626'}; font-weight: 600; white-space: normal !important; word-break: break-word !important;">
+                        ${r.diffAbs >= 0 ? `+${formatNum(r.diffAbs, 2)}` : formatNum(r.diffAbs, 2)}
+                      </td>
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; color: #059669; font-weight: 800; background: rgba(16,185,129,0.05); white-space: normal !important; word-break: break-word !important;"><strong>${formatNum(r.gOpt, 2)}</strong></td>
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; color: #0284c7; font-weight: 800; background: rgba(2,132,199,0.05); white-space: normal !important; word-break: break-word !important;"><strong>${formatNum(r.gPvgisOpt, 2)}</strong></td>
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; color: ${r.diffOptAbs >= 0 ? '#059669' : '#dc2626'}; font-weight: 700; white-space: normal !important; word-break: break-word !important;">
+                        ${r.diffOptAbs >= 0 ? `+${formatNum(r.diffOptAbs, 2)}` : formatNum(r.diffOptAbs, 2)}
+                      </td>
+                      <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.66rem; color: ${r.diffOptPct >= 0 ? '#059669' : '#dc2626'}; font-weight: 700; white-space: normal !important; word-break: break-word !important;">
+                        ${formatPercent(r.diffOptPct, 1, true)}
+                      </td>
+                      <td style="padding: 0.35rem 0.15rem; text-align: center; white-space: normal !important; word-break: break-word !important;">${ratingBadge}</td>
+                    </tr>
+                  `;
                 }).join('')}
               </tbody>
               <tfoot>
-                ${pvgisCompareMetric === 'both' ? `
-                  <tr class="table-media-row verif-media-row">
-                    <td><strong>${isEn ? 'ANNUAL MEAN' : 'MEDIA ANUAL'}</strong></td>
-                    <td class="td-num"><strong>${formatNum(meanG0, 2)}</strong></td>
-                    <td class="td-num" style="color: #0284c7;"><strong>${formatNum(meanPvgis, 2)}</strong></td>
-                    <td class="td-num" style="color: ${meanDiff >= 0 ? '#059669' : '#dc2626'};">
-                      <strong>${meanDiff >= 0 ? `+${formatNum(meanDiff, 2)}` : formatNum(meanDiff, 2)}</strong>
-                    </td>
-                    <td class="td-num" style="color: #059669; font-weight: 800; background: rgba(16,185,129,0.06);"><strong>${formatNum(meanGOpt, 2)}</strong></td>
-                    <td class="td-num" style="color: #0284c7; font-weight: 800; background: rgba(2,132,199,0.06);"><strong>${formatNum(meanPvgisOpt, 2)}</strong></td>
-                    <td class="td-num" style="color: ${meanDiffOpt >= 0 ? '#059669' : '#dc2626'};">
-                      <strong>${meanDiffOpt >= 0 ? `+${formatNum(meanDiffOpt, 2)}` : formatNum(meanDiffOpt, 2)}</strong>
-                    </td>
-                    <td class="td-num" style="color: ${mapeOpt <= 5.0 ? '#059669' : '#2563eb'};">
-                      <strong>MAPE Ópt: ${formatPercent(mapeOpt, 1)}</strong>
-                    </td>
-                    <td style="text-align: center;">
-                      <span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; font-weight: 700;">✓ ${isEn ? 'Global WMO Accordance' : 'Concordancia Global OMM'}</span>
-                    </td>
-                  </tr>
-                ` : pvgisCompareMetric === 'optimal' ? `
-                  <tr class="table-media-row verif-media-row">
-                    <td><strong>${isEn ? 'ANNUAL MEAN' : 'MEDIA ANUAL'}</strong></td>
-                    <td class="td-num" style="color: #059669; font-weight: 800; background: rgba(16,185,129,0.06);"><strong>${formatNum(meanGOpt, 2)}</strong></td>
-                    <td class="td-num" style="color: #0284c7; font-weight: 800; background: rgba(2,132,199,0.06);"><strong>${formatNum(meanPvgisOpt, 2)}</strong></td>
-                    <td class="td-num" style="color: ${meanDiffOpt >= 0 ? '#059669' : '#dc2626'};">
-                      <strong>${meanDiffOpt >= 0 ? `+${formatNum(meanDiffOpt, 2)}` : formatNum(meanDiffOpt, 2)}</strong>
-                    </td>
-                    <td class="td-num" style="color: ${mapeOpt <= 5.0 ? '#059669' : '#2563eb'};">
-                      <strong>MAPE: ${formatPercent(mapeOpt, 1)}</strong>
-                    </td>
-                    <td style="text-align: center;">
-                      <span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; font-weight: 700;">✓ ${isEn ? 'Optimal Yield Confirmed' : 'Rendimiento Óptimo Consistente'}</span>
-                    </td>
-                  </tr>
-                ` : `
-                  <tr class="table-media-row verif-media-row">
-                    <td><strong>${isEn ? 'ANNUAL MEAN' : 'MEDIA ANUAL'}</strong></td>
-                    <td class="td-num"><strong>${formatNum(meanG0, 2)}</strong></td>
-                    <td class="td-num" style="color: #0284c7;"><strong>${formatNum(meanPvgis, 2)}</strong></td>
-                    <td class="td-num" style="color: ${meanDiff >= 0 ? '#059669' : '#dc2626'};">
-                      <strong>${meanDiff >= 0 ? `+${formatNum(meanDiff, 2)}` : formatNum(meanDiff, 2)}</strong>
-                    </td>
-                    <td class="td-num" style="color: ${mape <= 5.0 ? '#059669' : '#2563eb'};">
-                      <strong>MAPE: ${formatPercent(mape, 1)}</strong>
-                    </td>
-                    <td style="text-align: center;">
-                      <span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; font-weight: 700;">✓ ${isEn ? 'Global WMO Accordance' : 'Concordancia Global OMM'}</span>
-                    </td>
-                  </tr>
-                `}
+                <tr class="table-media-row verif-media-row" style="background: rgba(2, 132, 199, 0.05); font-weight: 700;">
+                  <td style="padding: 0.4rem 0.15rem; font-size: 0.65rem; white-space: normal !important; word-break: break-word !important;"><strong>${isEn ? 'ANNUAL' : 'MEDIA'}</strong></td>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; white-space: normal !important;"><strong>${formatNum(meanG0, 2)}</strong></td>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; color: #0284c7; white-space: normal !important;"><strong>${formatNum(meanPvgis, 2)}</strong></td>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; color: ${meanDiff >= 0 ? '#059669' : '#dc2626'}; white-space: normal !important;">
+                    <strong>${meanDiff >= 0 ? `+${formatNum(meanDiff, 2)}` : formatNum(meanDiff, 2)}</strong>
+                  </td>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; color: #059669; font-weight: 800; background: rgba(16,185,129,0.06); white-space: normal !important;"><strong>${formatNum(meanGOpt, 2)}</strong></td>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; color: #0284c7; font-weight: 800; background: rgba(2,132,199,0.06); white-space: normal !important;"><strong>${formatNum(meanPvgisOpt, 2)}</strong></td>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; color: ${meanDiffOpt >= 0 ? '#059669' : '#dc2626'}; white-space: normal !important;">
+                    <strong>${meanDiffOpt >= 0 ? `+${formatNum(meanDiffOpt, 2)}` : formatNum(meanDiffOpt, 2)}</strong>
+                  </td>
+                  <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.65rem; color: ${mapeOpt <= 5.0 ? '#059669' : '#2563eb'}; white-space: normal !important;">
+                    <strong>MAPE ${formatPercent(mapeOpt, 1)}</strong>
+                  </td>
+                  <td style="padding: 0.4rem 0.15rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
+                    <span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.3rem;">✓ OMM</span>
+                  </td>
+                </tr>
               </tfoot>
             </table>
           </div>
@@ -1282,7 +1187,7 @@ export function renderPythonConsole(): HTMLElement {
           <div style="padding: 0.85rem 1.15rem; background: rgba(2, 132, 199, 0.05); border-top: 1px solid var(--border-subtle); font-size: 0.76rem; color: var(--text-dim); line-height: 1.5;">
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.4rem;">
               <span style="font-weight: 700; color: var(--accent-cyan, #0284c7); font-size: 0.82rem;">
-                🔬 ${isEn ? 'TFM Scientific Validation Metrics (vs European PVGIS Reference)' : 'Métricas Estadísticas de Validación para TFM (vs Referencia Europea PVGIS)'}
+                🔬 ${isEn ? 'TFM Scientific Validation Metrics (Complete Analysis vs European PVGIS Reference)' : 'Métricas Estadísticas de Validación para TFM (Análisis Completo vs Referencia PVGIS)'}
               </span>
               <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-size: 0.72rem; font-weight: 700;">
                 ${pvgisData.provider}
@@ -1290,21 +1195,37 @@ export function renderPythonConsole(): HTMLElement {
             </div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-top: 0.6rem; padding: 0.65rem; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border-subtle);">
               <div>
-                <span style="color: var(--text-muted); font-size: 0.7rem;">${pvgisCompareMetric === 'optimal' ? (isEn ? 'Optimal MAPE:' : 'MAPE Captación Óptima:') : (isEn ? 'Mean Absolute Percentage Error (MAPE):' : 'Error Porcentual Absoluto Medio (MAPE):')}</span>
-                <div style="font-size: 1.05rem; font-weight: 800; color: ${(pvgisCompareMetric === 'optimal' ? mapeOpt : mape) <= 10 ? '#059669' : '#2563eb'};">${formatPercent(pvgisCompareMetric === 'optimal' ? mapeOpt : mape, 2)}</div>
-                <span style="font-size: 0.68rem; color: var(--text-muted);">${(pvgisCompareMetric === 'optimal' ? mapeOpt : mape) <= 5 ? (isEn ? 'High scientific agreement (< 5%)' : 'Acuerdo científico superior (< 5%)') : (isEn ? 'WMO Compliant (< 10%)' : 'Conforme a Norma OMM (< 10%)')}</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem;">${isEn ? 'Mean Absolute Percentage Error (MAPE):' : 'Error Porcentual Absoluto Medio (MAPE):'}</span>
+                <div style="display: flex; align-items: baseline; gap: 0.4rem; margin-top: 0.2rem;">
+                  <span style="font-size: 1.05rem; font-weight: 800; color: #059669;">${formatPercent(mapeOpt, 2)}</span>
+                  <span style="font-size: 0.68rem; font-weight: 600; color: #059669;">(Óptimo)</span>
+                  <span style="font-size: 0.85rem; font-weight: 700; color: #0284c7; margin-left: 0.25rem;">${formatPercent(mape, 2)}</span>
+                  <span style="font-size: 0.65rem; color: var(--text-muted);">(Horiz)</span>
+                </div>
+                <span style="font-size: 0.66rem; color: var(--text-muted); display: block; margin-top: 0.2rem;">${mapeOpt <= 5 ? (isEn ? 'High scientific agreement (< 5%)' : 'Acuerdo científico superior (< 5%)') : (isEn ? 'WMO Compliant (< 10%)' : 'Conforme a Norma OMM (< 10%)')}</span>
               </div>
               <div>
-                <span style="color: var(--text-muted); font-size: 0.7rem;">${pvgisCompareMetric === 'optimal' ? (isEn ? 'Optimal MBE:' : 'Sesgo Sistemático Óptimo (MBE):') : (isEn ? 'Mean Bias Error (MBE):' : 'Sesgo Sistemático Medio (MBE):')}</span>
-                <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">${(pvgisCompareMetric === 'optimal' ? mbeOpt : mbe) >= 0 ? `+${formatNum(pvgisCompareMetric === 'optimal' ? mbeOpt : mbe, 3)}` : formatNum(pvgisCompareMetric === 'optimal' ? mbeOpt : mbe, 3)} <span style="font-size: 0.72rem; font-weight: 400;">kWh/m²·d</span></div>
-                <span style="font-size: 0.68rem; color: var(--text-muted);">${(pvgisCompareMetric === 'optimal' ? mbeOpt : mbe) >= 0 ? (isEn ? 'Slight conservative overestimation' : 'Ligera sobreestimación conservadora') : (isEn ? 'Slight underestimation' : 'Ligera subestimación')}</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem;">${isEn ? 'Mean Bias Error (MBE):' : 'Sesgo Sistemático Medio (MBE):'}</span>
+                <div style="display: flex; align-items: baseline; gap: 0.4rem; margin-top: 0.2rem;">
+                  <span style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">${mbeOpt >= 0 ? `+${formatNum(mbeOpt, 3)}` : formatNum(mbeOpt, 3)}</span>
+                  <span style="font-size: 0.68rem; font-weight: 600; color: #059669;">(Ópt.)</span>
+                  <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-dim); margin-left: 0.25rem;">${mbe >= 0 ? `+${formatNum(mbe, 3)}` : formatNum(mbe, 3)}</span>
+                  <span style="font-size: 0.65rem; color: var(--text-muted);">(Horiz)</span>
+                </div>
+                <span style="font-size: 0.66rem; color: var(--text-muted); display: block; margin-top: 0.2rem;">kWh/m²·d • ${mbeOpt >= 0 ? (isEn ? 'Slight conservative overestimation' : 'Ligera sobreestimación conservadora') : (isEn ? 'Slight underestimation' : 'Ligera subestimación')}</span>
               </div>
               <div>
-                <span style="color: var(--text-muted); font-size: 0.7rem;">${pvgisCompareMetric === 'optimal' ? (isEn ? 'Optimal RMSE:' : 'RMSE Captación Óptima:') : (isEn ? 'Root Mean Square Error (RMSE):' : 'Error Cuadrático Medio (RMSE):')}</span>
-                <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">${formatNum(pvgisCompareMetric === 'optimal' ? rmseOpt : rmse, 3)} <span style="font-size: 0.72rem; font-weight: 400;">kWh/m²·d</span></div>
-                <span style="font-size: 0.68rem; color: var(--text-muted);">${isEn ? 'Low dispersion across calendar months' : 'Baja dispersión intermensual'}</span>
+                <span style="color: var(--text-muted); font-size: 0.7rem;">${isEn ? 'Root Mean Square Error (RMSE):' : 'Error Cuadrático Medio (RMSE):'}</span>
+                <div style="display: flex; align-items: baseline; gap: 0.4rem; margin-top: 0.2rem;">
+                  <span style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">${formatNum(rmseOpt, 3)}</span>
+                  <span style="font-size: 0.68rem; font-weight: 600; color: #059669;">(Ópt.)</span>
+                  <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-dim); margin-left: 0.25rem;">${formatNum(rmse, 3)}</span>
+                  <span style="font-size: 0.65rem; color: var(--text-muted);">(Horiz)</span>
+                </div>
+                <span style="font-size: 0.66rem; color: var(--text-muted); display: block; margin-top: 0.2rem;">kWh/m²·d • ${isEn ? 'Low dispersion across calendar months' : 'Baja dispersión intermensual'}</span>
               </div>
             </div>
+
 
             <!-- Climatological Reference Context Callout (PVGIS-SARAH3 Multiannual Normal) - ONLY VISIBLE IN OFFLINE MODE -->
             ${pvgisData.isOffline ? `
@@ -1986,21 +1907,6 @@ export function renderPythonConsole(): HTMLElement {
 
     container.querySelector('#btn-pvgis-view-diff')?.addEventListener('click', () => {
       showPvgisComparison = true;
-      renderView();
-    });
-
-    container.querySelector('#btn-pvgis-metric-both')?.addEventListener('click', () => {
-      pvgisCompareMetric = 'both';
-      renderView();
-    });
-
-    container.querySelector('#btn-pvgis-metric-opt')?.addEventListener('click', () => {
-      pvgisCompareMetric = 'optimal';
-      renderView();
-    });
-
-    container.querySelector('#btn-pvgis-metric-horiz')?.addEventListener('click', () => {
-      pvgisCompareMetric = 'horizontal';
       renderView();
     });
 
