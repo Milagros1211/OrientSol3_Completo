@@ -23,8 +23,6 @@ export function renderStatusBar(): HTMLElement {
       <button type="button" class="status-item status-link-btn" id="footer-legal-btn" title="${isEn ? 'Legal Notice, GDPR Privacy, Terms & Cookie Policy' : 'Aviso Legal, Privacidad RGPD, Términos y Política de Cookies'}">
         ⚖️ ${isEn ? 'Privacy & Legal (EU/GDPR)' : 'Privacidad & Legal (UE/RGPD)'}
       </button>
-      <span class="status-separator">|</span>
-      <span class="status-item">TypeScript + Pyodide (WASM)</span>
     </div>
   `;
 

@@ -12,7 +12,7 @@ export function openLegalPoliciesModal(initialTab: LegalTabId = 'privacy'): void
   }
 
   const isEn = i18n.getLocale() === 'en';
-  let activeTab: LegalTabId = initialTab;
+  let activeTab: LegalTabId = initialTab === 'security' ? 'privacy' : initialTab;
 
   const modal = document.createElement('div');
   modal.className = 'modal-backdrop legal-modal-backdrop';
@@ -45,17 +45,14 @@ export function openLegalPoliciesModal(initialTab: LegalTabId = 'privacy'): void
 
         <!-- Navigation Tabs inside Modal -->
         <div class="legal-tabs-bar">
-          <button type="button" class="legal-tab-btn ${activeTab === 'privacy' ? 'active' : ''}" data-legal-tab="privacy">
-            <span>🛡️ ${isEn ? 'Privacy (GDPR)' : 'Privacidad (RGPD)'}</span>
+          <button type="button" class="legal-tab-btn ${activeTab === 'privacy' || activeTab === 'security' ? 'active' : ''}" data-legal-tab="privacy">
+            <span>🛡️ ${isEn ? 'Privacy & Security (GDPR)' : 'Privacidad & Seguridad (RGPD)'}</span>
           </button>
           <button type="button" class="legal-tab-btn ${activeTab === 'terms' ? 'active' : ''}" data-legal-tab="terms">
             <span>📜 ${isEn ? 'Terms & Free Access' : 'Términos & Gratuidad'}</span>
           </button>
           <button type="button" class="legal-tab-btn ${activeTab === 'cookies' ? 'active' : ''}" data-legal-tab="cookies">
             <span>🍪 ${isEn ? 'Cookies & Storage' : 'Cookies & Almacenamiento'}</span>
-          </button>
-          <button type="button" class="legal-tab-btn ${activeTab === 'security' ? 'active' : ''}" data-legal-tab="security">
-            <span>🔒 ${isEn ? 'Security Audit' : 'Informe de Seguridad'}</span>
           </button>
         </div>
 
@@ -141,13 +138,12 @@ export function openLegalPoliciesModal(initialTab: LegalTabId = 'privacy'): void
 function renderTabContent(tab: LegalTabId, isEn: boolean): string {
   switch (tab) {
     case 'privacy':
+    case 'security':
       return renderPrivacyContent(isEn);
     case 'terms':
       return renderTermsContent(isEn);
     case 'cookies':
       return renderCookiesContent(isEn);
-    case 'security':
-      return renderSecurityContent(isEn);
     default:
       return renderPrivacyContent(isEn);
   }
@@ -208,6 +204,8 @@ function renderPrivacyContent(isEn: boolean): string {
           <li><strong>Supervisory Authority:</strong> If you consider that the processing of your data violates European or Spanish regulations, you have the right to file a complaint before the Spanish Data Protection Agency (<strong>AEPD</strong>) at <a href="https://www.aepd.es" target="_blank" rel="noopener" style="color: var(--accent-cyan);">www.aepd.es</a>.</li>
         </ul>
       </div>
+
+      ${renderSecurityContent(true)}
     `;
   }
 
@@ -263,6 +261,8 @@ function renderPrivacyContent(isEn: boolean): string {
         <li><strong>Autoridad de Control:</strong> En caso de considerar vulnerados sus derechos, el usuario tiene derecho a presentar una reclamación ante la Agencia Española de Protección de Datos (<strong>AEPD</strong>), sita en C/ Jorge Juan 6, 28001 Madrid (<a href="https://www.aepd.es" target="_blank" rel="noopener" style="color: var(--accent-cyan);">www.aepd.es</a>).</li>
       </ul>
     </div>
+
+    ${renderSecurityContent(false)}
   `;
 }
 
@@ -538,7 +538,7 @@ function renderSecurityContent(isEn: boolean): string {
   if (isEn) {
     return `
       <div class="legal-clause-card">
-        <h4 class="legal-clause-title">1. Technical Security Architecture & Threat Mitigation</h4>
+        <h4 class="legal-clause-title">5. Technical Security Architecture & Threat Mitigation</h4>
         <p class="legal-text">
           OrientSol 4.0 was built to conform with modern web security standards, ISO/IEC 27001 principles, and OWASP Top 10 recommendations:
         </p>
@@ -590,7 +590,7 @@ function renderSecurityContent(isEn: boolean): string {
       </div>
 
       <div class="legal-clause-card">
-        <h4 class="legal-clause-title">2. Cryptography & Transmission Protocol</h4>
+        <h4 class="legal-clause-title">6. Cryptography & Transmission Protocol</h4>
         <ul class="legal-list">
           <li><strong>Transport Layer Security:</strong> All external satellite queries (NASA POWER, PVGIS, Open-Meteo) and cloud database operations are strictly enforced over encrypted <strong>HTTPS / TLS 1.3</strong>.</li>
           <li><strong>Content Security Policy (CSP):</strong> Configured to prevent cross-origin script execution from untrusted domains.</li>
@@ -601,7 +601,7 @@ function renderSecurityContent(isEn: boolean): string {
 
   return `
     <div class="legal-clause-card">
-      <h4 class="legal-clause-title">1. Arquitectura Técnica de Seguridad y Mitigación de Amenazas</h4>
+      <h4 class="legal-clause-title">5. Arquitectura Técnica de Seguridad y Mitigación de Amenazas</h4>
       <p class="legal-text">
         OrientSol 4.0 ha sido auditado y desarrollado conforme a las directrices de seguridad web OWASP Top 10 y los principios de seguridad de la información ISO/IEC 27001:
       </p>
@@ -653,7 +653,7 @@ function renderSecurityContent(isEn: boolean): string {
     </div>
 
     <div class="legal-clause-card">
-      <h4 class="legal-clause-title">2. Criptografía y Seguridad en Tránsito</h4>
+      <h4 class="legal-clause-title">6. Criptografía y Seguridad en Tránsito</h4>
       <ul class="legal-list">
         <li><strong>Cifrado en Tránsito:</strong> Todas las consultas a servicios meteorológicos homologados (NASA POWER, PVGIS JRC, Open-Meteo) y a Supabase se ejecutan obligatoriamente mediante <strong>HTTPS / TLS 1.3</strong>.</li>
         <li><strong>Política de Seguridad de Contenidos (CSP):</strong> Restricción de inyección de scripts externos y protección contra ataques de Clickjacking.</li>

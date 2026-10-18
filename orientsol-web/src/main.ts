@@ -5,9 +5,7 @@ import {
   renderDualClimateLoaderPanel,
   renderPythonConsole,
   renderArchitectureOverview,
-  openLegalPoliciesModal,
   renderCookieBanner,
-  type LegalTabId,
 } from '@/components';
 import { pyodideService } from '@/services/pyodide';
 import { i18n } from '@/i18n';
@@ -165,50 +163,7 @@ function renderAboutView(isEn: boolean): HTMLElement {
         </div>
       </div>
     </div>
-
-    <!-- Legal, Privacy (GDPR), Cookies & Terms Hub -->
-    <div class="result-card wide-card" style="margin-top: 1.25rem; border: 1px solid rgba(14, 165, 233, 0.35); background: linear-gradient(to right, rgba(14, 165, 233, 0.03), transparent);">
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.6rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-cyan, #0284c7);">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          </svg>
-          <h4 style="margin: 0; color: var(--text-main);">
-            ${isEn ? 'Legal Compliance, Privacy (GDPR), Cookies & Terms' : 'Aviso Legal, Privacidad (RGPD), Cookies & Términos de Servicio'}
-          </h4>
-        </div>
-        <span class="badge badge-success">${isEn ? 'EU Law (GDPR) & Spanish Law' : 'Derecho UE (RGPD) y Ley Española'}</span>
-      </div>
-      <p style="font-size: 0.82rem; color: var(--text-dim); margin-bottom: 1rem; line-height: 1.5;">
-        ${isEn
-          ? 'OrientSol 4.0 strictly complies with European Union General Data Protection Regulation (EU 2016/679), Spanish Organic Law 3/2018 (LOPDGDD), ePrivacy Directive 2002/58/EC, LSSI-CE, and Consumer Rights Law (TRLGDCU). Explore our full legal, privacy, and technical security audit documentation:'
-          : 'OrientSol 4.0 cumple rigurosamente con el Reglamento General de Protección de Datos de la Unión Europea (RGPD 2016/679), la Ley Orgánica 3/2018 (LOPDGDD), la Directiva ePrivacy 2002/58/CE, la LSSI-CE y la Ley de Consumidores (TRLGDCU). Consulta la documentación legal y el informe de seguridad:'}
-      </p>
-      <div style="display: flex; flex-wrap: wrap; gap: 0.6rem;" id="about-legal-actions">
-        <button type="button" class="btn btn-secondary legal-trigger-btn" data-tab="privacy" style="font-size: 0.8rem; padding: 0.45rem 0.85rem;">
-          🛡️ ${isEn ? 'Privacy Policy (GDPR)' : 'Política de Privacidad (RGPD)'}
-        </button>
-        <button type="button" class="btn btn-secondary legal-trigger-btn" data-tab="terms" style="font-size: 0.8rem; padding: 0.45rem 0.85rem;">
-          📜 ${isEn ? 'Terms & Free Open Access' : 'Términos & Gratuidad'}
-        </button>
-        <button type="button" class="btn btn-secondary legal-trigger-btn" data-tab="cookies" style="font-size: 0.8rem; padding: 0.45rem 0.85rem;">
-          🍪 ${isEn ? 'Cookie & Storage Policy' : 'Política de Cookies & Almacenamiento'}
-        </button>
-        <button type="button" class="btn btn-secondary legal-trigger-btn" data-tab="security" style="font-size: 0.8rem; padding: 0.45rem 0.85rem;">
-          🔒 ${isEn ? 'Security Audit Report' : 'Informe de Seguridad'}
-        </button>
-      </div>
-    </div>
   `;
-
-  // Attach legal button click handlers
-  const legalTriggerBtns = container.querySelectorAll<HTMLButtonElement>('.legal-trigger-btn');
-  legalTriggerBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const tab = (btn.getAttribute('data-tab') || 'privacy') as LegalTabId;
-      openLegalPoliciesModal(tab);
-    });
-  });
 
   // Attach architecture technical details inside About view
   const archPanel = renderArchitectureOverview(isEn);
