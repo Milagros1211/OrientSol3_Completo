@@ -23,7 +23,7 @@ const gradlewPath = path.join(androidDir, gradlew);
 console.log(`[APK Builder] Checking Gradle wrapper at: ${gradlewPath}`);
 console.log('[APK Builder] Executing Gradle assembleDebug...');
 
-const proc = spawn(gradlewPath, ['assembleDebug'], {
+const proc = spawn(`"${gradlewPath}"`, ['assembleDebug'], {
   cwd: androidDir,
   shell: true,
   stdio: 'inherit',
