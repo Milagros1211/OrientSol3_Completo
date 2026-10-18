@@ -10,6 +10,8 @@ import {
 import { pyodideService } from '@/services/pyodide';
 import { i18n } from '@/i18n';
 import { registerServiceWorker } from '@/sw-register';
+import ujaLogo from '@/assets/uja-logo.png';
+import ujaShield from '@/assets/uja-shield.png';
 
 function renderAboutView(isEn: boolean): HTMLElement {
   const container = document.createElement('section');
@@ -29,17 +31,43 @@ function renderAboutView(isEn: boolean): HTMLElement {
       </div>
     </div>
 
-    <div class="about-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-top: 1rem;">
-      <div class="result-card highlight-card">
-        <h4 style="margin-bottom: 0.75rem; color: var(--solar-amber);">${isEn ? 'Academic Framework (TFM)' : 'Marco Académico (TFM)'}</h4>
-        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.88rem;">
-          <li><strong>${isEn ? 'Institution' : 'Institución'}:</strong> Universidad de Jaén (UJA)</li>
-          <li><strong>${isEn ? 'Degree' : 'Titulación'}:</strong> ${isEn ? "Master's Degree in Renewable Energy" : 'Máster Universitario en Energías Renovables'}</li>
-          <li><strong>${isEn ? 'Title' : 'Título'}:</strong> ${isEn ? 'Development of a software environment for position and motion optimization of solar radiation receiving surfaces in a photovoltaic system' : 'Desarrollo de un entorno software para optimización de posición y movimiento de superficies receptoras de radiación solar en un sistema fotovoltaico'}</li>
-          <li><strong>${isEn ? 'Student' : 'Alumna'}:</strong> Karina Milagros Baldeón Zárate</li>
-          <li><strong>${isEn ? 'Supervisors' : 'Directores'}:</strong> Dr. Leocadio Hontoria García &amp; Dra. Catalina Rus Casas</li>
-          <li><strong>${isEn ? 'Department' : 'Departamento'}:</strong> ${isEn ? 'Electronic and Automatic Engineering' : 'Ingeniería Electrónica y Automática'}</li>
-        </ul>
+    <!-- Institutional UJA Banner with Official Logos -->
+    <div class="about-institution-banner">
+      <div class="about-institution-content">
+        <a href="https://www.ujaen.es" target="_blank" rel="noopener noreferrer" class="about-uja-logo-box" title="${isEn ? 'Visit University of Jaén website' : 'Visitar portal oficial de la Universidad de Jaén'}">
+          <img src="${ujaLogo}" alt="Universidad de Jaén" class="about-uja-logo-img" />
+        </a>
+        <div class="about-institution-text">
+          <h4>${isEn ? 'Universidad de Jaén (UJA) • Spain' : 'Universidad de Jaén (UJA) • España'}</h4>
+          <p>${isEn ? "Master's Degree in Renewable Energy • Department of Electronic and Automatic Engineering" : 'Máster Universitario en Energías Renovables • Departamento de Ingeniería Electrónica y Automática'}</p>
+          <div class="about-institution-tags">
+            <span class="badge badge-source">EPS Jaén</span>
+            <span class="badge badge-primary">TFM 2026</span>
+            <span class="badge badge-success">${isEn ? 'Open-Source Academic Software' : 'Software Académico de Código Abierto'}</span>
+          </div>
+        </div>
+      </div>
+      <div class="about-institution-shield-box">
+        <img src="${ujaShield}" alt="Escudo Oficial UJA" class="about-uja-shield-img" />
+      </div>
+    </div>
+
+    <div class="about-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-top: 1.25rem;">
+      <div class="result-card highlight-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+            <h4 style="margin: 0; color: var(--solar-amber);">${isEn ? 'Academic Framework (TFM)' : 'Marco Académico (TFM)'}</h4>
+            <img src="${ujaShield}" alt="UJA" style="height: 32px; width: auto; object-fit: contain;" />
+          </div>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.88rem; padding: 0;">
+            <li><strong>${isEn ? 'Institution' : 'Institución'}:</strong> Universidad de Jaén (UJA)</li>
+            <li><strong>${isEn ? 'Degree' : 'Titulación'}:</strong> ${isEn ? "Master's Degree in Renewable Energy" : 'Máster Universitario en Energías Renovables'}</li>
+            <li><strong>${isEn ? 'Title' : 'Título'}:</strong> ${isEn ? 'Development of a software environment for position and motion optimization of solar radiation receiving surfaces in a photovoltaic system' : 'Desarrollo de un entorno software para optimización de posición y movimiento de superficies receptoras de radiación solar en un sistema fotovoltaico'}</li>
+            <li><strong>${isEn ? 'Student' : 'Alumna'}:</strong> Karina Milagros Baldeón Zárate</li>
+            <li><strong>${isEn ? 'Supervisors' : 'Directores'}:</strong> Dr. Leocadio Hontoria García &amp; Dra. Catalina Rus Casas</li>
+            <li><strong>${isEn ? 'Department' : 'Departamento'}:</strong> ${isEn ? 'Electronic and Automatic Engineering' : 'Ingeniería Electrónica y Automática'}</li>
+          </ul>
+        </div>
       </div>
 
       <div class="result-card">

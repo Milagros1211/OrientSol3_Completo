@@ -1,6 +1,8 @@
 import { pyodideService } from '@/services/pyodide';
 import { i18n } from '@/i18n';
 import { openLegalPoliciesModal } from '@/components/modals/LegalPoliciesModal';
+import ujaShield from '@/assets/uja-shield.png';
+
 export function renderStatusBar(): HTMLElement {
   const footer = document.createElement('footer');
   footer.className = 'app-statusbar';
@@ -10,6 +12,11 @@ export function renderStatusBar(): HTMLElement {
 
   footer.innerHTML = `
     <div class="statusbar-left">
+      <a href="https://www.ujaen.es" target="_blank" rel="noopener noreferrer" class="status-item uja-statusbar-item" title="${isEn ? 'University of Jaén — Official Portal' : 'Universidad de Jaén — Portal Oficial'}">
+        <img src="${ujaShield}" alt="UJA" class="uja-statusbar-shield" />
+        <span class="uja-statusbar-text">Univ. de Jaén</span>
+      </a>
+      <span class="status-separator">|</span>
       <span class="status-item">
         <span class="status-indicator live"></span>
         <span id="footer-engine-info">Pyodide WASM Runtime</span>

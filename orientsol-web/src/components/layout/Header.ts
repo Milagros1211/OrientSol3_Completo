@@ -3,6 +3,8 @@ import { climateDatabaseService } from '@/services/supabase';
 import { openSupabaseSyncModal } from '@/components/supabase/SupabaseSyncModal';
 import { i18n } from '@/i18n';
 import { themeManager } from '@/services/theme/themeManager';
+import ujaLogo from '@/assets/uja-logo.png';
+import ujaShield from '@/assets/uja-shield.png';
 
 export function renderHeader(): HTMLElement {
   const header = document.createElement('header');
@@ -35,6 +37,11 @@ export function renderHeader(): HTMLElement {
         <h1 class="brand-title">${t.common.appName} <span class="brand-badge">${t.common.versionBadge}</span></h1>
         <p class="brand-subtitle">${t.common.subtitle}</p>
       </div>
+      <div class="header-brand-divider"></div>
+      <a href="https://www.ujaen.es" target="_blank" rel="noopener noreferrer" class="header-uja-brand" title="${isEn ? 'University of Jaén (UJA) — Official Institutional Portal' : 'Universidad de Jaén (UJA) — Portal Institucional Oficial'}">
+        <img src="${ujaLogo}" alt="Universidad de Jaén" class="header-uja-logo" />
+        <img src="${ujaShield}" alt="UJA" class="header-uja-shield" />
+      </a>
     </div>
     <div class="header-actions">
       <!-- Supabase Connection & Offline Sync Pill -->

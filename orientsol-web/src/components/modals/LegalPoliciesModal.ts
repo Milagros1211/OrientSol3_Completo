@@ -1,5 +1,6 @@
 import { i18n } from '@/i18n';
 import { themeManager } from '@/services/theme/themeManager';
+import ujaLogo from '@/assets/uja-logo.png';
 
 export type LegalTabId = 'privacy' | 'terms' | 'cookies' | 'security';
 
@@ -153,7 +154,12 @@ function renderPrivacyContent(isEn: boolean): string {
   if (isEn) {
     return `
       <div class="legal-clause-card">
-        <h4 class="legal-clause-title">1. Data Controller Identification</h4>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+          <h4 class="legal-clause-title" style="margin: 0;">1. Data Controller Identification</h4>
+          <a href="https://www.ujaen.es" target="_blank" rel="noopener noreferrer" style="display: inline-flex;" title="Universidad de Jaén">
+            <img src="${ujaLogo}" alt="Universidad de Jaén" class="legal-uja-logo" />
+          </a>
+        </div>
         <p class="legal-text">
           In compliance with Regulation (EU) 2016/679 of the European Parliament and of the Council (General Data Protection Regulation - <strong>GDPR</strong>) and Spanish Organic Law 3/2018 (<strong>LOPDGDD</strong>), the entity responsible for data processing within this platform is:
         </p>
@@ -210,7 +216,12 @@ function renderPrivacyContent(isEn: boolean): string {
 
   return `
     <div class="legal-clause-card">
-      <h4 class="legal-clause-title">1. Identificación del Responsable del Tratamiento</h4>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+        <h4 class="legal-clause-title" style="margin: 0;">1. Identificación del Responsable del Tratamiento</h4>
+        <a href="https://www.ujaen.es" target="_blank" rel="noopener noreferrer" style="display: inline-flex;" title="Universidad de Jaén">
+          <img src="${ujaLogo}" alt="Universidad de Jaén" class="legal-uja-logo" />
+        </a>
+      </div>
       <p class="legal-text">
         En cumplimiento del Reglamento (UE) 2016/679 del Parlamento Europeo y del Consejo (Reglamento General de Protección de Datos - <strong>RGPD</strong>), de la Ley Orgánica 3/2018, de 5 de diciembre, de Protección de Datos Personales y garantía de los derechos digitales (<strong>LOPDGDD</strong>), y de la Ley 34/2002 de Servicios de la Sociedad de la Información y de Comercio Electrónico (<strong>LSSI-CE</strong>), se informa que el responsable de este entorno software es:
       </p>
