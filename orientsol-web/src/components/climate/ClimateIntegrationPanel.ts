@@ -7,6 +7,7 @@ import {
 import type { ClimateDataRecord, ClimateSourceType } from '@/types/climate';
 import { i18n } from '@/i18n';
 import { formatNum, formatInt } from '@/utils/formatters';
+import { escapeHtml } from '@/utils/security';
 
 const CITY_PRESETS = [
   { name: 'Madrid (España)', lat: 40.4168, lon: -3.7038 },
@@ -357,7 +358,7 @@ export function renderClimateIntegrationPanel(): HTMLElement {
           <span class="badge badge-success">${t.results.pythonSuccess}</span>
           <span class="badge badge-neutral">${res.executionTimeMs} ms</span>
         </div>
-        <h3>${t.results.resultsFor.replace('{location}', res.locationName).replace('{lat}', formatNum(res.latitude, 2))}</h3>
+        <h3>${escapeHtml(t.results.resultsFor.replace('{location}', res.locationName).replace('{lat}', formatNum(res.latitude, 2)))}</h3>
       </div>
 
       <div class="results-section-grid">

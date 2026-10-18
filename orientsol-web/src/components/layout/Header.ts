@@ -1,7 +1,6 @@
 import { pyodideService } from '@/services/pyodide';
 import { climateDatabaseService } from '@/services/supabase';
 import { openSupabaseSyncModal } from '@/components/supabase/SupabaseSyncModal';
-import { openLegalPoliciesModal } from '@/components/modals/LegalPoliciesModal';
 import { i18n } from '@/i18n';
 import { themeManager } from '@/services/theme/themeManager';
 
@@ -69,18 +68,8 @@ export function renderHeader(): HTMLElement {
       <a href="https://github.com" target="_blank" class="header-link" title="${t.common.docs}">
         ${t.common.docs}
       </a>
-      <button id="header-legal-btn" class="header-link header-btn-link" type="button" title="${isEn ? 'Legal Compliance, Privacy (GDPR), Cookies & Terms' : 'Aviso Legal, Privacidad (RGPD), Cookies y Términos'}">
-        ⚖️ ${isEn ? 'Legal & Privacy' : 'Legal & Privacidad'}
-      </button>
     </div>
   `;
-
-  // Attach Legal Policies modal event
-  const legalBtn = header.querySelector<HTMLButtonElement>('#header-legal-btn');
-  legalBtn?.addEventListener('click', (e) => {
-    e.preventDefault();
-    openLegalPoliciesModal('privacy');
-  });
 
   // Attach Supabase sync modal event
   const supabasePill = header.querySelector<HTMLButtonElement>('#supabase-sync-pill');

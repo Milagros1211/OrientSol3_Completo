@@ -731,7 +731,11 @@ export class ClimateDatabaseService {
           });
         }
 
-        const { error } = await supabase.from('datos_mensuales').insert(monthlyRows);
+        // Usar upsert con ignoreDuplicates: true para evitar colisiones de concurrencia o errores 23505
+        const { error } = await supabase
+          .from('datos_mensuales')
+          .upsert(monthlyRows, { onConflict: 'nombre_emplazamiento,mes', ignoreDuplicates: true });
+
         if (!error) {
           const savedRecord: ClimateDataRecord = {
             ...record,
@@ -750,6 +754,18 @@ export class ClimateDatabaseService {
             isOffline: false,
             message: `✓ Emplazamiento "${record.locationName}" registrado con éxito en Supabase (12 meses en datos_mensuales).`,
             record: savedRecord,
+          };
+        } else if (error.code === '23505' || error.message?.includes('duplicate key') || error.message?.includes('unique constraint')) {
+          // Manejo limpio de colisión de unicidad sin crashear la aplicación
+          console.info('[Supabase Info] Registro duplicado detectado por restricción UNIQUE de base de datos:', error.message);
+          return {
+            success: false,
+            isDuplicate: true,
+            isOffline: false,
+            duplicateReason: 'name',
+            similarityPct: 100,
+            message: `ℹ️ El emplazamiento "${record.locationName}" ya existe en la base de datos comunitaria de Supabase. No se requieren duplicados.`,
+            record,
           };
         } else {
           console.warn('[Supabase Insert Error]', error.message);
@@ -905,7 +921,10 @@ export class ClimateDatabaseService {
             });
           }
 
-          const { error } = await supabase.from('datos_mensuales').insert(monthlyRows);
+          const { error } = await supabase
+            .from('datos_mensuales')
+            .upsert(monthlyRows, { onConflict: 'nombre_emplazamiento,mes', ignoreDuplicates: true });
+
           if (!error) {
             summary.inserted++;
             summary.details.push({
@@ -914,12 +933,20 @@ export class ClimateDatabaseService {
               message: `✓ Emplazamiento "${item.locationName}" ingresado con éxito en Supabase (12 meses).`,
             });
             existingCloudRecords.push({ ...item, id: `supabase-${item.locationName.toLowerCase().replace(/\s+/g, '-')}` });
+          } else if (error.code === '23505' || error.message?.includes('duplicate key') || error.message?.includes('unique constraint')) {
+            // Ya existía en Supabase: se considera sincronizado/descartado pacíficamente
+            summary.duplicates++;
+            summary.details.push({
+              name: item.locationName,
+              status: 'duplicate',
+              message: `ℹ️ Omitido: "${item.locationName}" ya existía en la base de datos Supabase.`,
+            });
           } else {
             summary.errors++;
             summary.details.push({
               name: item.locationName,
               status: 'error',
-              message: `Error al insertar: ${error?.message || 'Error desconocido'}`,
+              message: `Error al sincronizar: ${error?.message || 'Error desconocido'}`,
             });
             remainingQueue.push(item);
           }

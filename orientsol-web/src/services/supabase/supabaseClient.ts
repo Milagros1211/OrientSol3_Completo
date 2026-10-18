@@ -3,8 +3,11 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 const STORAGE_KEY_URL = 'orientsol_supabase_url';
 const STORAGE_KEY_KEY = 'orientsol_supabase_anon_key';
 
-const DEFAULT_SUPABASE_URL = 'https://dqdkjkcmdsolpobxfbfi.supabase.co';
-const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_REDACTED_ANON_KEY';
+// Sin claves ni credenciales hardcodeadas en el código fuente.
+// Se obtienen de las variables de entorno inyectadas en tiempo de build (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)
+// o de la configuración segura local.
+const DEFAULT_SUPABASE_URL = '';
+const DEFAULT_SUPABASE_ANON_KEY = '';
 
 let clientInstance: SupabaseClient | null = null;
 
