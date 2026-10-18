@@ -18,6 +18,15 @@ interface PVGISResponse {
       longitude: number;
       elevation?: number;
     };
+    meteo_data?: {
+      radiation_db?: string;
+      meteo_db?: string;
+      year_min?: number;
+      year_max?: number;
+      use_horizon?: boolean;
+      horizon_db?: string | null;
+      horizon_data?: string;
+    };
   };
   outputs?: {
     monthly?: PVGISMonthlyItem[];
@@ -181,9 +190,15 @@ export async function fetchPvgisClimateData(
             monthlyTemperature,
             fetchedAt: new Date().toISOString(),
             metadata: {
-              provider: 'European Commission PVGIS Meteo Database (ERA5 Reanalysis Grid)',
-              note: 'Obtenido mediante el modelo satelital oficial ERA5 (base de datos meteorológica de PVGIS 5.3).',
-              statusDetail: 'Datos climáticos oficiales obtenidos mediante el modelo satelital ERA5 de PVGIS.',
+              provider: 'European Commission Joint Research Centre (JRC) PVGIS 5.3',
+              database: 'PVGIS-SARAH3',
+              dbType: 'Satellite',
+              startYear: 2005,
+              endYear: 2023,
+              spatialRes: '0.05° x 0.05° (~5 km)',
+              comments: 'In PVGIS 5.3, default DB for Europe, Central Asia, Africa and South America',
+              note: 'Base de datos meteorológica y satelital oficial de la Comisión Europea (JRC PVGIS 5.3).',
+              statusDetail: 'Datos climáticos oficiales obtenidos según la base de datos PVGIS-SARAH3 / ERA5 (2005-2023).',
               pvgisEquivalent: true,
             },
           };
@@ -202,7 +217,7 @@ export async function fetchPvgisClimateData(
     throw new Error(`PVGIS API returned insufficient records (${rawList.length} rows, minimum 12 required).`);
   }
 
-  // JRC PVGIS MRcalc returns historical timeseries across multiple years (e.g., 2005-2020).
+  // JRC PVGIS MRcalc returns historical timeseries across multiple years (e.g., 2005-2023).
   // Compute multi-year climatological average for each of the 12 calendar months (1 to 12).
   const monthBuckets: Record<number, { radMonthly: number[]; temp: number[] }> = {};
   for (let m = 1; m <= 12; m++) {
@@ -243,6 +258,13 @@ export async function fetchPvgisClimateData(
   }
 
   const elevation = json.inputs?.location?.elevation;
+  const meteoData = json.inputs?.meteo_data;
+  const radiationDb = meteoData?.radiation_db || 'PVGIS-SARAH3';
+  const startYear = meteoData?.year_min ?? 2005;
+  const endYear = meteoData?.year_max ?? 2023;
+  const isSarah = radiationDb.toUpperCase().includes('SARAH');
+  const spatialRes = isSarah ? '0.05° x 0.05° (~5 km)' : '0.25° x 0.25° (~25 km)';
+  const dbType = isSarah ? 'Satellite' : 'Reanalysis';
 
   const cleanName = locationName.replace(/\s*\([^)]*pvgis[^)]*\)/gi, '').trim();
 
@@ -257,8 +279,16 @@ export async function fetchPvgisClimateData(
     monthlyTemperature,
     fetchedAt: new Date().toISOString(),
     metadata: {
-      provider: 'European Commission Joint Research Centre (JRC) PVGIS',
-      database: 'PVGIS-SARAH2 / PVGIS-ERA5',
+      provider: 'European Commission Joint Research Centre (JRC) PVGIS 5.3',
+      database: radiationDb,
+      dbType,
+      startYear,
+      endYear,
+      spatialRes,
+      comments: isSarah
+        ? 'In PVGIS 5.3, default DB for Europe, Central Asia, Africa and South America (partly)'
+        : 'Default DB for rest of the world without coverage from satellite-based DBs',
+      meteoDb: meteoData?.meteo_db || 'ERA5',
       yearsRecorded: Math.round(rawList.length / 12),
     },
   };

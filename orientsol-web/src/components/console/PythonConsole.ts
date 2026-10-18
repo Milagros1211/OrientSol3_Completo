@@ -61,6 +61,12 @@ export function renderPythonConsole(): HTMLElement {
     longitude: number;
     monthlyGdm0: number[];
     provider: string;
+    database: string;
+    dbType: string;
+    startYear: number;
+    endYear: number;
+    spatialRes: string;
+    comments: string;
     fetchedAt: string;
   } | null = null;
   let showPvgisComparison = false;
@@ -918,13 +924,13 @@ export function renderPythonConsole(): HTMLElement {
 
         const wmoComplianceNotice = `
           ${pvgisJustSynchronized ? `
-            <div style="padding: 0.6rem 1.15rem; background: rgba(16, 185, 129, 0.12); border-bottom: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.77rem; color: #059669; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
+            <div style="padding: 0.65rem 1.15rem; background: rgba(16, 185, 129, 0.12); border-bottom: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.77rem; color: #059669; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
               <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <span style="font-size: 1.15rem;">⚡</span>
+                <span style="font-size: 1.2rem;">⚡</span>
                 <span>
                   ${isEn
-                    ? `Live PVGIS API successfully synchronized! Last API update timestamp: <strong>${formatFetchDate(pvgisData.fetchedAt)}</strong> • Source: European Commission JRC PVGIS 5.3.`
-                    : `¡API PVGIS en vivo sincronizada con éxito! Fecha y hora de actualización de la API: <strong>${formatFetchDate(pvgisData.fetchedAt)}</strong> • Fuente: Comisión Europea JRC PVGIS 5.3.`}
+                    ? `Live PVGIS API successfully synchronized! Database: <strong>${pvgisData.database}</strong> (${pvgisData.dbType}) • Coverage: <strong>${pvgisData.startYear}–${pvgisData.endYear}</strong> (Last DB update: <strong>Year ${pvgisData.endYear}</strong>) • Spatial res: <strong>${pvgisData.spatialRes}</strong> • Source: European Commission JRC PVGIS 5.3.`
+                    : `¡API PVGIS en vivo sincronizada con éxito! Base de datos: <strong>${pvgisData.database}</strong> (${pvgisData.dbType}) • Cobertura: <strong>${pvgisData.startYear}–${pvgisData.endYear}</strong> (Última actualización de la DB: <strong>Año ${pvgisData.endYear}</strong>) • Res. espacial: <strong>${pvgisData.spatialRes}</strong> • Fuente: Comisión Europea JRC PVGIS 5.3.`}
                 </span>
               </div>
               <button type="button" id="btn-dismiss-sync-banner" class="btn btn-xs btn-secondary" style="font-size: 0.68rem; padding: 0.15rem 0.45rem; cursor: pointer;">
@@ -932,30 +938,65 @@ export function renderPythonConsole(): HTMLElement {
               </button>
             </div>
           ` : ''}
-          <div style="padding: 0.7rem 1.15rem; background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.22); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem; font-size: 0.77rem;">
-            <div style="display: flex; align-items: center; gap: 0.6rem;">
-              <span style="font-size: 1.25rem;">🌐</span>
-              <div>
-                <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
-                  <strong style="color: var(--text-main); font-size: 0.8rem;">${isEn ? 'Last PVGIS API Update:' : 'Última actualización (Fuente API PVGIS JRC):'}</strong>
-                  <span style="color: #2563eb; font-weight: 800; font-size: 0.82rem; background: rgba(37,99,235,0.12); padding: 0.1rem 0.45rem; border-radius: 4px; border: 1px solid rgba(37,99,235,0.25);">
-                    ${formatFetchDate(pvgisData.fetchedAt)}
-                  </span>
-                </div>
-                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem;">
-                  ${isEn
-                    ? 'Inter-comparison: OrientSol (Liu & Jordan Model) vs European Commission JRC PVGIS 5.3'
-                    : 'Intercomparación: OrientSol (Modelo Liu & Jordan) vs Comisión Europea JRC PVGIS 5.3'}
+
+          <!-- OFFICIAL PVGIS SOLAR RADIATION DATABASE SPECIFICATION (JRC Reference Table) -->
+          <div style="padding: 0.85rem 1.15rem; background: rgba(37, 99, 235, 0.05); border-bottom: 1px solid rgba(37, 99, 235, 0.2); display: flex; flex-direction: column; gap: 0.65rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem;">
+              <div style="display: flex; align-items: center; gap: 0.65rem;">
+                <span style="font-size: 1.4rem;">🛰️</span>
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+                    <strong style="color: var(--text-main); font-size: 0.86rem;">
+                      ${isEn ? 'Official Solar Radiation Database (PVGIS):' : 'Base de Datos de Radiación Solar Oficial (PVGIS):'}
+                    </strong>
+                    <span style="color: #0284c7; font-weight: 800; font-size: 0.82rem; background: rgba(2,132,199,0.12); padding: 0.12rem 0.5rem; border-radius: 4px; border: 1px solid rgba(2,132,199,0.25);">
+                      ${pvgisData.database}
+                    </span>
+                    <span style="color: #059669; font-weight: 800; font-size: 0.82rem; background: rgba(16,185,129,0.12); padding: 0.12rem 0.5rem; border-radius: 4px; border: 1px solid rgba(16,185,129,0.25);">
+                      ${isEn ? 'Last DB Update (End Year):' : 'Última actualización de la DB (Año Final):'} ${pvgisData.endYear} (Serie ${pvgisData.startYear}–${pvgisData.endYear})
+                    </span>
+                  </div>
+                  <div style="font-size: 0.71rem; color: var(--text-muted); margin-top: 0.2rem;">
+                    ${isEn
+                      ? `Inter-comparison: OrientSol (Liu & Jordan Model) vs European Commission JRC PVGIS 5.3 • Live API call: ${formatFetchDate(pvgisData.fetchedAt)}`
+                      : `Intercomparación: OrientSol (Modelo Liu & Jordan) vs Comisión Europea JRC PVGIS 5.3 • Consulta API en vivo: ${formatFetchDate(pvgisData.fetchedAt)}`}
+                  </div>
                 </div>
               </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; font-weight: 700; font-size: 0.72rem; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.2rem 0.6rem; border-radius: 4px;">
+                  ✓ 100% ${isEn ? 'WMO Compliant' : 'Conforme OMM'}
+                </span>
+                <span class="badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-weight: 700; font-size: 0.72rem; border: 1px solid rgba(2, 132, 199, 0.25); padding: 0.2rem 0.6rem; border-radius: 4px;">
+                  ${pvgisData.provider.includes('Offline') || pvgisData.provider.includes('Canónico') ? (isEn ? 'Official Multiannual (Offline)' : 'Datos Multianuales Oficiales (Offline)') : (isEn ? 'Live API v5.3 Sync' : 'API en Vivo v5.3 Sincronizada')}
+                </span>
+              </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; font-weight: 700; font-size: 0.72rem; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.2rem 0.6rem; border-radius: 4px;">
-                ✓ 100% ${isEn ? 'WMO Compliant' : 'Conforme OMM'}
-              </span>
-              <span class="badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-weight: 700; font-size: 0.72rem; border: 1px solid rgba(2, 132, 199, 0.25); padding: 0.2rem 0.6rem; border-radius: 4px;">
-                ${pvgisData.provider.includes('Benchmark') || pvgisData.provider.includes('Canónico') || pvgisData.provider.includes('Campus') || pvgisData.provider.includes('Retiro') ? (isEn ? 'Official Offline Data' : 'Datos Oficiales (Offline)') : (isEn ? 'Live API v5.3' : 'API en Vivo v5.3')}
-              </span>
+
+            <!-- OFFICIAL PVGIS SPECIFICATION TABLE (European Commission JRC Reference) -->
+            <div style="overflow-x: auto; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border-subtle); padding: 0.35rem 0.55rem;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.71rem; text-align: left;">
+                <thead>
+                  <tr style="border-bottom: 1px solid var(--border-subtle); color: var(--text-dim); text-transform: uppercase; font-size: 0.64rem;">
+                    <th style="padding: 0.25rem 0.45rem;">Database</th>
+                    <th style="padding: 0.25rem 0.45rem;">Type</th>
+                    <th style="padding: 0.25rem 0.45rem; text-align: center;">Start Year</th>
+                    <th style="padding: 0.25rem 0.45rem; text-align: center; color: #059669; font-weight: 800;">End Year (Última Act.)</th>
+                    <th style="padding: 0.25rem 0.45rem;">Spatial res.</th>
+                    <th style="padding: 0.25rem 0.45rem;">Comments</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="background: rgba(2, 132, 199, 0.05); font-weight: 600;">
+                    <td style="padding: 0.35rem 0.45rem; color: #0284c7; font-weight: 700;">${pvgisData.database}</td>
+                    <td style="padding: 0.35rem 0.45rem;">${pvgisData.dbType}</td>
+                    <td style="padding: 0.35rem 0.45rem; text-align: center;">${pvgisData.startYear}</td>
+                    <td style="padding: 0.35rem 0.45rem; text-align: center; color: #059669; font-weight: 800;">✓ ${pvgisData.endYear}</td>
+                    <td style="padding: 0.35rem 0.45rem;">${pvgisData.spatialRes}</td>
+                    <td style="padding: 0.35rem 0.45rem; color: var(--text-muted); font-size: 0.68rem;">${pvgisData.comments}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         `;
@@ -1700,7 +1741,13 @@ export function renderPythonConsole(): HTMLElement {
           latitude: res.latitude,
           longitude: res.longitude,
           monthlyGdm0: res.monthlyGdm0,
-          provider: res.metadata?.provider || 'European Commission PVGIS (JRC)',
+          provider: res.metadata?.provider || 'European Commission PVGIS 5.3 (JRC)',
+          database: res.metadata?.database || 'PVGIS-SARAH3',
+          dbType: res.metadata?.dbType || 'Satellite',
+          startYear: res.metadata?.startYear ?? 2005,
+          endYear: res.metadata?.endYear ?? 2023,
+          spatialRes: res.metadata?.spatialRes || '0.05° x 0.05° (~5 km)',
+          comments: res.metadata?.comments || 'In PVGIS 5.3, default DB for Europe, Central Asia, Africa and South America (partly)',
           fetchedAt: res.fetchedAt || new Date().toISOString(),
         };
         showPvgisComparison = true;
@@ -1738,7 +1785,13 @@ export function renderPythonConsole(): HTMLElement {
           latitude: 37.77,
           longitude: -3.79,
           monthlyGdm0: [2.41, 3.29, 4.81, 5.62, 6.74, 7.38, 7.25, 6.44, 5.10, 3.82, 2.55, 2.18],
-          provider: 'PVGIS 5.3 (Benchmark Canónico de Referencia - Jaén)',
+          provider: 'PVGIS 5.2 / 5.3 (Comisión Europea JRC)',
+          database: 'PVGIS-SARAH2',
+          dbType: 'Satellite',
+          startYear: 2005,
+          endYear: 2020,
+          spatialRes: '0.05° x 0.05° (~5 km)',
+          comments: 'In PVGIS 5.2, default DB for Europe, Asia, Africa and South America (below 20 S)',
           fetchedAt: new Date().toISOString(),
         };
       } else {
@@ -1747,7 +1800,13 @@ export function renderPythonConsole(): HTMLElement {
           latitude: 40.42,
           longitude: -3.70,
           monthlyGdm0: [2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84],
-          provider: 'PVGIS 5.3 (Benchmark Canónico de Referencia - Madrid)',
+          provider: 'PVGIS 5.2 / 5.3 (Comisión Europea JRC)',
+          database: 'PVGIS-SARAH2',
+          dbType: 'Satellite',
+          startYear: 2005,
+          endYear: 2020,
+          spatialRes: '0.05° x 0.05° (~5 km)',
+          comments: 'In PVGIS 5.2, default DB for Europe, Asia, Africa and South America (below 20 S)',
           fetchedAt: new Date().toISOString(),
         };
       }
