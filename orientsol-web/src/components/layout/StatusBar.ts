@@ -1,8 +1,6 @@
 import { pyodideService } from '@/services/pyodide';
 import { i18n } from '@/i18n';
 import { openLegalPoliciesModal } from '@/components/modals/LegalPoliciesModal';
-import { openSecurityAuditModal } from '@/components/modals/SecurityAuditModal';
-
 export function renderStatusBar(): HTMLElement {
   const footer = document.createElement('footer');
   footer.className = 'app-statusbar';
@@ -22,10 +20,6 @@ export function renderStatusBar(): HTMLElement {
     <div class="statusbar-right">
       <span class="status-item" id="footer-exec-time">${t.statusBar.crossPlatform}</span>
       <span class="status-separator">|</span>
-      <button type="button" class="status-item status-link-btn" id="footer-audit-btn" title="${isEn ? 'Security Monitoring & Audit Logs' : 'Monitorización de Seguridad y Registro de Auditoría'}">
-        🛡️ ${isEn ? 'Audit & Security' : 'Auditoría & Seguridad'}
-      </button>
-      <span class="status-separator">|</span>
       <button type="button" class="status-item status-link-btn" id="footer-legal-btn" title="${isEn ? 'Legal Notice, GDPR Privacy, Terms & Cookie Policy' : 'Aviso Legal, Privacidad RGPD, Términos y Política de Cookies'}">
         ⚖️ ${isEn ? 'Privacy & Legal (EU/GDPR)' : 'Privacidad & Legal (UE/RGPD)'}
       </button>
@@ -33,12 +27,6 @@ export function renderStatusBar(): HTMLElement {
       <span class="status-item">TypeScript + Pyodide (WASM)</span>
     </div>
   `;
-
-  const auditBtn = footer.querySelector('#footer-audit-btn');
-  auditBtn?.addEventListener('click', (e) => {
-    e.preventDefault();
-    openSecurityAuditModal();
-  });
 
   const legalBtn = footer.querySelector('#footer-legal-btn');
   legalBtn?.addEventListener('click', (e) => {
