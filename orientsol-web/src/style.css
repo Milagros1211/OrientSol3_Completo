@@ -5155,24 +5155,35 @@ body.theme-dark .select-comp-dropdown:focus {
 
 /* Angle X Selection Drawer */
 .anglex-drawer {
+  display: none;
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.35s ease, margin 0.35s ease, padding 0.35s ease;
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid transparent;
-  border-radius: var(--radius-md, 8px);
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
 }
 
 .anglex-drawer.visible {
+  display: block;
   max-height: 250px;
   padding: 1.1rem;
   margin-bottom: 1.25rem;
-  border-color: rgba(168, 85, 247, 0.35);
+  border: 1px solid rgba(168, 85, 247, 0.35);
   background: linear-gradient(135deg, rgba(30, 27, 75, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border-radius: var(--radius-md, 8px);
+}
+
+[data-theme="light"] .anglex-drawer,
+body.theme-light .anglex-drawer {
+  border: none;
+  background: transparent;
 }
 
 [data-theme="light"] .anglex-drawer.visible,
 body.theme-light .anglex-drawer.visible {
+  display: block;
   background: #f8fafc;
   border: 1px solid #cbd5e1;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);

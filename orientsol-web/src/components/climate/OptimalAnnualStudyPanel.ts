@@ -467,7 +467,8 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
         </div>
 
         <!-- 3. Angle X Selection Drawer / Toolbar (When opened or active) -->
-        <div id="anglex-picker-drawer" class="anglex-drawer ${stateShowAnglePicker ? 'visible' : ''}">
+        ${stateShowAnglePicker ? `
+        <div id="anglex-picker-drawer" class="anglex-drawer visible">
           <div class="anglex-drawer-inner">
             <div class="anglex-input-col">
               <label for="anglex-range-slider" class="anglex-label">
@@ -514,6 +515,7 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
             </div>
           </div>
         </div>
+        ` : ''}
 
         <!-- 4. Subtitle and Comparative Banner -->
         <div class="opt-study-subhead">
