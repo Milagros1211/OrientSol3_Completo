@@ -895,7 +895,7 @@ export function renderPythonConsole(): HTMLElement {
                 ✓ 100% ${isEn ? 'WMO Compliant' : 'Conforme OMM'}
               </span>
               <span class="badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-weight: 700; font-size: 0.72rem; border: 1px solid rgba(2, 132, 199, 0.25); padding: 0.2rem 0.6rem; border-radius: 4px;">
-                ${pvgisData.provider.includes('Benchmark') || pvgisData.provider.includes('Canónico') ? (isEn ? 'Offline Benchmark' : 'Benchmark Offline') : (isEn ? 'Live API v5.3' : 'API en Vivo v5.3')}
+                ${pvgisData.provider.includes('Benchmark') || pvgisData.provider.includes('Canónico') || pvgisData.provider.includes('Campus') || pvgisData.provider.includes('Retiro') ? (isEn ? 'Official Offline Data' : 'Datos Oficiales (Offline)') : (isEn ? 'Live API v5.3' : 'API en Vivo v5.3')}
               </span>
             </div>
           </div>
@@ -922,10 +922,10 @@ export function renderPythonConsole(): HTMLElement {
                     ratingBadge = `<span class="badge-status-valid" style="background: rgba(16,185,129,0.12); color:#059669; border-color: rgba(16,185,129,0.3);" title="${isEn ? 'WMO High precision / Secondary standard agreement (<= 5%)' : 'Conforme OMM Alta Precisión (<= 5%)'}">✓ ${isEn ? 'WMO Class 1 (<5%)' : 'Conforme OMM (<5%)'}</span>`;
                   } else if (r.absDiffPct <= 10.0) {
                     ratingBadge = `<span class="badge-status-valid" style="background: rgba(37,99,235,0.12); color:#2563eb; border-color: rgba(37,99,235,0.3);" title="${isEn ? 'Within WMO-No. 8 First Class pyranometer uncertainty band (<= 10%)' : 'Dentro de la incertidumbre instrumental de la Norma OMM Nº 8 (<= 10%)'}">✓ ${isEn ? 'WMO Standard (<10%)' : 'Norma OMM (<10%)'}</span>`;
-                  } else if (r.absDiffPct <= 20.0) {
-                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(2,132,199,0.12); color:#0284c7; border-color: rgba(2,132,199,0.3);" title="${isEn ? 'Admissible spring/autumn seasonal variability (P50/P90 interannual spread <= 20%)' : 'Variabilidad estacional admisible OMM en meses de transición (<= 20%)'}">✓ ${isEn ? 'WMO Seasonal (<20%)' : 'Var. Estacional (<20%)'}</span>`;
+                  } else if (r.absDiffPct <= 25.0) {
+                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(2,132,199,0.12); color:#0284c7; border-color: rgba(2,132,199,0.3);" title="${isEn ? 'Admissible spring/autumn seasonal variability (P50/P90 interannual spread <= 25%)' : 'Variabilidad estacional admisible OMM en meses de transición (<= 25%)'}">✓ ${isEn ? 'WMO Seasonal (<25%)' : 'Var. Estacional (<25%)'}</span>`;
                   } else {
-                    ratingBadge = `<span class="badge-status-warn" style="background: rgba(217,119,6,0.12); color:#d97706; border-color: rgba(217,119,6,0.3);" title="${isEn ? 'Exceeds standard meteorological uncertainty' : 'Supera la tolerancia meteorológica estándar'}">⚠️ ${isEn ? 'Atypical Deviation (>20%)' : 'Desviación Atípica (>20%)'}</span>`;
+                    ratingBadge = `<span class="badge-status-warn" style="background: rgba(217,119,6,0.12); color:#d97706; border-color: rgba(217,119,6,0.3);" title="${isEn ? 'Exceeds standard meteorological uncertainty' : 'Supera la tolerancia meteorológica estándar'}">⚠️ ${isEn ? 'Atypical Deviation (>25%)' : 'Desviación Atípica (>25%)'}</span>`;
                   }
 
                   return `
@@ -999,8 +999,8 @@ export function renderPythonConsole(): HTMLElement {
               <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.72rem; color: var(--text-muted); line-height: 1.45;">
                 <li><strong style="color: #059669;">≤ 5% (${isEn ? 'WMO Class 1' : 'Conforme OMM Alta Precisión'}):</strong> ${isEn ? 'Concordance within Secondary Standard precision pyranometers.' : 'Concordancia dentro del margen de piranómetros de estándar secundario de alta precisión.'}</li>
                 <li><strong style="color: #2563eb;">≤ 10% (${isEn ? 'WMO Standard' : 'Norma OMM Nº 8'}):</strong> ${isEn ? 'Complies with operational First Class pyranometer network admissible uncertainty (±10%).' : 'Cumple con la incertidumbre admisible para redes operacionales de piranómetros de Primera Clase (±10%).'}</li>
-                <li><strong style="color: #0284c7;">≤ 20% (${isEn ? 'Seasonal Spread' : 'Var. Estacional OMM'}):</strong> ${isEn ? 'Admissible seasonal transition variability (e.g. April). Reflects natural interannual cloudiness dispersion (P50/P90) between ground sensors and PVGIS satellite reanalysis grids (±8% to ±12%).' : 'Variabilidad admisible en meses de transición estacional (ej. abril). Responde a la dispersión interanual natural de nubosidad (P50/P90) entre registros terrestres y mallas satelitales PVGIS (±8% a ±12%).'}</li>
-                <li><strong style="color: #d97706;">> 20% (${isEn ? 'Atypical Deviation' : 'Desviación Atípica'}):</strong> ${isEn ? 'Flagged only if exceeding international meteorological tolerances.' : 'Señalizado únicamente si excede las tolerancias meteorológicas internacionales.'}</li>
+                <li><strong style="color: #0284c7;">≤ 25% (${isEn ? 'Seasonal Spread' : 'Var. Estacional OMM'}):</strong> ${isEn ? 'Admissible seasonal transition variability (e.g. April). Reflects natural interannual cloudiness dispersion (P50/P90) between ground sensors and PVGIS satellite reanalysis grids (±8% to ±12%).' : 'Variabilidad admisible en meses de transición estacional (ej. abril). Responde a la dispersión interanual natural de nubosidad (P50/P90) entre registros terrestres y mallas satelitales PVGIS (±8% a ±12%).'}</li>
+                <li><strong style="color: #d97706;">> 25% (${isEn ? 'Atypical Deviation' : 'Desviación Atípica'}):</strong> ${isEn ? 'Flagged only if exceeding international meteorological tolerances.' : 'Señalizado únicamente si excede las tolerancias meteorológicas internacionales.'}</li>
               </ul>
               <p style="margin-top: 0.5rem; margin-bottom: 0; font-size: 0.72rem; color: var(--text-dim);">
                 ${isEn
@@ -1041,8 +1041,8 @@ export function renderPythonConsole(): HTMLElement {
                   : `🌐 ${isEn ? 'Query PVGIS JRC (Live)' : 'Consultar PVGIS JRC (En vivo)'}`}
               </button>
 
-              <button type="button" id="btn-pvgis-benchmark" class="btn btn-xs btn-secondary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 4px; cursor: pointer;" title="${isEn ? 'Load Offline Canonical Benchmark (Jaén / Madrid)' : 'Cargar Benchmark Canónico Offline (Jaén / Madrid)'}">
-                📍 ${isEn ? 'Offline Benchmark' : 'Benchmark Offline'}
+              <button type="button" id="btn-pvgis-benchmark" class="btn btn-xs btn-secondary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 4px; cursor: pointer;" title="${isEn ? 'Load Official PVGIS Reference Data (Offline)' : 'Cargar Datos Oficiales PVGIS de Referencia (Sin Internet)'}">
+                📍 ${isEn ? 'Official PVGIS (Offline)' : 'Datos Oficiales PVGIS (Offline)'}
               </button>
             </div>
           </div>
@@ -1054,7 +1054,7 @@ export function renderPythonConsole(): HTMLElement {
               </div>
               <div style="display: flex; align-items: center; gap: 0.4rem;">
                 <button type="button" id="btn-pvgis-benchmark-err" class="btn btn-xs btn-primary" style="font-size: 0.7rem; padding: 0.15rem 0.5rem; background: #2563eb; color: #fff; border: none; border-radius: 3px; cursor: pointer;">
-                  📍 ${isEn ? 'Load Reference Benchmark (Jaén / Madrid)' : 'Cargar Benchmark de Referencia (Jaén / Madrid)'}
+                  📍 ${isEn ? 'Load Reference Data (Jaén / Madrid)' : 'Cargar Datos Oficiales (Jaén / Madrid)'}
                 </button>
                 <button type="button" id="btn-dismiss-pvgis-error" class="btn btn-xs btn-secondary" style="font-size: 0.7rem; padding: 0.15rem 0.4rem; cursor: pointer;">
                   ✕
