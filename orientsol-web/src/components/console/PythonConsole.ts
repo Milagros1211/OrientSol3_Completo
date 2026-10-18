@@ -893,51 +893,51 @@ export function renderPythonConsole(): HTMLElement {
 
       // Render standard Liu-Jordan table
       const standardTableHtml = `
-        <div class="verif-table-wrap">
-          <table class="verif-data-table">
+        <div class="verif-table-wrap" style="overflow-x: hidden !important; overflow-y: auto !important; max-height: 480px; width: 100% !important; border: 1px solid var(--border-subtle); border-radius: 4px;">
+          <table class="verif-data-table" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.67rem; margin: 0;">
             <thead>
               <tr>
-                <th>${isEn ? 'Month' : 'Mes'}</th>
-                <th style="text-align: right;">${isEn ? 'Gdm(0°) Horiz' : 'Gdm(0°) Horiz (kWh/m²·d)'}</th>
-                <th style="text-align: right;">${isEn ? 'Beam Bdm' : 'Directa Bdm (kWh/m²·d)'}</th>
-                <th style="text-align: right;">${isEn ? 'Diffuse Ddm' : 'Difusa Ddm (kWh/m²·d)'}</th>
-                <th style="text-align: right;">${isEn ? 'Opt Tilt Inc (°)' : 'Inclinación Óptima Inc (°)'}</th>
-                <th style="text-align: right;">${isEn ? 'Gdm Opt' : 'Gdm Óptimo (kWh/m²·d)'}</th>
-                <th style="text-align: right;">${isEn ? 'Gain vs Horiz (%)' : 'Ganancia s/ Horiz (%)'}</th>
-                <th style="text-align: center;">${isEn ? 'Physical Validation' : 'Validación Física'}</th>
+                <th style="width: 9%; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Month' : 'Mes'}</th>
+                <th style="width: 13%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Gdm(0)<br/>Horiz' : 'Gdm(0)<br/>Horiz (kWh/m²·d)'}</th>
+                <th style="width: 13%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Beam<br/>Bdm' : 'Directa<br/>Bdm (kWh/m²·d)'}</th>
+                <th style="width: 13%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Diffuse<br/>Ddm' : 'Difusa<br/>Ddm (kWh/m²·d)'}</th>
+                <th style="width: 13%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Optimal<br/>Tilt (°)' : 'Inclinación<br/>Óptima (°)'}</th>
+                <th style="width: 13%; text-align: right; color: #059669; font-weight: 700; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Gdm Opt<br/>(kWh/m²·d)' : 'Gdm Óptimo<br/>(kWh/m²·d)'}</th>
+                <th style="width: 11%; text-align: right; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Gain vs<br/>Horiz (%)' : 'Ganancia<br/>s/ Horiz (%)'}</th>
+                <th style="width: 15%; text-align: center; padding: 0.35rem 0.15rem; white-space: normal !important; word-break: break-word !important; overflow-wrap: break-word !important; line-height: 1.15; font-size: 0.64rem;">${isEn ? 'Physical<br/>Validation' : 'Validación<br/>Física'}</th>
               </tr>
             </thead>
             <tbody>
               ${radRows.map((r) => `
                 <tr style="${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
-                  <td><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★ (Selected)' : '★ (Consultado)') : ''}</strong></td>
-                  <td class="td-num">${formatNum(r.g0, 2)}</td>
-                  <td class="td-num">${formatNum(r.bdm, 2)}</td>
-                  <td class="td-num">${formatNum(r.ddm, 2)}</td>
-                  <td class="td-num">Inc: ${formatAngle(r.optTilt, 1)}</td>
-                  <td class="td-num">${formatNum(r.gOpt, 2)}</td>
-                  <td class="td-num" style="color: ${r.gain >= 0 ? '#059669' : '#dc2626'}; font-weight: 600;">${formatPercent(r.gain, 1, true)}</td>
-                  <td style="text-align: center;">
+                  <td style="padding: 0.35rem 0.15rem; font-size: 0.67rem; white-space: normal !important; word-break: break-word !important;"><strong>${r.month} ${r.isSelectedMonth ? (isEn ? '★' : '★') : ''}</strong></td>
+                  <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; white-space: normal !important; word-break: break-word !important;">${formatNum(r.g0, 2)}</td>
+                  <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; white-space: normal !important; word-break: break-word !important;">${formatNum(r.bdm, 2)}</td>
+                  <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; white-space: normal !important; word-break: break-word !important;">${formatNum(r.ddm, 2)}</td>
+                  <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; white-space: normal !important; word-break: break-word !important;">${formatAngle(r.optTilt, 1)}</td>
+                  <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; color: #059669; font-weight: 700; white-space: normal !important; word-break: break-word !important;">${formatNum(r.gOpt, 2)}</td>
+                  <td class="td-num" style="padding: 0.35rem 0.15rem; font-size: 0.67rem; color: ${r.gain >= 0 ? '#059669' : '#dc2626'}; font-weight: 600; white-space: normal !important; word-break: break-word !important;">${formatPercent(r.gain, 1, true)}</td>
+                  <td style="padding: 0.35rem 0.15rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
                     ${r.isPhysicalValid
-                      ? `<span class="badge-status-valid">✓ ${isEn ? 'Verified' : 'Verificado'}</span>`
-                      : `<span class="badge-status-warn">⚠️ ${isEn ? 'Deviation' : 'Desviación'}</span>`}
+                      ? `<span class="badge-status-valid" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; word-break: break-word !important; display: inline-block; line-height: 1.1;">✓ ${isEn ? 'Verified' : 'Verificado'}</span>`
+                      : `<span class="badge-status-warn" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; word-break: break-word !important; display: inline-block; line-height: 1.1;">⚠️ ${isEn ? 'Deviation' : 'Desviación'}</span>`}
                   </td>
                 </tr>
               `).join('')}
             </tbody>
             <tfoot>
-              <tr class="table-media-row verif-media-row">
-                <td><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
-                <td class="td-num"><strong>${formatNum(meanG0, 2)}</strong></td>
-                <td class="td-num"><strong>${formatNum(meanBdm, 2)}</strong></td>
-                <td class="td-num"><strong>${formatNum(meanDdm, 2)}</strong></td>
-                <td class="td-num"><strong>Inc: ${formatAngle(meanTilt, 1)}</strong></td>
-                <td class="td-num"><strong>${formatNum(meanGOpt, 2)}</strong></td>
-                <td class="td-num" style="color: ${meanGain >= 0 ? '#059669' : '#dc2626'};"><strong>${formatPercent(meanGain, 1, true)}</strong></td>
-                <td style="text-align: center;">
+              <tr class="table-media-row verif-media-row" style="background: rgba(16, 185, 129, 0.05); font-weight: 700;">
+                <td style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important; word-break: break-word !important;"><strong>${isEn ? 'MEAN' : 'MEDIA'}</strong></td>
+                <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important;"><strong>${formatNum(meanG0, 2)}</strong></td>
+                <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important;"><strong>${formatNum(meanBdm, 2)}</strong></td>
+                <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important;"><strong>${formatNum(meanDdm, 2)}</strong></td>
+                <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; white-space: normal !important;"><strong>${formatAngle(meanTilt, 1)}</strong></td>
+                <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; color: #059669; font-weight: 700; white-space: normal !important;"><strong>${formatNum(meanGOpt, 2)}</strong></td>
+                <td class="td-num" style="padding: 0.4rem 0.15rem; font-size: 0.66rem; color: ${meanGain >= 0 ? '#059669' : '#dc2626'}; white-space: normal !important;"><strong>${formatPercent(meanGain, 1, true)}</strong></td>
+                <td style="padding: 0.4rem 0.15rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
                   ${allRowsValid
-                    ? `<span class="badge-status-valid">✓ ${isEn ? '100% Consistent' : '100% Consistente'}</span>`
-                    : `<span class="badge-status-warn">⚠️ ${isEn ? 'Check Bounds' : 'Revisar Límites'}</span>`}
+                    ? `<span class="badge-status-valid" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; display: inline-block;">✓ ${isEn ? '100% Consistent' : '100% Consistente'}</span>`
+                    : `<span class="badge-status-warn" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; display: inline-block;">⚠️ ${isEn ? 'Check Bounds' : 'Revisar Límites'}</span>`}
                 </td>
               </tr>
             </tfoot>
@@ -1281,41 +1281,42 @@ export function renderPythonConsole(): HTMLElement {
         `;
       }
 
+      const isLiuActive = !showPvgisComparison;
+      const isPvgisLiveActive = showPvgisComparison && pvgisData && !pvgisData.isOffline;
+      const isPvgisOfflineActive = showPvgisComparison && pvgisData && pvgisData.isOffline;
+
       return `
         <div class="verif-table-card">
           <div class="verif-table-title-bar" style="flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
               <span class="verif-table-title">
                 ${showPvgisComparison && pvgisData
-                  ? `🛰️ ${isEn ? `PVGIS JRC Cross-Validation (${pvgisData.locationName}, Lat ${formatAngle(stateLat, 2)})` : `Validación Cruzada con PVGIS JRC (${pvgisData.locationName}, Latitud ${formatAngle(stateLat, 2)})`}`
+                  ? (pvgisData.isOffline
+                      ? `📍 ${isEn ? `PVGIS Official Climatology Offline (${pvgisData.locationName}, Lat ${formatAngle(stateLat, 2)})` : `Validación Cruzada con PVGIS JRC Offline (${pvgisData.locationName}, Latitud ${formatAngle(stateLat, 2)})`}`
+                      : `🛰️ ${isEn ? `PVGIS JRC Live Cross-Validation (${pvgisData.locationName}, Lat ${formatAngle(stateLat, 2)})` : `Validación Cruzada con PVGIS JRC (En vivo) (${pvgisData.locationName}, Latitud ${formatAngle(stateLat, 2)})`}`)
                   : `🌐 ${isEn ? `Monthly Radiative Decomposition & Transposition (Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})` : `Descomposición Radiativa y Transposición Liu-Jordan (Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}`}
               </span>
-              <span class="badge-status-valid">${showPvgisComparison && pvgisData ? '✓ JRC v5.3 / ERA5' : '✓ Bod0, Bdm0, Ddm0, GdBeta'}</span>
+              <span class="badge-status-valid">${showPvgisComparison && pvgisData ? (pvgisData.isOffline ? '✓ PVGIS-SARAH3 Offline' : '✓ JRC v5.3 / ERA5') : '✓ Bod0, Bdm0, Ddm0, GdBeta'}</span>
             </div>
 
-            <!-- Mode Switcher & PVGIS Action Buttons -->
-            <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
-              ${showPvgisComparison ? `
-                <button type="button" id="btn-pvgis-view-standard" class="btn btn-xs btn-secondary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 4px; cursor: pointer;" title="${isEn ? 'Return to OrientSol Liu-Jordan decomposition table' : 'Volver a la tabla de descomposición Liu-Jordan de OrientSol'}">
-                  📊 ${isEn ? 'Back to Liu-Jordan' : 'Volver a Liu-Jordan'}
-                </button>
-              ` : pvgisData ? `
-                <button type="button" id="btn-pvgis-view-diff" class="btn btn-xs btn-secondary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 4px; cursor: pointer;" title="${isEn ? 'View PVGIS Cross-Validation comparison table' : 'Ver tabla comparativa de validación cruzada con PVGIS'}">
-                  🛰️ ${isEn ? 'View PVGIS Comparison' : 'Ver Comparativa PVGIS'}
-                </button>
-              ` : ''}
+            <!-- Mode Switcher & PVGIS Action Buttons: Always 3 Persistent Buttons -->
+            <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+              <button type="button" id="btn-pvgis-view-standard" class="btn btn-xs ${isLiuActive ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; border-radius: 4px; cursor: pointer; ${isLiuActive ? 'background: #059669; color: #fff; border: 1px solid #059669; font-weight: 700;' : ''}" title="${isEn ? 'Return to OrientSol Liu-Jordan decomposition table' : 'Volver al análisis Liu-Jordan de OrientSol'}">
+                📊 ${isEn ? 'Liu-Jordan Analysis' : 'Volver a Liu-Jordan'}
+              </button>
 
-              <button type="button" id="btn-fetch-pvgis" class="btn btn-xs btn-primary" ${isFetchingPvgis ? 'disabled' : ''} style="font-size: 0.72rem; padding: 0.2rem 0.6rem; background: #0284c7; color: #fff; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 0.35rem;" title="${isEn ? 'Query European Commission PVGIS 5.3 Live API' : 'Consultar API en vivo de PVGIS 5.3 de la Comisión Europea'}">
+              <button type="button" id="btn-fetch-pvgis" class="btn btn-xs ${isPvgisLiveActive ? 'btn-primary' : 'btn-secondary'}" ${isFetchingPvgis ? 'disabled' : ''} style="font-size: 0.72rem; padding: 0.25rem 0.6rem; ${isPvgisLiveActive ? 'background: #0284c7; color: #fff; border: 1px solid #0284c7; font-weight: 700;' : ''} border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 0.35rem;" title="${isEn ? 'Query European Commission PVGIS 5.3 Live API' : 'Consultar API en vivo de PVGIS 5.3 de la Comisión Europea'}">
                 ${isFetchingPvgis
                   ? `⏳ ${isEn ? 'Querying PVGIS JRC...' : 'Consultando PVGIS JRC...'}`
                   : `🌐 ${isEn ? 'Query PVGIS JRC (Live)' : 'Consultar PVGIS JRC (En vivo)'}`}
               </button>
 
-              <button type="button" id="btn-pvgis-benchmark" class="btn btn-xs btn-secondary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 4px; cursor: pointer;" title="${isEn ? 'Load Official PVGIS Reference Data (Offline)' : 'Cargar Datos Oficiales PVGIS de Referencia (Sin Internet)'}">
+              <button type="button" id="btn-pvgis-benchmark" class="btn btn-xs ${isPvgisOfflineActive ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; ${isPvgisOfflineActive ? 'background: #059669; color: #fff; border: 1px solid #059669; font-weight: 700;' : ''} border-radius: 4px; cursor: pointer;" title="${isEn ? 'Load Official PVGIS Reference Data (Offline)' : 'Cargar Datos Oficiales PVGIS de Referencia (Sin Internet)'}">
                 📍 ${isEn ? 'Official PVGIS (Offline)' : 'Datos Oficiales PVGIS (Offline)'}
               </button>
             </div>
           </div>
+
 
           ${pvgisFetchError ? `
             <div style="padding: 0.5rem 1rem; background: rgba(239, 68, 68, 0.08); border-bottom: 1px solid rgba(239, 68, 68, 0.25); font-size: 0.75rem; color: #ef4444; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
@@ -1852,17 +1853,27 @@ export function renderPythonConsole(): HTMLElement {
 
     // PVGIS Live Cross-Validation Handlers
     container.querySelector('#btn-fetch-pvgis')?.addEventListener('click', async () => {
-      isFetchingPvgis = true;
-      pvgisFetchError = null;
-      renderView();
-
       const isMadrid = Math.abs(stateLat - 40.4168) < 0.6;
-      const isJaen = Math.abs(stateLat - 37.77) < 0.6;
+      const isJaen = Math.abs(stateLat - 37.77) < 2.0 || stateLat < 39.0;
       const activeSim = solarSyncState.getLastSimulationResult();
       const lon = (activeSim && Math.abs(activeSim.latitude - stateLat) < 0.6)
         ? activeSim.longitude
         : (isMadrid ? -3.7038 : (isJaen ? -3.7903 : -3.7038));
       const locName = isMadrid ? 'Madrid' : (isJaen ? 'Jaén' : `${isEn ? 'Latitude' : 'Latitud'} ${formatAngle(stateLat, 2)}`);
+
+      // If switching from Liu-Jordan or Offline mode and live data was already loaded in memory:
+      const cached = getPvgisFromTempMemory(stateLat, lon);
+      if ((!showPvgisComparison || (pvgisData && pvgisData.isOffline)) && cached && !cached.isOffline) {
+        pvgisData = { ...cached, isOffline: false };
+        showPvgisComparison = true;
+        pvgisFetchError = null;
+        renderView();
+        return;
+      }
+
+      isFetchingPvgis = true;
+      pvgisFetchError = null;
+      renderView();
 
       try {
         const res = await fetchPvgisClimateData(stateLat, lon, locName);
