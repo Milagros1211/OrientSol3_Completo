@@ -44,16 +44,16 @@ export function openLegalPoliciesModal(initialTab: LegalTabId = 'privacy'): void
         <!-- Navigation Tabs inside Modal -->
         <div class="legal-tabs-bar">
           <button type="button" class="legal-tab-btn ${activeTab === 'privacy' ? 'active' : ''}" data-legal-tab="privacy">
-            <span>🛡️ ${isEn ? 'Privacy Policy (GDPR)' : 'Política de Privacidad (RGPD)'}</span>
+            <span>🛡️ ${isEn ? 'Privacy (GDPR)' : 'Privacidad (RGPD)'}</span>
           </button>
           <button type="button" class="legal-tab-btn ${activeTab === 'terms' ? 'active' : ''}" data-legal-tab="terms">
-            <span>📜 ${isEn ? 'Terms & Free Open Access' : 'Términos & Gratuidad'}</span>
+            <span>📜 ${isEn ? 'Terms & Free Access' : 'Términos & Gratuidad'}</span>
           </button>
           <button type="button" class="legal-tab-btn ${activeTab === 'cookies' ? 'active' : ''}" data-legal-tab="cookies">
-            <span>🍪 ${isEn ? 'Cookie & Storage Policy' : 'Política de Cookies & Almacenamiento'}</span>
+            <span>🍪 ${isEn ? 'Cookies & Storage' : 'Cookies & Almacenamiento'}</span>
           </button>
           <button type="button" class="legal-tab-btn ${activeTab === 'security' ? 'active' : ''}" data-legal-tab="security">
-            <span>🔒 ${isEn ? 'Security & Technical Audit' : 'Informe de Seguridad'}</span>
+            <span>🔒 ${isEn ? 'Security Audit' : 'Informe de Seguridad'}</span>
           </button>
         </div>
 
@@ -62,10 +62,12 @@ export function openLegalPoliciesModal(initialTab: LegalTabId = 'privacy'): void
         </div>
 
         <div class="modal-footer legal-modal-footer">
-          <div style="font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
-            <span>🇪🇺 ${isEn ? 'EU Law Compliant' : 'Conforme a Derecho UE'}</span>
-            <span>•</span>
-            <span>🇪🇸 ${isEn ? 'Spanish Jurisdiction (Jaén)' : 'Jurisdicción Española (Jaén)'}</span>
+          <div style="font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="badge badge-primary" style="font-size: 0.68rem; padding: 0.1rem 0.45rem;">UE</span>
+            <span>${isEn ? 'EU Law Compliant' : 'Conforme a Derecho UE'}</span>
+            <span style="opacity: 0.4;">•</span>
+            <span class="badge badge-neutral" style="font-size: 0.68rem; padding: 0.1rem 0.45rem;">ES</span>
+            <span>${isEn ? 'Spanish Jurisdiction (Jaén)' : 'Jurisdicción Española (Jaén)'}</span>
           </div>
           <button type="button" class="btn btn-secondary" id="btn-accept-legal-modal" style="min-width: 110px;">
             ${isEn ? 'Understood & Close' : 'Entendido y Cerrar'}
