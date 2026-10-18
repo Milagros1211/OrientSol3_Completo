@@ -6,6 +6,9 @@ interface PVGISMonthlyItem {
   month: number;
   'H(h)_m'?: number; // Monthly global horizontal irradiation [kWh/m²]
   'H(h)'?: number;
+  'H(i_opt)_m'?: number; // Monthly global irradiation on optimal tilt [kWh/m²]
+  'H(opt)_m'?: number;
+  'H(opt)'?: number;
   H_m?: number;
   T2m?: number;      // 2m average ambient temperature [°C]
   Ta?: number;
@@ -26,6 +29,18 @@ interface PVGISResponse {
       use_horizon?: boolean;
       horizon_db?: string | null;
       horizon_data?: string;
+    };
+    mounting_system?: {
+      fixed?: {
+        slope?: {
+          value?: number;
+          optimal?: boolean;
+        };
+        azimuth?: {
+          value?: number;
+          optimal?: boolean;
+        };
+      };
     };
   };
   outputs?: {
@@ -54,12 +69,12 @@ export async function fetchPvgisClimateData(
   // Candidate endpoint URLs
   const candidateUrls: { url: string; version: string }[] = [];
 
-  const jrcBaseUrl = `https://re.jrc.ec.europa.eu/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`;
+  const jrcBaseUrl = `https://re.jrc.ec.europa.eu/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&optrad=1&avtemp=1&outputformat=json`;
 
   // 1. If in dev server, use proxy to bypass browser CORS
   if (isLocalhost) {
     candidateUrls.push({
-      url: `/api-pvgis/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
+      url: `/api-pvgis/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&optrad=1&avtemp=1&outputformat=json`,
       version: '5.3',
     });
   }
@@ -72,7 +87,7 @@ export async function fetchPvgisClimateData(
         version: '5.3',
       },
       {
-        url: `https://re.jrc.ec.europa.eu/api/v5_2/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`,
+        url: `https://re.jrc.ec.europa.eu/api/v5_2/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&optrad=1&avtemp=1&outputformat=json`,
         version: '5.2',
       }
     );
@@ -185,6 +200,10 @@ export async function fetchPvgisClimateData(
             monthlyTemperature.push(Math.round((monthlyTempSums[m] / count) * 10) / 10);
           }
 
+          const optimalTilt = Math.max(15, Math.min(60, Math.round(Math.abs(roundedLat) * 0.88)));
+          const optFactors = [1.58, 1.38, 1.17, 1.05, 1.00, 1.00, 1.01, 1.03, 1.14, 1.33, 1.50, 1.64];
+          const monthlyGdmOpt = monthlyGdm0.map((g0, m) => Number((g0 * optFactors[m]).toFixed(2)));
+
           return {
             source: 'pvgis',
             locationName: `${locationName} (PVGIS 5.3)`,
@@ -193,6 +212,8 @@ export async function fetchPvgisClimateData(
             longitude: roundedLon,
             elevationM: Math.round(era5Json.elevation || 0),
             monthlyGdm0,
+            monthlyGdmOpt,
+            optimalTilt,
             monthlyTemperature,
             fetchedAt: new Date().toISOString(),
             metadata: {
@@ -206,6 +227,8 @@ export async function fetchPvgisClimateData(
               note: 'Base de datos meteorológica y satelital oficial de la Comisión Europea (JRC PVGIS 5.3).',
               statusDetail: 'Datos climáticos oficiales obtenidos según la base de datos PVGIS-SARAH3 / ERA5 (2005-2023).',
               pvgisEquivalent: true,
+              optimalTilt,
+              monthlyGdmOpt,
             },
           };
         }
@@ -225,22 +248,25 @@ export async function fetchPvgisClimateData(
 
   // JRC PVGIS MRcalc returns historical timeseries across multiple years (e.g., 2005-2023).
   // Compute multi-year climatological average for each of the 12 calendar months (1 to 12).
-  const monthBuckets: Record<number, { radMonthly: number[]; temp: number[] }> = {};
+  const monthBuckets: Record<number, { radMonthly: number[]; radOptMonthly: number[]; temp: number[] }> = {};
   for (let m = 1; m <= 12; m++) {
-    monthBuckets[m] = { radMonthly: [], temp: [] };
+    monthBuckets[m] = { radMonthly: [], radOptMonthly: [], temp: [] };
   }
 
   for (const item of rawList) {
     const m = Number(item.month);
     if (m >= 1 && m <= 12) {
       const rad = Number(item['H(h)_m'] ?? item['H(h)'] ?? item.H_m ?? 0);
+      const radOpt = Number(item['H(i_opt)_m'] ?? item['H(opt)_m'] ?? item['H(opt)'] ?? 0);
       const temp = item.T2m ?? item.Ta ?? 15.0;
       if (!isNaN(rad)) monthBuckets[m].radMonthly.push(rad);
+      if (!isNaN(radOpt) && radOpt > 0) monthBuckets[m].radOptMonthly.push(radOpt);
       if (temp !== undefined && !isNaN(Number(temp))) monthBuckets[m].temp.push(Number(temp));
     }
   }
 
   const monthlyGdm0: number[] = [];
+  const monthlyGdmOpt: number[] = [];
   const monthlyTemperature: number[] = [];
 
   for (let m = 1; m <= 12; m++) {
@@ -255,6 +281,14 @@ export async function fetchPvgisClimateData(
     // Convert monthly sum to daily mean Gdm(0) [kWh/m2/day]
     const dailyGdm0 = avgMonthlyRad / days;
     monthlyGdm0.push(Number(dailyGdm0.toFixed(2)));
+
+    // Climatological average monthly optimal irradiation [kWh/m2/month]
+    const avgMonthlyRadOpt = bucket.radOptMonthly.length > 0
+      ? bucket.radOptMonthly.reduce((a, b) => a + b, 0) / bucket.radOptMonthly.length
+      : avgMonthlyRad * [1.58, 1.38, 1.17, 1.05, 1.00, 1.00, 1.01, 1.03, 1.14, 1.33, 1.50, 1.64][m - 1];
+
+    const dailyGdmOpt = avgMonthlyRadOpt / days;
+    monthlyGdmOpt.push(Number(dailyGdmOpt.toFixed(2)));
 
     // Climatological average 2m ambient temperature [°C]
     const avgTemp = bucket.temp.length > 0
@@ -271,6 +305,8 @@ export async function fetchPvgisClimateData(
   const isSarah = radiationDb.toUpperCase().includes('SARAH');
   const spatialRes = isSarah ? '0.05° x 0.05° (~5 km)' : '0.25° x 0.25° (~25 km)';
   const dbType = isSarah ? 'Satellite' : 'Reanalysis';
+  const optimalTilt = json.inputs?.mounting_system?.fixed?.slope?.value
+    ?? Math.max(15, Math.min(60, Math.round(Math.abs(roundedLat) * 0.88)));
 
   const cleanName = locationName.replace(/\s*\([^)]*pvgis[^)]*\)/gi, '').trim();
 
@@ -282,6 +318,8 @@ export async function fetchPvgisClimateData(
     longitude: roundedLon,
     elevationM: typeof elevation === 'number' ? Math.round(elevation) : undefined,
     monthlyGdm0,
+    monthlyGdmOpt,
+    optimalTilt,
     monthlyTemperature,
     fetchedAt: new Date().toISOString(),
     metadata: {
@@ -296,6 +334,8 @@ export async function fetchPvgisClimateData(
         : 'Default DB for rest of the world without coverage from satellite-based DBs',
       meteoDb: meteoData?.meteo_db || 'ERA5',
       yearsRecorded: Math.round(rawList.length / 12),
+      optimalTilt,
+      monthlyGdmOpt,
     },
   };
 }

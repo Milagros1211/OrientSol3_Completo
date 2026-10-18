@@ -28,6 +28,10 @@ export interface ClimateDataRecord {
   monthlyBdm0?: number[];
   /** Optional 12 monthly diffuse horizontal [kWh/m²/day] */
   monthlyDdm0?: number[];
+  /** Optional 12 monthly global radiation on optimal inclination plane [kWh/m²/day] */
+  monthlyGdmOpt?: number[];
+  /** Optional optimal inclination angle [°] from PVGIS */
+  optimalTilt?: number;
   /** Retrieval timestamp (ISO string) */
   fetchedAt: string;
   /** Additional provider-specific metadata */

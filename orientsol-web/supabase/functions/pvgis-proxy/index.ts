@@ -48,10 +48,7 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const roundedLat = Math.round(lat * 10000) / 10000;
-    const roundedLon = Math.round(lon * 10000) / 10000;
-
-    const jrcUrl = `https://re.jrc.ec.europa.eu/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&avtemp=1&outputformat=json`;
+    const jrcUrl = `https://re.jrc.ec.europa.eu/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&optrad=1&avtemp=1&outputformat=json`;
 
     // Fetch JRC with 8-second timeout and 1 retry on 429/529
     let jrcResp: Response | null = null;
