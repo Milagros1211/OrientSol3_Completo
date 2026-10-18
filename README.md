@@ -293,8 +293,7 @@ npm run --prefix orientsol-web cap:open:android
 OrientSol 4.0 cumple rigurosamente con la normativa europea y española de protección de datos, comercio electrónico y derechos de los consumidores:
 * **Reglamento General de Protección de Datos (RGPD 2016/679):** Arquitectura Zero-Tracking con cálculo 100% en cliente (Pyodide WebAssembly) y preservación de derechos ARCO-POL.
 * **Ley Orgánica 3/2018 (LOPDGDD):** Garantía de los derechos digitales y seguridad en reposo/tránsito.
-* **Directiva ePrivacy 2002/58/CE & Art. 22.2 LSSI-CE:** Almacenamiento local estrictamente técnico para preferencias visuales y caché offline, sin cookies de terceros ni rastreadores publicitarios.
-* **Ley General de Defensa de los Consumidores (TRLGDCU) & Directiva 2011/83/UE:** Declaración de gratuidad académica y política de desistimiento/reembolso de 14 días.
+* **Términos de Servicio y Declaración de Gratuidad Total:** Software libre sin cobros, compras integradas ni suscripciones comerciales.
 * **Informe de Auditoría y Seguridad:** Aislamiento en sandbox WASM, prevención estricta de XSS y de inyección en fórmulas CSV/Excel (CWE-1236), y RLS en base de datos PostgreSQL.
 
 Para consultar el marco legal íntegro, revisa el documento [LEGAL_POLICIES.md](file:///c:/Users/karin/Downloads/PFCOrientSol3/Programas%20fuente/OrientSol3_Completo/LEGAL_POLICIES.md).

@@ -37,8 +37,9 @@ Cualquier usuario puede ejercer sus derechos de Acceso, Rectificación, Supresi�
 
 ## 3. Términos de Servicio y Condiciones de Uso / Terms of Service
 
-### 3.1 Naturaleza del Software y Licencia
+### 3.1 Naturaleza del Software, Licencia y Gratuidad Total
 * OrientSol 4.0 se distribuye como software científico, docente y de investigación de **Acceso Abierto (Open Access)** bajo licencia permisiva MIT.
+* **Declaración de Gratuidad Total:** El software es 100% gratuito. **NO existen suscripciones de pago, ni tarifas comerciales, ni compras dentro de la aplicación, ni transacciones bancarias**.
 * Se autoriza el uso libre para la docencia universitaria, la investigación académica, la consultoría técnica y el pre-dimensionamiento de sistemas solares fotovoltaicos.
 * Toda publicación que incorpore resultados de OrientSol 4.0 deberá citar la autoría académica correspondiente y la Universidad de Jaén.
 
@@ -73,20 +74,7 @@ El usuario puede vaciar la caché en cualquier momento desde el botón interacti
 
 ---
 
-## 5. Política de Reembolso y Desistimiento / Refund & Withdrawal Policy
-
-### 5.1 Gratuidad Total
-OrientSol 4.0 es una plataforma científica y docente de **libre acceso y gratuita**. No se efectúan cobros, suscripciones de pago ni transacciones comerciales.
-
-### 5.2 Cumplimiento con la Directiva 2011/83/UE y el Real Decreto Legislativo 1/2007 (TRLGDCU)
-En cumplimiento de la legislación europea y española de defensa de los consumidores:
-1. **Derecho Legal de Desistimiento de 14 Días:** Si en el futuro se prestase cualquier servicio comercial o de pago, el consumidor europeo gozará del derecho irrenunciable a desistir del contrato en el plazo de **14 días naturales** sin alegar motivo ni sufrir penalización alguna (Art. 102 TRLGDCU).
-2. **Excepción para Suministro de Contenido Digital (Art. 103.m TRLGDCU):** Dicho derecho no aplicará a la ejecución de contenido digital inmediato no prestado en soporte material cuando se cuente con el consentimiento expreso previo del usuario y su renuncia informada.
-3. **Plazo de Devolución:** Ante cualquier pago accidental o duplicado, el reintegro total se liquidará en un plazo máximo de **14 días naturales** a través del mismo canal de pago.
-
----
-
-## 6. Informe de Seguridad y Auditoría Técnica / Security Audit Report
+## 5. Informe de Seguridad y Auditoría Técnica / Security Audit Report
 
 OrientSol 4.0 incorpora defensas técnicas preventivas en línea con las recomendaciones **OWASP Top 10** y buenas prácticas de seguridad de software:
 
