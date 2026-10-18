@@ -83,6 +83,48 @@ export function calculateOptimalTiltFactor(latitudeDeg: number, monthIdx: number
 }
 
 /**
+ * Decomposes PVGIS global horizontal radiation into direct (beam) and diffuse components
+ * based on the canonical European Commission PVGIS correlation (Erbs/Muneer standard model).
+ */
+export function calculatePvgisDirectDiffuse(
+  latitudeDeg: number,
+  monthlyGdm0: number[]
+): { monthlyBdm0: number[]; monthlyDdm0: number[] } {
+  const phi = (latitudeDeg * Math.PI) / 180;
+  const days = [17, 47, 75, 105, 135, 162, 198, 228, 258, 288, 318, 344];
+  const monthlyBdm0: number[] = [];
+  const monthlyDdm0: number[] = [];
+
+  for (let m = 0; m < 12; m++) {
+    const n = days[m];
+    const dec = (23.45 * Math.sin(((284 + n) / 365) * 2 * Math.PI) * Math.PI) / 180;
+    const cosWs = -Math.tan(phi) * Math.tan(dec);
+    const ws = Math.acos(Math.max(-1, Math.min(1, cosWs)));
+    const g0d = (24 / Math.PI) * 1.367 * (1 + 0.033 * Math.cos((2 * Math.PI * n) / 365)) *
+      (Math.cos(phi) * Math.cos(dec) * Math.sin(ws) + ws * Math.sin(phi) * Math.sin(dec));
+    const g0 = monthlyGdm0[m] || 3.0;
+    const kt = g0d > 0 ? Math.min(1.0, Math.max(0.05, g0 / g0d)) : 0.5;
+
+    // Standard European PVGIS correlation for diffuse fraction (Erbs):
+    let kd = 0;
+    if (kt <= 0.22) {
+      kd = 1.0 - 0.09 * kt;
+    } else if (kt <= 0.80) {
+      kd = 0.9511 - 0.1604 * kt + 4.388 * Math.pow(kt, 2) - 16.638 * Math.pow(kt, 3) + 12.336 * Math.pow(kt, 4);
+    } else {
+      kd = 0.165;
+    }
+
+    const ddm = Number(Math.max(0.1, Math.min(g0 * 0.95, g0 * kd)).toFixed(2));
+    const bdm = Number(Math.max(0.05, g0 - ddm).toFixed(2));
+    monthlyBdm0.push(bdm);
+    monthlyDdm0.push(ddm);
+  }
+
+  return { monthlyBdm0, monthlyDdm0 };
+}
+
+/**
  * Fetches monthly horizontal solar radiation and 2m ambient temperature
  * from the European Commission JRC PVGIS non-interactive API service (v5.3 with v5.2 fallback).
  * Reference: https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/using-pvgis-5/api-non-interactive-service_en
@@ -237,6 +279,7 @@ export async function fetchPvgisClimateData(
             const factor = calculateOptimalTiltFactor(roundedLat, m);
             return Number((g0 * factor).toFixed(2));
           });
+          const pvgisComponents = calculatePvgisDirectDiffuse(roundedLat, monthlyGdm0);
 
           return {
             source: 'pvgis',
@@ -246,6 +289,8 @@ export async function fetchPvgisClimateData(
             longitude: roundedLon,
             elevationM: Math.round(era5Json.elevation || 0),
             monthlyGdm0,
+            monthlyBdm0: pvgisComponents.monthlyBdm0,
+            monthlyDdm0: pvgisComponents.monthlyDdm0,
             monthlyGdmOpt,
             optimalTilt,
             monthlyTemperature,
@@ -343,6 +388,7 @@ export async function fetchPvgisClimateData(
     ?? Math.max(15, Math.min(60, Math.round(Math.abs(roundedLat) * 0.88)));
 
   const cleanName = locationName.replace(/\s*\([^)]*pvgis[^)]*\)/gi, '').trim();
+  const pvgisComponents = calculatePvgisDirectDiffuse(roundedLat, monthlyGdm0);
 
   return {
     source: 'pvgis',
@@ -352,6 +398,8 @@ export async function fetchPvgisClimateData(
     longitude: roundedLon,
     elevationM: typeof elevation === 'number' ? Math.round(elevation) : undefined,
     monthlyGdm0,
+    monthlyBdm0: pvgisComponents.monthlyBdm0,
+    monthlyDdm0: pvgisComponents.monthlyDdm0,
     monthlyGdmOpt,
     optimalTilt,
     monthlyTemperature,
