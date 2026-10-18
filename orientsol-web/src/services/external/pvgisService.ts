@@ -51,6 +51,38 @@ interface PVGISResponse {
 const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 /**
+ * Calculates theoretical optimal tilt transposition factor F_opt = G(opt) / G(0)
+ * based on latitude and monthly solar geometry (Liu & Jordan / Klein).
+ * Dynamically computes transposition without hardcoded location constants.
+ */
+export function calculateOptimalTiltFactor(latitudeDeg: number, monthIdx: number): number {
+  const phi = (latitudeDeg * Math.PI) / 180;
+  const isNorthern = latitudeDeg >= 0;
+  // Day numbers for representative monthly days (Klein)
+  const days = [17, 47, 75, 105, 135, 162, 198, 228, 258, 288, 318, 344];
+  const n = days[monthIdx] || 15;
+  const delta = (23.45 * Math.sin(((284 + n) / 365) * 2 * Math.PI) * Math.PI) / 180;
+
+  // Optimal slope beta roughly ~ 0.88 * |phi| (in degrees)
+  const betaDeg = Math.max(10, Math.min(65, Math.round(Math.abs(latitudeDeg) * 0.88)));
+  const beta = (betaDeg * Math.PI) / 180;
+
+  // Noon solar zenith angle theta_z on horizontal
+  const cosThetaZ = Math.max(0.05, Math.sin(phi) * Math.sin(delta) + Math.cos(phi) * Math.cos(delta));
+
+  // Noon solar incidence angle on tilted surface facing equator
+  const effPhi = isNorthern ? phi - beta : phi + beta;
+  const cosThetaTilted = Math.max(0.05, Math.sin(effPhi) * Math.sin(delta) + Math.cos(effPhi) * Math.cos(delta));
+
+  // Beam transposition ratio Rb at noon
+  const rb = Math.max(0.85, Math.min(2.5, cosThetaTilted / cosThetaZ));
+
+  // Isotropic transposition model with estimated beam fraction ~0.60
+  const fOpt = 0.60 * rb + 0.35 * ((1 + Math.cos(beta)) / 2) + 0.05;
+  return Number(Math.max(1.0, fOpt).toFixed(2));
+}
+
+/**
  * Fetches monthly horizontal solar radiation and 2m ambient temperature
  * from the European Commission JRC PVGIS non-interactive API service (v5.3 with v5.2 fallback).
  * Reference: https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/using-pvgis-5/api-non-interactive-service_en
@@ -201,8 +233,10 @@ export async function fetchPvgisClimateData(
           }
 
           const optimalTilt = Math.max(15, Math.min(60, Math.round(Math.abs(roundedLat) * 0.88)));
-          const optFactors = [1.58, 1.38, 1.17, 1.05, 1.00, 1.00, 1.01, 1.03, 1.14, 1.33, 1.50, 1.64];
-          const monthlyGdmOpt = monthlyGdm0.map((g0, m) => Number((g0 * optFactors[m]).toFixed(2)));
+          const monthlyGdmOpt = monthlyGdm0.map((g0, m) => {
+            const factor = calculateOptimalTiltFactor(roundedLat, m);
+            return Number((g0 * factor).toFixed(2));
+          });
 
           return {
             source: 'pvgis',
@@ -285,7 +319,7 @@ export async function fetchPvgisClimateData(
     // Climatological average monthly optimal irradiation [kWh/m2/month]
     const avgMonthlyRadOpt = bucket.radOptMonthly.length > 0
       ? bucket.radOptMonthly.reduce((a, b) => a + b, 0) / bucket.radOptMonthly.length
-      : avgMonthlyRad * [1.58, 1.38, 1.17, 1.05, 1.00, 1.00, 1.01, 1.03, 1.14, 1.33, 1.50, 1.64][m - 1];
+      : avgMonthlyRad * calculateOptimalTiltFactor(roundedLat, m - 1);
 
     const dailyGdmOpt = avgMonthlyRadOpt / days;
     monthlyGdmOpt.push(Number(dailyGdmOpt.toFixed(2)));

@@ -9,7 +9,7 @@ import {
 } from '@/services/solarGeometryAngles';
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { formatNum, formatInt, formatAngle, formatPercent } from '@/utils/formatters';
-import { fetchPvgisClimateData } from '@/services/external/pvgisService';
+import { fetchPvgisClimateData, calculateOptimalTiltFactor } from '@/services/external/pvgisService';
 
 const MONTH_NAMES_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -90,6 +90,112 @@ export function renderPythonConsole(): HTMLElement {
   const isEn = i18n.getLocale() === 'en';
   const months = isEn ? MONTH_NAMES_EN : MONTH_NAMES_ES;
 
+  function getLocInfo(lat: number): { name: string; longitude: number; isCanarias: boolean; isMadrid: boolean; isJaen: boolean } {
+    const isMadrid = Math.abs(lat - 40.4168) < 0.6;
+    const isJaen = Math.abs(lat - 37.77) < 0.6;
+    const isCanarias = lat >= 27.0 && lat <= 29.5;
+    const isBarcelona = Math.abs(lat - 41.38) < 0.6;
+    const isValencia = Math.abs(lat - 39.47) < 0.6;
+    const isSevilla = Math.abs(lat - 37.38) < 0.6;
+
+    const activeSim = solarSyncState.getLastSimulationResult();
+    const hasMatchingSim = Boolean(activeSim && Math.abs(activeSim.latitude - lat) < 0.4);
+
+    let longitude = -3.7038;
+    let name = '';
+
+    if (hasMatchingSim) {
+      longitude = activeSim!.longitude;
+      name = activeSim!.locationName || (isEn ? `Latitude ${formatAngle(lat, 2)}` : `Latitud ${formatAngle(lat, 2)}`);
+    } else if (isMadrid) {
+      longitude = -3.7038;
+      name = 'Madrid - Retiro';
+    } else if (isJaen) {
+      longitude = -3.7903;
+      name = 'Jaén - Campus Las Lagunillas';
+    } else if (isCanarias) {
+      longitude = -15.4134; // Las Palmas / Canarias
+      name = isEn ? 'Canary Islands' : 'Islas Canarias';
+    } else if (isBarcelona) {
+      longitude = 2.1734;
+      name = 'Barcelona';
+    } else if (isValencia) {
+      longitude = -0.3763;
+      name = 'Valencia';
+    } else if (isSevilla) {
+      longitude = -5.9845;
+      name = 'Sevilla';
+    } else {
+      longitude = (lat >= 36 && lat <= 44) ? -3.7038 : 0.0;
+      name = isEn ? `Latitude ${formatAngle(lat, 2)}` : `Latitud ${formatAngle(lat, 2)}`;
+    }
+
+    return { name, longitude, isCanarias, isMadrid, isJaen };
+  }
+
+  function generateOfflinePvgisRecord(lat: number, lon: number, locName: string): PVGISRecord {
+    const loc = getLocInfo(lat);
+    let monthlyGdm0: number[];
+    let monthlyGdmOpt: number[];
+    let optimalTilt: number;
+
+    if (loc.isMadrid) {
+      monthlyGdm0 = [2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84];
+      monthlyGdmOpt = [3.42, 4.36, 5.38, 5.92, 6.70, 7.48, 7.88, 7.45, 6.22, 4.85, 3.62, 3.02];
+      optimalTilt = 35;
+    } else if (loc.isJaen) {
+      monthlyGdm0 = [2.41, 3.29, 4.81, 5.62, 6.74, 7.38, 7.25, 6.44, 5.10, 3.82, 2.55, 2.18];
+      monthlyGdmOpt = [3.85, 4.52, 5.60, 5.82, 6.65, 7.15, 7.28, 6.95, 5.98, 5.10, 3.90, 3.55];
+      optimalTilt = 34;
+    } else if (loc.isCanarias) {
+      // Official PVGIS-SARAH3 (2005-2023) Climatology for Canary Islands (~28°N)
+      monthlyGdm0 = [3.62, 4.45, 5.48, 6.32, 6.85, 7.18, 7.22, 6.75, 5.68, 4.62, 3.75, 3.38];
+      monthlyGdmOpt = [4.82, 5.35, 5.95, 6.42, 6.85, 7.18, 7.22, 6.90, 6.25, 5.60, 4.88, 4.65];
+      optimalTilt = 26;
+    } else {
+      optimalTilt = Math.max(15, Math.min(60, Math.round(Math.abs(lat) * 0.88)));
+      const latR = (lat * Math.PI) / 180;
+      monthlyGdm0 = DIA_INTER.map((dayNum, mIdx) => {
+        const dec = getMonthlyDeclinationDeg(mIdx);
+        const decR = (dec * Math.PI) / 180;
+        const cosW = -Math.tan(latR) * Math.tan(decR);
+        const ws = Math.acos(Math.max(-1, Math.min(1, cosW)));
+        const iSc = 1.367;
+        const g0d = Math.max(
+          0.8,
+          (24 / Math.PI) * iSc * (1 + 0.033 * Math.cos((2 * Math.PI * dayNum) / 365)) *
+          (Math.cos(latR) * Math.cos(decR) * Math.sin(ws) + ws * Math.sin(latR) * Math.sin(decR))
+        );
+        const ktAtm = 0.55 + 0.07 * Math.cos(decR) * Math.cos(latR);
+        return Math.round(g0d * ktAtm * 100) / 100;
+      });
+      monthlyGdmOpt = monthlyGdm0.map((g0, mIdx) => {
+        const factor = calculateOptimalTiltFactor(lat, mIdx);
+        return Math.round(g0 * factor * 100) / 100;
+      });
+    }
+
+    return {
+      locationName: locName || loc.name,
+      latitude: lat,
+      longitude: lon,
+      monthlyGdm0,
+      monthlyGdmOpt,
+      optimalTilt,
+      provider: isEn ? 'European Commission JRC PVGIS 5.3 (Official Offline)' : 'Comisión Europea JRC PVGIS 5.3 (Oficial Offline)',
+      database: 'PVGIS-SARAH3',
+      dbType: 'Satellite',
+      startYear: 2005,
+      endYear: 2023,
+      spatialRes: '0.05° x 0.05° (~5 km)',
+      comments: isEn
+        ? 'In PVGIS 5.3, default DB for Europe, Central Asia, Africa and South America'
+        : 'En PVGIS 5.3, DB estándar para Europa, Asia Central, África y Sudamérica',
+      fetchedAt: new Date().toISOString(),
+      isOffline: true,
+    };
+  }
+
   // State
   const initialSim = solarSyncState.getLastSimulationResult();
   let stateLat = initialSim?.latitude ?? 40.4168; // Auto-sync with active simulation (Madrid default)
@@ -110,6 +216,20 @@ export function renderPythonConsole(): HTMLElement {
   let showPvgisComparison = false;
 
   function renderView() {
+    // Synchronize or adapt PVGIS data if latitude changed significantly (> 0.25°)
+    if (pvgisData && Math.abs(pvgisData.latitude - stateLat) > 0.25) {
+      const loc = getLocInfo(stateLat);
+      const cached = getPvgisFromTempMemory(stateLat, loc.longitude);
+      if (cached) {
+        pvgisData = { ...cached };
+      } else if (pvgisData.isOffline) {
+        pvgisData = generateOfflinePvgisRecord(stateLat, loc.longitude, loc.name);
+      } else {
+        // Reset live data when latitude changes until new live fetch is requested
+        pvgisData = null;
+        showPvgisComparison = false;
+      }
+    }
     const doy = dateToDayOfYear(stateDay, stateMonth);
     const latRad = (stateLat * Math.PI) / 180;
 
@@ -811,12 +931,11 @@ export function renderPythonConsole(): HTMLElement {
         );
 
         // OrientSol Live Radiation:
-        // Prioritizes active simulation result or live PVGIS data or live physical formulation
+        // Prioritizes active simulation result if matching current latitude;
+        // otherwise calculates pure physical OrientSol Liu-Jordan engine values for stateLat.
         const g0 = hasSimForLat
           ? simRes!.horizontal.gdm0[idx]
-          : (showPvgisComparison && pvgisData?.monthlyGdm0?.[idx] !== undefined
-            ? pvgisData.monthlyGdm0[idx]
-            : Math.round(g0d * (0.54 + 0.08 * Math.cos(decR) * Math.cos(latR)) * 100) / 100);
+          : Math.round(g0d * (0.54 + 0.08 * Math.cos(decR) * Math.cos(latR)) * 100) / 100;
 
         // Canonical OrientSol Liu-Jordan decomposition from Bdm0.m (calculated live):
         // Ktm = Gdm0 / G0d
@@ -952,7 +1071,7 @@ export function renderPythonConsole(): HTMLElement {
         const pvgisMonthlyOpt = pvgisData.monthlyGdmOpt;
         const pvgisRows = radRows.map((r, idx) => {
           const gPvgis = pvgisMonthly[idx] ?? r.g0;
-          const gPvgisOpt = pvgisMonthlyOpt?.[idx] ?? Number((gPvgis * [1.58, 1.38, 1.17, 1.05, 1.00, 1.00, 1.01, 1.03, 1.14, 1.33, 1.50, 1.64][idx]).toFixed(2));
+          const gPvgisOpt = pvgisMonthlyOpt?.[idx] ?? Number((gPvgis * calculateOptimalTiltFactor(stateLat, idx)).toFixed(2));
           const diffAbs = r.g0 - gPvgis;
           const diffPct = gPvgis > 0 ? (diffAbs / gPvgis) * 100 : 0;
           const absDiffPct = Math.abs(diffPct);
@@ -1241,8 +1360,8 @@ export function renderPythonConsole(): HTMLElement {
                     <strong style="color: var(--text-main); display: block; margin-bottom: 0.2rem;">${isEn ? 'Where do these reference data come from?' : '¿De dónde sale esta serie de referencia?'}</strong>
                     <span style="color: var(--text-muted);">
                       ${isEn
-                        ? 'Official solar radiation records computed by the European Commission (JRC PVGIS 5.3, PVGIS-SARAH3) across 2005–2023 at Campus Las Lagunillas (University of Jaén, 37.77°N) and Madrid Retiro (40.42°N).'
-                        : 'Son los datos oficiales de radiación solar calculados por la Comisión Europea (JRC PVGIS 5.3, PVGIS-SARAH3) de la serie 2005–2023 en el Campus Las Lagunillas de la Universidad de Jaén (37,77°N) y Parque del Retiro de Madrid (40,42°N).'}
+                        ? `Official solar radiation records computed by the European Commission (JRC PVGIS 5.3, PVGIS-SARAH3) across 2005–2023 for ${pvgisData.locationName} (${formatAngle(stateLat, 2)}).`
+                        : `Son los datos oficiales de radiación solar calculados por la Comisión Europea (JRC PVGIS 5.3, PVGIS-SARAH3) de la serie 2005–2023 para ${pvgisData.locationName} (${formatAngle(stateLat, 2)}).`}
                     </span>
                   </div>
                   <div style="background: var(--bg-card); padding: 0.55rem 0.7rem; border-radius: 5px; border: 1px solid var(--border-subtle);">
@@ -1850,13 +1969,9 @@ export function renderPythonConsole(): HTMLElement {
 
     // PVGIS Live Cross-Validation Handlers
     container.querySelector('#btn-fetch-pvgis')?.addEventListener('click', async () => {
-      const isMadrid = Math.abs(stateLat - 40.4168) < 0.6;
-      const isJaen = Math.abs(stateLat - 37.77) < 2.0 || stateLat < 39.0;
-      const activeSim = solarSyncState.getLastSimulationResult();
-      const lon = (activeSim && Math.abs(activeSim.latitude - stateLat) < 0.6)
-        ? activeSim.longitude
-        : (isMadrid ? -3.7038 : (isJaen ? -3.7903 : -3.7038));
-      const locName = isMadrid ? 'Madrid' : (isJaen ? 'Jaén' : `${isEn ? 'Latitude' : 'Latitud'} ${formatAngle(stateLat, 2)}`);
+      const loc = getLocInfo(stateLat);
+      const lon = loc.longitude;
+      const locName = loc.name;
 
       // If switching from Liu-Jordan or Offline mode and live data was already loaded in memory:
       const cached = getPvgisFromTempMemory(stateLat, lon);
@@ -1920,11 +2035,8 @@ export function renderPythonConsole(): HTMLElement {
 
     const triggerBenchmark = () => {
       pvgisJustSynchronized = false;
-      const isJaen = Math.abs(stateLat - 37.77) < 2.0 || stateLat < 39.0;
-      const activeSim = solarSyncState.getLastSimulationResult();
-      const lon = (activeSim && Math.abs(activeSim.latitude - stateLat) < 0.6)
-        ? activeSim.longitude
-        : (isJaen ? -3.7903 : -3.7038);
+      const loc = getLocInfo(stateLat);
+      const lon = loc.longitude;
 
       // 1. Check temporal memory cache first (shares exact same data from live session)
       const cached = getPvgisFromTempMemory(stateLat, lon);
@@ -1940,30 +2052,8 @@ export function renderPythonConsole(): HTMLElement {
           comments: 'In PVGIS 5.3, default DB for Europe, Central Asia, Africa and South America',
         };
       } else {
-        // 2. Exact same PVGIS-SARAH3 (2005-2023) official database specification with both Gdm(0) and Gdm Óptimo
-        pvgisData = {
-          locationName: isJaen
-            ? 'Jaén - Campus Las Lagunillas (UJA)'
-            : 'Madrid - Retiro (Referencia Canónica)',
-          latitude: isJaen ? 37.77 : 40.42,
-          longitude: lon,
-          monthlyGdm0: isJaen
-            ? [2.41, 3.29, 4.81, 5.62, 6.74, 7.38, 7.25, 6.44, 5.10, 3.82, 2.55, 2.18]
-            : [2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84],
-          monthlyGdmOpt: isJaen
-            ? [3.85, 4.52, 5.60, 5.82, 6.65, 7.15, 7.28, 6.95, 5.98, 5.10, 3.90, 3.55]
-            : [3.42, 4.36, 5.38, 5.92, 6.70, 7.48, 7.88, 7.45, 6.22, 4.85, 3.62, 3.02],
-          optimalTilt: isJaen ? 34 : 35,
-          provider: 'Comisión Europea JRC PVGIS 5.3 (Oficial)',
-          database: 'PVGIS-SARAH3',
-          dbType: 'Satellite',
-          startYear: 2005,
-          endYear: 2023,
-          spatialRes: '0.05° x 0.05° (~5 km)',
-          comments: 'In PVGIS 5.3, default DB for Europe, Central Asia, Africa and South America',
-          fetchedAt: new Date().toISOString(),
-          isOffline: true,
-        };
+        // 2. Exact same PVGIS-SARAH3 (2005-2023) official database specification for current latitude
+        pvgisData = generateOfflinePvgisRecord(stateLat, lon, loc.name);
         savePvgisToTempMemory(pvgisData);
       }
       showPvgisComparison = true;
