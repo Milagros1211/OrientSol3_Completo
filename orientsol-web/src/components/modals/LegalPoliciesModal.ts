@@ -66,7 +66,7 @@ export function openLegalPoliciesModal(initialTab: LegalTabId = 'privacy'): void
             <span>${isEn ? 'EU Law Compliant' : 'Conforme a Derecho UE'}</span>
             <span style="opacity: 0.4;">•</span>
             <span class="badge badge-neutral" style="font-size: 0.68rem; padding: 0.1rem 0.45rem;">ES</span>
-            <span>${isEn ? 'Spanish Jurisdiction (Jaén)' : 'Jurisdicción Española (Jaén)'}</span>
+            <span>${isEn ? 'Spanish Jurisdiction' : 'Jurisdicción Española'}</span>
           </div>
           <button type="button" class="btn btn-secondary" id="btn-accept-legal-modal" style="min-width: 110px;">
             ${isEn ? 'Understood & Close' : 'Entendido y Cerrar'}
