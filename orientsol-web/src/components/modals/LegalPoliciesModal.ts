@@ -163,7 +163,6 @@ function renderPrivacyContent(isEn: boolean): string {
           <li><strong>Author / Researcher:</strong> Karina Milagros Baldeón Zárate</li>
           <li><strong>Academic Direction:</strong> Dr. Leocadio Hontoria García & Dra. Catalina Rus Casas</li>
           <li><strong>Department:</strong> Electronic and Automatic Engineering, Universidad de Jaén</li>
-          <li><strong>Institutional Contact:</strong> <a href="mailto:ujaen@ujaen.es" style="color: var(--accent-cyan);">ujaen.es</a></li>
         </ul>
       </div>
 
@@ -221,7 +220,6 @@ function renderPrivacyContent(isEn: boolean): string {
         <li><strong>Alumna / Investigadora:</strong> Karina Milagros Baldeón Zárate</li>
         <li><strong>Dirección Académica:</strong> Dr. Leocadio Hontoria García & Dra. Catalina Rus Casas</li>
         <li><strong>Departamento:</strong> Departamento de Ingeniería Electrónica y Automática, Universidad de Jaén</li>
-        <li><strong>Contacto Institucional:</strong> <a href="mailto:ujaen@ujaen.es" style="color: var(--accent-cyan);">ujaen.es</a></li>
       </ul>
     </div>
 
