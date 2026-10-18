@@ -146,3 +146,51 @@ export async function testSupabaseConnection(): Promise<{ ok: boolean; message: 
     };
   }
 }
+
+const STORAGE_KEY_BACKEND_URL = 'orientsol_backend_api_url';
+
+/**
+ * Returns optional custom backend API proxy URL (e.g. https://api.orientsol.com)
+ * When set, the mobile app calls this backend instead of holding database credentials directly.
+ */
+export function getBackendApiUrl(): string {
+  let envBackend = '';
+  try {
+    if (typeof import.meta.env.VITE_BACKEND_API_URL === 'string') {
+      envBackend = import.meta.env.VITE_BACKEND_API_URL.trim();
+    }
+  } catch {}
+
+  let storageBackend = '';
+  try {
+    if (typeof localStorage !== 'undefined') {
+      storageBackend = (localStorage.getItem(STORAGE_KEY_BACKEND_URL) || '').trim();
+    }
+  } catch {}
+
+  return storageBackend || envBackend || '';
+}
+
+/**
+ * Checks whether an external backend proxy server is configured.
+ */
+export function isBackendProxyConfigured(): boolean {
+  const url = getBackendApiUrl();
+  return url.length > 0 && (url.startsWith('https://') || url.startsWith('http://'));
+}
+
+/**
+ * Sets or updates the custom backend API proxy URL in local storage.
+ */
+export function setBackendApiUrl(url: string): void {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      if (url.trim()) {
+        localStorage.setItem(STORAGE_KEY_BACKEND_URL, url.trim());
+      } else {
+        localStorage.removeItem(STORAGE_KEY_BACKEND_URL);
+      }
+    }
+  } catch {}
+}
+

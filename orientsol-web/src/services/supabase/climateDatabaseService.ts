@@ -2,6 +2,8 @@ import {
   getSupabaseClient,
   isSupabaseConfigured,
   testSupabaseConnection,
+  getBackendApiUrl,
+  isBackendProxyConfigured,
 } from './supabaseClient';
 import type { ClimateDataRecord } from '@/types/climate';
 import { LOCATIONS_DATABASE } from '@/database/locations';
@@ -476,6 +478,23 @@ export class ClimateDatabaseService {
    * Fetches all climate datasets from Supabase (or offline cache if offline).
    */
   public async getClimateDatasets(): Promise<ClimateDataRecord[]> {
+    // Option A: If mobile app is configured to call dedicated backend proxy gateway
+    if (isBackendProxyConfigured() && this.isOnline()) {
+      try {
+        const backendUrl = getBackendApiUrl();
+        const res = await fetch(`${backendUrl}/api/climate/datasets`);
+        if (res.ok) {
+          const datasets = await res.json();
+          if (Array.isArray(datasets) && datasets.length > 0) {
+            this.saveToCache(datasets);
+            return datasets;
+          }
+        }
+      } catch (backendErr) {
+        console.warn('[OrientSol Backend Proxy] Error fetching datasets from backend gateway, falling back to direct:', backendErr);
+      }
+    }
+
     const supabase = getSupabaseClient();
 
     if (supabase && this.isOnline()) {
@@ -722,7 +741,40 @@ export class ClimateDatabaseService {
       };
     }
 
-    // 2. Online insertion to Supabase
+    // 2. Online insertion: Option A: Backend Proxy Gateway (Zero client credentials)
+    if (isBackendProxyConfigured() && this.isOnline()) {
+      try {
+        const backendUrl = getBackendApiUrl();
+        const res = await fetch(`${backendUrl}/api/climate/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(record),
+        });
+        if (res.ok) {
+          const result = await res.json();
+          const savedRecord: ClimateDataRecord = {
+            ...record,
+            id: `server-${record.locationName.toLowerCase().replace(/\s+/g, '-')}`,
+            source: 'supabase',
+          };
+          const existing = this.getFromCache() || this.getDefaultLocationsAsRecords();
+          this.saveToCache([savedRecord, ...existing.filter((r) => r.locationName !== savedRecord.locationName)]);
+          this.notify();
+
+          return {
+            success: true,
+            isDuplicate: result.isDuplicate || false,
+            isOffline: false,
+            message: result.message || `✓ Emplazamiento "${record.locationName}" registrado con éxito a través del servidor backend seguro.`,
+            record: savedRecord,
+          };
+        }
+      } catch (backendErr) {
+        console.warn('[OrientSol Backend Proxy] Register failed via backend gateway, checking direct connection:', backendErr);
+      }
+    }
+
+    // 2. Online insertion: Option B: Direct Supabase client
     const supabase = getSupabaseClient();
     if (supabase && this.isOnline()) {
       try {
