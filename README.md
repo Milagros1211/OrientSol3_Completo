@@ -12,13 +12,20 @@
 
 ---
 
-## 🚀 Acceso Rápido y Descargas Oficiales (v4.0.0)
+> 🎓 **Proyecto de Trabajo Fin de Máster (TFM)**  
+> **Máster Universitario en Energías Renovables — Universidad de Jaén (UJA)**  
+> **Autora:** Karina Milagros Baldeón Zárate | **Tutoría:** Dr. Leocadio Hontoria García & Dra. Catalina Rus Casas  
+> *Versión Final Académica (v4.0.0): modernización, validación y migración de OrientSol desde MATLAB hacia un entorno web y multiplataforma autónomo.*
+
+---
+
+## 🚀 Acceso Rápido y Descargas Oficiales (v4.0.0 - Versión TFM)
 
 OrientSol 4.0 se encuentra disponible en formato **100% Offline** (sin necesidad de Internet ni licencias de MATLAB) para todas las plataformas, así como en versión Web:
 
 | Plataforma | Tipo de Binario | Enlace de Descarga / Acceso | Estado |
 | :--- | :--- | :--- | :--- |
-| 🌐 **Web en Vivo (Online/PWA)** | Aplicación Web Progresiva | [🔗 Abrir OrientSol 4.0 Web](https://Milagros1211.github.io/OrientSol3_Completo/) | ✅ En Producción |
+| 🌐 **Web en Vivo (Online/PWA)** | Aplicación Web Progresiva | [🔗 Abrir OrientSol 4.0 Web](https://Milagros1211.github.io/OrientSol3_Completo/) | ✅ Operativo (Versión TFM) |
 | 🪟 **Windows (10 / 11)** | Instalador `.exe` + Portable | [📥 Descargar para Windows (Releases)](https://github.com/Milagros1211/OrientSol3_Completo/releases/latest) | ✅ 100% Offline |
 | 🍎 **macOS (Intel & Apple Silicon)** | Imagen de Disco `.dmg` + `.zip` | [📥 Descargar para macOS (Releases)](https://github.com/Milagros1211/OrientSol3_Completo/releases/latest) | ✅ 100% Offline |
 | 🤖 **Android (Móviles & Tablets)** | Paquete de Instalación `.apk` | [📥 Descargar para Android (Releases)](https://github.com/Milagros1211/OrientSol3_Completo/releases/latest) | ✅ 100% Offline |
@@ -61,7 +68,7 @@ La versión para Android está optimizada con diseño responsivo adaptativo tant
 
 ## Guía de Plantillas y Formatos para la Carga de Emplazamientos (CSV / JSON)
 
-OrientSol 3.0 incluye un motor universal de ingesta digital capaz de procesar archivos de climatología tanto para **un único emplazamiento** como para un **lote de múltiples emplazamientos simultáneos (Batch)**. Los archivos subidos se validan matemáticamente, se cargan en el motor de cálculo y se registran automáticamente en la base de datos de **Supabase** (tabla `datos_mensuales`) o en la caché offline si no hay conexión a Internet.
+OrientSol 4.0 incluye un motor universal de ingesta digital capaz de procesar archivos de climatología tanto para **un único emplazamiento** como para un **lote de múltiples emplazamientos simultáneos (Batch)**. Los archivos subidos se validan matemáticamente, se cargan en el motor de cálculo y se registran automáticamente en la base de datos de **Supabase** (tabla `datos_mensuales`) o en la caché offline si no hay conexión a Internet.
 
 ---
 
@@ -202,39 +209,146 @@ Para facilitar la creación de tus archivos, la plataforma cuenta con botones de
 
 ---
 
-## Ejecución y Desarrollo Local
+## 💻 Requisitos del Sistema, Instalación y Guía de Uso por Plataforma
 
-### Requisitos previos:
-- [Node.js](https://nodejs.org/) v18 o superior.
-- npm v9 o superior.
+OrientSol 4.0 está diseñado para funcionar de manera **100% autónoma y offline** tanto para usuarios finales (mediante instaladores y ejecutables directos sin necesidad de instalar entornos de desarrollo ni licencias de MATLAB) como para desarrolladores o investigadores que deseen ejecutar o compilar el código fuente.
 
-### Instalación de dependencias:
+---
+
+### 1. 🪟 Windows (Windows 10 / Windows 11 de 64 bits)
+
+#### A. ¿Qué necesitas para ejecutar la app en Windows?
+* **Sistema Operativo:** Windows 10 o Windows 11 (edición de 64 bits).
+* **Hardware mínimo recomendado:** Procesador Intel o AMD x64 de doble núcleo, 4 GB de memoria RAM y 350 MB de almacenamiento libre en disco.
+* **Dependencias de software:** **Ninguna.** No necesitas tener instalado Node.js, Python, MATLAB ni librerías adicionales. El motor científico de cálculo (Pyodide WebAssembly y NumPy) ya viene empotrado en el ejecutable.
+* **Conectividad:** 100% Offline para todos los módulos de cálculo astronómico, optimización y simulación. *(Solo requiere conexión a Internet si se desea consultar dinámicamente las bases de datos externas de PVGIS o NASA POWER).*
+
+#### B. Paso a paso para usar el ejecutable (.exe):
+1. **Descarga:** Accede a la sección de [Releases de GitHub](https://github.com/Milagros1211/OrientSol3_Completo/releases/latest) y descarga el instalador `OrientSol 4.0 Setup 4.0.0.exe` (con acceso directo en el escritorio) o la versión portable `OrientSol 4.0 4.0.0.exe` (que no requiere instalación).
+2. **Desbloqueo de SmartScreen:** Al ejecutarlo por primera vez, Windows SmartScreen puede mostrar la ventana azul *"Windows protegió su PC"* (al tratarse de una aplicación académica de código abierto sin firma corporativa de pago). Haz clic en el enlace **"Más información"** y luego en el botón **"Ejecutar de todas formas"**.
+3. **Arranque del simulador:** La aplicación abrirá su ventana principal al instante. En segundo plano, se inicializa automáticamente el hilo seguro de WebAssembly con Pyodide.
+4. **Flujo de uso en la aplicación:**
+   * **Paso 1 (Emplazamiento):** En la cabecera, selecciona una localidad española del catálogo de 114 estaciones, introduce coordenadas libres (Latitud/Longitud) o sube tu propio archivo de radiación en la pestaña *"Subida Digital (CSV / JSON)"*.
+   * **Paso 2 (Módulo de Estudio):** Selecciona en la barra superior el análisis deseado: *Inclinación Fija Anual*, *Inclinación Estacional*, *Seguimiento Solar (1 o 2 ejes)*, *Pérdidas CTE DB-HE4* o *Modelo Energético de Osterwald*.
+   * **Paso 3 (Ajuste de Parámetros):** Modifica el albedo ($\rho$), los ángulos de inclinación ($\beta$) y orientación ($\alpha$), o los coeficientes térmicos del panel.
+   * **Paso 4 (Cálculo):** Pulsa el botón **"Calcular"**. Los resultados numéricos, tablas de radiación mensual y diagramas polares vectoriales en SVG se procesarán en milisegundos.
+   * **Paso 5 (Exportación):** Utiliza los botones de descarga para exportar el informe técnico completo en **PDF**, las series de radiación en **CSV**, o la hoja de cálculo sanitizada en **Excel (.xlsx)**.
+
+---
+
+### 2. 🍎 macOS (macOS 12 Monterey o superior — Apple Silicon & Intel)
+
+#### A. ¿Qué necesitas para ejecutar la app en macOS?
+* **Sistema Operativo:** macOS 12 Monterey, macOS 13 Ventura, macOS 14 Sonoma o macOS 15 Sequoia.
+* **Arquitectura:** Compatible de forma nativa con procesadores Apple Silicon (M1, M2, M3, M4) y procesadores Intel x86_64.
+* **Hardware mínimo recomendado:** 4 GB de memoria RAM unificada y 400 MB de espacio disponible en disco.
+* **Dependencias de software:** Ninguna adicional requerida (Pyodide y NumPy integrados en el bundle).
+
+#### B. Paso a paso para usar el descargable (.dmg):
+1. **Descarga:** Descarga la imagen de disco `OrientSol 4.0-4.0.0.dmg` desde [GitHub Releases](https://github.com/Milagros1211/OrientSol3_Completo/releases/latest).
+2. **Instalación:** Haz doble clic en el archivo `.dmg` descargado y arrastra el icono de **OrientSol 4.0** a la carpeta **Aplicaciones** (`/Applications`).
+3. **Desbloqueo de Gatekeeper:** La primera vez que abras la aplicación, macOS indicará que el desarrollador no ha sido verificado. Para autorizarla:
+   * Haz clic derecho (o mantén pulsada la tecla `Ctrl` y haz clic) sobre **OrientSol 4.0** en tu carpeta Aplicaciones.
+   * Selecciona **"Abrir"** en el menú contextual emergente.
+   * En el cuadro de diálogo de confirmación de seguridad de macOS, pulsa **"Abrir"**. *(Solo tendrás que hacer esto la primera vez).*
+4. **Uso del Simulador:** La app se ejecuta con aceleración gráfica Metal/Chromium nativa, lista para simular y exportar informes.
+
+---
+
+### 3. 🐧 Linux (Ubuntu, Debian, Fedora, Arch, openSUSE)
+
+#### A. ¿Qué necesitas para ejecutar la app en Linux?
+* **Sistema Operativo:** Distribución Linux moderna con entorno gráfico X11 o Wayland (Ubuntu 20.04+, Debian 11+, Fedora 36+, etc.).
+* **Librería de sistema:** Soporte FUSE para paquetes AppImage (`libfuse2` en distribuciones modernas como Ubuntu 22.04 / 24.04):
+  ```bash
+  sudo apt update && sudo apt install libfuse2
+  ```
+* **Hardware mínimo:** Procesador de 64 bits, 4 GB RAM y 350 MB de almacenamiento libre.
+
+#### B. Paso a paso para usar el descargable (.AppImage):
+1. **Descarga:** Descarga el binario autónomo `OrientSol-4.0.0.AppImage` desde [Releases](https://github.com/Milagros1211/OrientSol3_Completo/releases/latest).
+2. **Permisos de Ejecución:** Abre la terminal en la carpeta de descarga y asigna permisos de ejecución al archivo:
+   ```bash
+   chmod +x OrientSol-4.0.0.AppImage
+   ```
+   *(O alternativamente, haz clic derecho sobre el archivo en el explorador gráfico > Propiedades > Permisos > Marcar "Permitir ejecutar como un programa").*
+3. **Ejecución:** Haz doble clic sobre el archivo o lánzalo desde terminal con `./OrientSol-4.0.0.AppImage`.
+4. **Uso:** El simulador se despliega con su motor WebAssembly aislado para máxima seguridad y rendimiento.
+
+---
+
+### 4. 🤖 Android (Smartphones y Tablets — Android 7.0 a 16)
+
+#### A. ¿Qué necesitas para mantener la app en funcionamiento?
+* **Sistema Operativo:** Android 7.0 (Nougat, API nivel 24) o cualquier versión superior hasta Android 16.
+* **Almacenamiento:** Mínimo 200 MB de memoria interna libre.
+* **Permisos del sistema:** Permiso de almacenamiento para guardar informes PDF y archivos exportados CSV/Excel generados por el simulador.
+* **Conectividad:** Funciona 100% sin conexión (ideal para ingenieros y técnicos en instalaciones solares aisladas o en cubiertas sin cobertura móvil).
+
+#### B. Paso a paso para usar la aplicación en Android (.apk):
+1. **Descarga:** Descarga el paquete `OrientSol-Android-APK.zip` o `app-debug.apk` directamente en tu dispositivo Android o transfiérelo desde un PC mediante cable USB o Google Drive.
+2. **Autorización de Fuentes Desconocidas:** Si Android bloquea la instalación por proceder de fuera de Google Play:
+   * Accede a *Ajustes > Seguridad > Instalar aplicaciones desconocidas* (o pulsa *"Ajustes"* en el mensaje que aparece al tocar el archivo).
+   * Activa la casilla *"Permitir desde esta fuente"* para tu navegador o gestor de archivos.
+3. **Instalación:** Toca el archivo `.apk` y pulsa **"Instalar"**. Al finalizar, pulsa **"Abrir"**.
+4. **Uso táctil optimizado:** La interfaz se adapta dinámicamente a la orientación de la pantalla (modo vertical para móviles y modo apaisado panorámico con gráficas expandidas en tablets).
+
+---
+
+### 5. 🌐 Navegador Web / PWA (Multiplataforma sin Instalación)
+
+#### A. ¿Qué necesitas?
+* Cualquier navegador web moderno con soporte para WebAssembly, Canvas y ES Modules:
+  * Google Chrome / Chromium v90+
+  * Mozilla Firefox v89+
+  * Microsoft Edge v90+
+  * Apple Safari (iOS / macOS) v15+
+  * Opera, Brave, Vivaldi.
+
+#### B. Paso a paso de uso:
+1. Entra directamente a la dirección oficial: [https://Milagros1211.github.io/OrientSol3_Completo/](https://Milagros1211.github.io/OrientSol3_Completo/).
+2. **Instalación opcional como PWA (Aplicación Web Progresiva):**
+   * En **Google Chrome / Microsoft Edge:** Haz clic en el icono de instalación ⊕ ("Instalar OrientSol") en el extremo derecho de la barra de direcciones.
+   * En **Safari (iPhone / iPad):** Pulsa el botón *"Compartir"* (icono con flecha hacia arriba) y selecciona *"Añadir a pantalla de inicio"*.
+3. La aplicación se integrará con su propio icono en tu sistema y funcionará incluso cuando no dispongas de conexión a Internet gracias a su Service Worker.
+
+---
+
+### 6. 🛠️ Ejecución y Desarrollo Local desde Código Fuente (Para Desarrolladores)
+
+Si deseas modificar el código fuente, ejecutar el servidor de desarrollo local o recompilar los binarios multiplataforma:
+
+#### Requisitos previos de desarrollo:
+* [Node.js](https://nodejs.org/) v18.0.0 o superior (recomendado v20+ LTS).
+* Gestor de paquetes `npm` v9.0.0 o superior.
+* Para compilar Android: Java JDK 21 y Android Studio con Android SDK configurado.
+
+#### Instalación y arranque del entorno:
 ```bash
-# Desde la carpeta raíz del proyecto:
+# 1. Clonar el repositorio:
+git clone https://github.com/Milagros1211/OrientSol3_Completo.git
+cd OrientSol3_Completo
+
+# 2. Instalar dependencias del frontend web:
 npm install --prefix orientsol-web
-```
 
-### Iniciar servidor local de desarrollo:
-```bash
+# 3. Iniciar servidor local de desarrollo con Hot Module Replacement (HMR):
 npm run dev
+# Abre en tu navegador la dirección: http://localhost:5173
 ```
-Abre en tu navegador la dirección `http://localhost:5173`.
 
-### Compilación y Despliegue Web:
+#### Comandos de Compilación y Empaquetado Multiplataforma:
 ```bash
-# Compilar versión web para producción:
+# Compilar versión web para distribución final:
 npm run build
 
-# Desplegar directamente a GitHub Pages:
+# Desplegar directamente la versión compilada a GitHub Pages:
 npm run deploy
-```
 
-### Compilar Aplicaciones de Escritorio Offline (Electron):
-```bash
-# Iniciar app de escritorio en modo desarrollo:
+# Iniciar aplicación de escritorio en modo desarrollo con Electron:
 npm run app:desktop
 
-# Empaquetar instalador .exe y portable para Windows (x64):
+# Empaquetar instalador .exe y versión portable para Windows (x64):
 npm run --prefix orientsol-web build:win
 
 # Empaquetar instalador .dmg y .zip para macOS:
@@ -242,18 +356,10 @@ npm run --prefix orientsol-web build:mac
 
 # Empaquetar para todas las plataformas de escritorio (Windows, macOS, Linux):
 npm run --prefix orientsol-web build:all
-```
 
-### Compilar para Android (Capacitor):
-```bash
-# Sincronizar assets web y Pyodide WASM al proyecto Android:
+# Sincronizar assets web y compilar APK para Android:
 npm run --prefix orientsol-web cap:sync
-
-# Compilar APK Debug directamente con Gradle:
 cd orientsol-web/android && ./gradlew assembleDebug
-
-# Abrir proyecto en Android Studio:
-npm run --prefix orientsol-web cap:open:android
 ```
 
 ---

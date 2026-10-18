@@ -59,7 +59,7 @@ La versión 4.0 ha sido sometida a una auditoría exhaustiva de seguridad ofensi
 # Iniciar servidor local de desarrollo
 npm run dev
 
-# Compilar versión web para producción
+# Compilar versión web para distribución final
 npm run build
 ```
 
