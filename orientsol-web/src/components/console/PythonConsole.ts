@@ -133,52 +133,24 @@ export function renderPythonConsole(): HTMLElement {
     return { name, longitude, isCanarias, isMadrid, isJaen };
   }
 
-  function generateOfflinePvgisRecord(lat: number, lon: number, locName: string): PVGISRecord {
+  function generateOfflinePvgisRecord(lat: number): PVGISRecord {
     const loc = getLocInfo(lat);
-    let monthlyGdm0: number[];
-    let monthlyGdmOpt: number[];
-    let optimalTilt: number;
-
-    if (loc.isMadrid) {
-      monthlyGdm0 = [2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84];
-      monthlyGdmOpt = [3.42, 4.36, 5.38, 5.92, 6.70, 7.48, 7.88, 7.45, 6.22, 4.85, 3.62, 3.02];
-      optimalTilt = 35;
-    } else if (loc.isJaen) {
-      monthlyGdm0 = [2.41, 3.29, 4.81, 5.62, 6.74, 7.38, 7.25, 6.44, 5.10, 3.82, 2.55, 2.18];
-      monthlyGdmOpt = [3.85, 4.52, 5.60, 5.82, 6.65, 7.15, 7.28, 6.95, 5.98, 5.10, 3.90, 3.55];
-      optimalTilt = 34;
-    } else if (loc.isCanarias) {
-      // Official PVGIS-SARAH3 (2005-2023) Climatology for Canary Islands (~28°N)
-      monthlyGdm0 = [3.62, 4.45, 5.48, 6.32, 6.85, 7.18, 7.22, 6.75, 5.68, 4.62, 3.75, 3.38];
-      monthlyGdmOpt = [4.82, 5.35, 5.95, 6.42, 6.85, 7.18, 7.22, 6.90, 6.25, 5.60, 4.88, 4.65];
-      optimalTilt = 26;
-    } else {
-      optimalTilt = Math.max(15, Math.min(60, Math.round(Math.abs(lat) * 0.88)));
-      const latR = (lat * Math.PI) / 180;
-      monthlyGdm0 = DIA_INTER.map((dayNum, mIdx) => {
-        const dec = getMonthlyDeclinationDeg(mIdx);
-        const decR = (dec * Math.PI) / 180;
-        const cosW = -Math.tan(latR) * Math.tan(decR);
-        const ws = Math.acos(Math.max(-1, Math.min(1, cosW)));
-        const iSc = 1.367;
-        const g0d = Math.max(
-          0.8,
-          (24 / Math.PI) * iSc * (1 + 0.033 * Math.cos((2 * Math.PI * dayNum) / 365)) *
-          (Math.cos(latR) * Math.cos(decR) * Math.sin(ws) + ws * Math.sin(latR) * Math.sin(decR))
-        );
-        const ktAtm = 0.55 + 0.07 * Math.cos(decR) * Math.cos(latR);
-        return Math.round(g0d * ktAtm * 100) / 100;
-      });
-      monthlyGdmOpt = monthlyGdm0.map((g0, mIdx) => {
-        const factor = calculateOptimalTiltFactor(lat, mIdx);
-        return Math.round(g0 * factor * 100) / 100;
-      });
-    }
+    const isMadrid = loc.isMadrid;
+    const monthlyGdm0 = isMadrid
+      ? [2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84]
+      : [2.41, 3.29, 4.81, 5.62, 6.74, 7.38, 7.25, 6.44, 5.10, 3.82, 2.55, 2.18];
+    const monthlyGdmOpt = isMadrid
+      ? [3.42, 4.36, 5.38, 5.92, 6.70, 7.48, 7.88, 7.45, 6.22, 4.85, 3.62, 3.02]
+      : [3.85, 4.52, 5.60, 5.82, 6.65, 7.15, 7.28, 6.95, 5.98, 5.10, 3.90, 3.55];
+    const optimalTilt = isMadrid ? 35 : 34;
+    const locationName = isMadrid
+      ? 'Madrid - Retiro (Referencia Canónica)'
+      : 'Jaén - Campus Las Lagunillas (UJA)';
 
     return {
-      locationName: locName || loc.name,
-      latitude: lat,
-      longitude: lon,
+      locationName,
+      latitude: isMadrid ? 40.42 : 37.77,
+      longitude: isMadrid ? -3.7038 : -3.7903,
       monthlyGdm0,
       monthlyGdmOpt,
       optimalTilt,
@@ -219,11 +191,15 @@ export function renderPythonConsole(): HTMLElement {
     // Synchronize or adapt PVGIS data if latitude changed significantly (> 0.25°)
     if (pvgisData && Math.abs(pvgisData.latitude - stateLat) > 0.25) {
       const loc = getLocInfo(stateLat);
-      const cached = getPvgisFromTempMemory(stateLat, loc.longitude);
-      if (cached) {
-        pvgisData = { ...cached };
-      } else if (pvgisData.isOffline) {
-        pvgisData = generateOfflinePvgisRecord(stateLat, loc.longitude, loc.name);
+      const isOfflineSupported = loc.isMadrid || loc.isJaen;
+      if (pvgisData.isOffline) {
+        if (isOfflineSupported) {
+          pvgisData = generateOfflinePvgisRecord(stateLat);
+        } else {
+          // Offline reference data ONLY exists for Jaén (37.77°) or Madrid (40.42°)
+          pvgisData = null;
+          showPvgisComparison = false;
+        }
       } else {
         // Reset live data when latitude changes until new live fetch is requested
         pvgisData = null;
@@ -1109,24 +1085,6 @@ export function renderPythonConsole(): HTMLElement {
         const rmse = Math.sqrt(pvgisRows.reduce((acc, r) => acc + Math.pow(r.diffAbs, 2), 0) / 12);
         const rmseOpt = Math.sqrt(pvgisRows.reduce((acc, r) => acc + Math.pow(r.diffOptAbs, 2), 0) / 12);
 
-        const formatFetchDate = (isoString?: string) => {
-          if (!isoString) return new Date().toLocaleDateString();
-          try {
-            const d = new Date(isoString);
-            if (isNaN(d.getTime())) return isoString;
-            return d.toLocaleString(isEn ? 'en-US' : 'es-ES', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-            });
-          } catch {
-            return isoString;
-          }
-        };
-
         const wmoComplianceNotice = `
           ${pvgisJustSynchronized ? `
             <div style="padding: 0.65rem 1.15rem; background: rgba(16, 185, 129, 0.12); border-bottom: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.77rem; color: #059669; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
@@ -1143,7 +1101,8 @@ export function renderPythonConsole(): HTMLElement {
             </div>
           ` : ''}
 
-          <!-- OFFICIAL PVGIS SOLAR RADIATION DATABASE SPECIFICATION (JRC Reference Table) -->
+          <!-- OFFICIAL PVGIS SOLAR RADIATION DATABASE SPECIFICATION (JRC Reference Table) - ONLY VISIBLE IN OFFLINE MODE -->
+          ${pvgisData.isOffline ? `
           <div style="padding: 0.85rem 1.15rem; background: rgba(37, 99, 235, 0.05); border-bottom: 1px solid rgba(37, 99, 235, 0.2); display: flex; flex-direction: column; gap: 0.65rem;">
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem;">
               <div style="display: flex; align-items: center; gap: 0.65rem;">
@@ -1161,8 +1120,8 @@ export function renderPythonConsole(): HTMLElement {
                   </div>
                   <div style="font-size: 0.71rem; color: var(--text-muted); margin-top: 0.2rem;">
                     ${isEn
-                      ? `Inter-comparison: OrientSol (Liu & Jordan Model) vs European Commission JRC PVGIS 5.3 • Live API call: ${formatFetchDate(pvgisData.fetchedAt)}`
-                      : `Intercomparación: OrientSol (Modelo Liu & Jordan) vs Comisión Europea JRC PVGIS 5.3 • Consulta API en vivo: ${formatFetchDate(pvgisData.fetchedAt)}`}
+                      ? `Official multiannual reference dataset: European Commission JRC PVGIS 5.3 (PVGIS-SARAH3 2005–2023) • Offline Validation`
+                      : `Base de datos multianual oficial: Comisión Europea JRC PVGIS 5.3 (PVGIS-SARAH3 2005–2023) • Validación Offline`}
                   </div>
                 </div>
               </div>
@@ -1171,7 +1130,7 @@ export function renderPythonConsole(): HTMLElement {
                   ✓ 100% ${isEn ? 'WMO Compliant' : 'Conforme OMM'}
                 </span>
                 <span class="badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-weight: 700; font-size: 0.72rem; border: 1px solid rgba(2, 132, 199, 0.25); padding: 0.2rem 0.6rem; border-radius: 4px;">
-                  ${pvgisData.provider.includes('Offline') || pvgisData.provider.includes('Canónico') ? (isEn ? 'Official Multiannual (Offline)' : 'Datos Multianuales Oficiales (Offline)') : (isEn ? 'Live API v5.3 Sync' : 'API en Vivo v5.3 Sincronizada')}
+                  ${isEn ? 'Official Multiannual (Offline)' : 'Datos Multianuales Oficiales (Offline)'}
                 </span>
               </div>
             </div>
@@ -1202,6 +1161,7 @@ export function renderPythonConsole(): HTMLElement {
               </table>
             </div>
           </div>
+          ` : ''}
         `;
 
         const comparisonMetricSelector = `
@@ -1400,6 +1360,8 @@ export function renderPythonConsole(): HTMLElement {
       const isLiuActive = !showPvgisComparison;
       const isPvgisLiveActive = showPvgisComparison && pvgisData && !pvgisData.isOffline;
       const isPvgisOfflineActive = showPvgisComparison && pvgisData && pvgisData.isOffline;
+      const locCurrent = getLocInfo(stateLat);
+      const isOfflineSupported = locCurrent.isMadrid || locCurrent.isJaen;
 
       return `
         <div class="verif-table-card">
@@ -1427,7 +1389,7 @@ export function renderPythonConsole(): HTMLElement {
                   : `${isEn ? 'Query PVGIS JRC (Live)' : 'Consultar PVGIS JRC (En vivo)'}`}
               </button>
 
-              <button type="button" id="btn-pvgis-benchmark" class="btn btn-xs ${isPvgisOfflineActive ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.25rem 0.6rem; ${isPvgisOfflineActive ? 'background: #059669; color: #fff; border: 1px solid #059669; font-weight: 700;' : ''} border-radius: 4px; cursor: pointer;" title="${isEn ? 'Load Official PVGIS Reference Data (Offline)' : 'Cargar Datos Oficiales PVGIS de Referencia (Sin Internet)'}">
+              <button type="button" id="btn-pvgis-benchmark" class="btn btn-xs ${isPvgisOfflineActive ? 'btn-primary' : 'btn-secondary'}" ${!isOfflineSupported ? 'disabled' : ''} style="font-size: 0.72rem; padding: 0.25rem 0.6rem; ${isPvgisOfflineActive ? 'background: #059669; color: #fff; border: 1px solid #059669; font-weight: 700;' : ''} ${!isOfflineSupported ? 'opacity: 0.45; cursor: not-allowed;' : 'cursor: pointer;'} border-radius: 4px;" title="${!isOfflineSupported ? (isEn ? 'Official offline benchmark only available for Jaén (37.77°) and Madrid (40.42°)' : 'Datos Oficiales Offline solo disponibles para Jaén (37,77°) y Madrid (40,42°)') : (isEn ? 'Load Official PVGIS Reference Data (Offline)' : 'Cargar Datos Oficiales PVGIS de Referencia (Sin Internet)')}">
                 ${isEn ? 'Official PVGIS (Offline)' : 'Datos Oficiales PVGIS (Offline)'}
               </button>
             </div>
@@ -2036,26 +1998,12 @@ export function renderPythonConsole(): HTMLElement {
     const triggerBenchmark = () => {
       pvgisJustSynchronized = false;
       const loc = getLocInfo(stateLat);
-      const lon = loc.longitude;
-
-      // 1. Check temporal memory cache first (shares exact same data from live session)
-      const cached = getPvgisFromTempMemory(stateLat, lon);
-      if (cached) {
-        pvgisData = {
-          ...cached,
-          isOffline: true,
-          database: 'PVGIS-SARAH3',
-          dbType: 'Satellite',
-          startYear: 2005,
-          endYear: 2023,
-          spatialRes: '0.05° x 0.05° (~5 km)',
-          comments: 'In PVGIS 5.3, default DB for Europe, Central Asia, Africa and South America',
-        };
-      } else {
-        // 2. Exact same PVGIS-SARAH3 (2005-2023) official database specification for current latitude
-        pvgisData = generateOfflinePvgisRecord(stateLat, lon, loc.name);
-        savePvgisToTempMemory(pvgisData);
+      const isOfflineSupported = loc.isMadrid || loc.isJaen;
+      if (!isOfflineSupported) {
+        return;
       }
+      // Strictly official offline dataset of Jaén or Madrid (NO online cache)
+      pvgisData = generateOfflinePvgisRecord(stateLat);
       showPvgisComparison = true;
       pvgisFetchError = null;
       renderView();
