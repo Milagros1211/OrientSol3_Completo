@@ -189,13 +189,10 @@ function renderAboutView(isEn: boolean): HTMLElement {
           🛡️ ${isEn ? 'Privacy Policy (GDPR)' : 'Política de Privacidad (RGPD)'}
         </button>
         <button type="button" class="btn btn-secondary legal-trigger-btn" data-tab="terms" style="font-size: 0.8rem; padding: 0.45rem 0.85rem;">
-          📜 ${isEn ? 'Terms of Service' : 'Términos de Servicio'}
+          📜 ${isEn ? 'Terms & Free Open Access' : 'Términos & Gratuidad'}
         </button>
         <button type="button" class="btn btn-secondary legal-trigger-btn" data-tab="cookies" style="font-size: 0.8rem; padding: 0.45rem 0.85rem;">
           🍪 ${isEn ? 'Cookie & Storage Policy' : 'Política de Cookies & Almacenamiento'}
-        </button>
-        <button type="button" class="btn btn-secondary legal-trigger-btn" data-tab="refund" style="font-size: 0.8rem; padding: 0.45rem 0.85rem;">
-          💶 ${isEn ? 'Refund & Withdrawal' : 'Reembolso & Desistimiento'}
         </button>
         <button type="button" class="btn btn-secondary legal-trigger-btn" data-tab="security" style="font-size: 0.8rem; padding: 0.45rem 0.85rem;">
           🔒 ${isEn ? 'Security Audit Report' : 'Informe de Seguridad'}

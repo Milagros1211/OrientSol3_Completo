@@ -1,6 +1,6 @@
 import { i18n } from '@/i18n';
 
-export type LegalTabId = 'privacy' | 'terms' | 'cookies' | 'refund' | 'security';
+export type LegalTabId = 'privacy' | 'terms' | 'cookies' | 'security';
 
 let activeLegalModalEl: HTMLElement | null = null;
 
@@ -33,8 +33,8 @@ export function openLegalPoliciesModal(initialTab: LegalTabId = 'privacy'): void
               </h3>
               <p class="modal-subtitle">
                 ${isEn 
-                  ? 'Compliant with EU GDPR (2016/679), Spanish LOPDGDD (3/2018), LSSI-CE & TRLGDCU'
-                  : 'Conforme a normativa europea RGPD (2016/679), española LOPDGDD (3/2018), LSSI-CE y TRLGDCU'}
+                  ? 'Compliant with EU GDPR (2016/679), Spanish LOPDGDD (3/2018), LSSI-CE & OWASP Standards'
+                  : 'Conforme a normativa europea RGPD (2016/679), española LOPDGDD (3/2018), LSSI-CE y Estándares OWASP'}
               </p>
             </div>
           </div>
@@ -47,13 +47,10 @@ export function openLegalPoliciesModal(initialTab: LegalTabId = 'privacy'): void
             <span>🛡️ ${isEn ? 'Privacy Policy (GDPR)' : 'Política de Privacidad (RGPD)'}</span>
           </button>
           <button type="button" class="legal-tab-btn ${activeTab === 'terms' ? 'active' : ''}" data-legal-tab="terms">
-            <span>📜 ${isEn ? 'Terms of Service' : 'Términos de Servicio'}</span>
+            <span>📜 ${isEn ? 'Terms & Free Open Access' : 'Términos & Gratuidad'}</span>
           </button>
           <button type="button" class="legal-tab-btn ${activeTab === 'cookies' ? 'active' : ''}" data-legal-tab="cookies">
             <span>🍪 ${isEn ? 'Cookie & Storage Policy' : 'Política de Cookies & Almacenamiento'}</span>
-          </button>
-          <button type="button" class="legal-tab-btn ${activeTab === 'refund' ? 'active' : ''}" data-legal-tab="refund">
-            <span>💶 ${isEn ? 'Refund & Withdrawal' : 'Reembolso & Desistimiento'}</span>
           </button>
           <button type="button" class="legal-tab-btn ${activeTab === 'security' ? 'active' : ''}" data-legal-tab="security">
             <span>🔒 ${isEn ? 'Security & Technical Audit' : 'Informe de Seguridad'}</span>
@@ -145,8 +142,6 @@ function renderTabContent(tab: LegalTabId, isEn: boolean): string {
       return renderTermsContent(isEn);
     case 'cookies':
       return renderCookiesContent(isEn);
-    case 'refund':
-      return renderRefundContent(isEn);
     case 'security':
       return renderSecurityContent(isEn);
     default:
@@ -271,12 +266,15 @@ function renderTermsContent(isEn: boolean): string {
   if (isEn) {
     return `
       <div class="legal-clause-card">
-        <h4 class="legal-clause-title">1. Object and Nature of Service</h4>
+        <h4 class="legal-clause-title">1. Object, 100% Free Open-Access Statement & No Commercial Charges</h4>
         <p class="legal-text">
           These Terms of Service govern the access, execution, and use of <strong>OrientSol 4.0</strong>, a scientific solar simulation environment developed within the academic framework of the Master's Thesis in Renewable Energy at the <strong>University of Jaén (UJA)</strong>.
         </p>
+        <p class="legal-text" style="color: var(--accent-emerald, #10b981); font-weight: 600;">
+          ✔ OrientSol 4.0 is 100% free of charge (Gratuito) and distributed as an Open-Access academic resource. There are NO subscriptions, NO recurring fees, NO hidden purchases, and NO payment transactions.
+        </p>
         <p class="legal-text">
-          OrientSol 4.0 is delivered as open-access, educational, and research software designed to assist renewable energy engineers, researchers, students, and professionals in evaluating photovoltaic surfaces, orientation, tilt, solar tracking, and cell thermal behavior.
+          OrientSol 4.0 is delivered to assist renewable energy engineers, researchers, students, and professionals in evaluating photovoltaic surfaces, orientation, tilt, solar tracking, and cell thermal behavior.
         </p>
       </div>
 
@@ -310,12 +308,15 @@ function renderTermsContent(isEn: boolean): string {
 
   return `
     <div class="legal-clause-card">
-      <h4 class="legal-clause-title">1. Objeto y Naturaleza del Servicio</h4>
+      <h4 class="legal-clause-title">1. Objeto, Declaración de Gratuidad Total (Open Access) y Ausencia de Cobros</h4>
       <p class="legal-text">
         Las presentes Condiciones de Uso y Términos de Servicio regulan el acceso, navegación y uso del software <strong>OrientSol 4.0</strong>, entorno científico de simulación solar y cálculo fotovoltaico desarrollado como Trabajo Fin de Máster (TFM) en el Máster Universitario en Energías Renovables de la <strong>Universidad de Jaén (UJA)</strong>.
       </p>
+      <p class="legal-text" style="color: var(--accent-emerald, #10b981); font-weight: 600;">
+        ✔ OrientSol 4.0 es un software 100% gratuito de Acceso Abierto Académico. NO existen cuotas de suscripción, ni tarifas comerciales, ni pasarelas de pago, ni cobros bancarios de ningún tipo.
+      </p>
       <p class="legal-text">
-        OrientSol 4.0 se ofrece como una herramienta de acceso libre, docente y de investigación orientada a estudiantes, ingenieros, investigadores y profesionales del sector de la energía solar para la evaluación de superficies colectoras, pérdidas por orientación e inclinación, sistemas de seguimiento y cálculo de producción eléctrica.
+        OrientSol 4.0 se ofrece como una herramienta orientada a estudiantes, ingenieros, investigadores y profesionales del sector de la energía solar para la evaluación de superficies colectoras, pérdidas por orientación e inclinación, sistemas de seguimiento y cálculo de producción eléctrica.
       </p>
     </div>
 
@@ -525,78 +526,6 @@ function renderCookiesContent(isEn: boolean): string {
           🗑️ Vaciar Caché Local y Restablecer Preferencias
         </button>
       </div>
-    </div>
-  `;
-}
-
-function renderRefundContent(isEn: boolean): string {
-  if (isEn) {
-    return `
-      <div class="legal-clause-card">
-        <h4 class="legal-clause-title">1. Gratuity & Academic Open-Access Statement</h4>
-        <p class="legal-text">
-          <strong>OrientSol 4.0 is 100% free of charge (Gratuito)</strong> and distributed as an open-access scientific resource under the academic patronage of the University of Jaén.
-        </p>
-        <p class="legal-text">
-          There are <strong>no subscriptions, no recurrent fees, no hidden in-app purchases, and no credit card charges</strong> for simulating solar geometry, transposing radiation, or generating PDF/Excel reports.
-        </p>
-      </div>
-
-      <div class="legal-clause-card">
-        <h4 class="legal-clause-title">2. Statutory Right of Withdrawal (EU Directive 2011/83/EU & Spanish TRLGDCU)</h4>
-        <p class="legal-text">
-          In full accordance with Directive 2011/83/EU on Consumer Rights and the Spanish General Law for the Protection of Consumers and Users (<strong>Real Decreto Legislativo 1/2007 - TRLGDCU</strong>, amended by Royal Decree-Law 24/2021):
-        </p>
-        <ul class="legal-list">
-          <li><strong>14-Day Legal Cooling-Off Period:</strong> In the hypothetical event that any commercial expansion, dedicated cloud calculation tier, or certified engineering training package were ever offered for a fee, European consumers possess the statutory right to withdraw from the contract within <strong>14 calendar days</strong> without providing any reason and without incurring any penalty (Article 102 TRLGDCU).</li>
-          <li><strong>Digital Content Exception (Article 103.m TRLGDCU):</strong> For digital services and software delivered immediately via digital download, the right of withdrawal expires once execution has begun with the consumer's express prior consent and acknowledgment that they lose the right of withdrawal.</li>
-          <li><strong>Reimbursement Process:</strong> In the event of any inadvertent or erroneous donation/charge, full refunds will be executed using the same payment method within a maximum period of <strong>14 natural days</strong> from receipt of the notification.</li>
-        </ul>
-      </div>
-
-      <div class="legal-clause-card">
-        <h4 class="legal-clause-title">3. Contact for Consumer Queries</h4>
-        <p class="legal-text">
-          For any inquiry regarding academic licensing, institutional collaboration, or consumer protection inquiries:
-        </p>
-        <p class="legal-text">
-          <strong>Academic Support:</strong> Master in Renewable Energy, Universidad de Jaén, Campus Las Lagunillas, 23071 Jaén, Spain.
-        </p>
-      </div>
-    `;
-  }
-
-  return `
-    <div class="legal-clause-card">
-      <h4 class="legal-clause-title">1. Declaración de Gratuidad y Acceso Abierto</h4>
-      <p class="legal-text">
-        <strong>OrientSol 4.0 es un software 100% gratuito</strong>, concebido y puesto a disposición de la comunidad académica, científica e industrial como proyecto de fin de máster universitario de acceso abierto (Open Access).
-      </p>
-      <p class="legal-text">
-        <strong>No existen cuotas de suscripción, ni tarifas recurrentes, ni compras integradas, ni pasarelas de pago</strong> para utilizar el simulador, calcular ángulos óptimos o exportar informes en PDF o Excel.
-      </p>
-    </div>
-
-    <div class="legal-clause-card">
-      <h4 class="legal-clause-title">2. Derecho Legal de Desistimiento y Política de Reembolsos (TRLGDCU / Directiva 2011/83/UE)</h4>
-      <p class="legal-text">
-        En riguroso cumplimiento de la Directiva 2011/83/UE sobre los Derechos de los Consumidores y del Texto Refundido de la Ley General para la Defensa de los Consumidores y Usuarios (<strong>Real Decreto Legislativo 1/2007 - TRLGDCU</strong>, modificado por el Real Decreto-ley 24/2021):
-      </p>
-      <ul class="legal-list">
-        <li><strong>Plazo Legal de Desistimiento de 14 Días:</strong> En el hipotético supuesto de que en el futuro se ofreciese algún módulo comercial certificado o servicio de computación en la nube de pago, el usuario gozará del derecho legal a desistir del contrato en el plazo de <strong>14 días naturales</strong> a contar desde la contratación, sin necesidad de justificación y sin penalización alguna (Artículo 102 TRLGDCU).</li>
-        <li><strong>Excepción para Contenido Digital (Art. 103.m TRLGDCU):</strong> Conforme a la legislación vigente, el derecho de desistimiento decae en el caso del suministro de contenido digital que no se preste en soporte material cuando la ejecución haya comenzado con el previo consentimiento expreso del consumidor y con el conocimiento por su parte de que en consecuencia pierde su derecho de desistimiento.</li>
-        <li><strong>Garantía de Devolución:</strong> Ante cualquier hipotético cargo no autorizado, erróneo o donación duplicada, el reintegro íntegro se procesará sin demora indebida y, en todo caso, en un plazo máximo de <strong>14 días naturales</strong> utilizando el mismo medio de pago.</li>
-      </ul>
-    </div>
-
-    <div class="legal-clause-card">
-      <h4 class="legal-clause-title">3. Canal de Atención y Consultas</h4>
-      <p class="legal-text">
-        Para cualquier cuestión relacionada con licencias docentes, colaboración científica o derechos de usuarios:
-      </p>
-      <p class="legal-text">
-        <strong>Secretaría Académica:</strong> Máster en Energías Renovables, Universidad de Jaén, Campus Las Lagunillas, 23071 Jaén, España.
-      </p>
     </div>
   `;
 }
