@@ -1463,7 +1463,7 @@ export function renderPythonConsole(): HTMLElement {
 
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 0.75rem; font-size: 0.72rem; line-height: 1.5;">
                 <!-- Module 1: Horizontal Decomposition & Liu-Jordan Fraction -->
-                <div style="background: var(--bg-primary); padding: 0.7rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.45rem;">
+                <div style="background: var(--bg-primary); padding: 0.75rem 0.9rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.5rem;">
                   <div style="font-weight: 700; color: #0284c7; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
                     <span>☀️</span>
                     <span>${isEn ? '1. Horizontal Decomposition (Bdm0.m & Ddm0.m)' : '1. Descomposición Horizontal y Claridad (Bdm0.m y Ddm0.m)'}</span>
@@ -1473,27 +1473,49 @@ export function renderPythonConsole(): HTMLElement {
                       ? 'Extraterrestrial horizontal daily radiation <em>G<sub>0d</sub></em> computed on Klein characteristic day <em>n</em>:'
                       : 'Radiación extraterrestre diaria sobre superficie horizontal <em>G<sub>0d</sub></em> evaluada en el día medio de Klein <em>n</em>:'}
                   </div>
-                  <div style="background: var(--bg-card); padding: 0.45rem 0.6rem; border-radius: 4px; border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-main); overflow-x: auto;">
-                    $$G_{0d} = \frac{24}{\pi} I_{sc} \left[1 + 0{,}033 \cos\left(\frac{2\pi n}{365}\right)\right] \left[\cos\phi \cos\delta \sin\omega_s + \left(\frac{\pi \omega_s}{180^\circ}\right) \sin\phi \sin\delta\right]$$
+                  <!-- Beautiful Rendered Equation -->
+                  <div style="background: var(--bg-card); padding: 0.55rem 0.75rem; border-radius: 5px; border: 1px solid var(--border-subtle); font-family: 'Cambria Math', 'Times New Roman', serif; font-size: 0.78rem; color: var(--text-main); display: flex; flex-direction: column; gap: 0.35rem; overflow-x: auto;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                      <strong style="font-style: italic;">G<sub>0d</sub></strong> = 
+                      <span style="display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1;">
+                        <span style="border-bottom: 1px solid currentColor; padding: 0 4px;">24 &middot; 3600</span>
+                        <span>&pi;</span>
+                      </span>
+                      <span>&middot; I<sub>sc</sub> &middot; E<sub>0</sub> &middot; [ cos&phi; cos&delta; sin&omega;<sub>s</sub> + (&pi;&omega;<sub>s</sub> / 180&deg;) sin&phi; sin&delta; ]</span>
+                    </div>
+                    <div style="font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-muted); opacity: 0.85; margin-top: 0.2rem;">
+                      LaTeX: <code>G_{0d} = \frac{24}{\pi} I_{sc} E_0 [\cos\phi \cos\delta \sin\omega_s + \frac{\pi\omega_s}{180^\circ} \sin\phi \sin\delta]</code>
+                    </div>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.70rem;">
                     ${isEn
-                      ? 'where <em>I<sub>sc</sub> = 1367 W/m²</em>, solar declination $\delta = 23{,}45^\circ \sin\left(\frac{360^\circ}{365}(284+n)\right)$ and sunset angle $\omega_s = \arccos(-\tan\phi \tan\delta)$.'
-                      : 'donde <em>I<sub>sc</sub> = 1367 W/m²</em>, declinación $\delta = 23{,}45^\circ \sin\left(\frac{360^\circ}{365}(284+n)\right)$ y ángulo de puesta $\omega_s = \arccos(-\tan\phi \tan\delta)$.'}
+                      ? 'where <em>I<sub>sc</sub> = 1367 W/m²</em>, <em>E<sub>0</sub> = 1 + 0.033 cos(360&deg;n/365)</em>, declination &delta; and sunset angle &omega;<sub>s</sub> = arccos(&minus;tan&phi; tan&delta;).'
+                      : 'donde <em>I<sub>sc</sub> = 1367 W/m²</em>, <em>E<sub>0</sub> = 1 + 0,033 cos(360&deg;n/365)</em>, declinación &delta; y ángulo de puesta &omega;<sub>s</sub> = arccos(&minus;tan&phi; tan&delta;).'}
                   </div>
-                  <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                  <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.15rem;">
                     ${isEn
                       ? 'Monthly clearness index <em>K<sub>tm</sub></em> and canonical Liu-Jordan diffuse fraction <em>K<sub>dm</sub></em>:'
                       : 'Índice de claridad mensual <em>K<sub>tm</sub></em> y fracción difusa de Liu y Jordan <em>K<sub>dm</sub></em>:'}
                   </div>
-                  <div style="background: var(--bg-card); padding: 0.4rem 0.6rem; border-radius: 4px; border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-main); overflow-x: auto;">
-                    $$K_{tm} = \frac{G_{dm}(0)}{G_{0d}} \qquad K_{dm} = \frac{D_{dm}(0)}{G_{dm}(0)} = 1{,}0 - 1{,}13 \cdot K_{tm} \quad (0 \le K_{dm} \le 1)$$
-                    $$D_{dm}(0) = K_{dm} \cdot G_{dm}(0) \qquad B_{dm}(0) = G_{dm}(0) - D_{dm}(0)$$
+                  <div style="background: var(--bg-card); padding: 0.5rem 0.75rem; border-radius: 5px; border: 1px solid var(--border-subtle); font-family: 'Cambria Math', 'Times New Roman', serif; font-size: 0.78rem; color: var(--text-main); display: flex; flex-direction: column; gap: 0.35rem; overflow-x: auto;">
+                    <div style="display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;">
+                      <span><em>K<sub>tm</sub></em> = <sup>G<sub>dm</sub>(0)</sup>&frasl;<sub>G<sub>0d</sub></sub></span>
+                      <span>&bull;</span>
+                      <span><em>K<sub>dm</sub></em> = <sup>D<sub>dm</sub>(0)</sup>&frasl;<sub>G<sub>dm</sub>(0)</sub> = 1,0 &minus; 1,13 &middot; <em>K<sub>tm</sub></em></span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; font-size: 0.74rem;">
+                      <span><em>D<sub>dm</sub>(0)</em> = <em>K<sub>dm</sub></em> &middot; <em>G<sub>dm</sub>(0)</em></span>
+                      <span>&bull;</span>
+                      <span><em>B<sub>dm</sub>(0)</em> = <em>G<sub>dm</sub>(0)</em> &minus; <em>D<sub>dm</sub>(0)</em></span>
+                    </div>
+                    <div style="font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-muted); opacity: 0.85; margin-top: 0.15rem;">
+                      LaTeX: <code>K_{tm} = \frac{G_{dm}(0)}{G_{0d}}, \quad K_{dm} = \frac{D_{dm}(0)}{G_{dm}(0)} = 1.0 - 1.13 K_{tm}</code>
+                    </div>
                   </div>
                 </div>
 
                 <!-- Module 2: Isotropic Transposition to Tilted Plane -->
-                <div style="background: var(--bg-primary); padding: 0.7rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.45rem;">
+                <div style="background: var(--bg-primary); padding: 0.75rem 0.9rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.5rem;">
                   <div style="font-weight: 700; color: #059669; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
                     <span>📐</span>
                     <span>${isEn ? '2. Isotropic Transposition to Slope β (DdBeta.m & GdBeta.m)' : '2. Transposición Isotrópica a Superficie Inclinada β (DdBeta.m y GdBeta.m)'}</span>
@@ -1503,42 +1525,70 @@ export function renderPythonConsole(): HTMLElement {
                       ? 'Global daily irradiation on surface tilted at slope <em>β</em> facing equator (Liu-Jordan isotropic model):'
                       : 'Irradiación global diaria sobre superficie con inclinación <em>β</em> orientada al ecuador (modelo isotrópico de Liu-Jordan):'}
                   </div>
-                  <div style="background: var(--bg-card); padding: 0.45rem 0.6rem; border-radius: 4px; border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-main); overflow-x: auto;">
-                    $$G_d(\beta) = B_{dm}(0) \cdot R_b + D_{dm}(0) \left(\frac{1 + \cos\beta}{2}\right) + G_{dm}(0) \cdot \rho \left(\frac{1 - \cos\beta}{2}\right)$$
+                  <div style="background: var(--bg-card); padding: 0.55rem 0.75rem; border-radius: 5px; border: 1px solid var(--border-subtle); font-family: 'Cambria Math', 'Times New Roman', serif; font-size: 0.78rem; color: var(--text-main); display: flex; flex-direction: column; gap: 0.35rem; overflow-x: auto;">
+                    <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+                      <strong style="font-style: italic;">G<sub>dm</sub>(&beta;)</strong> = 
+                      <span>B<sub>dm</sub>(0) &middot; R<sub>b</sub></span> + 
+                      <span>D<sub>dm</sub>(0) &middot; ( <sup>1 + cos&beta;</sup>&frasl;<sub>2</sub> )</span> + 
+                      <span>G<sub>dm</sub>(0) &middot; &rho; &middot; ( <sup>1 &minus; cos&beta;</sup>&frasl;<sub>2</sub> )</span>
+                    </div>
+                    <div style="font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-muted); opacity: 0.85; margin-top: 0.2rem;">
+                      LaTeX: <code>G_{dm}(\beta) = B_{dm}(0)R_b + D_{dm}(0)\left(\frac{1+\cos\beta}{2}\right) + G_{dm}(0)\rho\left(\frac{1-\cos\beta}{2}\right)</code>
+                    </div>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.70rem;">
                     ${isEn
-                      ? 'Geometric direct beam transposition ratio <em>R<sub>b</sub></em> and ground albedo $\rho = 0{,}20$:'
-                      : 'Factor geométrico de transposición directa <em>R<sub>b</sub></em> y albedo del suelo $\rho = 0{,}20$:'}
+                      ? 'Geometric direct beam transposition ratio <em>R<sub>b</sub></em> (Klein, 1977) and ground albedo &rho; = 0.20:'
+                      : 'Factor geométrico de transposición directa <em>R<sub>b</sub></em> (Klein, 1977) y albedo del suelo &rho; = 0,20:'}
                   </div>
-                  <div style="background: var(--bg-card); padding: 0.4rem 0.6rem; border-radius: 4px; border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-main); overflow-x: auto;">
-                    $$R_b = \frac{\cos(\phi - \beta) \cos\delta \sin\omega'_s + \left(\frac{\pi \omega'_s}{180^\circ}\right) \sin(\phi - \beta) \sin\delta}{\cos\phi \cos\delta \sin\omega_s + \left(\frac{\pi \omega_s}{180^\circ}\right) \sin\phi \sin\delta}$$
-                    $$\omega'_s = \min\left\{\omega_s, \, \arccos(-\tan(\phi - \beta)\tan\delta)\right\}$$
+                  <div style="background: var(--bg-card); padding: 0.5rem 0.75rem; border-radius: 5px; border: 1px solid var(--border-subtle); font-family: 'Cambria Math', 'Times New Roman', serif; font-size: 0.78rem; color: var(--text-main); display: flex; flex-direction: column; gap: 0.35rem; overflow-x: auto;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                      <strong style="font-style: italic;">R<sub>b</sub></strong> = 
+                      <span style="display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1;">
+                        <span style="border-bottom: 1px solid currentColor; padding: 0 4px;">cos(&phi; &minus; &beta;) cos&delta; sin&omega;'<sub>s</sub> + (&pi;&omega;'<sub>s</sub> / 180&deg;) sin(&phi; &minus; &beta;) sin&delta;</span>
+                        <span>cos&phi; cos&delta; sin&omega;<sub>s</sub> + (&pi;&omega;<sub>s</sub> / 180&deg;) sin&phi; sin&delta;</span>
+                      </span>
+                    </div>
+                    <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 0.2rem;">
+                      &omega;'<sub>s</sub> = min{ &omega;<sub>s</sub> , arccos(&minus;tan(&phi; &minus; &beta;) tan&delta;) }
+                    </div>
+                    <div style="font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-muted); opacity: 0.85; margin-top: 0.15rem;">
+                      LaTeX: <code>R_b(\beta) = \frac{\cos(\phi-\beta)\cos\delta\sin\omega'_s + \frac{\pi\omega'_s}{180^\circ}\sin(\phi-\beta)\sin\delta}{\cos\phi\cos\delta\sin\omega_s + \frac{\pi\omega_s}{180^\circ}\sin\phi\sin\delta}</code>
+                    </div>
                   </div>
                 </div>
 
                 <!-- Module 3: Annual Optimum Search & Verification Rules -->
-                <div style="background: var(--bg-primary); padding: 0.7rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.45rem;">
+                <div style="background: var(--bg-primary); padding: 0.75rem 0.9rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.5rem;">
                   <div style="font-weight: 700; color: #d97706; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
                     <span>⚡</span>
                     <span>${isEn ? '3. Annual Optimum Search & Physical Assertions (Calculos_optimo.m)' : '3. Búsqueda de Óptimo Anual y Verificación Física (Calculos_optimo.m)'}</span>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.71rem;">
                     ${isEn
-                      ? 'Discrete sweep across 91 inclination angles $\beta \in [0^\circ, 90^\circ]$ to maximize annual cumulative yield:'
-                      : 'Barrido angular discreto en 91 inclinaciones $\beta \in [0^\circ, 90^\circ]$ para maximizar la captación anual acumulada:'}
+                      ? 'Discrete angular sweep across 91 inclination angles &beta; &in; [0&deg;, 90&deg;] maximizing annual collection:'
+                      : 'Barrido angular discreto en 91 inclinaciones &beta; &in; [0&deg;, 90&deg;] para maximizar la captación anual:'}
                   </div>
-                  <div style="background: var(--bg-card); padding: 0.45rem 0.6rem; border-radius: 4px; border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-main); overflow-x: auto;">
-                    $$\beta_{opt} = \arg\max_{\beta \in [0^\circ, 90^\circ]} \sum_{m=1}^{12} G_{dm}(\beta) \qquad \text{Ganancia (\%)} = \left(\frac{G_{dm}(\beta_{opt}) - G_{dm}(0)}{G_{dm}(0)}\right) \times 100$$
+                  <div style="background: var(--bg-card); padding: 0.55rem 0.75rem; border-radius: 5px; border: 1px solid var(--border-subtle); font-family: 'Cambria Math', 'Times New Roman', serif; font-size: 0.78rem; color: var(--text-main); display: flex; flex-direction: column; gap: 0.35rem; overflow-x: auto;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                      <strong style="font-style: italic;">&beta;<sub>opt</sub></strong> = 
+                      <span>arg max<sub>&beta; &in; [0&deg;, 90&deg;]</sub> &sum;<sub>m=1</sub><sup>12</sup> G<sub>dm</sub>(&beta;) &middot; N<sub>m</sub></span>
+                    </div>
+                    <div style="font-size: 0.73rem; color: var(--text-muted);">
+                      Ganancia (%) = [ ( G<sub>dm</sub>(&beta;<sub>opt</sub>) &minus; G<sub>dm</sub>(0) ) / G<sub>dm</sub>(0) ] &times; 100
+                    </div>
+                    <div style="font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-muted); opacity: 0.85; margin-top: 0.2rem;">
+                      LaTeX: <code>\beta_{opt} = \arg\max_{\beta \in [0^\circ, 90^\circ]} \sum_{m=1}^{12} G_{dm}(\beta) \cdot N_m</code>
+                    </div>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.70rem; margin-top: 0.15rem;">
-                    ${isEn ? 'Real-time scientific integrity assertions validated by OrientSol Python/WASM engine:' : 'Aserciones de integridad física auditadas en tiempo real por el motor Python/WASM:'}
+                    ${isEn ? 'Real-time scientific integrity assertions audited by OrientSol Python/WASM engine:' : 'Aserciones de integridad física auditadas en tiempo real por el motor Python/WASM:'}
                   </div>
-                  <ul style="margin: 0; padding-left: 1rem; font-size: 0.69rem; color: var(--text-muted); line-height: 1.4;">
-                    <li><strong>${isEn ? 'Ceiling Assertion:' : 'Techo Extraterrestre:'}</strong> $G_{dm}(0) \le G_{0d} + 0{,}05\text{ kWh/m}^2\cdot\text{d}$</li>
-                    <li><strong>${isEn ? 'Closure Relation:' : 'Ley de Cierre Físico:'}</strong> $|(B_{dm} + D_{dm}) - G_{dm}(0)| < 0{,}05\text{ kWh/m}^2\cdot\text{d}$</li>
-                    <li><strong>${isEn ? 'Optimum Consistency:' : 'Consistencia de Óptimo:'}</strong> $G_{dm}(\beta_{opt}) \ge G_{dm}(0) - 0{,}02\text{ kWh/m}^2\cdot\text{d}$</li>
-                    <li><strong>${isEn ? 'WMO-No. 8 Tolerance:' : 'Tolerancia Norma OMM Nº 8:'}</strong> $\text{Desv \%} = \frac{G_{dm}^{OS}(\beta_{opt}) - G_{dm}^{PVGIS}(\beta_{opt})}{G_{dm}^{PVGIS}(\beta_{opt})} \times 100 \le 10\%$</li>
+                  <ul style="margin: 0; padding-left: 1rem; font-size: 0.70rem; color: var(--text-muted); line-height: 1.45;">
+                    <li><strong>${isEn ? 'Ceiling Assertion:' : 'Techo Extraterrestre:'}</strong> G<sub>dm</sub>(0) &le; G<sub>0d</sub> + 0,05 kWh/m&sup2;&middot;d</li>
+                    <li><strong>${isEn ? 'Closure Relation:' : 'Ley de Cierre Físico:'}</strong> |(B<sub>dm</sub> + D<sub>dm</sub>) &minus; G<sub>dm</sub>(0)| &lt; 0,05 kWh/m&sup2;&middot;d</li>
+                    <li><strong>${isEn ? 'Optimum Consistency:' : 'Consistencia de Óptimo:'}</strong> G<sub>dm</sub>(&beta;<sub>opt</sub>) &ge; G<sub>dm</sub>(0) &minus; 0,02 kWh/m&sup2;&middot;d</li>
+                    <li><strong>${isEn ? 'WMO-No. 8 Tolerance:' : 'Tolerancia Norma OMM Nº 8:'}</strong> Desv (%) = |G<sub>dm</sub><sup>OS</sup> &minus; G<sub>dm</sub><sup>PVGIS</sup>| / G<sub>dm</sub><sup>PVGIS</sup> &times; 100 &le; 10%</li>
                   </ul>
                 </div>
               </div>
