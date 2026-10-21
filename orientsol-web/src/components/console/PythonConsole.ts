@@ -1445,64 +1445,118 @@ export function renderPythonConsole(): HTMLElement {
               </p>
             </div>
 
-            <!-- COMPARATIVE METHODOLOGICAL STUDY: PVGIS vs. Supabase / Terrestrial & Optimal Tilt Sensitivity -->
+            <!-- EXHAUSTIVE MATHEMATICAL FOUNDATION: LIU-JORDAN METHOD & VERIFICATION FORMULATION (LaTeX) -->
             <div style="margin-top: 0.75rem; padding: 0.85rem 1rem; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.75rem;">
               <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem;">
                 <div style="display: flex; align-items: center; gap: 0.45rem;">
-                  <span style="font-size: 0.95rem;">🔬</span>
+                  <span style="font-size: 0.95rem;">📐</span>
                   <strong style="color: var(--text-main); font-size: 0.82rem;">
                     ${isEn
-                      ? 'Methodological Analysis: Optimal Tilt Sensitivity & Radiation Source Comparison (PVGIS vs. Supabase)'
-                      : 'Estudio Metodológico: Sensibilidad del Ángulo Óptimo y Comparativa de Fuentes (PVGIS vs. Supabase / Terrestre)'}
+                      ? 'Exhaustive Mathematical Foundation: Liu-Jordan Method (1960/1963) & Verification Algorithms'
+                      : 'Fundamento Matemático Exhaustivo: Método de Liu-Jordan (1960/1963) y Algoritmos de Verificación'}
                   </strong>
                 </div>
                 <span class="badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-size: 0.68rem; font-weight: 700; border: 1px solid rgba(2, 132, 199, 0.25); padding: 0.15rem 0.5rem; border-radius: 4px;">
-                  ${isEn ? 'Scientific Justification (TFM)' : 'Fundamento Científico para TFM'}
+                  ${isEn ? 'Physical Models & LaTeX Formulation' : 'Modelos Físicos & Notación LaTeX'}
                 </span>
               </div>
 
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem; font-size: 0.72rem; line-height: 1.45;">
-                <!-- Box 1: Why tilt angles differ -->
-                <div style="background: var(--bg-primary); padding: 0.65rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.35rem;">
-                  <div style="font-weight: 700; color: #0284c7; font-size: 0.75rem; display: flex; align-items: center; gap: 0.35rem;">
-                    <span>📐</span>
-                    <span>${isEn ? '1. Why do OrientSol and PVGIS optimal tilts differ?' : '1. ¿Por qué difiere la inclinación óptima entre OrientSol y PVGIS?'}</span>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 0.75rem; font-size: 0.72rem; line-height: 1.5;">
+                <!-- Module 1: Horizontal Decomposition & Liu-Jordan Fraction -->
+                <div style="background: var(--bg-primary); padding: 0.7rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.45rem;">
+                  <div style="font-weight: 700; color: #0284c7; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                    <span>☀️</span>
+                    <span>${isEn ? '1. Horizontal Decomposition (Bdm0.m & Ddm0.m)' : '1. Descomposición Horizontal y Claridad (Bdm0.m y Ddm0.m)'}</span>
                   </div>
-                  <p style="margin: 0; color: var(--text-muted);">
+                  <div style="color: var(--text-muted); font-size: 0.71rem;">
                     ${isEn
-                      ? '<strong>Isotropic vs. Anisotropic Sky Models:</strong> OrientSol applies the classic <em>Liu & Jordan (1960)</em> isotropic model, which assumes sky diffuse radiation is uniformly spread (<em>F<sub>sky</sub> = (1 + cos β)/2</em>), moderately penalizing higher tilt angles. Conversely, European PVGIS 5.3 relies on the <em>Muneer (1990/2004)</em> anisotropic transposition model, capturing concentrated <em>circumsolar brightening</em> around the sun disk. In high/medium latitudes, Muneer increases tilted winter/autumn capture with steeper slopes (&asymp; 33°–45°), whereas Liu-Jordan gives more weight to summer noon rays (&asymp; 30°–37°).'
-                      : '<strong>Modelo Isotrópico vs. Anisótropo:</strong> OrientSol utiliza el modelo isotrópico de <em>Liu y Jordan (1960)</em>, el cual asume que la radiación difusa se distribuye uniformemente por toda la bóveda celeste (<em>F<sub>cielo</sub> = (1 + cos β)/2</em>), penalizando inclinaciones elevadas. En contraste, PVGIS 5.3 del JRC implementa el modelo anisótropo de <em>Muneer (1990/2004)</em>, que modela el <em>brillo circunsolar</em> concentrado alrededor del disco solar. En otoño/invierno, Muneer favorece ángulos más empinados (&asymp; 33°–45°) para captar esa radiación rasante, mientras Liu-Jordan pondera más los rayos altos estivales (&asymp; 30°–37°).'}
-                  </p>
+                      ? 'Extraterrestrial horizontal daily radiation <em>G<sub>0d</sub></em> computed on Klein characteristic day <em>n</em>:'
+                      : 'Radiación extraterrestre diaria sobre superficie horizontal <em>G<sub>0d</sub></em> evaluada en el día medio de Klein <em>n</em>:'}
+                  </div>
+                  <div style="background: var(--bg-card); padding: 0.45rem 0.6rem; border-radius: 4px; border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-main); overflow-x: auto;">
+                    $$G_{0d} = \frac{24}{\pi} I_{sc} \left[1 + 0{,}033 \cos\left(\frac{2\pi n}{365}\right)\right] \left[\cos\phi \cos\delta \sin\omega_s + \left(\frac{\pi \omega_s}{180^\circ}\right) \sin\phi \sin\delta\right]$$
+                  </div>
+                  <div style="color: var(--text-muted); font-size: 0.70rem;">
+                    ${isEn
+                      ? 'where <em>I<sub>sc</sub> = 1367 W/m²</em>, solar declination $\delta = 23{,}45^\circ \sin\left(\frac{360^\circ}{365}(284+n)\right)$ and sunset angle $\omega_s = \arccos(-\tan\phi \tan\delta)$.'
+                      : 'donde <em>I<sub>sc</sub> = 1367 W/m²</em>, declinación $\delta = 23{,}45^\circ \sin\left(\frac{360^\circ}{365}(284+n)\right)$ y ángulo de puesta $\omega_s = \arccos(-\tan\phi \tan\delta)$.'}
+                  </div>
+                  <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                    ${isEn
+                      ? 'Monthly clearness index <em>K<sub>tm</sub></em> and canonical Liu-Jordan diffuse fraction <em>K<sub>dm</sub></em>:'
+                      : 'Índice de claridad mensual <em>K<sub>tm</sub></em> y fracción difusa de Liu y Jordan <em>K<sub>dm</sub></em>:'}
+                  </div>
+                  <div style="background: var(--bg-card); padding: 0.4rem 0.6rem; border-radius: 4px; border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-main); overflow-x: auto;">
+                    $$K_{tm} = \frac{G_{dm}(0)}{G_{0d}} \qquad K_{dm} = \frac{D_{dm}(0)}{G_{dm}(0)} = 1{,}0 - 1{,}13 \cdot K_{tm} \quad (0 \le K_{dm} \le 1)$$
+                    $$D_{dm}(0) = K_{dm} \cdot G_{dm}(0) \qquad B_{dm}(0) = G_{dm}(0) - D_{dm}(0)$$
+                  </div>
                 </div>
 
-                <!-- Box 2: PVGIS vs Supabase with same methodology -->
-                <div style="background: var(--bg-primary); padding: 0.65rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.35rem;">
-                  <div style="font-weight: 700; color: #059669; font-size: 0.75rem; display: flex; align-items: center; gap: 0.35rem;">
-                    <span>⚖️</span>
-                    <span>${isEn ? '2. What if PVGIS vs. Supabase data are run with identical methods?' : '2. ¿Habría gran diferencia usando PVGIS vs. Supabase con la misma metodología?'}</span>
+                <!-- Module 2: Isotropic Transposition to Tilted Plane -->
+                <div style="background: var(--bg-primary); padding: 0.7rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.45rem;">
+                  <div style="font-weight: 700; color: #059669; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                    <span>📐</span>
+                    <span>${isEn ? '2. Isotropic Transposition to Slope β (DdBeta.m & GdBeta.m)' : '2. Transposición Isotrópica a Superficie Inclinada β (DdBeta.m y GdBeta.m)'}</span>
                   </div>
-                  <p style="margin: 0; color: var(--text-muted);">
+                  <div style="color: var(--text-muted); font-size: 0.71rem;">
                     ${isEn
-                      ? '<strong>Structural Tilt Invariance (&Delta;&beta; &le; 1°–3°):</strong> The optimal tilt &beta;<sub>opt</sub> is determined in &asymp; 90% by celestial orbital geometry (latitude &phi;, declination &delta;, sun hours) and only &asymp; 10% by seasonal cloudiness weighting. Because PVGIS satellite data and Supabase/ground records follow the exact same seasonal bell curve, running either dataset under the <em>same mathematical algorithm</em> yields virtually identical angles (&plusmn;1° to &plusmn;2°). By <em>Lambert’s Cosine Law</em>, the annual energy curve is flat at the apex (<em>dE/d&beta; &asymp; 0</em>), causing less than 0.2%–0.5% energy difference. The actual divergence lies in <strong>total absolute yield (kWh/year)</strong> and economic payback, not in structural tilt design.'
-                      : '<strong>Invarianza del Ángulo Estructural (&Delta;&beta; &le; 1°–3°):</strong> La inclinación óptima &beta;<sub>opt</sub> viene fijada en un &asymp; 90% por la geometría astronómica invariable (latitud &phi;, declinación solar &delta; y horas de sol) y solo en un &asymp; 10% por el peso de la nubosidad estacional. Como los datos satelitales de PVGIS y las estaciones terrestres de Supabase comparten la misma curva estacional anual (pico en verano y valle en invierno), aplicar la <em>misma metodología matemática</em> da ángulos casi idénticos (&plusmn;1° a &plusmn;2°). Por la <em>Ley del Coseno de Lambert</em>, la curva de captación es muy plana en la cúspide (<em>dE/d&beta; &asymp; 0</em>), con una variación energética &lt; 0,2%–0,5%. La verdadera diferencia radica en la <strong>producción total acumulada (kWh/año)</strong> y el retorno económico, no en el ángulo estructural.'}
-                  </p>
+                      ? 'Global daily irradiation on surface tilted at slope <em>β</em> facing equator (Liu-Jordan isotropic model):'
+                      : 'Irradiación global diaria sobre superficie con inclinación <em>β</em> orientada al ecuador (modelo isotrópico de Liu-Jordan):'}
+                  </div>
+                  <div style="background: var(--bg-card); padding: 0.45rem 0.6rem; border-radius: 4px; border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-main); overflow-x: auto;">
+                    $$G_d(\beta) = B_{dm}(0) \cdot R_b + D_{dm}(0) \left(\frac{1 + \cos\beta}{2}\right) + G_{dm}(0) \cdot \rho \left(\frac{1 - \cos\beta}{2}\right)$$
+                  </div>
+                  <div style="color: var(--text-muted); font-size: 0.70rem;">
+                    ${isEn
+                      ? 'Geometric direct beam transposition ratio <em>R<sub>b</sub></em> and ground albedo $\rho = 0{,}20$:'
+                      : 'Factor geométrico de transposición directa <em>R<sub>b</sub></em> y albedo del suelo $\rho = 0{,}20$:'}
+                  </div>
+                  <div style="background: var(--bg-card); padding: 0.4rem 0.6rem; border-radius: 4px; border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-main); overflow-x: auto;">
+                    $$R_b = \frac{\cos(\phi - \beta) \cos\delta \sin\omega'_s + \left(\frac{\pi \omega'_s}{180^\circ}\right) \sin(\phi - \beta) \sin\delta}{\cos\phi \cos\delta \sin\omega_s + \left(\frac{\pi \omega_s}{180^\circ}\right) \sin\phi \sin\delta}$$
+                    $$\omega'_s = \min\left\{\omega_s, \, \arccos(-\tan(\phi - \beta)\tan\delta)\right\}$$
+                  </div>
+                </div>
+
+                <!-- Module 3: Annual Optimum Search & Verification Rules -->
+                <div style="background: var(--bg-primary); padding: 0.7rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.45rem;">
+                  <div style="font-weight: 700; color: #d97706; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                    <span>⚡</span>
+                    <span>${isEn ? '3. Annual Optimum Search & Physical Assertions (Calculos_optimo.m)' : '3. Búsqueda de Óptimo Anual y Verificación Física (Calculos_optimo.m)'}</span>
+                  </div>
+                  <div style="color: var(--text-muted); font-size: 0.71rem;">
+                    ${isEn
+                      ? 'Discrete sweep across 91 inclination angles $\beta \in [0^\circ, 90^\circ]$ to maximize annual cumulative yield:'
+                      : 'Barrido angular discreto en 91 inclinaciones $\beta \in [0^\circ, 90^\circ]$ para maximizar la captación anual acumulada:'}
+                  </div>
+                  <div style="background: var(--bg-card); padding: 0.45rem 0.6rem; border-radius: 4px; border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-main); overflow-x: auto;">
+                    $$\beta_{opt} = \arg\max_{\beta \in [0^\circ, 90^\circ]} \sum_{m=1}^{12} G_{dm}(\beta) \qquad \text{Ganancia (\%)} = \left(\frac{G_{dm}(\beta_{opt}) - G_{dm}(0)}{G_{dm}(0)}\right) \times 100$$
+                  </div>
+                  <div style="color: var(--text-muted); font-size: 0.70rem; margin-top: 0.15rem;">
+                    ${isEn ? 'Real-time scientific integrity assertions validated by OrientSol Python/WASM engine:' : 'Aserciones de integridad física auditadas en tiempo real por el motor Python/WASM:'}
+                  </div>
+                  <ul style="margin: 0; padding-left: 1rem; font-size: 0.69rem; color: var(--text-muted); line-height: 1.4;">
+                    <li><strong>${isEn ? 'Ceiling Assertion:' : 'Techo Extraterrestre:'}</strong> $G_{dm}(0) \le G_{0d} + 0{,}05\text{ kWh/m}^2\cdot\text{d}$</li>
+                    <li><strong>${isEn ? 'Closure Relation:' : 'Ley de Cierre Físico:'}</strong> $|(B_{dm} + D_{dm}) - G_{dm}(0)| < 0{,}05\text{ kWh/m}^2\cdot\text{d}$</li>
+                    <li><strong>${isEn ? 'Optimum Consistency:' : 'Consistencia de Óptimo:'}</strong> $G_{dm}(\beta_{opt}) \ge G_{dm}(0) - 0{,}02\text{ kWh/m}^2\cdot\text{d}$</li>
+                    <li><strong>${isEn ? 'WMO-No. 8 Tolerance:' : 'Tolerancia Norma OMM Nº 8:'}</strong> $\text{Desv \%} = \frac{G_{dm}^{OS}(\beta_{opt}) - G_{dm}^{PVGIS}(\beta_{opt})}{G_{dm}^{PVGIS}(\beta_{opt})} \times 100 \le 10\%$</li>
+                  </ul>
                 </div>
               </div>
 
-              <!-- Box 3: Formal Scientific References -->
+              <!-- References Footer -->
               <div style="background: rgba(2, 132, 199, 0.04); padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid rgba(2, 132, 199, 0.18);">
-                <div style="font-weight: 700; color: var(--text-main); font-size: 0.74rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+                <div style="font-weight: 700; color: var(--text-main); font-size: 0.73rem; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.35rem;">
                   <span>📚</span>
-                  <span>${isEn ? 'Formal Scientific References (International Solar Standards):' : 'Referencias Científicas y Metodológicas Internacionales:'}</span>
+                  <span>${isEn ? 'Canonical Scientific References:' : 'Referencias Científicas Canónicas del Modelo:'}</span>
                 </div>
-                <ul style="margin: 0; padding-left: 1.15rem; font-size: 0.69rem; color: var(--text-muted); line-height: 1.45; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0.25rem 0.75rem;">
-                  <li><strong>Liu, B. Y. H., & Jordan, R. C. (1960/1963):</strong> <em>The interrelationship and characteristic distribution of direct, diffuse and total solar radiation</em>. Solar Energy, 4(3), 1–19. (Modelo canónico de descomposición y transposición isotrópica).</li>
-                  <li><strong>Muneer, T. (1990/2004):</strong> <em>Solar Radiation and Daylight Models</em>. Elsevier Butterworth-Heinemann. (Modelo anisótropo con brillo circunsolar adoptado por el JRC PVGIS).</li>
-                  <li><strong>Huld, T., Müller, R., & Gambardella, A. (2012):</strong> <em>A new solar radiation database for estimating PV performance in Europe and Africa (PVGIS)</em>. Solar Energy, 86(6), 1803–1815.</li>
-                  <li><strong>Erbs, D. G., Klein, S. A., & Duffie, J. A. (1982):</strong> <em>Estimation of diffuse radiation fraction for hourly, daily and monthly-average global radiation</em>. Solar Energy, 28(4), 293–302.</li>
-                  <li><strong>Klein, S. A. (1977):</strong> <em>Calculation of monthly average insolation on tilted surfaces</em>. Solar Energy, 19(4), 325–329. (Días medios característicos de Klein).</li>
-                  <li><strong>OMM / WMO (World Meteorological Organization):</strong> <em>Guide to Meteorological Instruments and Methods of Observation (WMO-No. 8)</em>. Guía oficial de instrumentación y tolerancias.</li>
-                </ul>
+                <div style="font-size: 0.68rem; color: var(--text-muted); line-height: 1.45; display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 0.25rem 0.75rem;">
+                  <div>• <strong>Liu, B. Y. H., & Jordan, R. C. (1960):</strong> <em>The interrelationship and characteristic distribution of direct, diffuse and total solar radiation</em>. Solar Energy, 4(3), 1–19.</div>
+                  <div>• <strong>Liu, B. Y. H., & Jordan, R. C. (1963):</strong> <em>The long-term average performance of flat-plate solar energy collectors</em>. Solar Energy, 7(2), 53–74.</div>
+                  <div>• <strong>Klein, S. A. (1977):</strong> <em>Calculation of monthly average insolation on tilted surfaces</em>. Solar Energy, 19(4), 325–329.</div>
+                  <div>• <strong>Duffie, J. A., & Beckman, W. A. (2013):</strong> <em>Solar Engineering of Thermal Processes</em> (4th ed.). John Wiley & Sons.</div>
+                  <div>• <strong>OMM / WMO (World Meteorological Organization):</strong> <em>Guide to Instruments and Methods of Observation (WMO-No. 8)</em>. Ginebra.</div>
+                  <div>• <strong>Huld, T. et al. (2012):</strong> <em>A new solar radiation database for estimating PV performance in Europe and Africa (PVGIS)</em>. Solar Energy, 86(6), 1803–1815.</div>
+                </div>
               </div>
             </div>
           </div>
