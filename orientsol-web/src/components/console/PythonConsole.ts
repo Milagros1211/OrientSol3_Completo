@@ -1618,7 +1618,13 @@ export function renderPythonConsole(): HTMLElement {
 
                   <!-- WMO badge -->
                   <td style="padding: 0.4rem 0.12rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
-                    <span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;">✓ OMM</span>
+                    ${mapeG0 <= 5.0
+                      ? `<span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;" title="${isEn ? 'Global Mean <= 5% (High Precision OMM Class 1)' : 'Media Global <= 5% (OMM Alta Precisión Clase 1)'}">✓ OMM (&lt;5%)</span>`
+                      : (mapeG0 <= 10.0
+                          ? `<span class="badge-status-valid" style="background: rgba(37,99,235,0.15); color:#2563eb; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;" title="${isEn ? 'Global Mean <= 10% (OMM-No. 8 Standard)' : 'Media Global <= 10% (Norma OMM Nº 8 Estándar)'}">✓ OMM (&lt;10%)</span>`
+                          : (mapeG0 <= 25.0
+                              ? `<span class="badge-status-valid" style="background: rgba(2,132,199,0.15); color:#0284c7; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;" title="${isEn ? 'Global Mean <= 25% (Seasonal Transition Spread)' : 'Media Global <= 25% (Variabilidad Estacional OMM)'}">✓ Var. Estacional</span>`
+                              : `<span class="badge-status-warn" style="background: rgba(217,119,6,0.15); color:#d97706; font-weight: 700; font-size: 0.58rem; padding: 0.1rem 0.25rem;">&gt;25% OMM</span>`))}
                   </td>
                 </tr>
               </tfoot>
