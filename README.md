@@ -255,29 +255,7 @@ OrientSol 4.0 está diseñado para funcionar de manera **100% autónoma y offlin
 
 ---
 
-### 3. 🐧 Linux (Ubuntu, Debian, Fedora, Arch, openSUSE)
-
-#### A. ¿Qué necesitas para ejecutar la app en Linux?
-* **Sistema Operativo:** Distribución Linux moderna con entorno gráfico X11 o Wayland (Ubuntu 20.04+, Debian 11+, Fedora 36+, etc.).
-* **Librería de sistema:** Soporte FUSE para paquetes AppImage (`libfuse2` en distribuciones modernas como Ubuntu 22.04 / 24.04):
-  ```bash
-  sudo apt update && sudo apt install libfuse2
-  ```
-* **Hardware mínimo:** Procesador de 64 bits, 4 GB RAM y 350 MB de almacenamiento libre.
-
-#### B. Paso a paso para usar el descargable (.AppImage):
-1. **Descarga:** Descarga el binario autónomo `OrientSol-4.0.0.AppImage` desde [Releases](https://github.com/Milagros1211/OrientSol4_Completo/releases/latest).
-2. **Permisos de Ejecución:** Abre la terminal en la carpeta de descarga y asigna permisos de ejecución al archivo:
-   ```bash
-   chmod +x OrientSol-4.0.0.AppImage
-   ```
-   *(O alternativamente, haz clic derecho sobre el archivo en el explorador gráfico > Propiedades > Permisos > Marcar "Permitir ejecutar como un programa").*
-3. **Ejecución:** Haz doble clic sobre el archivo o lánzalo desde terminal con `./OrientSol-4.0.0.AppImage`.
-4. **Uso:** El simulador se despliega con su motor WebAssembly aislado para máxima seguridad y rendimiento.
-
----
-
-### 4. 🤖 Android (Smartphones y Tablets — Android 7.0 a 16)
+### 3. 🤖 Android (Smartphones y Tablets — Android 7.0 a 16)
 
 #### A. ¿Qué necesitas para mantener la app en funcionamiento?
 * **Sistema Operativo:** Android 7.0 (Nougat, API nivel 24) o cualquier versión superior hasta Android 16.
@@ -295,7 +273,7 @@ OrientSol 4.0 está diseñado para funcionar de manera **100% autónoma y offlin
 
 ---
 
-### 5. 🌐 Navegador Web / PWA (Multiplataforma sin Instalación)
+### 4. 🌐 Navegador Web / PWA (Multiplataforma sin Instalación)
 
 #### A. ¿Qué necesitas?
 * Cualquier navegador web moderno con soporte para WebAssembly, Canvas y ES Modules:
@@ -314,7 +292,7 @@ OrientSol 4.0 está diseñado para funcionar de manera **100% autónoma y offlin
 
 ---
 
-### 6. 🛠️ Ejecución y Desarrollo Local desde Código Fuente (Para Desarrolladores)
+### 5. 🛠️ Ejecución y Desarrollo Local desde Código Fuente (Para Desarrolladores)
 
 Si deseas modificar el código fuente, ejecutar el servidor de desarrollo local o recompilar los binarios multiplataforma:
 
@@ -354,7 +332,7 @@ npm run --prefix orientsol-web build:win
 # Empaquetar instalador .dmg y .zip para macOS:
 npm run --prefix orientsol-web build:mac
 
-# Empaquetar para todas las plataformas de escritorio (Windows, macOS, Linux):
+# Empaquetar para todas las plataformas de escritorio (Windows, macOS):
 npm run --prefix orientsol-web build:all
 
 # Sincronizar assets web y compilar APK para Android:
