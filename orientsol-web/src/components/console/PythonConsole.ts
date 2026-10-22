@@ -10,6 +10,8 @@ import {
 import { solarSyncState } from '@/services/bridge/solarSyncState';
 import { formatNum, formatInt, formatAngle, formatPercent } from '@/utils/formatters';
 import { fetchPvgisClimateData } from '@/services/external/pvgisService';
+import { executeSolarSimulationFromClimateData } from '@/services/bridge/solarCalculationBridge';
+import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 
 const MONTH_NAMES_ES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -212,6 +214,44 @@ export function renderPythonConsole(): HTMLElement {
   let pvgisData: PVGISRecord | null = null;
   let showPvgisComparison = true;
 
+  // Real OrientSol engine (Pyodide, same code as the simulator) fed with PVGIS horizontal radiation
+  let pvgisEngineRes: SolarBridgeSimulationResult | null = null;
+  let pvgisEngineKey = '';
+  let isComputingPvgisEngine = false;
+
+  function ensurePvgisEngine() {
+    if (activeTab !== 'radiation' || !showPvgisComparison || !pvgisData) return;
+    const key = `${pvgisData.latitude}|${pvgisData.monthlyGdm0.join(',')}`;
+    if (key === pvgisEngineKey || isComputingPvgisEngine) return;
+    isComputingPvgisEngine = true;
+    const data = pvgisData;
+    const simTemps = solarSyncState.getLastSimulationResult()?.temperatures?.ambient?.monthlyMeanC;
+    executeSolarSimulationFromClimateData({
+      climateData: {
+        source: 'pvgis',
+        locationName: data.locationName,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        monthlyGdm0: data.monthlyGdm0,
+        monthlyTemperature: simTemps && simTemps.length === 12 ? simTemps : Array(12).fill(15),
+        fetchedAt: data.fetchedAt,
+      },
+    })
+      .then((res) => {
+        pvgisEngineRes = res;
+        pvgisEngineKey = key;
+      })
+      .catch((err) => {
+        console.warn('[PVGIS engine] Pyodide run failed, using TS fallback', err);
+        pvgisEngineRes = null;
+        pvgisEngineKey = key;
+      })
+      .finally(() => {
+        isComputingPvgisEngine = false;
+        renderView();
+      });
+  }
+
   function renderView() {
     // If on Tab 3 and PVGIS record not yet loaded, auto-initialize
     if (activeTab === 'radiation' && !pvgisData) {
@@ -229,6 +269,7 @@ export function renderPythonConsole(): HTMLElement {
         showPvgisComparison = false;
       }
     }
+    ensurePvgisEngine();
     const doy = dateToDayOfYear(stateDay, stateMonth);
     const latRad = (stateLat * Math.PI) / 180;
 
@@ -1111,8 +1152,8 @@ export function renderPythonConsole(): HTMLElement {
         const pvgisMonthly = pvgisData.monthlyGdm0;
 
         // Apply OrientSol's calculation motor Bdm0.m & Ddm0.m to PVGIS horizontal radiation:
-        const bdmPvgisOsArr: number[] = [];
-        const ddmPvgisOsArr: number[] = [];
+        let bdmPvgisOsArr: number[] = [];
+        let ddmPvgisOsArr: number[] = [];
 
         for (let m = 0; m < 12; m++) {
           const dec = getMonthlyDeclinationDeg(m);
@@ -1167,8 +1208,16 @@ export function renderPythonConsole(): HTMLElement {
           }
         }
 
-        const optTiltPvgisOs = bestAnnualTiltPvgis;
-        const monthlyGOptPvgisOs = pvgisGridTransposed[bestAnnualTiltPvgis].map(v => Math.round(v * 100) / 100);
+        let optTiltPvgisOs = bestAnnualTiltPvgis;
+        let monthlyGOptPvgisOs = pvgisGridTransposed[bestAnnualTiltPvgis].map(v => Math.round(v * 100) / 100);
+
+        // Prefer the REAL OrientSol engine (identical code path to the simulator) when available
+        if (pvgisEngineRes && pvgisEngineKey === `${pvgisData.latitude}|${pvgisData.monthlyGdm0.join(',')}`) {
+          bdmPvgisOsArr = pvgisEngineRes.horizontal.bdm0;
+          ddmPvgisOsArr = pvgisEngineRes.horizontal.ddm0;
+          optTiltPvgisOs = pvgisEngineRes.optimalAnnual.optimalTiltDeg;
+          monthlyGOptPvgisOs = pvgisEngineRes.optimalAnnual.monthlyDailyKwh;
+        }
 
         // 3. COMPARISON OF ALL VARIABLES (SIMULATOR VS PVGIS WITH SAME CALCULATION MOTOR):
         const pvgisRows = radRows.map((r, idx) => {
