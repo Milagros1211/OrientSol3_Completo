@@ -1810,9 +1810,9 @@ export function renderPythonConsole(): HTMLElement {
                 </div>
               </div>
 
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 0.75rem; font-size: 0.72rem; line-height: 1.5;">
+              <div class="math-foundation-grid">
                 <!-- Module 1: Horizontal Decomposition & Liu-Jordan Fraction -->
-                <div style="background: var(--bg-primary); padding: 0.75rem 0.9rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.5rem;">
+                <div class="math-module-card">
                   <div style="font-weight: 700; color: #0284c7; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
                     <span>☀️</span>
                     <span>${isEn ? '1. Horizontal Decomposition' : '1. Descomposición Horizontal y Claridad'}</span>
@@ -1822,10 +1822,10 @@ export function renderPythonConsole(): HTMLElement {
                       ? 'Extraterrestrial horizontal daily radiation <em>G<sub>0d</sub></em> computed on Klein characteristic day <em>n</em>:'
                       : 'Radiación extraterrestre diaria sobre superficie horizontal <em>G<sub>0d</sub></em> evaluada en el día medio de Klein <em>n</em>:'}
                   </div>
-                  <!-- Beautiful Rendered KaTeX Equation -->
-                  <div style="background: var(--bg-card); padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.45rem; overflow-x: auto;">
-                    <div style="font-size: 0.88rem; color: var(--text-main); text-align: center;">
-                      ${renderTex('G_{0d} = \\frac{24\\cdot 3600}{\\pi} I_{sc} E_0 \\left[ \\cos\\phi \\cos\\delta \\sin\\omega_s + \\frac{\\pi \\omega_s}{180^\\circ} \\sin\\phi \\sin\\delta \\right]', true)}
+                  <!-- Auto-fit KaTeX Equation (Zero Scroll) -->
+                  <div class="math-formula-box">
+                    <div style="color: var(--text-main); text-align: center; width: 100%;">
+                      ${renderTex('\\begin{aligned} G_{0d} &= \\frac{24\\cdot 3600}{\\pi} I_{sc} E_0 \\\\[2pt] &\\quad \\times \\left[ \\cos\\phi \\cos\\delta \\sin\\omega_s + \\frac{\\pi \\omega_s}{180^\\circ} \\sin\\phi \\sin\\delta \\right] \\end{aligned}', true)}
                     </div>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.70rem;">
@@ -1838,18 +1838,20 @@ export function renderPythonConsole(): HTMLElement {
                       ? 'Monthly clearness index and canonical Liu-Jordan diffuse fraction:'
                       : 'Índice de claridad mensual y fracción difusa de Liu y Jordan:'}
                   </div>
-                  <div style="background: var(--bg-card); padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.45rem; overflow-x: auto;">
-                    <div style="font-size: 0.84rem; color: var(--text-main); text-align: center;">
-                      ${renderTex('K_{tm} = \\frac{G_{dm}(0)}{G_{0d}}, \\quad K_{dm} = \\frac{D_{dm}(0)}{G_{dm}(0)} = 1.0 - 1.13 K_{tm}', true)}
+                  <div class="math-formula-box">
+                    <div style="color: var(--text-main); text-align: center; width: 100%;">
+                      ${renderTex(isEn
+                        ? 'K_{tm} = \\frac{G_{dm}(0)}{G_{0d}}, \\qquad K_{dm} = 1.0 - 1.13\\, K_{tm}'
+                        : 'K_{tm} = \\frac{G_{dm}(0)}{G_{0d}}, \\qquad K_{dm} = 1{,}0 - 1{,}13\\, K_{tm}', true)}
                     </div>
-                    <div style="font-size: 0.82rem; color: var(--text-muted); text-align: center; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
-                      ${renderTex('D_{dm}(0) = K_{dm} \\cdot G_{dm}(0), \\quad B_{dm}(0) = G_{dm}(0) - D_{dm}(0)', true)}
+                    <div style="color: var(--text-muted); text-align: center; width: 100%; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
+                      ${renderTex('D_{dm}(0) = K_{dm} \\cdot G_{dm}(0), \\qquad B_{dm}(0) = G_{dm}(0) - D_{dm}(0)', true)}
                     </div>
                   </div>
                 </div>
 
                 <!-- Module 2: Isotropic Transposition to Tilted Plane -->
-                <div style="background: var(--bg-primary); padding: 0.75rem 0.9rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.5rem;">
+                <div class="math-module-card">
                   <div style="font-weight: 700; color: #059669; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
                     <span>📐</span>
                     <span>${isEn ? '2. Isotropic Transposition to Slope β' : '2. Transposición Isotrópica a Superficie Inclinada β'}</span>
@@ -1859,9 +1861,9 @@ export function renderPythonConsole(): HTMLElement {
                       ? `Global daily irradiation on surface tilted at slope ${renderTex('\\beta')} facing equator (Liu-Jordan model):`
                       : `Irradiación global diaria sobre superficie con inclinación ${renderTex('\\beta')} orientada al ecuador (modelo de Liu-Jordan):`}
                   </div>
-                  <div style="background: var(--bg-card); padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.45rem; overflow-x: auto;">
-                    <div style="font-size: 0.84rem; color: var(--text-main); text-align: center;">
-                      ${renderTex('G_{dm}(\\beta) = B_{dm}(0) R_b + D_{dm}(0) \\left( \\frac{1 + \\cos\\beta}{2} \\right) + G_{dm}(0) \\rho \\left( \\frac{1 - \\cos\\beta}{2} \\right)', true)}
+                  <div class="math-formula-box">
+                    <div style="color: var(--text-main); text-align: center; width: 100%;">
+                      ${renderTex('\\begin{aligned} G_{dm}(\\beta) &= B_{dm}(0) R_b + D_{dm}(0) \\left( \\frac{1 + \\cos\\beta}{2} \\right) \\\\[2pt] &\\quad + G_{dm}(0)\\,\\rho \\left( \\frac{1 - \\cos\\beta}{2} \\right) \\end{aligned}', true)}
                     </div>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.70rem;">
@@ -1869,18 +1871,18 @@ export function renderPythonConsole(): HTMLElement {
                       ? `Geometric direct beam transposition ratio ${renderTex('R_b')} (Klein, 1977) and ground albedo ${renderTex('\\rho = 0.20')}:`
                       : `Factor geométrico de transposición directa ${renderTex('R_b')} (Klein, 1977) y albedo del suelo ${renderTex('\\rho = 0{,}20')}:`}
                   </div>
-                  <div style="background: var(--bg-card); padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.45rem; overflow-x: auto;">
-                    <div style="font-size: 0.82rem; color: var(--text-main); text-align: center;">
+                  <div class="math-formula-box math-compact">
+                    <div style="color: var(--text-main); text-align: center; width: 100%;">
                       ${renderTex('R_b(\\beta) = \\frac{\\cos(\\phi - \\beta) \\cos\\delta \\sin\\omega\'_s + \\frac{\\pi \\omega\'_s}{180^\\circ} \\sin(\\phi - \\beta) \\sin\\delta}{\\cos\\phi \\cos\\delta \\sin\\omega_s + \\frac{\\pi \\omega_s}{180^\\circ} \\sin\\phi \\sin\\delta}', true)}
                     </div>
-                    <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
-                      ${renderTex('\\omega\'_s = \\min\\{ \\omega_s , \\arccos(-\\tan(\\phi - \\beta) \\tan\\delta) \\}', true)}
+                    <div style="color: var(--text-muted); text-align: center; width: 100%; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
+                      ${renderTex('\\omega\'_s = \\min\\left\\{ \\omega_s , \\; \\arccos(-\\tan(\\phi - \\beta) \\tan\\delta) \\right\\}', true)}
                     </div>
                   </div>
                 </div>
 
                 <!-- Module 3: Annual Optimum Search & Verification Rules -->
-                <div style="background: var(--bg-primary); padding: 0.75rem 0.9rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.5rem;">
+                <div class="math-module-card">
                   <div style="font-weight: 700; color: #d97706; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
                     <span>⚡</span>
                     <span>${isEn ? '3. Annual Optimum Search & Physical Assertions' : '3. Búsqueda de Óptimo Anual y Verificación Física'}</span>
@@ -1890,12 +1892,14 @@ export function renderPythonConsole(): HTMLElement {
                       ? `Discrete angular sweep across 91 inclination angles ${renderTex('\\beta \\in [0^\\circ, 90^\\circ]')} maximizing annual collection:`
                       : `Barrido angular discreto en 91 inclinaciones ${renderTex('\\beta \\in [0^\\circ, 90^\\circ]')} para maximizar la captación anual:`}
                   </div>
-                  <div style="background: var(--bg-card); padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.45rem; overflow-x: auto;">
-                    <div style="font-size: 0.86rem; color: var(--text-main); text-align: center;">
+                  <div class="math-formula-box">
+                    <div style="color: var(--text-main); text-align: center; width: 100%;">
                       ${renderTex('\\beta_{opt} = \\arg\\max_{\\beta \\in [0^\\circ, 90^\\circ]} \\sum_{m=1}^{12} G_{dm}(\\beta) \\cdot N_m', true)}
                     </div>
-                    <div style="font-size: 0.78rem; color: var(--text-muted); text-align: center; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
-                      ${renderTex('\\text{Ganancia (\\%)} = \\left[ \\frac{G_{dm}(\\beta_{opt}) - G_{dm}(0)}{G_{dm}(0)} \\right] \\times 100', true)}
+                    <div style="color: var(--text-muted); text-align: center; width: 100%; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
+                      ${renderTex(isEn
+                        ? '\\text{Gain (\\%)} = \\left[ \\frac{G_{dm}(\\beta_{opt}) - G_{dm}(0)}{G_{dm}(0)} \\right] \\times 100'
+                        : '\\text{Ganancia (\\%)} = \\left[ \\frac{G_{dm}(\\beta_{opt}) - G_{dm}(0)}{G_{dm}(0)} \\right] \\times 100', true)}
                     </div>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.70rem; margin-top: 0.15rem;">
@@ -1916,7 +1920,7 @@ export function renderPythonConsole(): HTMLElement {
                   <span>📚</span>
                   <span>${isEn ? 'Canonical Scientific References:' : 'Referencias Científicas Canónicas del Modelo:'}</span>
                 </div>
-                <div style="font-size: 0.68rem; color: var(--text-muted); line-height: 1.45; display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 0.25rem 0.75rem;">
+                <div style="font-size: 0.68rem; color: var(--text-muted); line-height: 1.45; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 0.25rem 0.75rem;">
                   <div>• <strong>Liu, B. Y. H., & Jordan, R. C. (1960):</strong> <em>The interrelationship and characteristic distribution of direct, diffuse and total solar radiation</em>. Solar Energy, 4(3), 1–19.</div>
                   <div>• <strong>Liu, B. Y. H., & Jordan, R. C. (1963):</strong> <em>The long-term average performance of flat-plate solar energy collectors</em>. Solar Energy, 7(2), 53–74.</div>
                   <div>• <strong>Klein, S. A. (1977):</strong> <em>Calculation of monthly average insolation on tilted surfaces</em>. Solar Energy, 19(4), 325–329.</div>
