@@ -4615,7 +4615,9 @@ body.theme-light .btn-save-solar-chart:hover {
   transition: fill 0.15s ease;
 }
 
-.ranking-row:hover text {
+/* Dark mode only: white text on hover. In light mode the text keeps its color (white would vanish on the light background). */
+[data-theme="dark"] .ranking-row:hover text,
+body.theme-dark .ranking-row:hover text {
   fill: #ffffff;
 }
 
