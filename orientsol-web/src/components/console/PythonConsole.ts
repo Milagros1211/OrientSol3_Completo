@@ -1436,26 +1436,53 @@ export function renderPythonConsole(): HTMLElement {
         pvgisTableHtml = `
           ${wmoComplianceNotice}
 
+          <!-- INPUT DATA CLIMATOLOGY SUMMARY BAR (Gdm(0) [kWh/m²/d]) -->
+          <div style="padding: 0.6rem 1rem; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.35rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; font-size: 0.73rem;">
+              <div style="display: flex; align-items: center; gap: 0.45rem;">
+                <strong style="color: #0284c7; font-size: 0.75rem;">📥 ${isEn ? 'Input Climatological Data — Global Horizontal Irradiation Gdm(0) [kWh/m²·day]:' : 'Datos de Entrada Climatológicos — Irradiación Global Horizontal Gdm(0) [kWh/m²·día]:'}</strong>
+              </div>
+              <div style="font-size: 0.69rem; color: var(--text-muted);">
+                ${isEn ? 'Annual Daily Mean:' : 'Media Diaria Anual:'}
+                <strong style="color: var(--text-main); margin-left: 0.25rem;">Simulador: ${formatNum(meanG0Sim, 2)} kWh/m²·d</strong>
+                <span style="margin: 0 0.3rem;">|</span>
+                <strong style="color: #0284c7;">PVGIS: ${formatNum(meanG0Pvgis, 2)} kWh/m²·d</strong>
+                <span style="margin: 0 0.3rem;">(Δ ${meanDiffG0 >= 0 ? `+${formatNum(meanDiffG0, 2)}` : formatNum(meanDiffG0, 2)}, MAPE ${formatPercent(mapeG0, 1)})</span>
+              </div>
+            </div>
+            <!-- Month-by-month input vector preview -->
+            <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 0.25rem; font-size: 0.61rem; text-align: center; background: var(--bg-primary); padding: 0.35rem 0.45rem; border-radius: 4px; border: 1px solid var(--border-subtle);">
+              ${pvgisRows.map((r, mIdx) => `
+                <div style="display: flex; flex-direction: column; gap: 0.1rem; padding: 0.15rem 0.1rem; border-radius: 3px; ${r.isSelectedMonth ? 'background: rgba(16, 185, 129, 0.15); font-weight: 700;' : ''}">
+                  <span style="color: var(--text-muted); font-size: 0.58rem;">${months[mIdx].slice(0, 3)}</span>
+                  <span style="color: var(--text-main); font-weight: 600;" title="Simulador: ${formatNum(r.g0Sim, 2)}">${formatNum(r.g0Sim, 2)}</span>
+                  <span style="color: #0284c7; font-weight: 600;" title="PVGIS: ${formatNum(r.g0Pvgis, 2)}">${formatNum(r.g0Pvgis, 2)}</span>
+                  <span style="font-size: 0.54rem; color: ${r.diffG0 >= 0 ? '#059669' : '#dc2626'};">${formatPercent(r.pctG0, 0, true)}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
           <!-- COMPARISON DATA TABLE: ALL VARIABLES (SIMULATOR VS PVGIS SAME MOTOR) -->
           <div class="verif-table-wrap" style="overflow-x: hidden !important; overflow-y: auto !important; max-height: 480px; width: 100% !important; border: 1px solid var(--border-subtle); border-radius: 4px;">
             <table class="verif-data-table" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.65rem; margin: 0;">
               <thead>
                 <tr>
                   <th style="width: 6%; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">${isEn ? 'Month' : 'Mes'}</th>
-                  <th style="width: 15%; text-align: center; color: #0284c7; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'Global Gdm(0)<br/>Sim vs PVGIS [Δ | %]' : 'Global Gdm(0)<br/>Sim vs PVGIS [Δ | %]'}
+                  <th style="width: 15%; text-align: center; color: #0284c7; background: rgba(2, 132, 199, 0.05); padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
+                    ${isEn ? '📥 Global Gdm(0) [Input]<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)' : '📥 Global Gdm(0) [Entrada]<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)'}
                   </th>
                   <th style="width: 14%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'Direct Bdm<br/>Sim vs PVGIS [Δ | %]' : 'Directa Bdm<br/>Sim vs PVGIS [Δ | %]'}
+                    ${isEn ? 'Direct Bdm(0)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)' : 'Directa Bdm(0)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)'}
                   </th>
                   <th style="width: 14%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'Diffuse Ddm<br/>Sim vs PVGIS [Δ | %]' : 'Difusa Ddm<br/>Sim vs PVGIS [Δ | %]'}
+                    ${isEn ? 'Diffuse Ddm(0)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)' : 'Difusa Ddm(0)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)'}
                   </th>
                   <th style="width: 9%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'Tilt β_opt<br/>Sim / PVGIS' : 'Inclinación β_opt<br/>Sim / PVGIS'}
+                    ${isEn ? 'Tilt β_opt<br/>Sim / PVGIS<br/>(°)' : 'Inclinación β_opt<br/>Sim / PVGIS<br/>(°)'}
                   </th>
                   <th style="width: 15%; text-align: center; color: #059669; background: rgba(16, 185, 129, 0.05); font-weight: 800; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'Optimal Gdm(β_opt)<br/>Sim vs PVGIS [Δ | %]' : 'Óptimo Gdm(β_opt)<br/>Sim vs PVGIS [Δ | %]'}
+                    ${isEn ? 'Optimal Gdm(β_opt)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)' : 'Óptimo Gdm(β_opt)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)'}
                   </th>
                   <th style="width: 14%; text-align: center; padding: 0.35rem 0.1rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.60rem;">
                     ${isEn ? 'Gain vs Horiz (%)<br/>Sim vs PVGIS [Δ]' : 'Ganancia s/ Horiz (%)<br/>Sim vs PVGIS [Δ]'}
