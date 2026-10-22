@@ -9634,6 +9634,215 @@ body.theme-dark .operation-dropdown-select option {
   color: #f8fafc;
 }
 
+/* Operation Methodology & Input Data Treatment Card */
+.op-methodology-card-root {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.op-methodology-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.85rem 1.15rem;
+  margin-top: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: all 0.25s ease;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+
+[data-theme="dark"] .op-methodology-card,
+body.theme-dark .op-methodology-card {
+  background: rgba(14, 28, 42, 0.65);
+  border-color: rgba(56, 189, 248, 0.22);
+}
+
+.op-methodology-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.op-methodology-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.op-methodology-badge {
+  background: rgba(2, 132, 199, 0.12);
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.25);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.15rem 0.55rem;
+  border-radius: 4px;
+  letter-spacing: 0.03em;
+}
+
+[data-theme="dark"] .op-methodology-badge,
+body.theme-dark .op-methodology-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.op-methodology-title {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.btn-toggle-op-methodology {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s;
+}
+
+.btn-toggle-op-methodology:hover {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border-color: #0284c7;
+}
+
+.op-methodology-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: all 0.3s ease;
+  height: auto;
+  overflow: visible;
+}
+
+.op-methodology-body.collapsed {
+  display: none;
+}
+
+.op-methodology-summary {
+  font-size: 0.77rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+  background: rgba(2, 132, 199, 0.04);
+  padding: 0.45rem 0.75rem;
+  border-radius: 5px;
+  border-left: 3px solid #0284c7;
+}
+
+.op-methodology-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(360px, 1.4fr);
+  gap: 0.85rem;
+}
+
+@media (max-width: 960px) {
+  .op-methodology-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.op-methodology-col-input {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.73rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.op-methodology-col-math {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.op-col-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-main);
+  border-bottom: 1px dashed var(--border-subtle);
+  padding-bottom: 0.35rem;
+}
+
+.op-col-output {
+  margin-top: auto;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  font-size: 0.72rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  line-height: 1.4;
+}
+
+.op-math-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.op-math-step-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.op-math-step-label {
+  font-size: 0.71rem;
+  font-weight: 700;
+  color: #0284c7;
+}
+
+[data-theme="dark"] .op-math-step-label,
+body.theme-dark .op-math-step-label {
+  color: #38bdf8;
+}
+
+.op-math-box {
+  padding: 0.45rem 0.65rem;
+  background: var(--bg-card);
+  border-radius: 5px;
+}
+
+.op-math-step-note {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  font-style: italic;
+  padding-left: 0.25rem;
+}
+
 .operation-selector-bar {
   display: flex;
   gap: 0.5rem;

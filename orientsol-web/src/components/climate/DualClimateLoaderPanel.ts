@@ -35,6 +35,7 @@ import { renderTrackingAzimuthalStudyPanel } from '@/components/climate/Tracking
 import { renderTrackingHorizontalStudyPanel } from '@/components/climate/TrackingHorizontalStudyPanel';
 import { renderTrackingDualAxisStudyPanel } from '@/components/climate/TrackingDualAxisStudyPanel';
 import { renderComparativeStudyPanel } from '@/components/climate/ComparativeStudyPanel';
+import { renderOperationMethodologyCard, type SolarOperationType } from '@/components/climate/OperationMethodologyCard';
 
 // Module-level caches to preserve state across language toggles (ES <-> EN)
 let cachedLastSimulationResult: SolarBridgeSimulationResult | null = null;
@@ -1772,6 +1773,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             </option>
           </select>
         </div>
+
+        <!-- Dynamic Operation Data Input & Mathematical Treatment Description Card -->
+        <div id="operation-methodology-mount-point"></div>
       </div>
 
       <!-- Mount point for Active Solar Study Operation -->
@@ -1900,6 +1904,15 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     // Dynamic Study Operation Mount Manager (Prevents Endless HTML)
     const mountStudyOperation = (op: typeof cachedActiveStudyOp) => {
       cachedActiveStudyOp = op;
+
+      // Update the operation mathematical methodology & data input treatment card
+      const methodologyMountPoint = resultsContainer.querySelector<HTMLDivElement>('#operation-methodology-mount-point');
+      if (methodologyMountPoint) {
+        methodologyMountPoint.innerHTML = '';
+        const cardEl = renderOperationMethodologyCard(op as SolarOperationType, isEn, res.latitude, res.locationName);
+        methodologyMountPoint.appendChild(cardEl);
+      }
+
       const mountPoint = resultsContainer.querySelector<HTMLDivElement>('#active-study-mount-point');
       if (!mountPoint) return;
       mountPoint.innerHTML = '';
