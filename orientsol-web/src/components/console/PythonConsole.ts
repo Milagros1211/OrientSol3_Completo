@@ -252,6 +252,63 @@ export function renderPythonConsole(): HTMLElement {
       });
   }
 
+  let pvgisAutoTriedKey = '';
+
+  // Live PVGIS fetch for the exact site linked to the latitude slider (uses the active site's real coordinates)
+  async function fetchLivePvgis() {
+      const loc = getLocInfo(stateLat);
+      const activeSim = solarSyncState.getLastSimulationResult();
+      const simMatches = Boolean(activeSim && Math.abs(activeSim.latitude - stateLat) < 0.4);
+      const siteLat = simMatches ? activeSim!.latitude : stateLat;
+      const lon = loc.longitude;
+      const locName = loc.name;
+
+      // If switching from Liu-Jordan or Offline mode and live data was already loaded in memory:
+      const cached = getPvgisFromTempMemory(siteLat, lon);
+      if ((!showPvgisComparison || (pvgisData && pvgisData.isOffline)) && cached && !cached.isOffline) {
+        pvgisData = { ...cached, isOffline: false };
+        showPvgisComparison = true;
+        pvgisFetchError = null;
+        renderView();
+        return;
+      }
+
+      isFetchingPvgis = true;
+      pvgisFetchError = null;
+      renderView();
+
+      try {
+        const res = await fetchPvgisClimateData(siteLat, lon, locName);
+        pvgisData = {
+          locationName: res.locationName,
+          latitude: res.latitude,
+          longitude: res.longitude,
+          monthlyGdm0: res.monthlyGdm0,
+          monthlyGdmOpt: res.monthlyGdmOpt,
+          optimalTilt: res.optimalTilt,
+          provider: res.metadata?.provider || 'European Commission PVGIS 5.3 (JRC)',
+          database: 'PVGIS-SARAH3',
+          dbType: 'Satellite',
+          startYear: 2005,
+          endYear: 2023,
+          spatialRes: '0.05° x 0.05° (~5 km)',
+          comments: 'In PVGIS 5.3, default DB for Europe, Central Asia, Africa and South America',
+          fetchedAt: res.fetchedAt || new Date().toISOString(),
+          isOffline: false,
+        };
+        savePvgisToTempMemory(pvgisData);
+        showPvgisComparison = true;
+        pvgisJustSynchronized = true;
+        pvgisFetchError = null;
+      } catch (err: unknown) {
+        pvgisFetchError = err instanceof Error ? err.message : String(err);
+      } finally {
+        isFetchingPvgis = false;
+        renderView();
+      }
+    
+  }
+
   function renderView() {
     // If on Tab 3 and PVGIS record not yet loaded, auto-initialize
     if (activeTab === 'radiation' && !pvgisData) {
@@ -270,6 +327,13 @@ export function renderPythonConsole(): HTMLElement {
       }
     }
     ensurePvgisEngine();
+
+    // Auto-load live PVGIS for the exact site linked to the latitude slider (once per site)
+    if (activeTab === 'radiation' && showPvgisComparison && !isFetchingPvgis && (!pvgisData || pvgisData.isOffline)
+        && pvgisAutoTriedKey !== stateLat.toFixed(3)) {
+      pvgisAutoTriedKey = stateLat.toFixed(3);
+      setTimeout(() => { void fetchLivePvgis(); }, 0);
+    }
     const doy = dateToDayOfYear(stateDay, stateMonth);
     const latRad = (stateLat * Math.PI) / 180;
 
@@ -1332,11 +1396,11 @@ export function renderPythonConsole(): HTMLElement {
                   📍 ${pvgisData.locationName} (${formatAngle(stateLat, 2)})
                 </span>
                 <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-weight: 700; font-size: 0.70rem; border: 1px solid rgba(16, 185, 129, 0.25);">
-                  ✓ ${isEn ? 'Side A: Simulator & Solar Optimization' : 'Lado A: Simulador & Optimización Solar'}
+                  ✓ ${isEn ? 'Side A: Simulator & Solar Optimization' : 'Lado A: Simulador & Optimización Solar'} · ${hasSimForLat ? (isEn ? 'active site data' : 'datos del emplazamiento activo') + ' (' + simRes!.source + ', ' + formatAngle(simRes!.latitude, 3) + ' / ' + formatAngle(simRes!.longitude, 3) + ')' : (isEn ? 'OrientSol reference dataset' : 'dataset de referencia OrientSol')}
                 </span>
                 <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700;">vs</span>
                 <span class="badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-weight: 700; font-size: 0.70rem; border: 1px solid rgba(2, 132, 199, 0.25);">
-                  🌐 ${isEn ? 'Side B: PVGIS JRC (Same OrientSol .m Motor)' : 'Lado B: PVGIS JRC (Mismo Motor OrientSol .m)'}
+                  🌐 ${isEn ? 'Side B: PVGIS JRC (Same OrientSol .m Motor)' : 'Lado B: PVGIS JRC (Mismo Motor OrientSol .m)'} · ${formatAngle(pvgisData.latitude, 3)} / ${formatAngle(pvgisData.longitude, 3)}
                 </span>
               </div>
               <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
@@ -2421,55 +2485,7 @@ export function renderPythonConsole(): HTMLElement {
     });
 
     // PVGIS Live Cross-Validation Handlers
-    container.querySelector('#btn-fetch-pvgis')?.addEventListener('click', async () => {
-      const loc = getLocInfo(stateLat);
-      const lon = loc.longitude;
-      const locName = loc.name;
-
-      // If switching from Liu-Jordan or Offline mode and live data was already loaded in memory:
-      const cached = getPvgisFromTempMemory(stateLat, lon);
-      if ((!showPvgisComparison || (pvgisData && pvgisData.isOffline)) && cached && !cached.isOffline) {
-        pvgisData = { ...cached, isOffline: false };
-        showPvgisComparison = true;
-        pvgisFetchError = null;
-        renderView();
-        return;
-      }
-
-      isFetchingPvgis = true;
-      pvgisFetchError = null;
-      renderView();
-
-      try {
-        const res = await fetchPvgisClimateData(stateLat, lon, locName);
-        pvgisData = {
-          locationName: res.locationName,
-          latitude: res.latitude,
-          longitude: res.longitude,
-          monthlyGdm0: res.monthlyGdm0,
-          monthlyGdmOpt: res.monthlyGdmOpt,
-          optimalTilt: res.optimalTilt,
-          provider: res.metadata?.provider || 'European Commission PVGIS 5.3 (JRC)',
-          database: 'PVGIS-SARAH3',
-          dbType: 'Satellite',
-          startYear: 2005,
-          endYear: 2023,
-          spatialRes: '0.05° x 0.05° (~5 km)',
-          comments: 'In PVGIS 5.3, default DB for Europe, Central Asia, Africa and South America',
-          fetchedAt: res.fetchedAt || new Date().toISOString(),
-          isOffline: false,
-        };
-        savePvgisToTempMemory(pvgisData);
-        showPvgisComparison = true;
-        pvgisJustSynchronized = true;
-        pvgisFetchError = null;
-      } catch (err: unknown) {
-        pvgisFetchError = err instanceof Error ? err.message : String(err);
-      } finally {
-        isFetchingPvgis = false;
-        renderView();
-      }
-    });
+    container.querySelector('#btn-fetch-pvgis')?.addEventListener('click', () => { void fetchLivePvgis(); });
 
     container.querySelector('#btn-dismiss-sync-banner')?.addEventListener('click', () => {
       pvgisJustSynchronized = false;
