@@ -900,8 +900,9 @@ export function renderPythonConsole(): HTMLElement {
     }
 
     if (activeTab === 'radiation') {
+      const isUsingPvgisBaseline = Boolean(showPvgisComparison && pvgisData?.monthlyGdm0);
       const simRes = solarSyncState.getLastSimulationResult();
-      const hasSimForLat = Boolean(simRes?.horizontal?.gdm0 && Math.abs(simRes.latitude - stateLat) < 0.6);
+      const hasSimForLat = Boolean(!isUsingPvgisBaseline && simRes?.horizontal?.gdm0 && Math.abs(simRes.latitude - stateLat) < 0.6);
 
       const radRows = DIA_INTER.map((dayNum, idx) => {
         const dec = getMonthlyDeclinationDeg(idx);
@@ -917,34 +918,36 @@ export function renderPythonConsole(): HTMLElement {
         );
 
         // OrientSol Live Radiation:
-        // Prioritizes active simulation result if matching current latitude;
-        // otherwise calculates pure physical OrientSol Liu-Jordan engine values for stateLat.
-        const g0 = hasSimForLat
-          ? simRes!.horizontal.gdm0[idx]
-          : Math.round(g0d * (0.54 + 0.08 * Math.cos(decR) * Math.cos(latR)) * 100) / 100;
+        // When PVGIS validation is active, OrientSol adopts PVGIS horizontal irradiation directly as input base,
+        // and evaluates all physical components via OrientSol's canonical Liu-Jordan algorithms (.m):
+        const g0 = isUsingPvgisBaseline
+          ? pvgisData!.monthlyGdm0[idx]
+          : (hasSimForLat
+              ? simRes!.horizontal.gdm0[idx]
+              : Math.round(g0d * (0.54 + 0.08 * Math.cos(decR) * Math.cos(latR)) * 100) / 100);
 
-        // Canonical OrientSol Liu-Jordan decomposition from Bdm0.m (calculated live):
+        // Canonical OrientSol Liu-Jordan decomposition from Bdm0.m & Ddm0.m:
         // Ktm = Gdm0 / G0d
         // Kdm = 1.0 - (1.13 * Ktm)
         // Ddm = Kdm * Gdm0
         // Bdm = Gdm0 - Ddm
         const ktm = Math.min(1.0, Math.max(0.01, g0 / g0d));
         const kdm = Math.min(1.0, Math.max(0.0, 1.0 - 1.13 * ktm));
-        const ddm = hasSimForLat && simRes!.horizontal.ddm0
+        const ddm = (!isUsingPvgisBaseline && hasSimForLat && simRes!.horizontal.ddm0)
           ? simRes!.horizontal.ddm0[idx]
           : Math.round(g0 * kdm * 100) / 100;
-        const bdm = hasSimForLat && simRes!.horizontal.bdm0
+        const bdm = (!isUsingPvgisBaseline && hasSimForLat && simRes!.horizontal.bdm0)
           ? simRes!.horizontal.bdm0[idx]
           : Math.round((g0 - ddm) * 100) / 100;
 
         // Discretized sweep beta in [0..90] to calculate live optimal tilt and maximum inclined radiation
         let optTilt = 0;
         let gOpt = g0;
-        if (hasSimForLat && simRes!.monthlyOptimum12?.monthlyDailyKwh?.[idx] !== undefined) {
+        if (!isUsingPvgisBaseline && hasSimForLat && simRes!.monthlyOptimum12?.monthlyDailyKwh?.[idx] !== undefined) {
           optTilt = simRes!.monthlyOptimum12.optimalTiltsDeg[idx];
           gOpt = simRes!.monthlyOptimum12.monthlyDailyKwh[idx];
         } else {
-          // Live calculation via Liu & Jordan isotropic transposition
+          // Live calculation via Liu & Jordan isotropic transposition (DdBeta.m & GdBeta.m)
           const den = Math.cos(latR) * Math.cos(decR) * Math.sin(ws) + ws * Math.sin(latR) * Math.sin(decR);
           let maxGd = g0;
           let bestTilt = 0;
@@ -1051,33 +1054,48 @@ export function renderPythonConsole(): HTMLElement {
       `;
 
       // Render PVGIS Cross-Validation View
-      // Render PVGIS Cross-Validation View
       let pvgisTableHtml = '';
       if (showPvgisComparison && pvgisData) {
-        // OrientSol Operación 1: Inclinación Óptima Anual fija para todo el año
-        const annualOptTiltOs = hasSimForLat && simRes?.optimalAnnual?.optimalTiltDeg !== undefined
-          ? simRes.optimalAnnual.optimalTiltDeg
-          : (Math.abs(stateLat - 37.77) < 0.6 ? 34 : (Math.abs(stateLat - 40.42) < 0.6 ? 35 : Math.max(10, Math.min(65, Math.round(Math.abs(stateLat) * 0.88)))));
+        const latR = (stateLat * Math.PI) / 180;
 
-        // Radiación mensual de OrientSol sobre plano con inclinación óptima anual (Operación 1)
-        const monthlyGOptAnnualOs = radRows.map((r, m) => {
-          if (hasSimForLat && simRes?.optimalAnnual?.monthlyDailyKwh?.[m] !== undefined) {
-            return simRes.optimalAnnual.monthlyDailyKwh[m];
+        // OrientSol Operación 1: Calculos_optimo.m
+        // Búsqueda exhaustiva del ángulo óptimo anual (beta en [0..90]) evaluada directamente sobre los 12 meses de PVGIS:
+        let annualOptTiltOs = 35;
+        let monthlyGOptAnnualOs: number[] = [];
+
+        let bestAnnualTilt = 0;
+        let maxAnnualSum = 0;
+        const gridTransposed: number[][] = []; // [beta][month]
+
+        for (let beta = 0; beta <= 90; beta++) {
+          const betaR = (beta * Math.PI) / 180;
+          let annualSum = 0;
+          const monthGds: number[] = [];
+
+          for (let m = 0; m < 12; m++) {
+            const rRow = radRows[m];
+            const dec = getMonthlyDeclinationDeg(m);
+            const decR = (dec * Math.PI) / 180;
+            const cosW = -Math.tan(latR) * Math.tan(decR);
+            const ws = Math.acos(Math.max(-1, Math.min(1, cosW)));
+            const den = Math.cos(latR) * Math.cos(decR) * Math.sin(ws) + ws * Math.sin(latR) * Math.sin(decR);
+            const cosWsp = -Math.tan(latR - betaR) * Math.tan(decR);
+            const wsp = Math.min(ws, Math.acos(Math.max(-1, Math.min(1, cosWsp))));
+            const num = Math.cos(latR - betaR) * Math.cos(decR) * Math.sin(wsp) + wsp * Math.sin(latR - betaR) * Math.sin(decR);
+            const rb = den > 0 ? Math.max(0, num / den) : 0;
+            const gd = rRow.bdm * rb + rRow.ddm * ((1 + Math.cos(betaR)) / 2) + rRow.g0 * 0.20 * ((1 - Math.cos(betaR)) / 2);
+            monthGds.push(gd);
+            annualSum += gd * DAYS_IN_MONTH[m];
           }
-          const dec = getMonthlyDeclinationDeg(m);
-          const latR = (stateLat * Math.PI) / 180;
-          const decR = (dec * Math.PI) / 180;
-          const cosW = -Math.tan(latR) * Math.tan(decR);
-          const ws = Math.acos(Math.max(-1, Math.min(1, cosW)));
-          const betaR = (annualOptTiltOs * Math.PI) / 180;
-          const cosWsp = -Math.tan(latR - betaR) * Math.tan(decR);
-          const wsp = Math.min(ws, Math.acos(Math.max(-1, Math.min(1, cosWsp))));
-          const den = Math.cos(latR) * Math.cos(decR) * Math.sin(ws) + ws * Math.sin(latR) * Math.sin(decR);
-          const num = Math.cos(latR - betaR) * Math.cos(decR) * Math.sin(wsp) + wsp * Math.sin(latR - betaR) * Math.sin(decR);
-          const rb = den > 0 ? Math.max(0, num / den) : 0;
-          const gd = r.bdm * rb + r.ddm * ((1 + Math.cos(betaR)) / 2) + r.g0 * 0.20 * ((1 - Math.cos(betaR)) / 2);
-          return Math.round(gd * 100) / 100;
-        });
+          gridTransposed.push(monthGds);
+          if (annualSum > maxAnnualSum) {
+            maxAnnualSum = annualSum;
+            bestAnnualTilt = beta;
+          }
+        }
+
+        annualOptTiltOs = bestAnnualTilt;
+        monthlyGOptAnnualOs = gridTransposed[bestAnnualTilt].map(v => Math.round(v * 100) / 100);
 
         const pvgisMonthly = pvgisData.monthlyGdm0;
         const pvgisMonthlyOpt = pvgisData.monthlyGdmOpt ?? pvgisMonthly.map((g0, m) => Number((g0 * calculateOptimalTiltFactor(stateLat, m)).toFixed(2)));
@@ -1222,9 +1240,12 @@ export function renderPythonConsole(): HTMLElement {
 
         const comparisonMetricSelector = `
           <div style="padding: 0.55rem 1rem; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.45rem;">
+            <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
               <span style="font-size: 0.76rem; font-weight: 800; color: #0284c7; display: flex; align-items: center; gap: 0.35rem;">
                 ${isEn ? 'Complete PVGIS Cross-Validation (Direct/Diffuse Components + Annual Optimal Tilt - Op. 1)' : 'Validación Cruzada Completa (Componentes Directa/Difusa + Óptimo Anual Op. 1)'}
+              </span>
+              <span class="badge" style="background: rgba(16,185,129,0.12); color: #059669; font-size: 0.68rem; font-weight: 700; border: 1px solid rgba(16,185,129,0.25);">
+                ${isEn ? '✓ Baseline: PVGIS Radiation evaluated with OrientSol (.m) algorithms' : '✓ Base Común: Irradiación PVGIS procesada con algoritmos OrientSol (.m)'}
               </span>
             </div>
             <div style="display: flex; align-items: center; gap: 0.55rem; font-size: 0.70rem; flex-wrap: wrap;">
