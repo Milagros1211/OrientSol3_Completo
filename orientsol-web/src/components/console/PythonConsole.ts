@@ -961,7 +961,7 @@ export function renderPythonConsole(): HTMLElement {
                   ? `12-Month Baseline (Klein Characteristic Days, Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})`
                   : `Línea Base 12 Meses (Días Intermedios de Klein, Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}
               </span>
-              <span class="badge-status-valid">✓ CoeficienteCalculos.m</span>
+              <span class="badge-status-valid">✓ Coeficientes de cálculo</span>
             </div>
             <button type="button" class="btn btn-xs btn-primary btn-goto-pvgis" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; background: #0284c7; color: #fff; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 0.35rem;">
               🌐 ${isEn ? 'Go to Tab 3: PVGIS Validation ➔' : 'Ir a Pestaña 3: Validación PVGIS ➔'}
@@ -1052,7 +1052,7 @@ export function renderPythonConsole(): HTMLElement {
               ? defaultSimG0[idx]
               : Math.round(g0d * (0.54 + 0.08 * Math.cos(decR) * Math.cos(latR)) * 100) / 100);
 
-        // Canonical OrientSol Liu-Jordan decomposition from Bdm0.m & Ddm0.m:
+        // Canonical OrientSol Liu-Jordan decomposition from Bdm0 & Ddm0:
         const ktm = Math.min(1.0, Math.max(0.01, g0 / g0d));
         const kdm = Math.min(1.0, Math.max(0.0, 1.0 - 1.13 * ktm));
         const ddm = (hasSimForLat && simRes!.horizontal.ddm0)
@@ -1124,7 +1124,7 @@ export function renderPythonConsole(): HTMLElement {
       if (hasSimForLat && simRes!.optimalAnnual?.monthlyDailyKwh) {
         simGOptAnnual = simRes!.optimalAnnual.monthlyDailyKwh;
       } else {
-        // Run Calculos_optimo.m on Simulator radiation data:
+        // Run Calculos_optimo on Simulator radiation data:
         let bestTiltSim = 0;
         let maxAnnualSumSim = 0;
         const simGridTransposed: number[][] = [];
@@ -1210,12 +1210,12 @@ export function renderPythonConsole(): HTMLElement {
         </div>
       `;
 
-      // 2. DATASET B: PVGIS PROCESSED WITH THE SAME ORIENTSOL CALCULATION MOTOR (.m)
+      // 2. DATASET B: PVGIS PROCESSED WITH THE SAME ORIENTSOL CALCULATION MOTOR
       let pvgisTableHtml = '';
       if (showPvgisComparison && pvgisData) {
         const pvgisMonthly = pvgisData.monthlyGdm0;
 
-        // Apply OrientSol's calculation motor Bdm0.m & Ddm0.m to PVGIS horizontal radiation:
+        // Apply OrientSol's calculation motor Bdm0 & Ddm0 to PVGIS horizontal radiation:
         let bdmPvgisOsArr: number[] = [];
         let ddmPvgisOsArr: number[] = [];
 
@@ -1239,7 +1239,7 @@ export function renderPythonConsole(): HTMLElement {
           bdmPvgisOsArr.push(bdmP);
         }
 
-        // Apply OrientSol's calculation motor Calculos_optimo.m (Op. 1) to PVGIS data:
+        // Apply OrientSol's calculation motor Calculos_optimo (Op. 1) to PVGIS data:
         // Exhaustive discrete sweep beta in [0..90] maximizing annual irradiation
         let bestAnnualTiltPvgis = 0;
         let maxAnnualSumPvgis = 0;
@@ -1260,7 +1260,7 @@ export function renderPythonConsole(): HTMLElement {
             const wsp = Math.min(ws, Math.acos(Math.max(-1, Math.min(1, cosWsp))));
             const num = Math.cos(latR - betaR) * Math.cos(decR) * Math.sin(wsp) + wsp * Math.sin(latR - betaR) * Math.sin(decR);
             const rb = den > 0 ? Math.max(0, num / den) : 0;
-            // Transposition Liu-Jordan (GdBeta.m)
+            // Transposition Liu-Jordan (GdBeta)
             const gd = bdmPvgisOsArr[m] * rb + ddmPvgisOsArr[m] * ((1 + Math.cos(betaR)) / 2) + pvgisMonthly[m] * 0.20 * ((1 - Math.cos(betaR)) / 2);
             monthGds.push(gd);
             annualSum += gd * DAYS_IN_MONTH[m];
@@ -1400,12 +1400,12 @@ export function renderPythonConsole(): HTMLElement {
                 </span>
                 <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700;">vs</span>
                 <span class="badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-weight: 700; font-size: 0.70rem; border: 1px solid rgba(2, 132, 199, 0.25);">
-                  🌐 ${isEn ? 'Side B: PVGIS JRC (Same OrientSol .m Motor)' : 'Lado B: PVGIS JRC (Mismo Motor OrientSol .m)'} · ${formatAngle(pvgisData.latitude, 3)} / ${formatAngle(pvgisData.longitude, 3)}
+                  🌐 ${isEn ? 'Side B: PVGIS JRC (Same OrientSol Motor)' : 'Lado B: PVGIS JRC (Mismo Motor OrientSol)'} · ${formatAngle(pvgisData.latitude, 3)} / ${formatAngle(pvgisData.longitude, 3)}
                 </span>
               </div>
               <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
                 <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; font-weight: 700; font-size: 0.70rem; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.15rem 0.5rem; border-radius: 4px;">
-                  ✓ ${isEn ? '100% Shared Physical Motor' : '100% Mismo Motor Físico (.m)'}
+                  ✓ ${isEn ? '100% Shared Physical Motor' : '100% Mismo Motor Físico'}
                 </span>
                 <span class="badge" style="background: rgba(37, 99, 235, 0.12); color: #2563eb; font-weight: 700; font-size: 0.70rem; border: 1px solid rgba(37, 99, 235, 0.25); padding: 0.15rem 0.5rem; border-radius: 4px;">
                   ${pvgisData.database} (${pvgisData.dbType})
@@ -1414,8 +1414,8 @@ export function renderPythonConsole(): HTMLElement {
             </div>
             <div style="font-size: 0.70rem; color: var(--text-muted); line-height: 1.35;">
               ${isEn
-                ? 'Both datasets are evaluated through the exact same OrientSol mathematical algorithms (<code>Bdm0.m</code>, <code>Ddm0.m</code>, <code>Calculos_optimo.m</code>, <code>GdBeta.m</code>). Any divergence strictly reflects pure climatological differences between the terrestrial/atlas dataset and satellite records.'
-                : 'Ambos conjuntos de datos se procesan con los mismos algoritmos matemáticos de OrientSol (<code>Bdm0.m</code>, <code>Ddm0.m</code>, <code>Calculos_optimo.m</code>, <code>GdBeta.m</code>). Cualquier diferencia observada se debe exclusivamente a la fuente climatológica (datos terrestres/atlas vs satélite), garantizando una comparación científica rigurosa.'}
+                ? 'Both datasets are evaluated through the exact same OrientSol mathematical algorithms. Any divergence strictly reflects pure climatological differences between the terrestrial/atlas dataset and satellite records.'
+                : 'Ambos conjuntos de datos se procesan con los mismos algoritmos matemáticos de OrientSol. Cualquier diferencia observada se debe exclusivamente a la fuente climatológica (datos terrestres/atlas vs satélite), garantizando una comparación científica rigurosa.'}
             </div>
           </div>
         `;
@@ -1433,19 +1433,19 @@ export function renderPythonConsole(): HTMLElement {
                     ${isEn ? 'Global Gdm(0)<br/>Sim vs PVGIS [Δ | %]' : 'Global Gdm(0)<br/>Sim vs PVGIS [Δ | %]'}
                   </th>
                   <th style="width: 14%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'Direct Bdm<br/>Sim vs PVGIS.m [Δ | %]' : 'Directa Bdm<br/>Sim vs PVGIS.m [Δ | %]'}
+                    ${isEn ? 'Direct Bdm<br/>Sim vs PVGIS [Δ | %]' : 'Directa Bdm<br/>Sim vs PVGIS [Δ | %]'}
                   </th>
                   <th style="width: 14%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'Diffuse Ddm<br/>Sim vs PVGIS.m [Δ | %]' : 'Difusa Ddm<br/>Sim vs PVGIS.m [Δ | %]'}
+                    ${isEn ? 'Diffuse Ddm<br/>Sim vs PVGIS [Δ | %]' : 'Difusa Ddm<br/>Sim vs PVGIS [Δ | %]'}
                   </th>
                   <th style="width: 9%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
                     ${isEn ? 'Tilt β_opt<br/>Sim / PVGIS' : 'Inclinación β_opt<br/>Sim / PVGIS'}
                   </th>
                   <th style="width: 15%; text-align: center; color: #059669; background: rgba(16, 185, 129, 0.05); font-weight: 800; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'Optimal Gdm(β_opt)<br/>Sim vs PVGIS.m [Δ | %]' : 'Óptimo Gdm(β_opt)<br/>Sim vs PVGIS.m [Δ | %]'}
+                    ${isEn ? 'Optimal Gdm(β_opt)<br/>Sim vs PVGIS [Δ | %]' : 'Óptimo Gdm(β_opt)<br/>Sim vs PVGIS [Δ | %]'}
                   </th>
                   <th style="width: 14%; text-align: center; padding: 0.35rem 0.1rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.60rem;">
-                    ${isEn ? 'Gain vs Horiz (%)<br/>Sim vs PVGIS.m [Δ]' : 'Ganancia s/ Horiz (%)<br/>Sim vs PVGIS.m [Δ]'}
+                    ${isEn ? 'Gain vs Horiz (%)<br/>Sim vs PVGIS [Δ]' : 'Ganancia s/ Horiz (%)<br/>Sim vs PVGIS [Δ]'}
                   </th>
                   <th style="width: 13%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
                     ${isEn ? 'WMO-No. 8<br/>Validation' : 'Validación<br/>Norma OMM Nº 8'}
@@ -1631,8 +1631,8 @@ export function renderPythonConsole(): HTMLElement {
               <span style="font-weight: 800; color: var(--accent-cyan, #0284c7); font-size: 0.82rem; display: flex; align-items: center; gap: 0.4rem;">
                 <span>📊</span>
                 ${isEn
-                  ? 'Comparative Error Metrics: Simulator vs PVGIS (Evaluated with the Same OrientSol .m Motor)'
-                  : 'Métricas Estadísticas de Error: Simulador vs PVGIS (Evaluados con el Mismo Motor OrientSol .m)'}
+                  ? 'Comparative Error Metrics: Simulator vs PVGIS (Evaluated with the Same OrientSol Motor)'
+                  : 'Métricas Estadísticas de Error: Simulador vs PVGIS (Evaluados con el Mismo Motor OrientSol)'}
               </span>
               <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-size: 0.72rem; font-weight: 700;">
                 ${pvgisData.provider}
@@ -1655,7 +1655,7 @@ export function renderPythonConsole(): HTMLElement {
               <!-- Variable 2: Direct Beam -->
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
                 <div style="font-weight: 700; color: #2563eb; font-size: 0.73rem; margin-bottom: 0.25rem;">
-                  2. Directa Bdm(0) (.m)
+                  2. Directa Bdm(0)
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
                   <div>MAPE: <strong style="color: #059669; font-size: 0.86rem;">${formatPercent(mapeBdm, 2)}</strong></div>
@@ -1667,7 +1667,7 @@ export function renderPythonConsole(): HTMLElement {
               <!-- Variable 3: Diffuse -->
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
                 <div style="font-weight: 700; color: #7c3aed; font-size: 0.73rem; margin-bottom: 0.25rem;">
-                  3. Difusa Ddm(0) (.m)
+                  3. Difusa Ddm(0)
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
                   <div>MAPE: <strong style="color: #059669; font-size: 0.86rem;">${formatPercent(mapeDdm, 2)}</strong></div>
@@ -1679,7 +1679,7 @@ export function renderPythonConsole(): HTMLElement {
               <!-- Variable 4: Optimal Plane -->
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
                 <div style="font-weight: 700; color: #059669; font-size: 0.73rem; margin-bottom: 0.25rem;">
-                  4. Óptimo Gdm(β_opt) (.m)
+                  4. Óptimo Gdm(β_opt)
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
                   <div>MAPE: <strong style="color: #059669; font-size: 0.86rem;">${formatPercent(mapeGOpt, 2)}</strong></div>
@@ -1691,11 +1691,11 @@ export function renderPythonConsole(): HTMLElement {
               <!-- Variable 5: Optimal Tilt -->
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
                 <div style="font-weight: 700; color: #d97706; font-size: 0.73rem; margin-bottom: 0.25rem;">
-                  5. Inclinación β_opt (.m)
+                  5. Inclinación β_opt
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
                   <div>Simulador: <strong style="color: #059669; font-size: 0.82rem;">${simAnnualOptTilt}°</strong></div>
-                  <div>PVGIS (.m): <strong style="color: #0284c7; font-size: 0.82rem;">${optTiltPvgisOs}°</strong></div>
+                  <div>PVGIS: <strong style="color: #0284c7; font-size: 0.82rem;">${optTiltPvgisOs}°</strong></div>
                   <div>Δ Error: <strong style="color: ${Math.abs(diffTilt) <= 1 ? '#059669' : '#d97706'};">${diffTilt >= 0 ? `+${diffTilt}` : diffTilt}° (${formatPercent(pctTilt, 1, true)})</strong></div>
                 </div>
               </div>
@@ -1769,7 +1769,7 @@ export function renderPythonConsole(): HTMLElement {
                 <div style="background: var(--bg-primary); padding: 0.75rem 0.9rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.5rem;">
                   <div style="font-weight: 700; color: #0284c7; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
                     <span>☀️</span>
-                    <span>${isEn ? '1. Horizontal Decomposition (Bdm0.m & Ddm0.m)' : '1. Descomposición Horizontal y Claridad (Bdm0.m y Ddm0.m)'}</span>
+                    <span>${isEn ? '1. Horizontal Decomposition' : '1. Descomposición Horizontal y Claridad'}</span>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.71rem;">
                     ${isEn
@@ -1821,7 +1821,7 @@ export function renderPythonConsole(): HTMLElement {
                 <div style="background: var(--bg-primary); padding: 0.75rem 0.9rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.5rem;">
                   <div style="font-weight: 700; color: #059669; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
                     <span>📐</span>
-                    <span>${isEn ? '2. Isotropic Transposition to Slope β (DdBeta.m & GdBeta.m)' : '2. Transposición Isotrópica a Superficie Inclinada β (DdBeta.m y GdBeta.m)'}</span>
+                    <span>${isEn ? '2. Isotropic Transposition to Slope β' : '2. Transposición Isotrópica a Superficie Inclinada β'}</span>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.71rem;">
                     ${isEn
@@ -1865,7 +1865,7 @@ export function renderPythonConsole(): HTMLElement {
                 <div style="background: var(--bg-primary); padding: 0.75rem 0.9rem; border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.5rem;">
                   <div style="font-weight: 700; color: #d97706; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
                     <span>⚡</span>
-                    <span>${isEn ? '3. Annual Optimum Search & Physical Assertions (Calculos_optimo.m)' : '3. Búsqueda de Óptimo Anual y Verificación Física (Calculos_optimo.m)'}</span>
+                    <span>${isEn ? '3. Annual Optimum Search & Physical Assertions' : '3. Búsqueda de Óptimo Anual y Verificación Física'}</span>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.71rem;">
                     ${isEn
@@ -1926,7 +1926,7 @@ export function renderPythonConsole(): HTMLElement {
             <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
               <span class="verif-table-title">
                 ${showPvgisComparison && pvgisData
-                  ? `${isEn ? 'Comparative Analysis: Simulator vs PVGIS (Same OrientSol .m Motor)' : 'Comparativa: Simulador & Optimización Solar vs PVGIS (Mismo Motor OrientSol .m)'} (${pvgisData.locationName}, ${formatAngle(stateLat, 2)})`
+                  ? `${isEn ? 'Comparative Analysis: Simulator vs PVGIS (Same OrientSol Motor)' : 'Comparativa: Simulador & Optimización Solar vs PVGIS (Mismo Motor OrientSol)'} (${pvgisData.locationName}, ${formatAngle(stateLat, 2)})`
                   : `${isEn ? `Monthly Radiative Decomposition & Transposition (Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})` : `Descomposición Radiativa y Transposición Liu-Jordan (Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}`}
               </span>
               <span class="badge-status-valid">${showPvgisComparison && pvgisData ? (pvgisData.isOffline ? '✓ PVGIS-SARAH3 Offline' : '✓ JRC v5.3 / ERA5 Live') : '✓ Bdm0, Ddm0, Calculos_optimo, GdBeta'}</span>
@@ -1986,7 +1986,7 @@ export function renderPythonConsole(): HTMLElement {
 
       // Calculate annual daytime mean tilt for 1-axis horizontal tracker:
       // In each month m, integrate beta(t) = arctan(|sin(psi_s)| / tan(gamma_s)) across daylight hours.
-      // Annual mean across 12 months for Madrid (Lat 40.42°) is exactly 51.2° (Bh_EjeHorizontal.m / OrientSol baseline).
+      // Annual mean across 12 months for Madrid (Lat 40.42°) is exactly 51.2° (Bh_EjeHorizontal / OrientSol baseline).
       const annualHorizTrackerTilt = months.reduce((acc: number, _: string, idx: number) => acc + getHorizontalTrackerDailyMeanTiltDeg(stateLat, idx), 0) / 12;
 
       // 1. Annual Benchmark values (OrientSol 12-Month Global Simulation)
