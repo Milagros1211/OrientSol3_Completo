@@ -144,7 +144,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         <div class="form-group flex-1" style="position: relative;">
           <label for="hist-search-input" class="form-label">
             ${t.hybridLoader.historicalLabel}
-            <span class="search-hint-sub">${isEn ? '(Search case-insensitive: Supabase & Cache)' : '(Búsqueda case-insensitive: Supabase & Caché)'}</span>
+            <span class="search-hint-sub">${isEn ? '(Verified Climate Catalog)' : '(Catálogo Climático Oficial)'}</span>
           </label>
           <div class="search-input-box">
             <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
@@ -703,21 +703,35 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   // 1. Historical & Supabase Station Live Similarity Search Actions
   let allSearchableStations: ClimateDataRecord[] = [];
 
-  const getBaseKey = (name: string) =>
+  const getCityCoreKey = (name: string) =>
     name
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/_?versionoriginal/gi, '')
+      .replace(/\([^)]*\)/g, '')
+      .split(/[-–—,]/)[0]
       .replace(/[^a-z0-9]/g, '')
       .trim();
+
+  const isDuplicateStation = (a: ClimateDataRecord, b: ClimateDataRecord) => {
+    const keyA = getCityCoreKey(a.locationName);
+    const keyB = getCityCoreKey(b.locationName);
+    if (keyA && keyB) {
+      if (keyA === keyB) return true;
+      if (keyA.length >= 4 && keyB.length >= 4 && (keyA.startsWith(keyB) || keyB.startsWith(keyA))) return true;
+    }
+    const dLat = Math.abs(a.latitude - b.latitude);
+    const dLon = Math.abs(a.longitude - b.longitude);
+    return dLat < 0.35 && dLon < 0.35;
+  };
 
   const updateSearchableStations = async () => {
     const isOnline = Boolean(typeof navigator !== 'undefined' ? navigator.onLine : true) && climateDatabaseService.isOnline();
     const historicalList = hybridClimateManager.getHistoricalLocations();
 
     if (!isOnline) {
-      // OFFLINE: Solo mostrar estaciones de la memoria caché local (OrientSol 4.0)
+      // OFFLINE: Mostrar estaciones de la biblioteca local
       allSearchableStations = historicalList.map((h) => ({
         ...h,
         source: 'local_database' as const,
@@ -725,7 +739,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       return;
     }
 
-    // ONLINE: Solo debe aparecer una por ciudad (prioridad máxima a Supabase)
+    // ONLINE: Unificar catálogo oficial sin duplicidades por ciudad
     let supabaseList: ClimateDataRecord[] = [];
     try {
       supabaseList = await climateDatabaseService.getClimateDatasets();
@@ -733,23 +747,18 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       console.warn('[OrientSol] Could not fetch Supabase datasets for search:', e);
     }
 
-    const seenBaseKeys = new Set<string>();
     const merged: ClimateDataRecord[] = [];
 
-    // 1. Agregar registros de Supabase (máxima prioridad online)
+    // 1. Agregar registros de Supabase (prioridad online)
     for (const rec of supabaseList) {
-      const baseKey = getBaseKey(rec.locationName);
-      if (!seenBaseKeys.has(baseKey)) {
-        seenBaseKeys.add(baseKey);
+      if (!merged.some((existing) => isDuplicateStation(existing, rec))) {
         merged.push(rec);
       }
     }
 
-    // 2. Solo agregar de la caché histórica aquellas ciudades que NO existan en Supabase
+    // 2. Agregar de la biblioteca histórica aquellas ciudades que NO existan en la lista
     for (const rec of historicalList) {
-      const baseKey = getBaseKey(rec.locationName);
-      if (!seenBaseKeys.has(baseKey)) {
-        seenBaseKeys.add(baseKey);
+      if (!merged.some((existing) => isDuplicateStation(existing, rec))) {
         merged.push(rec);
       }
     }
@@ -897,7 +906,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     histSuggestionsDropdown.classList.add('hidden');
     hideNotFoundBanner();
     renderActiveRecord(loc);
-    const sourceTag = loc.source === 'supabase' || (Boolean(loc.id) && loc.id!.startsWith('supabase-')) ? 'SUPABASE' : 'ORIENTSOL 4.0';
+    const isUserCustom = loc.source === 'manual_input' || (Boolean(loc.id) && loc.id!.startsWith('custom-'));
+    const sourceTag = isUserCustom ? (isEn ? 'CUSTOM' : 'PERSONALIZADA') : 'ORIENTSOL 4.0';
     const displayTitle = formatLocationWithCountry(loc.locationName, loc.country);
     setStatus(
       isEn
@@ -923,12 +933,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     });
 
     // Deduplicate matches so that only 1 station per city is displayed
-    const seenMatchKeys = new Set<string>();
     const matches: ClimateDataRecord[] = [];
     for (const m of rawMatches) {
-      const key = getBaseKey(m.locationName);
-      if (!seenMatchKeys.has(key)) {
-        seenMatchKeys.add(key);
+      if (!matches.some((existing) => isDuplicateStation(existing, m))) {
         matches.push(m);
       }
     }
@@ -943,9 +950,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         <div class="suggestions-list">
           ${matches
             .map((m) => {
-              const isSupabase = m.source === 'supabase' || (Boolean(m.id) && m.id!.startsWith('supabase-'));
-              const badgeClass = isSupabase ? 'badge-supabase' : 'badge-historical';
-              const badgeText = isSupabase ? 'SUPABASE' : 'ORIENTSOL 4.0';
+              const isUserCustom = m.source === 'manual_input' || (Boolean(m.id) && m.id!.startsWith('custom-'));
+              const badgeClass = isUserCustom ? 'badge-supabase' : 'badge-historical';
+              const badgeText = isUserCustom ? (isEn ? 'CUSTOM' : 'PERSONALIZADA') : 'ORIENTSOL 4.0';
               const annualG = m.monthlyGdm0.reduce((a, b) => a + b, 0) / 12;
               const cStr = (m.country || '').trim();
               const hasParenCountry = /\([^)]+\)$/.test(m.locationName.trim()) || (Boolean(cStr) && m.locationName.toLowerCase().includes(cStr.toLowerCase()));
