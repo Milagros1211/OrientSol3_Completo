@@ -1171,7 +1171,7 @@ export function renderPythonConsole(): HTMLElement {
 
       // Render standard Liu-Jordan single-source table
       const standardTableHtml = `
-        <div class="verif-table-wrap" style="overflow-x: hidden !important; overflow-y: auto !important; max-height: 480px; width: 100% !important; border: 1px solid var(--border-subtle); border-radius: 4px;">
+        <div class="verif-table-wrap" style="overflow: visible !important; width: 100% !important; border: 1px solid var(--border-subtle); border-radius: 4px;">
           <table class="verif-data-table" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.67rem; margin: 0;">
             <thead>
               <tr>
@@ -1464,7 +1464,7 @@ export function renderPythonConsole(): HTMLElement {
           </div>
 
           <!-- COMPARISON DATA TABLE: ALL VARIABLES (SIMULATOR VS PVGIS SAME MOTOR) -->
-          <div class="verif-table-wrap" style="overflow-x: hidden !important; overflow-y: auto !important; max-height: 480px; width: 100% !important; border: 1px solid var(--border-subtle); border-radius: 4px;">
+          <div class="verif-table-wrap" style="overflow: visible !important; width: 100% !important; border: 1px solid var(--border-subtle); border-radius: 4px;">
             <table class="verif-data-table" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.65rem; margin: 0;">
               <thead>
                 <tr>
