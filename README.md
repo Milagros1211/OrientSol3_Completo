@@ -1,8 +1,8 @@
 # OrientSol 4.0: Entorno Web y Multiplataforma para Optimización Solar Fotovoltaica
 
-[![GitHub Releases](https://img.shields.io/badge/Release-v4.0.0%20Offline%20Apps-orange?logo=github)](https://github.com/Milagros1211/OrientSol3_Completo/releases)
-[![GitHub Pages Deployment](https://img.shields.io/badge/GitHub%20Pages-Sitio%20En%20Vivo-brightgreen?logo=github)](https://Milagros1211.github.io/OrientSol3_Completo/)
-[![CI/CD Build Multiplatform](https://img.shields.io/badge/GitHub%20Actions-Multiplatform%20Build-blue?logo=githubactions)](https://github.com/Milagros1211/OrientSol3_Completo/actions/workflows/build-offline-releases.yml)
+[![GitHub Releases](https://img.shields.io/badge/Release-v4.0.0%20Offline%20Apps-orange?logo=github)](https://github.com/Milagros1211/OrientSol4_Completo/releases)
+[![GitHub Pages Deployment](https://img.shields.io/badge/GitHub%20Pages-Sitio%20En%20Vivo-brightgreen?logo=github)](https://Milagros1211.github.io/OrientSol4_Completo/)
+[![CI/CD Build Multiplatform](https://img.shields.io/badge/GitHub%20Actions-Multiplatform%20Build-blue?logo=githubactions)](https://github.com/Milagros1211/OrientSol4_Completo/actions/workflows/build-offline-releases.yml)
 [![Version](https://img.shields.io/badge/Versi%C3%B3n-4.0.0-blue.svg)](orientsol-web/package.json)
 [![Security Audit](https://img.shields.io/badge/Security%20Audit-Grade%20A%2B%20(100%25)-brightgreen)](orientsol-web/supabase_schema.sql)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -25,14 +25,14 @@ OrientSol 4.0 se encuentra disponible en formato **100% Offline** (sin necesidad
 
 | Plataforma | Tipo de Binario | Enlace de Descarga / Acceso | Estado |
 | :--- | :--- | :--- | :--- |
-| 🌐 **Web en Vivo (Online/PWA)** | Aplicación Web Progresiva | [🔗 Abrir OrientSol 4.0 Web](https://Milagros1211.github.io/OrientSol3_Completo/) | ✅ Operativo (Versión TFM) |
-| 🪟 **Windows (10 / 11)** | Instalador `.exe` + Portable | [📥 Descargar para Windows (Releases)](https://github.com/Milagros1211/OrientSol3_Completo/releases/latest) | ✅ 100% Offline |
-| 🍎 **macOS (Intel & Apple Silicon)** | Imagen de Disco `.dmg` + `.zip` | [📥 Descargar para macOS (Releases)](https://github.com/Milagros1211/OrientSol3_Completo/releases/latest) | ✅ 100% Offline |
-| 🤖 **Android (Móviles & Tablets)** | Paquete de Instalación `.apk` | [📥 Descargar para Android (Releases)](https://github.com/Milagros1211/OrientSol3_Completo/releases/latest) | ✅ 100% Offline |
+| 🌐 **Web en Vivo (Online/PWA)** | Aplicación Web Progresiva | [🔗 Abrir OrientSol 4.0 Web](https://Milagros1211.github.io/OrientSol4_Completo/) | ✅ Operativo (Versión TFM) |
+| 🪟 **Windows (10 / 11)** | Instalador `.exe` + Portable | [📥 Descargar para Windows (Releases)](https://github.com/Milagros1211/OrientSol4_Completo/releases/latest) | ✅ 100% Offline |
+| 🍎 **macOS (Intel & Apple Silicon)** | Imagen de Disco `.dmg` + `.zip` | [📥 Descargar para macOS (Releases)](https://github.com/Milagros1211/OrientSol4_Completo/releases/latest) | ✅ 100% Offline |
+| 🤖 **Android (Móviles & Tablets)** | Paquete de Instalación `.apk` | [📥 Descargar para Android (Releases)](https://github.com/Milagros1211/OrientSol4_Completo/releases/latest) | ✅ 100% Offline |
 
 > 📦 **Descargas directas desde GitHub Actions:**  
 > También puedes descargar los binarios recién generados en cualquier momento desde la sección de **Artifacts** de cada compilación en:  
-> [🔗 Acceder a GitHub Actions Artifacts](https://github.com/Milagros1211/OrientSol3_Completo/actions/workflows/build-offline-releases.yml)
+> [🔗 Acceder a GitHub Actions Artifacts](https://github.com/Milagros1211/OrientSol4_Completo/actions/workflows/build-offline-releases.yml)
 
 ---
 
@@ -59,7 +59,7 @@ La versión para Android está optimizada con diseño responsivo adaptativo tant
 4. Pulsa **"Instalar"** y luego abre **OrientSol 4.0**. Funciona de inmediato sin necesidad de datos móviles ni Wi-Fi.
 
 ### 🌐 4. Navegador Web / PWA (Multiplataforma)
-1. Entra a [https://Milagros1211.github.io/OrientSol3_Completo/](https://Milagros1211.github.io/OrientSol3_Completo/).
+1. Entra a [https://Milagros1211.github.io/OrientSol4_Completo/](https://Milagros1211.github.io/OrientSol4_Completo/).
 2. Si deseas instalarla en tu escritorio o pantalla de inicio, en Chrome/Edge haz clic en el icono de **"Instalar OrientSol"** en la barra de direcciones superior. En Safari iOS, pulsa **"Compartir" > "Añadir a pantalla de inicio"**.
 
 ---
@@ -224,7 +224,7 @@ OrientSol 4.0 está diseñado para funcionar de manera **100% autónoma y offlin
 * **Conectividad:** 100% Offline para todos los módulos de cálculo astronómico, optimización y simulación. *(Solo requiere conexión a Internet si se desea consultar dinámicamente las bases de datos externas de PVGIS o NASA POWER).*
 
 #### B. Paso a paso para usar el ejecutable (.exe):
-1. **Descarga:** Accede a la sección de [Releases de GitHub](https://github.com/Milagros1211/OrientSol3_Completo/releases/latest) y descarga el instalador `OrientSol 4.0 Setup 4.0.0.exe` (con acceso directo en el escritorio) o la versión portable `OrientSol 4.0 4.0.0.exe` (que no requiere instalación).
+1. **Descarga:** Accede a la sección de [Releases de GitHub](https://github.com/Milagros1211/OrientSol4_Completo/releases/latest) y descarga el instalador `OrientSol 4.0 Setup 4.0.0.exe` (con acceso directo en el escritorio) o la versión portable `OrientSol 4.0 4.0.0.exe` (que no requiere instalación).
 2. **Desbloqueo de SmartScreen:** Al ejecutarlo por primera vez, Windows SmartScreen puede mostrar la ventana azul *"Windows protegió su PC"* (al tratarse de una aplicación académica de código abierto sin firma corporativa de pago). Haz clic en el enlace **"Más información"** y luego en el botón **"Ejecutar de todas formas"**.
 3. **Arranque del simulador:** La aplicación abrirá su ventana principal al instante. En segundo plano, se inicializa automáticamente el hilo seguro de WebAssembly con Pyodide.
 4. **Flujo de uso en la aplicación:**
@@ -245,7 +245,7 @@ OrientSol 4.0 está diseñado para funcionar de manera **100% autónoma y offlin
 * **Dependencias de software:** Ninguna adicional requerida (Pyodide y NumPy integrados en el bundle).
 
 #### B. Paso a paso para usar el descargable (.dmg):
-1. **Descarga:** Descarga la imagen de disco `OrientSol 4.0-4.0.0.dmg` desde [GitHub Releases](https://github.com/Milagros1211/OrientSol3_Completo/releases/latest).
+1. **Descarga:** Descarga la imagen de disco `OrientSol 4.0-4.0.0.dmg` desde [GitHub Releases](https://github.com/Milagros1211/OrientSol4_Completo/releases/latest).
 2. **Instalación:** Haz doble clic en el archivo `.dmg` descargado y arrastra el icono de **OrientSol 4.0** a la carpeta **Aplicaciones** (`/Applications`).
 3. **Desbloqueo de Gatekeeper:** La primera vez que abras la aplicación, macOS indicará que el desarrollador no ha sido verificado. Para autorizarla:
    * Haz clic derecho (o mantén pulsada la tecla `Ctrl` y haz clic) sobre **OrientSol 4.0** en tu carpeta Aplicaciones.
@@ -266,7 +266,7 @@ OrientSol 4.0 está diseñado para funcionar de manera **100% autónoma y offlin
 * **Hardware mínimo:** Procesador de 64 bits, 4 GB RAM y 350 MB de almacenamiento libre.
 
 #### B. Paso a paso para usar el descargable (.AppImage):
-1. **Descarga:** Descarga el binario autónomo `OrientSol-4.0.0.AppImage` desde [Releases](https://github.com/Milagros1211/OrientSol3_Completo/releases/latest).
+1. **Descarga:** Descarga el binario autónomo `OrientSol-4.0.0.AppImage` desde [Releases](https://github.com/Milagros1211/OrientSol4_Completo/releases/latest).
 2. **Permisos de Ejecución:** Abre la terminal en la carpeta de descarga y asigna permisos de ejecución al archivo:
    ```bash
    chmod +x OrientSol-4.0.0.AppImage
@@ -306,7 +306,7 @@ OrientSol 4.0 está diseñado para funcionar de manera **100% autónoma y offlin
   * Opera, Brave, Vivaldi.
 
 #### B. Paso a paso de uso:
-1. Entra directamente a la dirección oficial: [https://Milagros1211.github.io/OrientSol3_Completo/](https://Milagros1211.github.io/OrientSol3_Completo/).
+1. Entra directamente a la dirección oficial: [https://Milagros1211.github.io/OrientSol4_Completo/](https://Milagros1211.github.io/OrientSol4_Completo/).
 2. **Instalación opcional como PWA (Aplicación Web Progresiva):**
    * En **Google Chrome / Microsoft Edge:** Haz clic en el icono de instalación ⊕ ("Instalar OrientSol") en el extremo derecho de la barra de direcciones.
    * En **Safari (iPhone / iPad):** Pulsa el botón *"Compartir"* (icono con flecha hacia arriba) y selecciona *"Añadir a pantalla de inicio"*.
@@ -326,8 +326,8 @@ Si deseas modificar el código fuente, ejecutar el servidor de desarrollo local 
 #### Instalación y arranque del entorno:
 ```bash
 # 1. Clonar el repositorio:
-git clone https://github.com/Milagros1211/OrientSol3_Completo.git
-cd OrientSol3_Completo
+git clone https://github.com/Milagros1211/OrientSol4_Completo.git
+cd OrientSol4_Completo
 
 # 2. Instalar dependencias del frontend web:
 npm install --prefix orientsol-web

@@ -1645,13 +1645,10 @@ export function renderPythonConsole(): HTMLElement {
                   <span style="font-size: 0.95rem;">📐</span>
                   <strong style="color: var(--text-main); font-size: 0.82rem;">
                     ${isEn
-                      ? 'Exhaustive Mathematical Foundation: Liu-Jordan Method (1960/1963) & Verification Algorithms'
-                      : 'Fundamento Matemático Exhaustivo: Método de Liu-Jordan (1960/1963) y Algoritmos de Verificación'}
+                      ? 'Exhaustive Mathematical Foundation: Liu-Jordan Method & Verification Algorithms'
+                      : 'Fundamento Matemático Exhaustivo: Método de Liu-Jordan y Algoritmos de Verificación'}
                   </strong>
                 </div>
-                <span class="badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-size: 0.68rem; font-weight: 700; border: 1px solid rgba(2, 132, 199, 0.25); padding: 0.15rem 0.5rem; border-radius: 4px;">
-                  ${isEn ? 'Physical Models & LaTeX Formulation' : 'Modelos Físicos & Notación LaTeX'}
-                </span>
               </div>
 
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 0.75rem; font-size: 0.72rem; line-height: 1.5;">
