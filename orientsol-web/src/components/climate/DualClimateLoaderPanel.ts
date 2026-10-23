@@ -301,9 +301,18 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <span>${isEn ? 'How to import your radiation measurements from a file?' : '¿Cómo importar tus mediciones desde un archivo digital?'}</span>
         </div>
         <ol class="tab-instruction-steps">
-          <li>${isEn ? '<strong>(Optional)</strong> Download one of our standardized sample templates (CSV or JSON, single or multi-station batch).' : '<strong>(Opcional)</strong> Descarga una de nuestras plantillas normalizadas (CSV o JSON, individual o multi-estación).'}</li>
-          <li>${isEn ? 'Drag and drop your .csv, .json, or .txt file into the dropzone below, or click <strong>"Select File"</strong>.' : 'Arrastra tu archivo .csv, .json o .txt a la zona de carga o pulsa el botón <strong>«Seleccionar Archivo»</strong>.'}</li>
-          <li>${isEn ? 'OrientSol will parse and validate the 12 monthly values, sending the dataset directly to the calculation engine.' : 'OrientSol validará los 12 meses de datos climáticos y los transferirá automáticamente al simulador.'}</li>
+          <li>${isEn 
+            ? '<strong>(Optional) Standardized Templates:</strong> Download our sample CSV or JSON templates (single station or multi-station batch) to format your monthly solar radiation G<sub>dm</sub>(0) and temperature records.' 
+            : '<strong>(Opcional) Plantillas Normalizadas:</strong> Descarga una de nuestras plantillas normalizadas (CSV o JSON, individual o lote multi-estación) para estructurar tus mediciones mensuales de radiación solar G<sub>dm</sub>(0) y temperatura.'}</li>
+          <li>${isEn 
+            ? '<strong>File Import:</strong> Drag and drop your .csv, .json, or .txt file into the dropzone below, or click <strong>"Select File"</strong>. OrientSol will immediately parse and validate all 12 monthly values for each station.' 
+            : '<strong>Carga del Archivo:</strong> Arrastra tu archivo .csv, .json o .txt a la zona de carga o pulsa el botón <strong>«Seleccionar Archivo»</strong>. OrientSol validará de inmediato los 12 meses de datos de cada emplazamiento.'}</li>
+          <li>${isEn 
+            ? '<strong>Cloud or Local Storage:</strong> Click <strong>"Upload to Database"</strong> to save the data in the Supabase Cloud Database (online mode) or in secure Local Cache (online or offline mode).' 
+            : '<strong>Almacenamiento (Nube DB o Caché Local):</strong> Pulsa el botón <strong>«Cargar a Base de Datos»</strong> para sincronizar los emplazamientos en la nube (Supabase) cuando estés online, o guardarlos en caché local seguro (online u offline).'}</li>
+          <li>${isEn 
+            ? '<strong>Available in Tab 1 (Official Catalog):</strong> All uploaded and synchronized stations appear directly in the search dropdown of <strong>Tab 1 (Official Catalog)</strong>, distinguished by their status tags: <code>[DATABASE (CLOUD)]</code> or <code>[LOCAL CACHE]</code>.' 
+            : '<strong>Disponibilidad en Pestaña 1 (Catálogo Oficial):</strong> Todos tus emplazamientos cargados se incorporan de forma automática al buscador y desplegable de la <strong>Pestaña 1 (Catálogo Oficial)</strong>, identificados mediante sus etiquetas: <code>[DATABASE (NUBE)]</code> o <code>[CACHÉ LOCAL]</code>.'}</li>
         </ol>
       </div>
       <div id="file-upload-permission-box">${renderSupabaseUploadBannerHtml(isEn)}</div>
@@ -329,14 +338,21 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <button id="btn-download-json-multi-template" class="btn btn-secondary">${isEn ? 'Sample Batch JSON (Multi)' : 'Plantilla JSON (Lote Multi)'}</button>
         </div>
       </div>
+
+      <!-- File Staging Card (prominently displays detected records and upload to database button) -->
+      <div id="upload-staging-card" class="upload-staging-card hidden"></div>
+
+      <!-- Post-Upload Success & Redirection Card (redirects to Tab 1 Catalog with dropdown tags) -->
+      <div id="upload-success-card" class="upload-success-card hidden"></div>
+
       <div class="upload-actions-row" style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
         <button id="btn-save-upload-to-supabase" class="btn btn-secondary" disabled>
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-            <polyline points="17 21 17 13 7 13 7 21"></polyline>
-            <polyline points="7 3 7 8 15 8"></polyline>
+            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
           </svg>
-          <span>${isEn ? 'Save to Supabase' : 'Guardar en Supabase'}</span>
+          <span>${isEn ? 'Upload to Database' : 'Cargar a Base de Datos'}</span>
         </button>
       </div>
     </div>
@@ -501,6 +517,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   const downloadJsonBtn = container.querySelector('#btn-download-json-template') as HTMLButtonElement;
   const downloadJsonMultiBtn = container.querySelector('#btn-download-json-multi-template') as HTMLButtonElement;
   const saveUploadBtn = container.querySelector('#btn-save-upload-to-supabase') as HTMLButtonElement;
+  const uploadStagingCard = container.querySelector('#upload-staging-card') as HTMLDivElement;
+  const uploadSuccessCard = container.querySelector('#upload-success-card') as HTMLDivElement;
 
   // Tab 4: Satellite Climate APIs Queries
   const apiSourceSelect = container.querySelector('#api-source-select') as HTMLSelectElement;
@@ -783,49 +801,49 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   const isDuplicateStation = (a: ClimateDataRecord, b: ClimateDataRecord) => {
     const keyA = getCityCoreKey(a.locationName);
     const keyB = getCityCoreKey(b.locationName);
-    if (keyA && keyB) {
-      if (keyA === keyB) return true;
-      if (keyA.length >= 4 && keyB.length >= 4 && (keyA.startsWith(keyB) || keyB.startsWith(keyA))) return true;
-    }
+    if (keyA && keyB && keyA === keyB) return true;
     const dLat = Math.abs(a.latitude - b.latitude);
     const dLon = Math.abs(a.longitude - b.longitude);
-    return dLat < 0.35 && dLon < 0.35;
+    return dLat < 0.05 && dLon < 0.05;
   };
 
   const updateSearchableStations = async () => {
-    const isOnline = Boolean(typeof navigator !== 'undefined' ? navigator.onLine : true) && climateDatabaseService.isOnline();
     const historicalList = hybridClimateManager.getHistoricalLocations();
 
-    if (!isOnline) {
-      // OFFLINE: Mostrar estaciones de la biblioteca local
-      allSearchableStations = historicalList.map((h) => ({
-        ...h,
-        source: 'local_database' as const,
-      }));
-      return;
-    }
-
-    // ONLINE: Unificar catálogo oficial sin duplicidades por ciudad
-    let supabaseList: ClimateDataRecord[] = [];
+    let cloudList: ClimateDataRecord[] = [];
     try {
-      supabaseList = await climateDatabaseService.getClimateDatasets();
+      cloudList = await climateDatabaseService.getClimateDatasets();
     } catch (e) {
       console.warn('[OrientSol] Could not fetch Supabase datasets for search:', e);
     }
 
+    const offlineQueue = climateDatabaseService.getOfflineQueue();
     const merged: ClimateDataRecord[] = [];
 
-    // 1. Agregar registros de Supabase (prioridad online)
-    for (const rec of supabaseList) {
+    // 1. Elementos en cola offline / caché local (máxima prioridad para pendientes de sincronización)
+    for (const rec of offlineQueue) {
+      if (!merged.some((existing) => isDuplicateStation(existing, rec))) {
+        merged.push({
+          ...rec,
+          source: 'offline_cache' as any,
+        });
+      }
+    }
+
+    // 2. Elementos sincronizados en Supabase / Base de Datos
+    for (const rec of cloudList) {
       if (!merged.some((existing) => isDuplicateStation(existing, rec))) {
         merged.push(rec);
       }
     }
 
-    // 2. Agregar de la biblioteca histórica aquellas ciudades que NO existan en la lista
+    // 3. Catálogo oficial histórico de OrientSol
     for (const rec of historicalList) {
       if (!merged.some((existing) => isDuplicateStation(existing, rec))) {
-        merged.push(rec);
+        merged.push({
+          ...rec,
+          source: 'historical' as any,
+        });
       }
     }
 
@@ -967,18 +985,53 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     histNotFoundBanner.innerHTML = '';
   }
 
+  function getLocationTagInfo(loc: ClimateDataRecord): { badgeClass: string; badgeText: string; statusTag: string } {
+    const isOffline = (loc as any).source === 'offline_cache' || 
+                      (Boolean(loc.id) && loc.id!.startsWith('offline-')) ||
+                      climateDatabaseService.getOfflineQueue().some((q) => q.locationName.trim().toLowerCase() === loc.locationName.trim().toLowerCase());
+
+    const isDatabase = !isOffline && (
+      loc.source === 'supabase' ||
+      (Boolean(loc.id) && (loc.id!.startsWith('supabase-') || loc.id!.startsWith('server-'))) ||
+      loc.metadata?.sourceTable === 'datos_mensuales'
+    );
+
+    const isLocalCache = isOffline ||
+                         loc.source === 'manual_input' ||
+                         (Boolean(loc.id) && loc.id!.startsWith('custom-'));
+
+    if (isDatabase) {
+      return {
+        badgeClass: 'badge-supabase',
+        badgeText: isEn ? 'DATABASE (CLOUD)' : 'DATABASE (NUBE)',
+        statusTag: isEn ? 'DATABASE (CLOUD)' : 'DATABASE (NUBE)',
+      };
+    } else if (isLocalCache) {
+      return {
+        badgeClass: 'badge-cache',
+        badgeText: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
+        statusTag: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
+      };
+    } else {
+      return {
+        badgeClass: 'badge-historical',
+        badgeText: isEn ? 'OFFICIAL CATALOG' : 'CATÁLOGO OFICIAL',
+        statusTag: isEn ? 'OFFICIAL CATALOG' : 'CATÁLOGO OFICIAL',
+      };
+    }
+  }
+
   function selectLocation(loc: ClimateDataRecord) {
     histSearchInput.value = loc.locationName;
     histSuggestionsDropdown.classList.add('hidden');
     hideNotFoundBanner();
     renderActiveRecord(loc);
-    const isUserCustom = loc.source === 'manual_input' || (Boolean(loc.id) && loc.id!.startsWith('custom-'));
-    const sourceTag = isUserCustom ? (isEn ? 'CUSTOM' : 'PERSONALIZADA') : 'ORIENTSOL 4.0';
+    const tagInfo = getLocationTagInfo(loc);
     const displayTitle = formatLocationWithCountry(loc.locationName, loc.country);
     setStatus(
       isEn
-        ? `Loaded station: ${displayTitle} [${sourceTag}].`
-        : `Cargada estación: ${displayTitle} [${sourceTag}].`,
+        ? `Loaded station: ${displayTitle} [${tagInfo.statusTag}].`
+        : `Cargada estación: ${displayTitle} [${tagInfo.statusTag}].`,
       'success'
     );
   }
@@ -1016,9 +1069,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         <div class="suggestions-list">
           ${matches
             .map((m) => {
-              const isUserCustom = m.source === 'manual_input' || (Boolean(m.id) && m.id!.startsWith('custom-'));
-              const badgeClass = isUserCustom ? 'badge-supabase' : 'badge-historical';
-              const badgeText = isUserCustom ? (isEn ? 'CUSTOM' : 'PERSONALIZADA') : 'ORIENTSOL 4.0';
+              const tagInfo = getLocationTagInfo(m);
+              const badgeClass = tagInfo.badgeClass;
+              const badgeText = tagInfo.badgeText;
               const annualG = m.monthlyGdm0.reduce((a, b) => a + b, 0) / 12;
               const cStr = (m.country || '').trim();
               const hasParenCountry = /\([^)]+\)$/.test(m.locationName.trim()) || (Boolean(cStr) && m.locationName.toLowerCase().includes(cStr.toLowerCase()));
@@ -1057,6 +1110,13 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       showNotFoundBanner(queryText.trim());
     }
   }
+
+  // Open suggestions on input focus if text exists
+  histSearchInput.addEventListener('focus', () => {
+    if (histSearchInput.value.trim()) {
+      performSearch(histSearchInput.value.trim());
+    }
+  });
 
   // Input event: case-insensitive only letters in Spanish/English
   histSearchInput.addEventListener('input', (e) => {
@@ -1485,14 +1545,78 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         pendingUploadedRecords = listToRegister;
         renderActiveRecord(record);
 
+        const isOnline = Boolean(typeof navigator !== 'undefined' ? navigator.onLine : true) && climateDatabaseService.isOnline();
+        const stationNames = listToRegister.map((r) => r.locationName).join(', ');
+
+        // Reset previous success card
+        if (uploadSuccessCard) {
+          uploadSuccessCard.classList.add('hidden');
+          uploadSuccessCard.innerHTML = '';
+        }
+
+        // Render Staging Card with prominent "Cargar a Base de Datos" button
+        if (uploadStagingCard) {
+          uploadStagingCard.innerHTML = `
+            <div class="staging-box-content">
+              <div class="staging-header">
+                <div class="staging-file-info">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                  </svg>
+                  <div>
+                    <div class="staging-filename">${escapeHtml(file.name)}</div>
+                    <div class="staging-meta">
+                      ${listToRegister.length} ${isEn ? 'station(s) ready' : 'emplazamiento(s) detectado(s)'}: <strong>${escapeHtml(stationNames)}</strong>
+                    </div>
+                  </div>
+                </div>
+                <div class="staging-status-badge ${isOnline ? 'badge-online' : 'badge-offline'}">
+                  ${isOnline 
+                    ? (isEn ? '● Online Mode: Supabase DB' : '● Conexión Nube: Supabase DB') 
+                    : (isEn ? '● Offline Mode: Local Cache' : '● Modo Offline: Caché Local')}
+                </div>
+              </div>
+              <div class="staging-actions">
+                <button type="button" id="btn-staging-save-db" class="btn btn-solar btn-lg" style="gap: 0.55rem; font-weight: 700;">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                  </svg>
+                  <span>${isOnline ? (isEn ? 'Upload to Database (Cloud)' : 'Cargar a Base de Datos (Nube)') : (isEn ? 'Save to Local Cache' : 'Guardar en Caché Local')}</span>
+                </button>
+              </div>
+            </div>
+          `;
+          uploadStagingCard.classList.remove('hidden');
+
+          const stagingBtn = uploadStagingCard.querySelector<HTMLButtonElement>('#btn-staging-save-db');
+          stagingBtn?.addEventListener('click', () => {
+            saveUploadBtn?.click();
+          });
+        }
+
         if (saveUploadBtn) {
           saveUploadBtn.disabled = false;
+          saveUploadBtn.classList.remove('btn-secondary');
+          saveUploadBtn.classList.add('btn-solar');
+          saveUploadBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+            </svg>
+            <span>${isOnline ? (isEn ? 'Upload to Database (Cloud)' : 'Cargar a Base de Datos (Nube)') : (isEn ? 'Save to Local Cache' : 'Guardar en Caché Local')}</span>
+          `;
         }
 
         setStatus(
           isEn
-            ? `✓ File "${file.name}" read successfully (${listToRegister.length} emplacement${listToRegister.length > 1 ? 's' : ''}). Click "Save to Supabase" to register.`
-            : `✓ Archivo "${file.name}" leído con éxito (${listToRegister.length} emplazamiento${listToRegister.length > 1 ? 's' : ''}). Pulsa "Guardar en Supabase" para registrarlos.`,
+            ? `✓ File "${file.name}" read successfully (${listToRegister.length} station${listToRegister.length > 1 ? 's' : ''}). Click "Upload to Database" to store in cloud or cache.`
+            : `✓ Archivo "${file.name}" leído con éxito (${listToRegister.length} emplazamiento${listToRegister.length > 1 ? 's' : ''}). Pulsa "Cargar a Base de Datos" para guardarlos en la nube o en caché.`,
           'info'
         );
       })
@@ -1518,7 +1642,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     }
 
     saveUploadBtn.disabled = true;
-    setStatus(isEn ? 'Registering uploaded dataset in Supabase...' : 'Registrando dataset en Supabase...', 'info');
+    setStatus(isEn ? 'Registering uploaded dataset...' : 'Registrando dataset...', 'info');
 
     try {
       let dupsCount = 0;
@@ -1537,14 +1661,85 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
       await updateSearchableStations();
 
+      const isOnline = Boolean(typeof navigator !== 'undefined' ? navigator.onLine : true) && climateDatabaseService.isOnline();
+      const savedNames = pendingUploadedRecords.map((r) => r.locationName);
+      const primaryStationName = savedNames[0] || '';
+
+      // Hide staging card
+      if (uploadStagingCard) {
+        uploadStagingCard.classList.add('hidden');
+      }
+
+      // Render Success Card with prominent redirect button to Tab 1
+      if (uploadSuccessCard) {
+        uploadSuccessCard.innerHTML = `
+          <div class="success-card-inner">
+            <div class="success-card-top">
+              <div class="success-icon-bubble">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#10b981" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div class="success-card-text">
+                <h4>${isEn ? 'Dataset Successfully Saved!' : '¡Emplazamientos Registrados con Éxito!'}</h4>
+                <p class="success-detail">
+                  ${isOnline 
+                    ? (isEn 
+                        ? `Synchronized with Supabase cloud database (datos_mensuales) and local cache: <strong>${escapeHtml(savedNames.join(', '))}</strong>.` 
+                        : `Se han sincronizado correctamente en la Base de Datos (Supabase) y registrado en caché local: <strong>${escapeHtml(savedNames.join(', '))}</strong>.`)
+                    : (isEn 
+                        ? `Saved in local browser cache: <strong>${escapeHtml(savedNames.join(', '))}</strong> (pending cloud synchronization when online).` 
+                        : `Se han guardado en Caché Local del navegador: <strong>${escapeHtml(savedNames.join(', '))}</strong> (se sincronizarán con Supabase al recuperar la conexión).`)
+                  }
+                </p>
+                <p class="success-instruction">
+                  ${isEn
+                    ? 'All datasets are now immediately available in the Tab 1 search dropdown, tagged with [DATABASE (CLOUD)] or [LOCAL CACHE].'
+                    : 'Todos los datos están ahora disponibles en el desplegable de búsqueda de la Pestaña 1 identificados con sus etiquetas [DATABASE (NUBE)] o [CACHÉ LOCAL].'
+                  }
+                </p>
+              </div>
+            </div>
+            <div class="success-card-actions">
+              <button type="button" id="btn-redirect-to-official-catalog" class="btn btn-primary btn-lg" style="gap: 0.6rem; font-weight: 700;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <span>${isEn ? 'Go to Tab 1 (Official Catalog) and View in Dropdown' : 'Ir a Pestaña 1 (Catálogo Oficial) y Ver en Desplegable'}</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        `;
+        uploadSuccessCard.classList.remove('hidden');
+
+        const redirectBtn = uploadSuccessCard.querySelector<HTMLButtonElement>('#btn-redirect-to-official-catalog');
+        redirectBtn?.addEventListener('click', () => {
+          const histTabBtn = container.querySelector<HTMLButtonElement>('.dual-tab-btn[data-tab="historical"]');
+          if (histTabBtn) {
+            histTabBtn.click();
+          }
+          if (histSearchInput && primaryStationName) {
+            histSearchInput.value = primaryStationName;
+            performSearch(primaryStationName);
+            histSearchInput.focus();
+            histSearchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        });
+      }
+
       if (pendingUploadedRecords.length === 1) {
         if (dupsCount > 0) {
           setStatus(warningMsg, 'warning');
         } else {
           setStatus(
             isEn
-              ? `✓ Emplacement "${pendingUploadedRecords[0].locationName}" saved to Supabase (12 monthly records).`
-              : `✓ Emplazamiento "${pendingUploadedRecords[0].locationName}" guardado en Supabase (12 registros mensuales).`,
+              ? `✓ Emplacement "${pendingUploadedRecords[0].locationName}" registered (${isOnline ? 'Supabase cloud & cache' : 'local cache'}).`
+              : `✓ Emplazamiento "${pendingUploadedRecords[0].locationName}" registrado (${isOnline ? 'Base de datos Supabase y caché' : 'caché local'}).`,
             'success'
           );
         }
@@ -1552,15 +1747,15 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         if (newCount > 0 && dupsCount === 0) {
           setStatus(
             isEn
-              ? `✓ All ${newCount} emplacements saved successfully to Supabase.`
-              : `✓ Los ${newCount} emplazamientos se guardaron exitosamente en Supabase.`,
+              ? `✓ All ${newCount} emplacements saved successfully (${isOnline ? 'Supabase cloud & cache' : 'local cache'}).`
+              : `✓ Los ${newCount} emplazamientos se guardaron exitosamente (${isOnline ? 'Base de datos Supabase y caché' : 'caché local'}).`,
             'success'
           );
         } else if (newCount > 0 && dupsCount > 0) {
           setStatus(
             isEn
-              ? `✓ ${newCount} new emplacements saved to Supabase (${dupsCount} already registered / duplicates).`
-              : `✓ ${newCount} nuevos emplazamientos guardados en Supabase (${dupsCount} ya registrados / advertencia de duplicado).`,
+              ? `✓ ${newCount} new emplacements saved (${dupsCount} already registered / duplicates).`
+              : `✓ ${newCount} nuevos emplazamientos guardados (${dupsCount} ya registrados / advertencia de duplicado).`,
             'warning'
           );
         } else {
