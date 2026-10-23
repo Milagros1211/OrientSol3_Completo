@@ -57,9 +57,9 @@ export const es: Translations = {
   hybridLoader: {
     title: 'Arquitectura Híbrida & Carga Dual de Climatología',
     subtitle: 'Consulta la Base Histórica OrientSol 4.0, introduce datos manualmente mes a mes, o sube documentos digitales (CSV / JSON) para alimentar el motor de cálculo Python.',
-    tabHistorical: '1. Base Histórica OrientSol',
-    tabManual: '2. Introducción Manual (Formulario)',
-    tabUpload: '3. Subida Digital (CSV / JSON)',
+    tabHistorical: '1. Catálogo Oficial (114 Estaciones)',
+    tabManual: '2. Entrada Manual (Formulario Paso a Paso)',
+    tabUpload: '3. Importar Archivo (CSV / JSON)',
     historicalLabel: 'Estación Histórica OrientSol 4.0',
     selectStation: 'Seleccionar Estación',
     manualPresetLabel: 'Prellenar con estación histórica:',

@@ -57,9 +57,9 @@ export const en: Translations = {
   hybridLoader: {
     title: 'Hybrid Architecture & Dual Climate Ingestion',
     subtitle: 'Query OrientSol 4.0 Historical Database, enter monthly data manually, or upload digital documents (CSV / JSON) to feed the Python calculation engine.',
-    tabHistorical: '1. OrientSol Historical Database',
-    tabManual: '2. Manual Entry (Form)',
-    tabUpload: '3. Digital Upload (CSV / JSON)',
+    tabHistorical: '1. Official Catalog (114 Stations)',
+    tabManual: '2. Manual Entry (Step-by-Step Form)',
+    tabUpload: '3. Import File (CSV / JSON)',
     historicalLabel: 'OrientSol 4.0 Historical Station',
     selectStation: 'Select Station',
     manualPresetLabel: 'Pre-fill with historical station:',

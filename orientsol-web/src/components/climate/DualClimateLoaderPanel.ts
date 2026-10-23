@@ -135,12 +135,28 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <line x1="12" y1="21" x2="12" y2="23"></line>
           <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"></path>
         </svg>
-        <span id="tab-api-title-text">${!isOnlineInit ? (isEn ? '4. Satellite Climate APIs (Offline )' : '4. APIs Satelitales (Sin conexión )') : (isEn ? '4. Satellite Climate APIs (PVGIS / NASA)' : '4. APIs Climáticas Satelitales (PVGIS / NASA)')}</span>
+        <span id="tab-api-title-text">${!isOnlineInit ? (isEn ? '4. Satellite Query (Offline)' : '4. Consulta Satelital (Sin conexión)') : (isEn ? '4. Consulta Satelital (PVGIS / NASA)' : '4. Consulta Satelital (PVGIS / NASA)')}</span>
       </button>
     </div>
 
     <!-- TAB 1: HISTORICAL DATABASE & SUPABASE SEARCH -->
     <div id="tab-content-historical" class="dual-tab-content ${cachedActiveTab === 'historical' ? '' : 'hidden'}">
+      <!-- Pedagogical Guide Banner: Tab 1 -->
+      <div class="tab-instruction-banner">
+        <div class="tab-instruction-header">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>${isEn ? 'How to select an official station from the catalog?' : '¿Cómo seleccionar una estación del catálogo?'}</span>
+        </div>
+        <ol class="tab-instruction-steps">
+          <li>${isEn ? 'Type your city or province name in the search box below (e.g., <em>Jaén</em>, <em>Madrid</em>, <em>Sevilla</em>).' : 'Escribe el nombre de tu ciudad o provincia en el buscador (ej. <em>Jaén</em>, <em>Madrid</em>, <em>Sevilla</em>).'}</li>
+          <li>${isEn ? 'Click on the matching station from the suggestion dropdown or press <strong>"Select Station"</strong>.' : 'Selecciona la localidad en la lista desplegable de sugerencias o pulsa <strong>«Seleccionar Estación»</strong>.'}</li>
+          <li>${isEn ? 'Official monthly radiation and ambient temperature data will automatically load into the solar calculation engine.' : 'Se cargarán de inmediato sus 12 meses de irradiación global G<sub>dm</sub>(0) y temperatura media oficial validados para simular.'}</li>
+        </ol>
+      </div>
       <div class="historical-search-row">
         <div class="form-group flex-1" style="position: relative;">
           <label for="hist-search-input" class="form-label">
@@ -176,6 +192,23 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     <!-- TAB 2: MANUAL FORM -->
     <div id="tab-content-manual" class="dual-tab-content ${cachedActiveTab === 'manual' ? '' : 'hidden'}">
+      <!-- Pedagogical Guide Banner: Tab 2 -->
+      <div class="tab-instruction-banner">
+        <div class="tab-instruction-header">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>${isEn ? 'How to enter custom climate data manually step by step?' : '¿Cómo introducir datos climáticos manualmente paso a paso?'}</span>
+        </div>
+        <ol class="tab-instruction-steps">
+          <li>${isEn ? '<strong>(Optional)</strong> Select a reference station in <em>"Pre-fill with historical station"</em> to load baseline values.' : '<strong>(Opcional)</strong> Puedes elegir una estación de referencia en <em>«Prellenar con estación»</em> para cargar datos base.'}</li>
+          <li>${isEn ? 'Set the location name, geographic coordinates (Latitude, Longitude), and ground albedo (ρ<sub>g</sub>).' : 'Asigna un nombre a la instalación y ajusta las coordenadas geográficas (Latitud, Longitud) y albedo del suelo (ρ<sub>g</sub>).'}</li>
+          <li>${isEn ? 'Fill in or adjust the 12 monthly values for daily radiation G<sub>dm</sub>(0) [kWh/m²·day] and temperature T<sub>amb</sub> [°C].' : 'Rellena o edita la radiación diaria G<sub>dm</sub>(0) [kWh/m²·día] y temperatura T<sub>amb</sub> [°C] de cada uno de los 12 meses.'}</li>
+          <li>${isEn ? 'Click <strong>"Apply Manual Data"</strong> to feed the dataset into the simulation engine.' : 'Pulsa <strong>«Aplicar Datos Manuales»</strong> para inyectar los datos en el motor solar (opcionalmente puedes guardarlos en Supabase).'}</li>
+        </ol>
+      </div>
       <div id="manual-upload-permission-box">${renderSupabaseUploadBannerHtml(isEn)}</div>
       <div class="manual-preset-row">
         <span class="manual-preset-label">${t.hybridLoader.manualPresetLabel}</span>
@@ -257,6 +290,22 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     <!-- TAB 3: DIGITAL FILE UPLOAD -->
     <div id="tab-content-upload" class="dual-tab-content hidden">
+      <!-- Pedagogical Guide Banner: Tab 3 -->
+      <div class="tab-instruction-banner">
+        <div class="tab-instruction-header">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>${isEn ? 'How to import your radiation measurements from a file?' : '¿Cómo importar tus mediciones desde un archivo digital?'}</span>
+        </div>
+        <ol class="tab-instruction-steps">
+          <li>${isEn ? '<strong>(Optional)</strong> Download one of our standardized sample templates (CSV or JSON, single or multi-station batch).' : '<strong>(Opcional)</strong> Descarga una de nuestras plantillas normalizadas (CSV o JSON, individual o multi-estación).'}</li>
+          <li>${isEn ? 'Drag and drop your .csv, .json, or .txt file into the dropzone below, or click <strong>"Select File"</strong>.' : 'Arrastra tu archivo .csv, .json o .txt a la zona de carga o pulsa el botón <strong>«Seleccionar Archivo»</strong>.'}</li>
+          <li>${isEn ? 'OrientSol will parse and validate the 12 monthly values, sending the dataset directly to the calculation engine.' : 'OrientSol validará los 12 meses de datos climáticos y los transferirá automáticamente al simulador.'}</li>
+        </ol>
+      </div>
       <div id="file-upload-permission-box">${renderSupabaseUploadBannerHtml(isEn)}</div>
       <div id="file-dropzone" class="file-dropzone">
         <div class="dropzone-icon">
@@ -294,6 +343,22 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     <!-- TAB 4: SATELLITE CLIMATE APIS -->
     <div id="tab-content-api" class="dual-tab-content ${cachedActiveTab === 'api' ? '' : 'hidden'}">
+      <!-- Pedagogical Guide Banner: Tab 4 -->
+      <div class="tab-instruction-banner">
+        <div class="tab-instruction-header">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>${isEn ? 'How to query live satellite solar data worldwide?' : '¿Cómo obtener radiación satelital en cualquier lugar del mundo?'}</span>
+        </div>
+        <ol class="tab-instruction-steps">
+          <li>${isEn ? 'Choose the satellite source: <strong>PVGIS 5.3</strong> (European Commission JRC) or <strong>NASA POWER</strong> (Global coverage).' : 'Elige el servicio satelital: <strong>PVGIS 5.3</strong> (Comisión Europea JRC) o <strong>NASA POWER</strong> (cobertura global).'}</li>
+          <li>${isEn ? 'Pick a preset city or enter custom geographic coordinates (Latitude / Longitude) anywhere on Earth.' : 'Elige una ciudad de la lista o escribe tus propias coordenadas (Latitud / Longitud) en cualquier parte del planeta.'}</li>
+          <li>${isEn ? 'Click <strong>"Query Satellite Data"</strong>. The satellite API will fetch monthly solar radiation and temperature series in real time.' : 'Pulsa <strong>«Consultar Climatología»</strong> para descargar los datos solares vía satélite en tiempo real.'}</li>
+        </ol>
+      </div>
       <div id="tab4-offline-alert" class="search-alert-box alert-warning-box ${isOnlineInit ? 'hidden' : ''}" style="margin-bottom: 1rem;">
         <div class="alert-icon-wrap">
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f59e0b" stroke-width="2">
@@ -784,8 +849,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           : 'Requiere conexión a Internet para consultar APIs satelitales (PVGIS / NASA)';
         if (apiText) {
           apiText.textContent = isEn
-            ? '4. Satellite Climate APIs (Offline )'
-            : '4. APIs Satelitales (Sin conexión )';
+            ? '4. Satellite Query (Offline)'
+            : '4. Consulta Satelital (Sin conexión)';
         }
         if (apiOfflineAlert) {
           apiOfflineAlert.classList.remove('hidden');
@@ -808,8 +873,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         apiBtn.title = '';
         if (apiText) {
           apiText.textContent = isEn
-            ? '4. Satellite Climate APIs (PVGIS / NASA)'
-            : '4. APIs Climáticas Satelitales (PVGIS / NASA)';
+            ? '4. Satellite Query (PVGIS / NASA)'
+            : '4. Consulta Satelital (PVGIS / NASA)';
         }
         if (apiOfflineAlert) {
           apiOfflineAlert.classList.add('hidden');
