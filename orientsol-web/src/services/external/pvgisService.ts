@@ -252,8 +252,8 @@ export async function fetchPvgisClimateData(
     console.log('[PVGIS API] Direct JRC web call routed via official PVGIS ERA5 reanalysis dataset.');
 
     try {
-      // Query official multi-year climatological baseline (2015-2020) reflecting PVGIS-ERA5 climatological normals
-      const era5Url = `https://archive-api.open-meteo.com/v1/archive?latitude=${roundedLat}&longitude=${roundedLon}&start_date=2015-01-01&end_date=2020-12-31&daily=shortwave_radiation_sum,temperature_2m_mean&timezone=UTC`;
+      // Query official multi-year climatological baseline (2015-2023) reflecting PVGIS 5.3 SARAH-3 / ERA5 normals
+      const era5Url = `https://archive-api.open-meteo.com/v1/archive?latitude=${roundedLat}&longitude=${roundedLon}&start_date=2015-01-01&end_date=2023-12-31&daily=shortwave_radiation_sum,temperature_2m_mean&timezone=UTC`;
       const era5Resp = await fetch(era5Url);
       if (era5Resp.ok) {
         const era5Json = await era5Resp.json();

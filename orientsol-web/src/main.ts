@@ -139,15 +139,15 @@ function renderAboutView(isEn: boolean): HTMLElement {
 
             <p style="font-size: 0.77rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
               <strong>${isEn ? 'Key Methodological Differences:' : 'Diferencias Metodológicas Clave:'}</strong><br/>
-              • <strong>${isEn ? 'Multi-Year Climatology:' : 'Climatología multianual:'}</strong> ${isEn
-                ? 'Synthesizes normalized multi-decadal series (2005–2020/2023) from Meteosat satellites. It does not reflect a single isolated year, but the representative normative baseline for European solar engineering.'
-                : 'Sintetiza series multianuales normalizadas (2005–2020/2023) desde satélites Meteosat. No representa un año puntual, sino la base climática normativa representativa para ingeniería solar europea.'}<br/>
+              • <strong>${isEn ? 'Multi-Year Climatology (2005–2023):' : 'Climatología multianual (2005–2023):'}</strong> ${isEn
+                ? 'Synthesizes normalized multi-decadal series (2005–2023 in PVGIS 5.3 SARAH-3, whereas previous PVGIS 5.2 covered up to 2020) from Meteosat satellites. It does not reflect a single isolated year, but the representative normative baseline for European solar engineering.'
+                : 'Sintetiza series multianuales normalizadas (2005–2023 en PVGIS 5.3 con SARAH-3; la versión anterior 5.2 cubría hasta 2020) desde satélites Meteosat. No representa un año puntual, sino la base climática normativa representativa para ingeniería solar europea.'}<br/>
               • <strong>${isEn ? 'Digital Terrain Horizon:' : 'Horizonte y sombreado orográfico:'}</strong> ${isEn
                 ? 'Incorporates automated terrain horizon masking (SRTM 90m DEM) to discount mountain shadows.'
                 : 'Incorpora cálculo automático del perfil de horizonte y sombras orográficas (malla SRTM 90m).'}<br/>
               • <strong>${isEn ? 'Update Cadence:' : 'Cadencia de actualización:'}</strong> ${isEn
-                ? 'Major algorithm releases every 2–3 years (v5.1, v5.2, v5.3). Underlying ECMWF time series updated monthly.'
-                : 'Versiones mayores cada 2–3 años (v5.1, v5.2, v5.3). Series subyacentes actualizadas mensualmente con 2–3 meses de latencia.'}
+                ? 'Major algorithm releases every 2–3 years (v5.1 in 2020, v5.2 in 2022, v5.3 in 2024). Underlying ECMWF time series updated monthly.'
+                : 'Versiones mayores cada 2–3 años (v5.1 en 2020, v5.2 en 2022, v5.3 en 2024 ampliando cobertura a 2023). Series subyacentes actualizadas mensualmente.'}
             </p>
           </div>
           <div style="font-size: 0.70rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.45rem; font-family: var(--font-mono); line-height: 1.35;">
@@ -281,7 +281,7 @@ function renderAboutView(isEn: boolean): HTMLElement {
               </tr>
               <tr style="border-bottom: 1px solid var(--border-subtle); background: rgba(2, 132, 199, 0.02);">
                 <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-main);">${isEn ? 'Temporal Baseline' : 'Base Temporal'}</td>
-                <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">${isEn ? 'Multi-year climatological average (2005–2020)' : 'Media climatológica multianual (2005–2020)'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">${isEn ? 'Multi-year climatology (2005–2023, v5.3 SARAH-3; v5.2 was to 2020)' : 'Media climatológica multianual (2005–2023, v5.3 SARAH-3; v5.2 era hasta 2020)'}</td>
                 <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">${isEn ? 'Multi-decade climatology (>35 yrs, 1984–present)' : 'Climatología multidecenal (>35 años, 1984–presente)'}</td>
                 <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">${isEn ? 'Single-year historical time series (e.g., 2023)' : 'Serie anual específica año a año (ej. 2023)'}</td>
               </tr>
