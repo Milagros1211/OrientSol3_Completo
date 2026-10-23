@@ -1387,40 +1387,40 @@ export function renderPythonConsole(): HTMLElement {
 
         const wmoComplianceNotice = `
           ${pvgisJustSynchronized ? `
-            <div style="padding: 0.65rem 1.15rem; background: rgba(16, 185, 129, 0.12); border-bottom: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.77rem; color: #059669; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <span>
+            <div style="padding: 0.45rem 1rem; background: rgba(16, 185, 129, 0.12); border-bottom: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.74rem; color: #059669; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: nowrap;">
+              <div style="display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                   ${isEn
-                    ? `Live PVGIS API synchronized! Database: <strong>${pvgisData.database}</strong> (${pvgisData.dbType}) • Coverage: <strong>${pvgisData.startYear}–${pvgisData.endYear}</strong> (End Year: <strong>${pvgisData.endYear}</strong>) • Spatial res: <strong>${pvgisData.spatialRes}</strong> • Source: European Commission JRC PVGIS 5.3.`
-                    : `¡API PVGIS en vivo sincronizada con éxito! Base de datos: <strong>${pvgisData.database}</strong> (${pvgisData.dbType}) • Cobertura: <strong>${pvgisData.startYear}–${pvgisData.endYear}</strong> (Año Final: <strong>${pvgisData.endYear}</strong>) • Res. espacial: <strong>${pvgisData.spatialRes}</strong> • Fuente: Comisión Europea JRC PVGIS 5.3.`}
+                    ? `Live PVGIS API synchronized! Database: <strong>${pvgisData.database}</strong> (${pvgisData.dbType}) • Coverage: <strong>${pvgisData.startYear}–${pvgisData.endYear}</strong> • Res: <strong>${pvgisData.spatialRes}</strong> • Source: European Commission JRC PVGIS 5.3.`
+                    : `¡API PVGIS sincronizada! Base: <strong>${pvgisData.database}</strong> (${pvgisData.dbType}) • Cobertura: <strong>${pvgisData.startYear}–${pvgisData.endYear}</strong> • Res: <strong>${pvgisData.spatialRes}</strong> • Fuente: CE JRC PVGIS 5.3.`}
                 </span>
               </div>
-              <button type="button" id="btn-dismiss-sync-banner" class="btn btn-xs btn-secondary" style="font-size: 0.68rem; padding: 0.15rem 0.45rem; cursor: pointer;">
+              <button type="button" id="btn-dismiss-sync-banner" class="btn btn-xs btn-secondary" style="font-size: 0.68rem; padding: 0.12rem 0.42rem; cursor: pointer; flex-shrink: 0;" title="${isEn ? 'Close notice' : 'Cerrar aviso'}">
                 ✕
               </button>
             </div>
           ` : ''}
 
           <!-- COMPARATIVE VALIDATION HEADER (SIMULADOR & OPTIMIZACION SOLAR VS PVGIS SAME MOTOR) -->
-          <div style="padding: 0.75rem 1rem; background: rgba(2, 132, 199, 0.05); border-bottom: 1px solid rgba(2, 132, 199, 0.2); display: flex; flex-direction: column; gap: 0.45rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-              <div style="display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap;">
-                <span style="font-size: 0.84rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.35rem;">
+          <div style="padding: 0.65rem 1rem; background: rgba(2, 132, 199, 0.05); border-bottom: 1px solid rgba(2, 132, 199, 0.2); display: flex; flex-direction: column; gap: 0.35rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap; gap: 0.45rem; overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
+              <div style="display: flex; align-items: center; gap: 0.45rem; flex-shrink: 0;">
+                <span style="font-size: 0.82rem; font-weight: 800; color: var(--text-main); white-space: nowrap;">
                   ${pvgisData.locationName} (${formatAngle(stateLat, 2)})
                 </span>
-                <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-weight: 700; font-size: 0.70rem; border: 1px solid rgba(16, 185, 129, 0.25);">
-                  ✓ ${isEn ? 'Side A: Simulator & Solar Optimization' : 'Lado A: Simulador & Optimización Solar'} · ${hasSimForLat ? (isEn ? 'active site data' : 'datos del emplazamiento activo') + ' (' + simRes!.source + ', ' + formatAngle(simRes!.latitude, 3) + ' / ' + formatAngle(simRes!.longitude, 3) + ')' : (isEn ? 'OrientSol reference dataset' : 'dataset de referencia OrientSol')}
+                <span class="badge" title="${hasSimForLat ? (isEn ? 'active site data' : 'datos del emplazamiento activo') + ' (' + simRes!.source + ', ' + formatAngle(simRes!.latitude, 3) + ' / ' + formatAngle(simRes!.longitude, 3) + ')' : (isEn ? 'OrientSol reference dataset' : 'dataset de referencia OrientSol')}" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-weight: 700; font-size: 0.69rem; border: 1px solid rgba(16, 185, 129, 0.25); white-space: nowrap; padding: 0.15rem 0.45rem;">
+                  ✓ ${isEn ? 'Side A: Simulator' : 'Lado A: Simulador'} (${hasSimForLat ? simRes!.source : 'OrientSol'})
                 </span>
-                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700;">vs</span>
-                <span class="badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-weight: 700; font-size: 0.70rem; border: 1px solid rgba(2, 132, 199, 0.25);">
-                  ${isEn ? 'Side B: PVGIS JRC (Same OrientSol Motor)' : 'Lado B: PVGIS JRC (Mismo Motor OrientSol)'} · ${formatAngle(pvgisData.latitude, 3)} / ${formatAngle(pvgisData.longitude, 3)}
+                <span style="font-size: 0.70rem; color: var(--text-muted); font-weight: 700;">vs</span>
+                <span class="badge" title="${isEn ? 'Side B: PVGIS JRC (Same OrientSol Motor)' : 'Lado B: PVGIS JRC (Mismo Motor OrientSol)'} · ${formatAngle(pvgisData.latitude, 3)} / ${formatAngle(pvgisData.longitude, 3)}" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-weight: 700; font-size: 0.69rem; border: 1px solid rgba(2, 132, 199, 0.25); white-space: nowrap; padding: 0.15rem 0.45rem;">
+                  ${isEn ? 'Side B: PVGIS' : 'Lado B: PVGIS JRC'} (${pvgisData.database})
                 </span>
               </div>
-              <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
-                <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; font-weight: 700; font-size: 0.70rem; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.15rem 0.5rem; border-radius: 4px;">
-                  ✓ ${isEn ? '100% Shared Physical Motor' : '100% Mismo Motor Físico'}
+              <div style="display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
+                <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; font-weight: 700; font-size: 0.68rem; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.15rem 0.45rem; border-radius: 4px; white-space: nowrap;">
+                  ✓ ${isEn ? '100% Shared Motor' : '100% Mismo Motor Físico'}
                 </span>
-                <span class="badge" style="background: rgba(37, 99, 235, 0.12); color: #2563eb; font-weight: 700; font-size: 0.70rem; border: 1px solid rgba(37, 99, 235, 0.25); padding: 0.15rem 0.5rem; border-radius: 4px;">
+                <span class="badge" style="background: rgba(37, 99, 235, 0.12); color: #2563eb; font-weight: 700; font-size: 0.68rem; border: 1px solid rgba(37, 99, 235, 0.25); padding: 0.15rem 0.45rem; border-radius: 4px; white-space: nowrap;">
                   ${pvgisData.database} (${pvgisData.dbType})
                 </span>
               </div>
