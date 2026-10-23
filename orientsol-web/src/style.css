@@ -9838,10 +9838,21 @@ body.theme-dark .op-math-step-label {
 }
 
 .op-math-step-note {
-  font-size: 0.68rem;
-  color: var(--text-dim);
-  font-style: italic;
-  padding-left: 0.25rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  padding: 0.4rem 0.6rem;
+  background: rgba(2, 132, 199, 0.07);
+  border-left: 3px solid #0284c7;
+  border-radius: var(--radius-sm, 8px);
+  margin-top: 0.25rem;
+}
+
+[data-theme="dark"] .op-math-step-note,
+body.theme-dark .op-math-step-note {
+  background: rgba(56, 189, 248, 0.08);
+  border-left-color: #38bdf8;
+  color: #cbd5e1;
 }
 
 .operation-selector-bar {

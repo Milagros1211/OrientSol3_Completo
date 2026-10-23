@@ -79,8 +79,8 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
             label: isEn ? '3. Annual Energy Summation & Optimum Tilt:' : '3. Integración Anual y Búsqueda de Óptimo:',
             formula: '\\beta_{\\text{óptimo}} = \\arg\\max_{\\beta \\in [0^\\circ, 90^\\circ]} \\sum_{m=1}^{12} G_{dm}(\\beta)_m \\cdot N_{\\text{días}, m}',
             note: isEn
-              ? 'arg max (argument of the maximum) identifies the specific optimal tilt angle β (in degrees) that delivers peak annual energy, rather than the peak energy quantity itself.'
-              : 'La operación arg max (argumento que maximiza) selecciona el ángulo de inclinación óptimo β (en grados) que produce la máxima captación anual, no la cantidad de kWh.'
+              ? '<div style="margin-top: 0.25rem; line-height: 1.45;"><strong>Why arg max and not max?</strong><br/>• <strong>max</strong> answers <em>"How much?"</em>: returns peak annual collected energy (kWh/m²).<br/>• <strong>arg max</strong> answers <em>"Which angle?"</em>: evaluates all 91 angles \\(\\beta \\in [0^\\circ, 90^\\circ]\\) and returns the <strong>optimal tilt angle in degrees (e.g., 38°)</strong> that achieves that peak, telling the solar installer exactly how to fix the structure.</div>'
+              : '<div style="margin-top: 0.25rem; line-height: 1.45;"><strong>¿Por qué arg max y no max?</strong><br/>• <strong>max</strong> responde a <em>«¿Cuánto?»</em>: devuelve la energía anual máxima en kWh/m².<br/>• <strong>arg max</strong> responde a <em>«¿Cuál?»</em>: prueba los 91 ángulos \\(\\beta \\in [0^\\circ, 90^\\circ]\\) y devuelve el <strong>ángulo óptimo en grados (ej: 38°)</strong> que logra ese récord, indicando al instalador a cuántos grados fijar la estructura física.</div>'
           },
           {
             label: isEn ? '4. Annual Energy Gain vs Horizontal:' : '4. Balance de Ganancia Relativa vs Horizontal:',
@@ -111,8 +111,8 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
             label: isEn ? '1. Month-by-Month Maximum Search:' : '1. Búsqueda Desacoplada del Máximo Mensual:',
             formula: '\\beta_{\\text{óptimo}, m} = \\arg\\max_{\\beta \\in [0^\\circ, 90^\\circ]} G_{dm}(\\beta)_m \\qquad (m = 1, \\dots, 12)',
             note: isEn
-              ? 'Each month selects its own tilt angle that maximizes daily irradiation during that specific month.'
-              : 'Cada mes selecciona su propia inclinación maximizando la irradiación captada de forma independiente.'
+              ? '<strong>arg max per month:</strong> Evaluates all 91 angles for each individual month m, returning the 12 specific optimal angles \\(\\beta_{\\text{opt}, m}\\) that maximize daily irradiance in that exact month.'
+              : '<strong>arg max mensual:</strong> Resuelve independientemente para cada mes m ∈ [1..12] cuál es el ángulo específico \\(\\beta_{\\text{óptimo}, m}\\) que maximiza la irradiación captada en ese mes concreto.'
           },
           {
             label: isEn ? '2. Solar Declination Coupling:' : '2. Relación Física con la Declinación Solar:',
@@ -148,7 +148,9 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           {
             label: isEn ? '1. Seasonal Energy Maximization per Block:' : '1. Maximización de Energía por Bloque Estacional:',
             formula: '\\beta_{\\text{estación}, k} = \\arg\\max_{\\beta \\in [0^\\circ, 90^\\circ]} \\sum_{m \\in S_k} G_{dm}(\\beta)_m \\cdot N_{\\text{días}, m}',
-            note: isEn ? 'Maximizes total energy collected during the months belonging to season S_k.' : 'Maximiza la energía acumulada durante el conjunto de meses que componen la estación S_k.'
+            note: isEn
+              ? '<strong>arg max seasonal:</strong> Returns the single compromise tilt angle for seasonal group S_k that maximizes sum of energy captured across all months in that period.'
+              : '<strong>arg max estacional:</strong> Devuelve la inclinación de compromiso óptima que maximiza la captación acumulada de todos los meses que integran el bloque estacional S_k.'
           },
           {
             label: isEn ? '2. Bi-Annual & Quad-Annual Rules:' : '2. Reglas Canónicas Semestrales y Trimestrales:',
