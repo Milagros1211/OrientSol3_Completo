@@ -9753,6 +9753,7 @@ body.theme-dark .op-methodology-badge {
   display: grid;
   grid-template-columns: minmax(280px, 1fr) minmax(360px, 1.4fr);
   gap: 0.85rem;
+  align-items: start;
 }
 
 @media (max-width: 960px) {
@@ -9796,7 +9797,7 @@ body.theme-dark .op-methodology-badge {
 }
 
 .op-col-output {
-  margin-top: auto;
+  margin-top: 0.5rem;
   padding-top: 0.45rem;
   border-top: 1px solid var(--border-subtle);
   color: var(--text-main);

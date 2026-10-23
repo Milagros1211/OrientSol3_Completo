@@ -47,8 +47,18 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           ? `Calculates the single, optimal fixed inclination angle β_optimal that maximizes total solar energy captured over the entire 365-day year at ${locationName} (φ = ${latStr}).`
           : `Calcula el ángulo de inclinación fijo único β_óptimo que maximiza la captación total de radiación solar acumulada a lo largo de los 365 días del año en ${locationName} (φ = ${latStr}).`,
         inputDescription: isEn
-          ? `<strong>Input Climatology Data:</strong> Monthly global horizontal radiation vector ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·day], latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}, ground albedo ${renderTex('\\rho_{\\text{albedo}} = 0{,}20')} and Klein characteristic day ${renderTex('n_m')}.`
-          : `<strong>Datos Climatológicos de Entrada (Input):</strong> Vector mensual de irradiación global sobre plano horizontal ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·día], latitud geográfica ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}, albedo del suelo ${renderTex('\\rho_{\\text{albedo}} = 0{,}20')} y día medio de Klein ${renderTex('n_m')}.`,
+          ? `<div style="display: flex; flex-direction: column; gap: 0.45rem;">
+              <div><strong>Solar Radiation:</strong> Global horizontal vector ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·day].</div>
+              <div><strong>Site Coordinates:</strong> Local latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
+              <div><strong>Ground & Solar Day:</strong> Albedo ${renderTex('\\rho_{\\text{albedo}} = 0{,}20')} and Klein characteristic day ${renderTex('n_m')}.</div>
+              <div><strong>Search Space:</strong> Discrete sweeping across 91 tilt angles ${renderTex('\\beta \\in [0^\\circ, 90^\\circ]')} (${renderTex('\\Delta\\beta = 1^\\circ')}).</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.45rem;">
+              <div><strong>Radiación de Entrada:</strong> Vector mensual sobre horizontal ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·día].</div>
+              <div><strong>Emplazamiento:</strong> Latitud geográfica local ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
+              <div><strong>Entorno y Geometría:</strong> Albedo del suelo ${renderTex('\\rho_{\\text{albedo}} = 0{,}20')} y día medio de Klein ${renderTex('n_m')}.</div>
+              <div><strong>Espacio de Búsqueda:</strong> Barrido discreto de 91 inclinaciones fijas ${renderTex('\\beta \\in [0^\\circ, 90^\\circ]')} (${renderTex('\\Delta\\beta = 1^\\circ')}).</div>
+            </div>`,
         mathProcessTitle: isEn ? 'Mathematical Algorithm & Formulations:' : 'Procedimiento y Algoritmo Matemático:',
         mathSteps: [
           {
@@ -69,8 +79,8 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
             label: isEn ? '3. Annual Energy Summation & Optimum Tilt:' : '3. Integración Anual y Búsqueda de Óptimo:',
             formula: '\\beta_{\\text{óptimo}} = \\arg\\max_{\\beta \\in [0^\\circ, 90^\\circ]} \\sum_{m=1}^{12} G_{dm}(\\beta)_m \\cdot N_{\\text{días}, m}',
             note: isEn
-              ? 'Identifies the tilt angle that maximizes annual collector capture across all 12 months.'
-              : 'Identifica la inclinación fija que maximiza la captación total anual ponderada por los días del mes.'
+              ? 'arg max (argument of the maximum) identifies the specific optimal tilt angle β (in degrees) that delivers peak annual energy, rather than the peak energy quantity itself.'
+              : 'La operación arg max (argumento que maximiza) selecciona el ángulo de inclinación óptimo β (en grados) que produce la máxima captación anual, no la cantidad de kWh.'
           },
           {
             label: isEn ? '4. Annual Energy Gain vs Horizontal:' : '4. Balance de Ganancia Relativa vs Horizontal:',
@@ -79,8 +89,8 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           }
         ],
         outputSummary: isEn
-          ? 'Output: Single fixed angle β_optimal, 12 transposed monthly values, and total annual collection.'
-          : 'Resultado: Ángulo óptimo anual fijo β_óptimo, irradiación mensual transpuesta y balance de ganancia.'
+          ? `Output: Single optimal fixed tilt ${renderTex('\\beta_{\\text{opt}}')}, 12 transposed monthly values ${renderTex('G_{dm}(\\beta)_m')}, and annual percentage gain balance.`
+          : `Resultado: Inclinación óptima anual fija ${renderTex('\\beta_{\\text{óptimo}}')}, irradiación mensual transpuesta ${renderTex('G_{dm}(\\beta)_m')} y balance de ganancia anual.`
       };
 
     case 'monthly':
