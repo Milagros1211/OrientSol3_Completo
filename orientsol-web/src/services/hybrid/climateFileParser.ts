@@ -456,43 +456,40 @@ export function parseClimateCSV(csvString: string, fileName = 'documento.csv'): 
 export function generateSampleCSV(isMulti = false): string {
   if (isMulti) {
     return `# OrientSol 4.0 - Plantilla de Lote Multi-Emplazamiento (Batch)
-# Formato: emplazamiento;pais;latitud;longitud;mes;radiacion_media;temp_media
+# Formato: emplazamiento;latitud;longitud;mes;radiacion_media;temp_media
 # Radiación: en kWh/m²/día (ej: 2.58) o mensual en kWh/m²/mes (se convierte automáticamente)
-emplazamiento;pais;latitud;longitud;mes;radiacion_media;temp_media
-Jaén;España;37.77;-3.78;1;2.45;9.2
-Jaén;España;37.77;-3.78;2;3.31;10.5
-Jaén;España;37.77;-3.78;3;4.68;13.8
-Jaén;España;37.77;-3.78;4;5.82;16.5
-Jaén;España;37.77;-3.78;5;6.95;20.8
-Jaén;España;37.77;-3.78;6;7.92;26.1
-Jaén;España;37.77;-3.78;7;8.10;29.4
-Jaén;España;37.77;-3.78;8;7.25;28.9
-Jaén;España;37.77;-3.78;9;5.54;24.5
-Jaén;España;37.77;-3.78;10;3.95;19.1
-Jaén;España;37.77;-3.78;11;2.75;13.2
-Jaén;España;37.77;-3.78;12;2.18;10.0
-Madrid;España;40.41;-3.70;1;2.14;6.1
-Madrid;España;40.41;-3.70;2;3.15;7.9
-Madrid;España;40.41;-3.70;3;4.48;11.2
-Madrid;España;40.41;-3.70;4;5.51;13.5
-Madrid;España;40.41;-3.70;5;6.62;17.8
-Madrid;España;40.41;-3.70;6;7.54;23.3
-Madrid;España;40.41;-3.70;7;7.78;27.8
-Madrid;España;40.41;-3.70;8;6.84;26.7
-Madrid;España;40.41;-3.70;9;5.25;22.0
-Madrid;España;40.41;-3.70;10;3.52;15.9
-Madrid;España;40.41;-3.70;11;2.36;10.1
-Madrid;España;40.41;-3.70;12;1.84;6.9
+emplazamiento;latitud;longitud;mes;radiacion_media;temp_media
+Jaén;37.77;-3.78;1;2.45;9.2
+Jaén;37.77;-3.78;2;3.31;10.5
+Jaén;37.77;-3.78;3;4.68;13.8
+Jaén;37.77;-3.78;4;5.82;16.5
+Jaén;37.77;-3.78;5;6.95;20.8
+Jaén;37.77;-3.78;6;7.92;26.1
+Jaén;37.77;-3.78;7;8.10;29.4
+Jaén;37.77;-3.78;8;7.25;28.9
+Jaén;37.77;-3.78;9;5.54;24.5
+Jaén;37.77;-3.78;10;3.95;19.1
+Jaén;37.77;-3.78;11;2.75;13.2
+Jaén;37.77;-3.78;12;2.18;10.0
+Madrid;40.41;-3.70;1;2.14;6.1
+Madrid;40.41;-3.70;2;3.15;7.9
+Madrid;40.41;-3.70;3;4.48;11.2
+Madrid;40.41;-3.70;4;5.51;13.5
+Madrid;40.41;-3.70;5;6.62;17.8
+Madrid;40.41;-3.70;6;7.54;23.3
+Madrid;40.41;-3.70;7;7.78;27.8
+Madrid;40.41;-3.70;8;6.84;26.7
+Madrid;40.41;-3.70;9;5.25;22.0
+Madrid;40.41;-3.70;10;3.52;15.9
+Madrid;40.41;-3.70;11;2.36;10.1
+Madrid;40.41;-3.70;12;1.84;6.9
 `;
   }
 
   return `# OrientSol 4.0 - Plantilla de Climatología Individual
 # Localidad: Jaén
-# Pais: España
 # Latitud: 37.7796
 # Longitud: -3.7849
-# Altitud: 570
-# Albedo: 0.20
 Mes,Gdm0_kWh_m2_dia,Temperatura_C
 1,2.45,9.2
 2,3.31,10.5
@@ -519,25 +516,17 @@ export function generateSampleJSON(isMulti = false): string {
       [
         {
           locationName: 'Jaén',
-          country: 'España',
           latitude: 37.7796,
           longitude: -3.7849,
-          elevationM: 570,
-          albedo: 0.20,
           monthlyGdm0: [2.45, 3.31, 4.68, 5.82, 6.95, 7.92, 8.10, 7.25, 5.54, 3.95, 2.75, 2.18],
-          monthlyTemperature: [9.2, 10.5, 13.8, 16.5, 20.8, 26.1, 29.4, 28.9, 24.5, 19.1, 13.2, 10.0],
-          notes: 'Jaén - Instalación Solar FV'
+          monthlyTemperature: [9.2, 10.5, 13.8, 16.5, 20.8, 26.1, 29.4, 28.9, 24.5, 19.1, 13.2, 10.0]
         },
         {
           locationName: 'Madrid',
-          country: 'España',
           latitude: 40.4168,
           longitude: -3.7038,
-          elevationM: 667,
-          albedo: 0.20,
           monthlyGdm0: [2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84],
-          monthlyTemperature: [6.1, 7.9, 11.2, 13.5, 17.8, 23.3, 27.8, 26.7, 22.0, 15.9, 10.1, 6.9],
-          notes: 'Madrid - Estación Histórica'
+          monthlyTemperature: [6.1, 7.9, 11.2, 13.5, 17.8, 23.3, 27.8, 26.7, 22.0, 15.9, 10.1, 6.9]
         }
       ],
       null,
@@ -548,14 +537,10 @@ export function generateSampleJSON(isMulti = false): string {
   return JSON.stringify(
     {
       locationName: 'Jaén',
-      country: 'España',
       latitude: 37.7796,
       longitude: -3.7849,
-      elevationM: 570,
-      albedo: 0.20,
       monthlyGdm0: [2.45, 3.31, 4.68, 5.82, 6.95, 7.92, 8.10, 7.25, 5.54, 3.95, 2.75, 2.18],
-      monthlyTemperature: [9.2, 10.5, 13.8, 16.5, 20.8, 26.1, 29.4, 28.9, 24.5, 19.1, 13.2, 10.0],
-      notes: 'Valores mensuales de radiación global horizontal media diaria Gdm(0) [kWh/m²/día] y temperatura ambiente [°C]'
+      monthlyTemperature: [9.2, 10.5, 13.8, 16.5, 20.8, 26.1, 29.4, 28.9, 24.5, 19.1, 13.2, 10.0]
     },
     null,
     2

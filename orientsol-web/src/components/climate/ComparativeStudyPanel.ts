@@ -186,7 +186,7 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
         </div>
 
         <!-- 4. 10-Column Comparative Table Matching Figura 5.2.98 including Monthly Optimum -->
-        <div class="opt-tracking-table-wrap">
+        <div class="opt-tracking-table-wrap comp-table-wrap-fit">
           <table class="opt-tracking-table comparative-results-table">
             <thead>
               <tr class="tracking-top-th-row">

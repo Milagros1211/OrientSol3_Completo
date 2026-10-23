@@ -317,6 +317,8 @@ export function renderOperationMethodologyCard(
   locationName: string
 ): HTMLElement {
   const data = getOperationData(op, isEn, latitude, locationName);
+  // Operation 8 (comparative) must not display the mathematical foundation
+  const showMath = op !== 'comparative';
   const container = document.createElement('div');
   container.className = 'op-methodology-card-root';
 
@@ -328,10 +330,10 @@ export function renderOperationMethodologyCard(
           <span class="op-methodology-badge">${data.badge}</span>
           <h4 class="op-methodology-title">${data.title}</h4>
         </div>
-        <button type="button" class="btn-toggle-op-methodology" id="btn-toggle-op-methodology" title="${isEn ? 'Collapse / Expand details' : 'Plegar / Desplegar detalles'}">
+        ${showMath ? `<button type="button" class="btn-toggle-op-methodology" id="btn-toggle-op-methodology" title="${isEn ? 'Collapse / Expand details' : 'Plegar / Desplegar detalles'}">
           <span class="toggle-icon">−</span>
           <span class="toggle-text">${isEn ? 'Mathematical Foundation' : 'Fundamento Matemático'}</span>
-        </button>
+        </button>` : ''}
       </div>
 
       <!-- Collapsible Body with auto-adjusting height -->
@@ -340,7 +342,7 @@ export function renderOperationMethodologyCard(
           ${data.summary}
         </div>
 
-        <div class="op-methodology-grid">
+        <div class="op-methodology-grid" ${showMath ? '' : 'style="grid-template-columns: 1fr;"'}>
           <!-- Column 1: Input Data Processing -->
           <div class="op-methodology-col-input">
             <div class="op-col-header">
@@ -357,7 +359,7 @@ export function renderOperationMethodologyCard(
           </div>
 
           <!-- Column 2: Mathematical Formulations with Descriptive LaTeX Variables -->
-          <div class="op-methodology-col-math">
+          ${showMath ? `<div class="op-methodology-col-math">
             <div class="op-col-header">
               <span class="col-icon">📐</span>
               <strong>${data.mathProcessTitle}</strong>
@@ -379,7 +381,7 @@ export function renderOperationMethodologyCard(
                 )
                 .join('')}
             </div>
-          </div>
+          </div>` : ''}
         </div>
       </div>
     </div>
