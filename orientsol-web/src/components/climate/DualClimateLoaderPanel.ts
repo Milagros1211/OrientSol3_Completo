@@ -813,19 +813,17 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
     const merged: ClimateDataRecord[] = [];
 
-    // Prioridad 1: Emplazamientos oficiales de Supabase y Catálogo OrientSol (siempre ORIENTSOL)
+    // Prioridad 1: Emplazamientos sincronizados en Supabase y Catálogo OrientSol (siempre ORIENTSOL)
     for (const rec of cloudList) {
-      if (rec.metadata?.isOfficial !== false) {
-        if (!merged.some((existing) => isDuplicateStation(existing, rec))) {
-          merged.push({
-            ...rec,
-            source: 'supabase',
-            metadata: {
-              ...rec.metadata,
-              isOfficial: true,
-            },
-          });
-        }
+      if (!merged.some((existing) => isDuplicateStation(existing, rec))) {
+        merged.push({
+          ...rec,
+          source: 'supabase',
+          metadata: {
+            ...rec.metadata,
+            isOfficial: true,
+          },
+        });
       }
     }
 
@@ -842,22 +840,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       }
     }
 
-    // Prioridad 2: Emplazamientos subidos por usuario o en caché local (siempre CACHÉ LOCAL)
-    for (const rec of cloudList) {
-      if (rec.metadata?.isOfficial === false) {
-        if (!merged.some((existing) => isDuplicateStation(existing, rec))) {
-          merged.push({
-            ...rec,
-            source: 'supabase',
-            metadata: {
-              ...rec.metadata,
-              isOfficial: false,
-            },
-          });
-        }
-      }
-    }
-
+    // Prioridad 2: Emplazamientos aún no sincronizados (en caché local o cola offline) -> CACHÉ LOCAL
     for (const rec of [...uploadedCache, ...offlineQueue]) {
       if (!merged.some((existing) => isDuplicateStation(existing, rec))) {
         merged.push({
@@ -1010,8 +993,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   }
 
   function getLocationTagInfo(loc: ClimateDataRecord): { badgeClass: string; badgeText: string; statusTag: string } {
-    // Si tiene marcado explícitamente isOfficial === true, es ORIENTSOL
-    if (loc.metadata?.isOfficial === true) {
+    // 1. Si proviene de la base de datos Supabase, catálogo oficial o tiene isOfficial === true -> ORIENTSOL
+    if (loc.source === 'supabase' || loc.source === 'local_database' || loc.metadata?.isOfficial === true) {
       return {
         badgeClass: 'badge-historical',
         badgeText: 'ORIENTSOL',
@@ -1019,35 +1002,11 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       };
     }
 
-    // Si tiene marcado es_oficial === false, o proviene de subida/offline/cache -> CACHÉ LOCAL
-    const isUserUploaded =
-      loc.metadata?.isOfficial === false ||
-      (loc.source as string) === 'file_upload' ||
-      (loc.source as string) === 'manual_input' ||
-      (loc.source as string) === 'offline_cache' ||
-      Boolean(loc.id && (loc.id.startsWith('cache-') || loc.id.startsWith('custom-') || loc.id.startsWith('offline-')));
-
-    const isPendingQueue =
-      climateDatabaseService
-        .getOfflineQueue()
-        .some((q) => q.locationName.trim().toLowerCase() === loc.locationName.trim().toLowerCase()) ||
-      climateDatabaseService
-        .getUploadedCache()
-        .some((q) => q.locationName.trim().toLowerCase() === loc.locationName.trim().toLowerCase());
-
-    if (isUserUploaded || isPendingQueue) {
-      return {
-        badgeClass: 'badge-cache',
-        badgeText: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
-        statusTag: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
-      };
-    }
-
-    // Por defecto, cualquier estación del catálogo oficial de base de datos
+    // 2. Si aún no está sincronizado en Supabase y está en caché local / cola offline -> CACHÉ LOCAL
     return {
-      badgeClass: 'badge-historical',
-      badgeText: 'ORIENTSOL',
-      statusTag: 'ORIENTSOL',
+      badgeClass: 'badge-cache',
+      badgeText: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
+      statusTag: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
     };
   }
 
@@ -1545,6 +1504,10 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         setStatus(reg.message, 'warning');
       } else {
         await updateSearchableStations();
+        const updated = allSearchableStations.find((s) => s.locationName.trim().toLowerCase() === rec.locationName.trim().toLowerCase());
+        if (updated) {
+          renderActiveRecord(updated);
+        }
         const uploadPermissionStatus = reg.isOffline
           ? (isEn ? 'Online upload NOT permitted (Offline Mode) → Stored in local cache.' : 'Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Guardado en caché local para sincronizar después.')
           : (isEn ? 'Online upload to Supabase: PERMITTED → Emplacement successfully registered in datos_mensuales.' : 'Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.');
@@ -1682,13 +1645,26 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         }
       }
 
-      // Sincronizar tanto la caché local de subidas como la lista de búsqueda
-      climateDatabaseService.saveUploadedCache(pendingUploadedRecords);
-      await updateSearchableStations();
-
       const isOnline = Boolean(typeof navigator !== 'undefined' ? navigator.onLine : true) && climateDatabaseService.isOnline();
       const savedNames = pendingUploadedRecords.map((r) => r.locationName);
       const primaryStationName = savedNames[0] || '';
+
+      if (isOnline) {
+        // Una vez sincronizados exitosamente en Supabase (datos_mensuales),
+        // se retiran de la caché de subidas pendientes y pasan a formar parte de ORIENTSOL
+        climateDatabaseService.removeUploadedCache(savedNames);
+      } else {
+        climateDatabaseService.saveUploadedCache(pendingUploadedRecords);
+      }
+      await updateSearchableStations();
+
+      // Actualizar de inmediato la tarjeta activa para que refleje la etiqueta [ORIENTSOL]
+      if (primaryStationName) {
+        const found = allSearchableStations.find((s) => s.locationName.trim().toLowerCase() === primaryStationName.trim().toLowerCase());
+        if (found) {
+          renderActiveRecord(found);
+        }
+      }
 
       // Hide staging card
       if (uploadStagingCard) {
@@ -1710,8 +1686,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
                 <p class="success-detail">
                   ${isOnline 
                     ? (isEn 
-                        ? `Synchronized with Supabase cloud database (datos_mensuales) and local cache: <strong>${escapeHtml(savedNames.join(', '))}</strong>.` 
-                        : `Se han sincronizado correctamente en la Base de Datos (Supabase) y registrado en caché local: <strong>${escapeHtml(savedNames.join(', '))}</strong>.`)
+                        ? `Synchronized with Supabase cloud database (datos_mensuales): <strong>${escapeHtml(savedNames.join(', '))}</strong>.` 
+                        : `Se han sincronizado correctamente en la Base de Datos oficial (Supabase, tabla datos_mensuales): <strong>${escapeHtml(savedNames.join(', '))}</strong>.`)
                     : (isEn 
                         ? `Saved in local browser cache: <strong>${escapeHtml(savedNames.join(', '))}</strong> (pending cloud synchronization when online).` 
                         : `Se han guardado en Caché Local del navegador: <strong>${escapeHtml(savedNames.join(', '))}</strong> (se sincronizarán con Supabase al recuperar la conexión).`)
@@ -1719,8 +1695,12 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
                 </p>
                 <p class="success-instruction">
                   ${isEn
-                    ? 'All datasets are now immediately available in the Tab 1 search dropdown, tagged with [LOCAL CACHE].'
-                    : 'Todos los datos están ahora disponibles en el desplegable de búsqueda de la Pestaña 1 identificados con la etiqueta [CACHÉ LOCAL].'
+                    ? (isOnline
+                        ? 'All datasets are now officially integrated in the database and visible in Tab 1 under [ORIENTSOL].'
+                        : 'All datasets are temporarily saved in local browser cache tagged with [LOCAL CACHE].')
+                    : (isOnline
+                        ? 'Todos los datos están ahora integrados en la Base de Datos oficial y disponibles en la Pestaña 1 con la etiqueta [ORIENTSOL].'
+                        : 'Todos los datos están guardados temporalmente en la caché local identificados con la etiqueta [CACHÉ LOCAL].')
                   }
                 </p>
               </div>

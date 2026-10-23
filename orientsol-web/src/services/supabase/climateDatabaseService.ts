@@ -795,7 +795,7 @@ export class ClimateDatabaseService {
             mes: m,
             radiacion_media: Math.max(0.0, Math.min(450.0, radMensual)),
             temp_media: Math.max(-90.0, Math.min(70.0, tempMedia)),
-            es_oficial: false,
+            es_oficial: true,
           });
         }
 
@@ -811,7 +811,7 @@ export class ClimateDatabaseService {
             source: 'supabase',
             metadata: {
               ...record.metadata,
-              isOfficial: false,
+              isOfficial: true,
             },
           };
 
@@ -901,6 +901,18 @@ export class ClimateDatabaseService {
       this.notify();
     } catch (err) {
       console.warn('[Supabase Service] Could not save uploaded stations to local cache:', err);
+    }
+  }
+
+  public removeUploadedCache(locationNames: string[]): void {
+    try {
+      const keysToRemove = new Set(locationNames.map((n) => n.trim().toLowerCase()));
+      const existing = this.getUploadedCache();
+      const filtered = existing.filter((rec) => !keysToRemove.has(rec.locationName.trim().toLowerCase()));
+      localStorage.setItem('orientsol_user_uploaded_stations_v1', JSON.stringify(filtered));
+      this.notify();
+    } catch (err) {
+      console.warn('[Supabase Service] Could not remove uploaded stations from local cache:', err);
     }
   }
 
