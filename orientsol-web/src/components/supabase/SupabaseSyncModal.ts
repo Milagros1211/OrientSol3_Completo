@@ -57,7 +57,7 @@ export function openSupabaseSyncModal(): void {
           <div class="status-indicator-col">
             <span class="status-label">${isEn ? 'Supabase (datos_mensuales):' : 'Supabase (datos_mensuales):'}</span>
             <span id="supabase-cloud-badge" class="badge ${isConnected ? 'badge-success' : 'badge-neutral'}">
-              ${isConnected ? (isEn ? '🟢 Connected' : '🟢 Conectado') : (isEn ? '🔴 Disconnected' : '🔴 Desconectado')}
+              ${isConnected ? (isEn ? 'Connected' : 'Conectado') : (isEn ? 'Disconnected' : 'Desconectado')}
             </span>
           </div>
           <div class="status-indicator-col">
@@ -92,10 +92,10 @@ export function openSupabaseSyncModal(): void {
             ${queue.length > 0 ? `
               <div class="queue-actions-group">
                 <button id="btn-trigger-sync" type="button" class="btn btn-solar btn-sm">
-                  🚀 ${isEn ? 'Sync to Supabase Now' : 'Sincronizar a Supabase Ahora'}
+                  ${isEn ? 'Sync to Supabase Now' : 'Sincronizar a Supabase Ahora'}
                 </button>
                 <button id="btn-clear-queue" type="button" class="btn btn-ghost btn-sm" title="${isEn ? 'Discard queue' : 'Vaciar cola'}">
-                  🗑️
+                  
                 </button>
               </div>
             ` : ''}
@@ -111,7 +111,7 @@ export function openSupabaseSyncModal(): void {
 
       <div class="modal-footer">
         <span class="modal-footer-hint">
-          ℹ️ ${isEn ? 'Duplicate Rule: At least 90% match in monthly curves flags duplicates.' : 'Regla de Integridad: Al menos 90% de coincidencia numérica detecta duplicados.'}
+          ℹ ${isEn ? 'Duplicate Rule: At least 90% match in monthly curves flags duplicates.' : 'Regla de Integridad: Al menos 90% de coincidencia numérica detecta duplicados.'}
         </span>
         <button type="button" class="btn btn-secondary" id="btn-modal-close-footer">${isEn ? 'Close' : 'Cerrar'}</button>
       </div>
@@ -156,7 +156,7 @@ export function openSupabaseSyncModal(): void {
     const syncBtn = modal.querySelector<HTMLButtonElement>('#btn-trigger-sync');
     if (syncBtn) {
       syncBtn.disabled = true;
-      syncBtn.innerHTML = `⏳ ${isEn ? 'Syncing...' : 'Sincronizando...'}`;
+      syncBtn.innerHTML = `${isEn ? 'Syncing...' : 'Sincronizando...'}`;
     }
 
     try {
@@ -201,7 +201,7 @@ export function openSupabaseSyncModal(): void {
     } finally {
       if (syncBtn) {
         syncBtn.disabled = false;
-        syncBtn.innerHTML = `🚀 ${isEn ? 'Sync to Supabase Now' : 'Sincronizar a Supabase Ahora'}`;
+        syncBtn.innerHTML = `${isEn ? 'Sync to Supabase Now' : 'Sincronizar a Supabase Ahora'}`;
       }
     }
   });

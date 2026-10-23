@@ -50,7 +50,7 @@ export function openSecurityAuditModal(): void {
             </div>
             <div>
               <h3 class="modal-title" id="audit-modal-title">
-                🛡️ ${isEn ? 'Security Monitoring & Audit Log' : 'Monitorización de Seguridad & Registro de Auditoría'}
+                ${isEn ? 'Security Monitoring & Audit Log' : 'Monitorización de Seguridad & Registro de Auditoría'}
               </h3>
               <p class="modal-subtitle">
                 ${isEn 
@@ -66,7 +66,7 @@ export function openSecurityAuditModal(): void {
           <!-- Telemetry Destination Banner -->
           <div class="result-card highlight-card" style="margin-bottom: 0; border-left: 4px solid var(--accent-cyan, #0284c7); padding: 0.85rem;">
             <h4 style="margin: 0 0 0.4rem 0; font-size: 0.92rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
-              <span>📍 ${isEn ? 'Where logs are stored & monitored' : 'Destino y Almacenamiento de los Registros'}</span>
+              <span>${isEn ? 'Where logs are stored & monitored' : 'Destino y Almacenamiento de los Registros'}</span>
             </h4>
             <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem;">
               <div>
@@ -125,10 +125,10 @@ export function openSecurityAuditModal(): void {
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
               <select id="audit-filter-level" class="form-control" style="font-size: 0.8rem; padding: 0.35rem 0.6rem; width: auto;">
                 <option value="ALL" ${selectedLevel === 'ALL' ? 'selected' : ''}>${isEn ? 'All Levels' : 'Todos los Niveles'}</option>
-                <option value="SUSPICIOUS" ${selectedLevel === 'SUSPICIOUS' ? 'selected' : ''}>⚠️ ${isEn ? 'Suspicious Only' : 'Solo Sospechosos'}</option>
-                <option value="ERROR" ${selectedLevel === 'ERROR' ? 'selected' : ''}>❌ ${isEn ? 'Errors Only' : 'Solo Errores'}</option>
-                <option value="WARN" ${selectedLevel === 'WARN' ? 'selected' : ''}>⚡ ${isEn ? 'Warnings Only' : 'Solo Advertencias'}</option>
-                <option value="INFO" ${selectedLevel === 'INFO' ? 'selected' : ''}>ℹ️ ${isEn ? 'Info Only' : 'Solo Informativos'}</option>
+                <option value="SUSPICIOUS" ${selectedLevel === 'SUSPICIOUS' ? 'selected' : ''}>${isEn ? 'Suspicious Only' : 'Solo Sospechosos'}</option>
+                <option value="ERROR" ${selectedLevel === 'ERROR' ? 'selected' : ''}>✗ ${isEn ? 'Errors Only' : 'Solo Errores'}</option>
+                <option value="WARN" ${selectedLevel === 'WARN' ? 'selected' : ''}>${isEn ? 'Warnings Only' : 'Solo Advertencias'}</option>
+                <option value="INFO" ${selectedLevel === 'INFO' ? 'selected' : ''}>ℹ ${isEn ? 'Info Only' : 'Solo Informativos'}</option>
               </select>
 
               <select id="audit-filter-category" class="form-control" style="font-size: 0.8rem; padding: 0.35rem 0.6rem; width: auto;">
@@ -152,10 +152,10 @@ export function openSecurityAuditModal(): void {
 
             <div style="display: flex; gap: 0.4rem;">
               <button type="button" class="btn btn-secondary btn-sm" id="btn-export-audit-json" style="font-size: 0.78rem; padding: 0.35rem 0.6rem;">
-                📥 ${isEn ? 'Download JSON' : 'Descargar JSON'}
+                ${isEn ? 'Download JSON' : 'Descargar JSON'}
               </button>
               <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-audit-logs" style="font-size: 0.78rem; padding: 0.35rem 0.6rem; color: #ef4444;">
-                🗑️ ${isEn ? 'Clear' : 'Limpiar'}
+                ${isEn ? 'Clear' : 'Limpiar'}
               </button>
             </div>
           </div>
@@ -178,16 +178,16 @@ export function openSecurityAuditModal(): void {
                   : filteredLogs.map((evt) => {
                       const timeStr = new Date(evt.timestamp).toLocaleTimeString();
                       let badgeClass = 'badge-neutral';
-                      let badgeIcon = 'ℹ️';
+                      let badgeIcon = 'ℹ';
                       if (evt.level === 'SUSPICIOUS') {
                         badgeClass = 'badge-warning';
-                        badgeIcon = '⚠️';
+                        badgeIcon = '';
                       } else if (evt.level === 'ERROR') {
                         badgeClass = 'badge-danger';
-                        badgeIcon = '❌';
+                        badgeIcon = '✗';
                       } else if (evt.level === 'WARN') {
                         badgeClass = 'badge-warning';
-                        badgeIcon = '⚡';
+                        badgeIcon = '';
                       } else {
                         badgeClass = 'badge-success';
                         badgeIcon = '✓';

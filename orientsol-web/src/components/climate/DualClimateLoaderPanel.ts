@@ -56,7 +56,7 @@ function renderSupabaseUploadBannerHtml(isEn: boolean): string {
       <div class="supabase-upload-indicator online">
         <span class="status-indicator-dot online"></span>
         <div class="indicator-text-block">
-          <strong>${isEn ? '🟢 Online Supabase Upload: PERMITTED' : '🟢 Carga Online a Supabase: PERMITIDA'}</strong>
+          <strong>${isEn ? 'Online Supabase Upload: PERMITTED' : 'Carga Online a Supabase: PERMITIDA'}</strong>
           <span class="indicator-sub">${isEn ? 'Connected to table: ' : 'Conectado a la tabla: '}<code>datos_mensuales</code>. ${isEn ? 'New emplacements are automatically stored in the cloud.' : 'Los nuevos emplazamientos se guardan automáticamente en la nube.'}</span>
         </div>
       </div>
@@ -66,7 +66,7 @@ function renderSupabaseUploadBannerHtml(isEn: boolean): string {
       <div class="supabase-upload-indicator offline">
         <span class="status-indicator-dot offline"></span>
         <div class="indicator-text-block">
-          <strong>${isEn ? '🔴 Online Supabase Upload: NOT PERMITTED (Offline Mode)' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline)'}</strong>
+          <strong>${isEn ? 'Online Supabase Upload: NOT PERMITTED (Offline Mode)' : 'Carga Online a Supabase: NO PERMITIDA (Modo Offline)'}</strong>
           <span class="indicator-sub">${isEn ? 'No Supabase connection detected. New emplacements will be safely saved in local cache.' : 'Sin conexión activa a Supabase. El emplazamiento se guardará en la caché local para sincronizarlo después.'}</span>
         </div>
       </div>
@@ -135,7 +135,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           <line x1="12" y1="21" x2="12" y2="23"></line>
           <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"></path>
         </svg>
-        <span id="tab-api-title-text">${!isOnlineInit ? (isEn ? '4. Satellite Climate APIs (Offline 🔒)' : '4. APIs Satelitales (Sin conexión 🔒)') : (isEn ? '4. Satellite Climate APIs (PVGIS / NASA)' : '4. APIs Climáticas Satelitales (PVGIS / NASA)')}</span>
+        <span id="tab-api-title-text">${!isOnlineInit ? (isEn ? '4. Satellite Climate APIs (Offline )' : '4. APIs Satelitales (Sin conexión )') : (isEn ? '4. Satellite Climate APIs (PVGIS / NASA)' : '4. APIs Climáticas Satelitales (PVGIS / NASA)')}</span>
       </button>
     </div>
 
@@ -633,8 +633,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         renderActiveRecord(recordToSave);
         await updateSearchableStations();
         const uploadPermissionStatus = reg.isOffline
-          ? (isEn ? '🔴 Online upload NOT permitted (Offline Mode) → Stored in local cache.' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Guardado en caché local para sincronizar después.')
-          : (isEn ? '🟢 Online upload to Supabase: PERMITTED → Emplacement successfully registered in datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.');
+          ? (isEn ? 'Online upload NOT permitted (Offline Mode) → Stored in local cache.' : 'Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Guardado en caché local para sincronizar después.')
+          : (isEn ? 'Online upload to Supabase: PERMITTED → Emplacement successfully registered in datos_mensuales.' : 'Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.');
         setStatus(`${uploadPermissionStatus} ${reg.message}`, 'success');
       }
     } catch (err: any) {
@@ -784,8 +784,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           : 'Requiere conexión a Internet para consultar APIs satelitales (PVGIS / NASA)';
         if (apiText) {
           apiText.textContent = isEn
-            ? '4. Satellite Climate APIs (Offline 🔒)'
-            : '4. APIs Satelitales (Sin conexión 🔒)';
+            ? '4. Satellite Climate APIs (Offline )'
+            : '4. APIs Satelitales (Sin conexión )';
         }
         if (apiOfflineAlert) {
           apiOfflineAlert.classList.remove('hidden');
@@ -880,7 +880,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
               : `El emplazamiento "<strong>${escapeHtml(queryText)}</strong>" no está guardado ni en caché ni en la base de datos. Si deseas, llena la introducción manual.`}
           </p>
           <button type="button" id="btn-goto-manual-tab" class="btn btn-secondary btn-sm" style="margin-top: 0.5rem; display: inline-flex; align-items: center; gap: 0.35rem;">
-            <span>✍️ ${isEn ? 'Go to Manual Entry (Tab 2)' : 'Llenar Introducción Manual (Pestaña 2)'}</span>
+            <span>${isEn ? 'Go to Manual Entry (Tab 2)' : 'Llenar Introducción Manual (Pestaña 2)'}</span>
           </button>
         </div>
       </div>
@@ -1159,8 +1159,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         highlightErrorInput(input);
         setStatus(
           isEn
-            ? `⚠️ "${labelName}" cannot be empty. Please enter a valid number.`
-            : `⚠️ "${labelName}" no puede estar vacío. Introduce un valor numérico.`,
+            ? `"${labelName}" cannot be empty. Please enter a valid number.`
+            : `"${labelName}" no puede estar vacío. Introduce un valor numérico.`,
           'warning'
         );
       } else {
@@ -1169,24 +1169,24 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           highlightErrorInput(input);
           setStatus(
             isEn
-              ? `⚠️ "${labelName}" contains invalid characters.`
-              : `⚠️ "${labelName}" contiene caracteres no válidos.`,
+              ? `"${labelName}" contains invalid characters.`
+              : `"${labelName}" contiene caracteres no válidos.`,
             'warning'
           );
         } else if (min !== undefined && num < min) {
           highlightErrorInput(input);
           setStatus(
             isEn
-              ? `⚠️ "${labelName}" cannot be lower than ${formatNum(min, min % 1 === 0 ? 0 : 2)}.`
-              : `⚠️ "${labelName}" no puede ser menor que ${formatNum(min, min % 1 === 0 ? 0 : 2)}.`,
+              ? `"${labelName}" cannot be lower than ${formatNum(min, min % 1 === 0 ? 0 : 2)}.`
+              : `"${labelName}" no puede ser menor que ${formatNum(min, min % 1 === 0 ? 0 : 2)}.`,
             'warning'
           );
         } else if (max !== undefined && num > max) {
           highlightErrorInput(input);
           setStatus(
             isEn
-              ? `⚠️ "${labelName}" cannot exceed ${formatNum(max, max % 1 === 0 ? 0 : 2)}.`
-              : `⚠️ "${labelName}" no puede ser mayor que ${formatNum(max, max % 1 === 0 ? 0 : 2)}.`,
+              ? `"${labelName}" cannot exceed ${formatNum(max, max % 1 === 0 ? 0 : 2)}.`
+              : `"${labelName}" no puede ser mayor que ${formatNum(max, max % 1 === 0 ? 0 : 2)}.`,
             'warning'
           );
         } else if (decimals !== undefined) {
@@ -1219,8 +1219,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       highlightErrorInput(manualName);
       setStatus(
         isEn
-          ? '⚠️ Location name cannot be empty.'
-          : '⚠️ El nombre de localización no puede estar vacío.',
+          ? 'Location name cannot be empty.'
+          : 'El nombre de localización no puede estar vacío.',
         'warning'
       );
     }
@@ -1391,8 +1391,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       } else {
         await updateSearchableStations();
         const uploadPermissionStatus = reg.isOffline
-          ? (isEn ? '🔴 Online upload NOT permitted (Offline Mode) → Stored in local cache.' : '🔴 Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Guardado en caché local para sincronizar después.')
-          : (isEn ? '🟢 Online upload to Supabase: PERMITTED → Emplacement successfully registered in datos_mensuales.' : '🟢 Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.');
+          ? (isEn ? 'Online upload NOT permitted (Offline Mode) → Stored in local cache.' : 'Carga Online a Supabase: NO PERMITIDA (Modo Offline) → Guardado en caché local para sincronizar después.')
+          : (isEn ? 'Online upload to Supabase: PERMITTED → Emplacement successfully registered in datos_mensuales.' : 'Carga Online a Supabase: PERMITIDA → Emplazamiento registrado exitosamente en datos_mensuales.');
         setStatus(`${uploadPermissionStatus} ${reg.message}`, 'success');
       }
     } catch (err: any) {

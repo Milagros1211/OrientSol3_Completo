@@ -54,17 +54,17 @@ export function renderHeader(): HTMLElement {
 
       <!-- Theme Switcher Toggle (Modo Claro / Modo Oscuro) -->
       <button id="header-theme-toggle" class="theme-toggle-pill" type="button" title="${isEn ? 'Switch between Light and Dark mode' : 'Alternar entre Modo Claro y Modo Oscuro'}">
-        <span class="theme-icon">${isDarkMode ? '🌙' : '☀️'}</span>
+        <span class="theme-icon">${isDarkMode ? '' : ''}</span>
         <span class="theme-text">${isDarkMode ? (isEn ? 'Dark' : 'Oscuro') : (isEn ? 'Light' : 'Claro')}</span>
       </button>
 
       <!-- Language Switcher Toggle -->
       <div class="lang-switch-group" role="group" aria-label="${t.header.langSelect}">
         <button type="button" class="lang-btn ${currentLocale === 'es' ? 'active' : ''}" data-lang="es" title="${t.header.toggleSpanish}">
-          <span class="flag-icon">🇪🇸</span> <span>ES</span>
+          <span>ES</span>
         </button>
         <button type="button" class="lang-btn ${currentLocale === 'en' ? 'active' : ''}" data-lang="en" title="${t.header.toggleEnglish}">
-          <span class="flag-icon">🇬🇧</span> <span>EN</span>
+          <span>EN</span>
         </button>
       </div>
 
@@ -131,7 +131,7 @@ export function renderHeader(): HTMLElement {
     const isDark = newTheme === 'dark';
     const iconEl = themeBtn.querySelector('.theme-icon');
     const textEl = themeBtn.querySelector('.theme-text');
-    if (iconEl) iconEl.textContent = isDark ? '🌙' : '☀️';
+    if (iconEl) iconEl.textContent = isDark ? '' : '';
     if (textEl) textEl.textContent = isDark ? (isEn ? 'Dark' : 'Oscuro') : (isEn ? 'Light' : 'Claro');
   });
 

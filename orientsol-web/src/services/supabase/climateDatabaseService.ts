@@ -660,8 +660,8 @@ export class ClimateDatabaseService {
           similarityPct: 100,
           matchedRecord: existing,
           message: isEn
-            ? `⚠️ Cannot register: An emplacement ("${existing.locationName}") is already registered with the exact same geographic coordinates (Lat: ${existing.latitude.toFixed(3)}°, Lon: ${existing.longitude.toFixed(3)}°), even though the name is different.`
-            : `⚠️ No se puede registrar: Ya existe un emplazamiento registrado ("${existing.locationName}") con las mismas coordenadas geográficas (Lat: ${existing.latitude.toFixed(3)}°, Lon: ${existing.longitude.toFixed(3)}°), aunque el nombre sea diferente.`,
+            ? `Cannot register: An emplacement ("${existing.locationName}") is already registered with the exact same geographic coordinates (Lat: ${existing.latitude.toFixed(3)}°, Lon: ${existing.longitude.toFixed(3)}°), even though the name is different.`
+            : `No se puede registrar: Ya existe un emplazamiento registrado ("${existing.locationName}") con las mismas coordenadas geográficas (Lat: ${existing.latitude.toFixed(3)}°, Lon: ${existing.longitude.toFixed(3)}°), aunque el nombre sea diferente.`,
         };
       }
 
@@ -674,8 +674,8 @@ export class ClimateDatabaseService {
           similarityPct: nameSim,
           matchedRecord: existing,
           message: isEn
-            ? `⚠️ Cannot register: The name "${target.locationName}" has a ${nameSim}% similarity (≥ 90%) with existing emplacement "${existing.locationName}".`
-            : `⚠️ No se puede registrar: El nombre "${target.locationName}" presenta una similitud del ${nameSim}% (≥ 90%) con el emplazamiento existente "${existing.locationName}".`,
+            ? `Cannot register: The name "${target.locationName}" has a ${nameSim}% similarity (≥ 90%) with existing emplacement "${existing.locationName}".`
+            : `No se puede registrar: El nombre "${target.locationName}" presenta una similitud del ${nameSim}% (≥ 90%) con el emplazamiento existente "${existing.locationName}".`,
         };
       }
 
@@ -694,8 +694,8 @@ export class ClimateDatabaseService {
         similarityPct: highestSim,
         matchedRecord: bestMatch,
         message: isEn
-          ? `⚠️ The emplacement was already registered previously with ${highestSim}% numerical data match with "${bestMatch.locationName}".`
-          : `⚠️ El emplazamiento ya ha sido registrado previamente con ${highestSim}% de coincidencia en datos numéricos con "${bestMatch.locationName}".`,
+          ? `The emplacement was already registered previously with ${highestSim}% numerical data match with "${bestMatch.locationName}".`
+          : `El emplazamiento ya ha sido registrado previamente con ${highestSim}% de coincidencia en datos numéricos con "${bestMatch.locationName}".`,
       };
     }
 
@@ -831,7 +831,7 @@ export class ClimateDatabaseService {
             isOffline: false,
             duplicateReason: 'name',
             similarityPct: 100,
-            message: `ℹ️ El emplazamiento "${record.locationName}" ya existe en la base de datos comunitaria de Supabase. No se requieren duplicados.`,
+            message: `ℹ El emplazamiento "${record.locationName}" ya existe en la base de datos comunitaria de Supabase. No se requieren duplicados.`,
             record,
           };
         } else {
@@ -850,7 +850,7 @@ export class ClimateDatabaseService {
       success: true,
       isDuplicate: false,
       isOffline: true,
-      message: `💾 Modo Offline: Emplazamiento guardado en caché local (pendiente de sincronización con Supabase).`,
+      message: `Modo Offline: Emplazamiento guardado en caché local (pendiente de sincronización con Supabase).`,
       record,
     };
   }
@@ -1006,7 +1006,7 @@ export class ClimateDatabaseService {
             summary.details.push({
               name: item.locationName,
               status: 'duplicate',
-              message: `ℹ️ Omitido: "${item.locationName}" ya existía en la base de datos Supabase.`,
+              message: `ℹ Omitido: "${item.locationName}" ya existía en la base de datos Supabase.`,
             });
           } else {
             summary.errors++;

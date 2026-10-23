@@ -109,7 +109,7 @@ function renderAboutView(isEn: boolean): HTMLElement {
         <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
-              <strong style="color: var(--text-main); font-size: 0.9rem;">🇪🇺 ${isEn ? 'PVGIS (European Commission - JRC)' : 'PVGIS (Comisión Europea - JRC)'}</strong>
+              <strong style="color: var(--text-main); font-size: 0.9rem;">${isEn ? 'PVGIS (European Commission - JRC)' : 'PVGIS (Comisión Europea - JRC)'}</strong>
               <span class="badge badge-primary" style="font-size: 0.7rem; white-space: nowrap;">${isEn ? 'Monthly / 2-3 yrs (v5.x)' : 'Mensual / 2-3 años (v5.x)'}</span>
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
@@ -134,7 +134,7 @@ function renderAboutView(isEn: boolean): HTMLElement {
         <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
-              <strong style="color: var(--text-main); font-size: 0.9rem;">🛰️ NASA POWER (CERES / MERRA-2)</strong>
+              <strong style="color: var(--text-main); font-size: 0.9rem;">NASA POWER (CERES / MERRA-2)</strong>
               <span class="badge badge-warning" style="font-size: 0.7rem; white-space: nowrap;">${isEn ? 'Daily (NRT) / Monthly' : 'Diaria (NRT) / Mensual'}</span>
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
@@ -164,7 +164,7 @@ function renderAboutView(isEn: boolean): HTMLElement {
         <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
-              <strong style="color: var(--text-main); font-size: 0.9rem;">🌐 ${isEn ? 'Open-Meteo / ECMWF ERA5 (Reanalysis)' : 'Open-Meteo / ECMWF ERA5 (Reanálisis)'}</strong>
+              <strong style="color: var(--text-main); font-size: 0.9rem;">${isEn ? 'Open-Meteo / ECMWF ERA5 (Reanalysis)' : 'Open-Meteo / ECMWF ERA5 (Reanálisis)'}</strong>
               <span class="badge badge-primary" style="font-size: 0.7rem; white-space: nowrap;">${isEn ? 'Daily / ERA5T (5 days)' : 'Diaria / ERA5T (5 días)'}</span>
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">

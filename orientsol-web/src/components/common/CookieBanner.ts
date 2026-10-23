@@ -33,7 +33,7 @@ export function renderCookieBanner(): HTMLElement | null {
       </div>
       <div class="cookie-banner-text-group">
         <p class="cookie-banner-title">
-          🛡️ <strong>${isEn ? 'Privacy Notice & Technical Storage' : 'Aviso de Privacidad & Almacenamiento Técnico'}</strong>
+          <strong>${isEn ? 'Privacy Notice & Technical Storage' : 'Aviso de Privacidad & Almacenamiento Técnico'}</strong>
           <span class="cookie-badge">${isEn ? 'GDPR / LOPDGDD Compliant' : 'Conforme a RGPD y LOPDGDD'}</span>
         </p>
         <p class="cookie-banner-desc">
@@ -45,7 +45,7 @@ export function renderCookieBanner(): HTMLElement | null {
     </div>
     <div class="cookie-banner-actions">
       <button type="button" class="btn cookie-btn-settings" id="cookie-btn-settings">
-        ⚙️ ${isEn ? 'Configure / Details' : 'Configurar / Detalles'}
+        ${isEn ? 'Configure / Details' : 'Configurar / Detalles'}
       </button>
       <button type="button" class="btn cookie-btn-essential" id="cookie-btn-essential">
         ${isEn ? 'Strictly Necessary Only' : 'Solo Técnicas'}

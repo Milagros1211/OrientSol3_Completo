@@ -11369,3 +11369,85 @@ body.theme-dark .loss-map-matrix-table tbody td:first-child {
   line-height: 1.2;
   padding: 0.1rem 0.25rem !important;
 }
+
+/* ==========================================================================
+   GLOBAL ROUNDED-BOX DESIGN LANGUAGE (rounded rectangles across the whole UI)
+   ========================================================================== */
+:root {
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+}
+
+button,
+.btn,
+select,
+textarea,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+.form-select,
+.form-input,
+[class*="btn-"],
+[class*="-btn"],
+[class*="badge"],
+[class*="chip"],
+[class*="tag"],
+[class*="pill"],
+[class*="tab"],
+[class*="toggle"] {
+  border-radius: var(--radius-sm) !important;
+}
+
+[class*="card"],
+[class*="panel"],
+[class*="modal"],
+[class*="dialog"],
+[class*="popup"],
+[class*="tooltip"],
+[class*="banner"],
+[class*="alert"],
+[class*="notice"],
+[class*="kpi"],
+[class*="box"],
+[class*="frame"],
+[class*="container"],
+[class*="wrap"],
+[class*="dropzone"],
+[class*="section"],
+[class*="group"],
+[class*="block"],
+[class*="summary"],
+[class*="status"],
+details,
+fieldset,
+pre,
+code {
+  border-radius: var(--radius-md) !important;
+}
+
+[class*="modal-content"],
+[class*="modal-box"],
+[class*="modal-card"],
+[class*="dialog-content"],
+.opt-tracking-window-frame,
+.op-methodology-card {
+  border-radius: var(--radius-lg) !important;
+}
+
+table {
+  border-radius: var(--radius-md);
+}
+
+table thead tr:first-child th:first-child { border-top-left-radius: var(--radius-md); }
+table thead tr:first-child th:last-child { border-top-right-radius: var(--radius-md); }
+table tfoot tr:last-child td:first-child { border-bottom-left-radius: var(--radius-md); }
+table tfoot tr:last-child td:last-child { border-bottom-right-radius: var(--radius-md); }
+
+img {
+  border-radius: var(--radius-sm);
+}
+
+/* Keep purely structural / full-viewport elements square */
+html, body, #app, svg, svg *, canvas {
+  border-radius: 0;
+}

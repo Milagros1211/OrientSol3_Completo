@@ -429,7 +429,7 @@ export function renderPythonConsole(): HTMLElement {
       const r = pairedRows[i];
       chronologicalRows.push({
         phase: isEn ? 'Morning' : 'Mañana',
-        phaseBadge: isEn ? '🌅 Morning' : '🌅 Mañana',
+        phaseBadge: isEn ? 'Morning' : 'Mañana',
         hourStr: r.morningHourStr,
         wDeg: r.wMorningDeg,
         altDeg: r.altDeg,
@@ -441,7 +441,7 @@ export function renderPythonConsole(): HTMLElement {
     // Solar Noon exact axis
     chronologicalRows.push({
       phase: isEn ? 'Solar Noon (Symmetry Axis)' : 'Mediodía Solar (Eje de Simetría)',
-      phaseBadge: isEn ? '☀️ Solar Noon' : '☀️ Mediodía Solar',
+      phaseBadge: isEn ? 'Solar Noon' : 'Mediodía Solar',
       hourStr: '12:00 h',
       wDeg: '0,0°',
       altDeg: formatAngle(noonAltDeg, 2),
@@ -454,7 +454,7 @@ export function renderPythonConsole(): HTMLElement {
       const r = pairedRows[i];
       chronologicalRows.push({
         phase: isEn ? 'Afternoon' : 'Tarde',
-        phaseBadge: '🌇 Tarde',
+        phaseBadge: 'Tarde',
         hourStr: r.afternoonHourStr,
         wDeg: r.wAfternoonDeg,
         altDeg: r.altDeg,
@@ -500,7 +500,7 @@ export function renderPythonConsole(): HTMLElement {
         <div class="verif-execution-banner" style="margin-bottom: 1.25rem; padding: 1rem 1.25rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.08)); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: var(--radius-sm); display: flex; flex-direction: column; gap: 0.75rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <div style="display: flex; align-items: center; gap: 0.6rem;">
-              <span style="font-size: 1.25rem;">✅</span>
+              <span style="font-size: 1.25rem;">✓</span>
               <div>
                 <strong style="color: #059669; font-size: 0.92rem;">
                   ${isEn ? 'Python WASM Engines Verified & Synchronized' : 'Motores de Cálculo OrientSol 4.0 Validados con Éxito'}
@@ -511,7 +511,7 @@ export function renderPythonConsole(): HTMLElement {
               </div>
             </div>
             <span class="badge badge-success" style="font-size: 0.78rem; padding: 0.35rem 0.65rem;">
-              ⚡ ${executionTimingMs > 0 ? `${executionTimingMs} ms` : '18 ms'} WebAssembly
+              ${executionTimingMs > 0 ? `${executionTimingMs} ms` : '18 ms'} WebAssembly
             </span>
           </div>
 
@@ -614,20 +614,20 @@ export function renderPythonConsole(): HTMLElement {
         <!-- Verification Category Navigation Pills -->
         <div class="verif-category-bar">
           <button type="button" class="verif-tab-btn ${activeTab === 'geometry' ? 'active' : ''}" data-tab="geometry">
-            ☀️ ${isEn ? '1. Solar Geometry' : '1. Geometría Solar'}
+            ${isEn ? '1. Solar Geometry' : '1. Geometría Solar'}
           </button>
           <button type="button" class="verif-tab-btn ${activeTab === 'baseline' ? 'active' : ''}" data-tab="baseline">
-            📅 ${isEn ? '2. 12-Month Baseline' : '2. Línea Base 12 Meses'}
+            ${isEn ? '2. 12-Month Baseline' : '2. Línea Base 12 Meses'}
           </button>
           <button type="button" class="verif-tab-btn ${activeTab === 'radiation' ? 'active' : ''}" data-tab="radiation" style="display: flex; align-items: center; gap: 0.35rem;">
-            <span>🌐 ${isEn ? '3. Radiation & PVGIS' : '3. Radiación & PVGIS'}</span>
+            <span>${isEn ? '3. Radiation & PVGIS' : '3. Radiación & PVGIS'}</span>
             <span style="background: #0284c7; color: #fff; font-size: 0.65rem; padding: 0.1rem 0.4rem; border-radius: 999px; font-weight: 700;">Live JRC</span>
           </button>
           <button type="button" class="verif-tab-btn ${activeTab === 'tracking' ? 'active' : ''}" data-tab="tracking">
-            🔄 ${isEn ? '4. Tracking & Seasonal' : '4. Seguimiento & Estacional'}
+            ${isEn ? '4. Tracking & Seasonal' : '4. Seguimiento & Estacional'}
           </button>
           <button type="button" class="verif-tab-btn ${activeTab === 'energy' ? 'active' : ''}" data-tab="energy">
-            ⚡ ${isEn ? '5. PV Energy & Osterwald' : '5. Energía FV & Osterwald'}
+            ${isEn ? '5. PV Energy & Osterwald' : '5. Energía FV & Osterwald'}
           </button>
         </div>
       </div>
@@ -713,7 +713,7 @@ export function renderPythonConsole(): HTMLElement {
         <div class="verif-table-card">
           <div class="verif-table-title-bar">
             <span class="verif-table-title">
-              ☀️ ${isEn ? `Fundamental Solar Parameters (Day n = ${doy}, ${stateDay} ${months[stateMonth - 1]}, Lat ${formatAngle(stateLat, 2)})` : `Parámetros Solares Fundamentales (Día n = ${doy}, ${stateDay} de ${months[stateMonth - 1]}, Latitud ${formatAngle(stateLat, 2)})`}
+              ${isEn ? `Fundamental Solar Parameters (Day n = ${doy}, ${stateDay} ${months[stateMonth - 1]}, Lat ${formatAngle(stateLat, 2)})` : `Parámetros Solares Fundamentales (Día n = ${doy}, ${stateDay} de ${months[stateMonth - 1]}, Latitud ${formatAngle(stateLat, 2)})`}
             </span>
             <span class="badge-status-valid">✓ ${isEn ? 'Algorithm Verified' : 'Algoritmo Verificado'}</span>
           </div>
@@ -735,42 +735,42 @@ export function renderPythonConsole(): HTMLElement {
                   <td><code>δ = 23,45 · ${isEn ? 'sin' : 'sen'}(2π · (n + 284) / 365)</code></td>
                   <td class="td-num">${decDeg > 0 ? `+${formatAngle(decDeg, 2)}` : formatAngle(decDeg, 2)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
-                  <td style="text-align: center;">${Math.abs(decDeg) <= 23.5 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">⚠️ ${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
+                  <td style="text-align: center;">${Math.abs(decDeg) <= 23.5 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Sunset Hour Angle' : 'Ángulo Horario de Salida / Puesta'} (ωs)</strong></td>
                   <td><code>cos(ωs) = -tan(φ) · tan(δ)</code></td>
                   <td class="td-num">${formatAngle(sunsetDeg, 2)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
-                  <td style="text-align: center;">${sunsetDeg >= 0 && sunsetDeg <= 180 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">⚠️ ${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
+                  <td style="text-align: center;">${sunsetDeg >= 0 && sunsetDeg <= 180 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Daylight Length' : 'Duración Solar del Día'} (S0)</strong></td>
                   <td><code>S0 = (2 · ωs) / 15°</code></td>
                   <td class="td-num">${formatNum(dayLengthHours, 2)} h</td>
                   <td>${isEn ? 'hours' : 'horas'}</td>
-                  <td style="text-align: center;">${dayLengthHours >= 0 && dayLengthHours <= 24 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">⚠️ ${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
+                  <td style="text-align: center;">${dayLengthHours >= 0 && dayLengthHours <= 24 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Solar Altitude at Noon' : 'Altura Solar al Mediodía (12:00h)'} (γs)</strong></td>
                   <td><code>γs = 90° - |φ - δ|</code></td>
                   <td class="td-num">${formatAngle(noonAltDeg, 2)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
-                  <td style="text-align: center;">${noonAltDeg >= 0 && noonAltDeg <= 90 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">⚠️ ${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
+                  <td style="text-align: center;">${noonAltDeg >= 0 && noonAltDeg <= 90 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Solar Azimuth / Orientation at Noon' : 'Orientación / Azimut Solar al Mediodía (12:00h)'}</strong></td>
                   <td><code>cos(αs) = (${isEn ? 'sin' : 'sen'}(γs) · ${isEn ? 'sin' : 'sen'}(φ) - ${isEn ? 'sin' : 'sen'}(δ)) / (cos(γs) · cos(φ))</code></td>
                   <td class="td-num">${formatAngle(noonAzimDeg, 1)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
-                  <td style="text-align: center;">${!isNaN(noonAzimDeg) ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">⚠️ NaN</span>`}</td>
+                  <td style="text-align: center;">${!isNaN(noonAzimDeg) ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">NaN</span>`}</td>
                 </tr>
                 <tr>
                   <td><strong>${isEn ? 'Dual-Axis Tracker Tilt at Noon' : 'Inclinación Colector 2-Ejes al Mediodía'}</strong></td>
                   <td><code>θz = 90° - γs = |φ - δ|</code></td>
                   <td class="td-num">${formatAngle(noonDualTiltDeg, 1)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
-                  <td style="text-align: center;">${noonDualTiltDeg >= 0 && noonDualTiltDeg <= 90 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">⚠️ ${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
+                  <td style="text-align: center;">${noonDualTiltDeg >= 0 && noonDualTiltDeg <= 90 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
               </tbody>
             </table>
@@ -782,7 +782,7 @@ export function renderPythonConsole(): HTMLElement {
           <div class="verif-table-title-bar" style="flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <span class="verif-table-title">
-                ⏱️ ${isEn ? 'Solar Hourly Angles Breakdown & Morning / Afternoon Symmetry' : 'Desglose Horario de Ángulos Solares y Simetría Mañana / Tarde'}
+                ${isEn ? 'Solar Hourly Angles Breakdown & Morning / Afternoon Symmetry' : 'Desglose Horario de Ángulos Solares y Simetría Mañana / Tarde'}
               </span>
               <span class="badge badge-success" style="font-size: 0.75rem;">${pairedRows.length} ${isEn ? 'symmetric pairs' : 'pares simétricos'}</span>
             </div>
@@ -793,14 +793,14 @@ export function renderPythonConsole(): HTMLElement {
                 ↔ ${isEn ? 'Paired Symmetry View' : 'Vista Emparejada (Simetría)'}
               </button>
               <button type="button" id="btn-view-chrono" class="btn btn-xs ${hourlyViewMode === 'chronological' ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; ${hourlyViewMode === 'chronological' ? 'background: #059669; color: #fff; border-color: #10b981;' : ''}">
-                📅 ${isEn ? 'Full Timeline View (Sunrise to Sunset)' : 'Línea Temporal Completa'}
+                ${isEn ? 'Full Timeline View (Sunrise to Sunset)' : 'Línea Temporal Completa'}
               </button>
             </div>
           </div>
 
           <!-- Educational Callout Explaining the Physical Symmetry -->
           <div style="padding: 0.75rem 1rem; background: rgba(2, 132, 199, 0.05); border-bottom: 1px solid var(--border-subtle); font-size: 0.75rem; color: var(--text-dim); line-height: 1.45; display: flex; align-items: flex-start; gap: 0.5rem;">
-            <span style="font-size: 1rem; color: var(--accent-cyan, #0284c7);">ℹ️</span>
+            <span style="font-size: 1rem; color: var(--accent-cyan, #0284c7);">ℹ</span>
             <div>
               <strong>${isEn ? 'Universal Solar Symmetry (Morning / Afternoon):' : 'Simetría Solar Universal (Mañana / Tarde):'}</strong><br/>
               ${isEn
@@ -827,7 +827,7 @@ export function renderPythonConsole(): HTMLElement {
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
                 <span style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">${isEn ? 'Symmetric Pair' : 'Par Horario Simétrico'}</span>
                 <div style="font-size: 0.95rem; font-weight: 800; color: var(--text-main); font-family: var(--font-mono); margin-top: 0.15rem;">
-                  🌅 ${activeInterval.morningHourStr} ↔ 🌇 ${activeInterval.afternoonHourStr}
+                  ${activeInterval.morningHourStr} ↔ ${activeInterval.afternoonHourStr}
                 </div>
                 <div style="font-size: 0.72rem; color: var(--text-dim);">Ángulo horario: ω = ±${activeInterval.wMagnitudeDeg}°</div>
               </div>
@@ -878,8 +878,8 @@ export function renderPythonConsole(): HTMLElement {
                   ${pairedRows.map((row: any, i: number) => `
                     <tr style="${i === selectedIntervalIdx ? 'background: rgba(16, 185, 129, 0.12); font-weight: 700;' : ''}">
                       <td><strong>Int. ${row.interval}</strong></td>
-                      <td style="color: #0284c7; font-weight: 600;">🌅 ${row.morningHourStr}</td>
-                      <td style="color: #ea580c; font-weight: 600;">🌇 ${row.afternoonHourStr}</td>
+                      <td style="color: #0284c7; font-weight: 600;">${row.morningHourStr}</td>
+                      <td style="color: #ea580c; font-weight: 600;">${row.afternoonHourStr}</td>
                       <td class="td-num">±${row.wMagnitudeDeg}°</td>
                       <td class="td-num" style="color: #0284c7; font-weight: 700;">${row.altDeg}</td>
                       <td class="td-num">${row.azimMorningDeg} / ${row.azimAfternoonDeg}</td>
@@ -970,14 +970,14 @@ export function renderPythonConsole(): HTMLElement {
           <div class="verif-table-title-bar" style="flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <span class="verif-table-title">
-                📅 ${isEn
+                ${isEn
                   ? `12-Month Baseline (Klein Characteristic Days, Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})`
                   : `Línea Base 12 Meses (Días Intermedios de Klein, Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}
               </span>
               <span class="badge-status-valid">✓ Coeficientes de cálculo</span>
             </div>
             <button type="button" class="btn btn-xs btn-primary btn-goto-pvgis" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; background: #0284c7; color: #fff; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 0.35rem;">
-              🌐 ${isEn ? 'Go to Tab 3: PVGIS Validation ➔' : 'Ir a Pestaña 3: Validación PVGIS ➔'}
+              ${isEn ? 'Go to Tab 3: PVGIS Validation ➔' : 'Ir a Pestaña 3: Validación PVGIS ➔'}
             </button>
           </div>
 
@@ -1198,7 +1198,7 @@ export function renderPythonConsole(): HTMLElement {
                   <td style="padding: 0.35rem 0.15rem; text-align: center; white-space: normal !important; word-break: break-word !important;">
                     ${r.isPhysicalValid
                       ? `<span class="badge-status-valid" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; word-break: break-word !important; display: inline-block; line-height: 1.1;">✓ ${isEn ? 'Verified' : 'Verificado'}</span>`
-                      : `<span class="badge-status-warn" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; word-break: break-word !important; display: inline-block; line-height: 1.1;">⚠️ ${isEn ? 'Deviation' : 'Desviación'}</span>`}
+                      : `<span class="badge-status-warn" style="font-size: 0.58rem; padding: 0.1rem 0.25rem; white-space: normal !important; word-break: break-word !important; display: inline-block; line-height: 1.1;">${isEn ? 'Deviation' : 'Desviación'}</span>`}
                   </td>
                 </tr>
               `).join('')}
@@ -1406,14 +1406,14 @@ export function renderPythonConsole(): HTMLElement {
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
               <div style="display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap;">
                 <span style="font-size: 0.84rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 0.35rem;">
-                  📍 ${pvgisData.locationName} (${formatAngle(stateLat, 2)})
+                  ${pvgisData.locationName} (${formatAngle(stateLat, 2)})
                 </span>
                 <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-weight: 700; font-size: 0.70rem; border: 1px solid rgba(16, 185, 129, 0.25);">
                   ✓ ${isEn ? 'Side A: Simulator & Solar Optimization' : 'Lado A: Simulador & Optimización Solar'} · ${hasSimForLat ? (isEn ? 'active site data' : 'datos del emplazamiento activo') + ' (' + simRes!.source + ', ' + formatAngle(simRes!.latitude, 3) + ' / ' + formatAngle(simRes!.longitude, 3) + ')' : (isEn ? 'OrientSol reference dataset' : 'dataset de referencia OrientSol')}
                 </span>
                 <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700;">vs</span>
                 <span class="badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-weight: 700; font-size: 0.70rem; border: 1px solid rgba(2, 132, 199, 0.25);">
-                  🌐 ${isEn ? 'Side B: PVGIS JRC (Same OrientSol Motor)' : 'Lado B: PVGIS JRC (Mismo Motor OrientSol)'} · ${formatAngle(pvgisData.latitude, 3)} / ${formatAngle(pvgisData.longitude, 3)}
+                  ${isEn ? 'Side B: PVGIS JRC (Same OrientSol Motor)' : 'Lado B: PVGIS JRC (Mismo Motor OrientSol)'} · ${formatAngle(pvgisData.latitude, 3)} / ${formatAngle(pvgisData.longitude, 3)}
                 </span>
               </div>
               <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
@@ -1440,7 +1440,7 @@ export function renderPythonConsole(): HTMLElement {
           <div style="padding: 0.6rem 1rem; background: var(--bg-card); border-bottom: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.35rem;">
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; font-size: 0.73rem;">
               <div style="display: flex; align-items: center; gap: 0.45rem;">
-                <strong style="color: #0284c7; font-size: 0.75rem;">📥 ${isEn ? 'Input Climatological Data — Global Horizontal Irradiation Gdm(0) [kWh/m²·day]:' : 'Datos de Entrada Climatológicos — Irradiación Global Horizontal Gdm(0) [kWh/m²·día]:'}</strong>
+                <strong style="color: #0284c7; font-size: 0.75rem;">${isEn ? 'Input Climatological Data — Global Horizontal Irradiation Gdm(0) [kWh/m²·day]:' : 'Datos de Entrada Climatológicos — Irradiación Global Horizontal Gdm(0) [kWh/m²·día]:'}</strong>
               </div>
               <div style="font-size: 0.69rem; color: var(--text-muted);">
                 ${isEn ? 'Annual Daily Mean:' : 'Media Diaria Anual:'}
@@ -1470,7 +1470,7 @@ export function renderPythonConsole(): HTMLElement {
                 <tr>
                   <th style="width: 6%; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">${isEn ? 'Month' : 'Mes'}</th>
                   <th style="width: 15%; text-align: center; color: #0284c7; background: rgba(2, 132, 199, 0.05); padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? '📥 Global Gdm(0) [Input]<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)' : '📥 Global Gdm(0) [Entrada]<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)'}
+                    ${isEn ? 'Global Gdm(0) [Input]<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)' : 'Global Gdm(0) [Entrada]<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)'}
                   </th>
                   <th style="width: 14%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
                     ${isEn ? 'Direct Bdm(0)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)' : 'Directa Bdm(0)<br/>Sim vs PVGIS [Δ | %]<br/>(kWh/m²·d)'}
@@ -1675,7 +1675,7 @@ export function renderPythonConsole(): HTMLElement {
           <div style="padding: 0.85rem 1.15rem; background: rgba(2, 132, 199, 0.05); border-top: 1px solid var(--border-subtle); font-size: 0.76rem; color: var(--text-dim); line-height: 1.5;">
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.4rem;">
               <span style="font-weight: 800; color: var(--accent-cyan, #0284c7); font-size: 0.82rem; display: flex; align-items: center; gap: 0.4rem;">
-                <span>📊</span>
+                <span></span>
                 ${isEn
                   ? 'Comparative Error Metrics: Simulator vs PVGIS (Evaluated with the Same OrientSol Motor)'
                   : 'Métricas Estadísticas de Error: Simulador vs PVGIS (Evaluados con el Mismo Motor OrientSol)'}
@@ -1801,7 +1801,7 @@ export function renderPythonConsole(): HTMLElement {
             <div style="margin-top: 0.75rem; padding: 0.85rem 1rem; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 0.75rem;">
               <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem;">
                 <div style="display: flex; align-items: center; gap: 0.45rem;">
-                  <span style="font-size: 0.95rem;">📐</span>
+                  <span style="font-size: 0.95rem;"></span>
                   <strong style="color: var(--text-main); font-size: 0.82rem;">
                     ${isEn
                       ? 'Exhaustive Mathematical Foundation: Liu-Jordan Method & Verification Algorithms'
@@ -1814,7 +1814,7 @@ export function renderPythonConsole(): HTMLElement {
                 <!-- Module 1: Horizontal Decomposition & Liu-Jordan Fraction -->
                 <div class="math-module-card">
                   <div style="font-weight: 700; color: #0284c7; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
-                    <span>☀️</span>
+                    <span></span>
                     <span>${isEn ? '1. Horizontal Decomposition' : '1. Descomposición Horizontal y Claridad'}</span>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.71rem;">
@@ -1853,7 +1853,7 @@ export function renderPythonConsole(): HTMLElement {
                 <!-- Module 2: Isotropic Transposition to Tilted Plane -->
                 <div class="math-module-card">
                   <div style="font-weight: 700; color: #059669; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
-                    <span>📐</span>
+                    <span></span>
                     <span>${isEn ? '2. Isotropic Transposition to Slope β' : '2. Transposición Isotrópica a Superficie Inclinada β'}</span>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.71rem;">
@@ -1884,7 +1884,7 @@ export function renderPythonConsole(): HTMLElement {
                 <!-- Module 3: Annual Optimum Search & Verification Rules -->
                 <div class="math-module-card">
                   <div style="font-weight: 700; color: #d97706; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
-                    <span>⚡</span>
+                    <span></span>
                     <span>${isEn ? '3. Annual Optimum Search & Physical Assertions' : '3. Búsqueda de Óptimo Anual y Verificación Física'}</span>
                   </div>
                   <div style="color: var(--text-muted); font-size: 0.71rem;">
@@ -1917,7 +1917,7 @@ export function renderPythonConsole(): HTMLElement {
               <!-- References Footer -->
               <div style="background: rgba(2, 132, 199, 0.04); padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid rgba(2, 132, 199, 0.18);">
                 <div style="font-weight: 700; color: var(--text-main); font-size: 0.73rem; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.35rem;">
-                  <span>📚</span>
+                  <span></span>
                   <span>${isEn ? 'Canonical Scientific References:' : 'Referencias Científicas Canónicas del Modelo:'}</span>
                 </div>
                 <div style="font-size: 0.68rem; color: var(--text-muted); line-height: 1.45; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 0.25rem 0.75rem;">
@@ -1972,7 +1972,7 @@ export function renderPythonConsole(): HTMLElement {
           ${pvgisFetchError ? `
             <div style="padding: 0.5rem 1rem; background: rgba(239, 68, 68, 0.08); border-bottom: 1px solid rgba(239, 68, 68, 0.25); font-size: 0.75rem; color: #ef4444; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
               <div style="display: flex; align-items: center; gap: 0.4rem;">
-                <span>⚠️ ${isEn ? 'Could not reach PVGIS live API:' : 'No se pudo contactar con la API en vivo de PVGIS:'} ${pvgisFetchError}</span>
+                <span>${isEn ? 'Could not reach PVGIS live API:' : 'No se pudo contactar con la API en vivo de PVGIS:'} ${pvgisFetchError}</span>
               </div>
               <div style="display: flex; align-items: center; gap: 0.4rem;">
                 <button type="button" id="btn-pvgis-benchmark-err" class="btn btn-xs btn-primary" style="font-size: 0.7rem; padding: 0.15rem 0.5rem; background: #2563eb; color: #fff; border: none; border-radius: 3px; cursor: pointer;">
@@ -2188,7 +2188,7 @@ export function renderPythonConsole(): HTMLElement {
           <div class="verif-table-title-bar" style="flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <span class="verif-table-title">
-                🔄 ${isEn
+                ${isEn
                   ? `Performance Comparison of Tracking & Seasonal Topologies (${activeCityName}, Lat ${formatAngle(stateLat, 2)})`
                   : `Comparativa de Rendimiento de Topologías de Seguimiento y Estacional (${activeCityName}, Latitud ${formatAngle(stateLat, 2)})`}
               </span>
@@ -2198,10 +2198,10 @@ export function renderPythonConsole(): HTMLElement {
             <!-- Tracking View Mode Switcher -->
             <div style="display: flex; align-items: center; gap: 0.35rem;">
               <button type="button" id="btn-trk-annual" class="btn btn-xs ${isAnnualView ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; ${isAnnualView ? 'background: #059669; color: #fff; border-color: #10b981;' : ''}">
-                📊 ${isEn ? 'Annual Benchmark (12 Months)' : 'Media Anual (12 Meses)'}
+                ${isEn ? 'Annual Benchmark (12 Months)' : 'Media Anual (12 Meses)'}
               </button>
               <button type="button" id="btn-trk-day" class="btn btn-xs ${!isAnnualView ? 'btn-primary' : 'btn-secondary'}" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; ${!isAnnualView ? 'background: #059669; color: #fff; border-color: #10b981;' : ''}">
-                📅 ${isEn ? `Consulted Day (${stateDay} ${months[mIdx]})` : `Día Consultado (${stateDay} ${months[mIdx]})`}
+                ${isEn ? `Consulted Day (${stateDay} ${months[mIdx]})` : `Día Consultado (${stateDay} ${months[mIdx]})`}
               </button>
             </div>
           </div>
@@ -2209,7 +2209,7 @@ export function renderPythonConsole(): HTMLElement {
           <!-- Educational & Location Consistency Callout -->
           <div style="padding: 0.65rem 1rem; background: rgba(5, 150, 105, 0.05); border-bottom: 1px solid var(--border-subtle); font-size: 0.75rem; color: var(--text-dim); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span style="font-size: 0.95rem; color: #10b981;">📍</span>
+              <span style="font-size: 0.95rem; color: #10b981;"></span>
               <span>
                 <strong>${activeCityName} (Lat ${formatAngle(stateLat, 2)}):</strong>
                 ${isAnnualView
@@ -2223,7 +2223,7 @@ export function renderPythonConsole(): HTMLElement {
             </div>
             ${simRes && !hasMatchingSim ? `
               <button type="button" id="btn-sync-sim-lat" class="btn btn-xs btn-primary" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: #2563eb; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
-                🔄 ${isEn ? `Sync with Active Sim (${simRes.locationName}, ${formatAngle(simRes.latitude, 2)})` : `Sincronizar con Simulación Activa (${simRes.locationName}, ${formatAngle(simRes.latitude, 2)})`}
+                ${isEn ? `Sync with Active Sim (${simRes.locationName}, ${formatAngle(simRes.latitude, 2)})` : `Sincronizar con Simulación Activa (${simRes.locationName}, ${formatAngle(simRes.latitude, 2)})`}
               </button>
             ` : ''}
           </div>
@@ -2312,7 +2312,7 @@ export function renderPythonConsole(): HTMLElement {
         <div class="verif-table-card">
           <div class="verif-table-title-bar">
             <span class="verif-table-title">
-              ⚡ ${isEn
+              ${isEn
                 ? `PV Energy Yield & Osterwald Cell Thermal Derating (Emplacement Lat: ${formatAngle(stateLat, 2)}, Active Month: ${months[mIdx]})`
                 : `Balance de Energía FV y Modelo Térmico Osterwald (Emplazamiento Lat: ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[mIdx]})`}
             </span>
@@ -2344,7 +2344,7 @@ export function renderPythonConsole(): HTMLElement {
                     <td style="text-align: center;">
                       ${r.eOster > 0 && r.tc >= (r.tAmb - 2) && r.thLoss <= 5
                         ? `<span class="badge-status-valid">✓ ${isEn ? 'Consistent' : 'Coherente'}</span>`
-                        : `<span class="badge-status-warn">⚠️ ${isEn ? 'Review' : 'Revisar'}</span>`}
+                        : `<span class="badge-status-warn">${isEn ? 'Review' : 'Revisar'}</span>`}
                     </td>
                   </tr>
                 `).join('')}
@@ -2360,7 +2360,7 @@ export function renderPythonConsole(): HTMLElement {
                   <td style="text-align: center;">
                     ${energyRows.every(r => r.eOster > 0 && r.tc >= (r.tAmb - 2))
                       ? `<span class="badge-status-valid">✓ ${isEn ? '100% Consistent' : '100% Coherente'}</span>`
-                      : `<span class="badge-status-warn">⚠️ ${isEn ? 'Review' : 'Revisar'}</span>`}
+                      : `<span class="badge-status-warn">${isEn ? 'Review' : 'Revisar'}</span>`}
                   </td>
                 </tr>
               </tfoot>

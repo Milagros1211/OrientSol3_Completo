@@ -159,23 +159,23 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
       return `
         <!-- Invierno (Ene, Feb) -->
         <rect x="${padLeft}" y="${padTop}" width="${slotW * 2}" height="${innerHVal}" fill="rgba(2, 132, 199, 0.10)" />
-        <text x="${padLeft + slotW}" y="${padTop + 12}" fill="rgba(56, 189, 248, 0.7)" font-size="9" text-anchor="middle" font-weight="700">❄️ INV</text>
+        <text x="${padLeft + slotW}" y="${padTop + 12}" fill="rgba(56, 189, 248, 0.7)" font-size="9" text-anchor="middle" font-weight="700">INV</text>
         
         <!-- Primavera (Mar, Abr, May) -->
         <rect x="${padLeft + slotW * 2}" y="${padTop}" width="${slotW * 3}" height="${innerHVal}" fill="rgba(22, 163, 74, 0.10)" />
-        <text x="${padLeft + slotW * 3.5}" y="${padTop + 12}" fill="rgba(74, 222, 128, 0.7)" font-size="9" text-anchor="middle" font-weight="700">🌸 PRIM</text>
+        <text x="${padLeft + slotW * 3.5}" y="${padTop + 12}" fill="rgba(74, 222, 128, 0.7)" font-size="9" text-anchor="middle" font-weight="700">PRIM</text>
         
         <!-- Verano (Jun, Jul, Ago) -->
         <rect x="${padLeft + slotW * 5}" y="${padTop}" width="${slotW * 3}" height="${innerHVal}" fill="rgba(217, 119, 6, 0.10)" />
-        <text x="${padLeft + slotW * 6.5}" y="${padTop + 12}" fill="rgba(250, 204, 21, 0.7)" font-size="9" text-anchor="middle" font-weight="700">☀️ VER</text>
+        <text x="${padLeft + slotW * 6.5}" y="${padTop + 12}" fill="rgba(250, 204, 21, 0.7)" font-size="9" text-anchor="middle" font-weight="700">VER</text>
         
         <!-- Otoño (Sep, Oct, Nov) -->
         <rect x="${padLeft + slotW * 8}" y="${padTop}" width="${slotW * 3}" height="${innerHVal}" fill="rgba(154, 52, 18, 0.10)" />
-        <text x="${padLeft + slotW * 9.5}" y="${padTop + 12}" fill="rgba(251, 146, 60, 0.7)" font-size="9" text-anchor="middle" font-weight="700">🍂 OTO</text>
+        <text x="${padLeft + slotW * 9.5}" y="${padTop + 12}" fill="rgba(251, 146, 60, 0.7)" font-size="9" text-anchor="middle" font-weight="700">OTO</text>
         
         <!-- Invierno (Dic) -->
         <rect x="${padLeft + slotW * 11}" y="${padTop}" width="${slotW}" height="${innerHVal}" fill="rgba(2, 132, 199, 0.10)" />
-        <text x="${padLeft + slotW * 11.5}" y="${padTop + 12}" fill="rgba(56, 189, 248, 0.7)" font-size="9" text-anchor="middle" font-weight="700">❄️ INV</text>
+        <text x="${padLeft + slotW * 11.5}" y="${padTop + 12}" fill="rgba(56, 189, 248, 0.7)" font-size="9" text-anchor="middle" font-weight="700">INV</text>
       `;
     };
 
@@ -410,7 +410,7 @@ export function renderOptimalSeasonalGraphsWindow(props: OptimalSeasonalGraphsPr
           <g class="albedo-seas-note">
             <rect x="${bPad.left + 10}" y="${bPad.top + 6}" width="${bInnerW - 20}" height="22" fill="${isDark ? 'rgba(245, 158, 11, 0.15)' : '#fffbeb'}" stroke="#f59e0b" stroke-width="0.8" rx="3" />
             <text x="${bPad.left + bInnerW / 2}" y="${bPad.top + 20}" fill="${isDark ? '#fbbf24' : '#92400e'}" font-size="9" font-weight="600" text-anchor="middle">
-              ⚠ Rdm(0º) = 0: ${isEn ? 'Gains vs horizontal plane (0°) cannot be calculated' : 'Las ganancias s/ plano horizontal (0°) no se pueden calcular'}
+              Rdm(0º) = 0: ${isEn ? 'Gains vs horizontal plane (0°) cannot be calculated' : 'Las ganancias s/ plano horizontal (0°) no se pueden calcular'}
             </text>
           </g>
         `;

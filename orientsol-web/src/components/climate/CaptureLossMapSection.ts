@@ -481,19 +481,19 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
             ★ ${isEn ? 'Optimal' : 'Óptimo'} (β=${Math.round(currentOptPoint.betaDeg)}°, α=${Math.round(currentOptPoint.alphaDeg)}°)
           </button>
           <button type="button" class="btn btn-xs loss-preset-btn" id="loss-preset-horiz" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-subtle); border-radius: 4px; font-weight: 600; cursor: pointer;">
-            📐 Horizontal (β=0°, α=0°)
+            Horizontal (β=0°, α=0°)
           </button>
           <button type="button" class="btn btn-xs loss-preset-btn" id="loss-preset-roof" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-subtle); border-radius: 4px; font-weight: 600; cursor: pointer;">
-            🏠 Tejado típico (β=30°, α=0°)
+            Tejado típico (β=30°, α=0°)
           </button>
           <button type="button" class="btn btn-xs loss-preset-btn" id="loss-preset-south-vert" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-subtle); border-radius: 4px; font-weight: 600; cursor: pointer;">
-            🏢 Fachada Sur (β=90°, α=0°)
+            Fachada Sur (β=90°, α=0°)
           </button>
           <button type="button" class="btn btn-xs loss-preset-btn" id="loss-preset-east" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-subtle); border-radius: 4px; font-weight: 600; cursor: pointer;">
-            🌅 Este (β=45°, α=-90°)
+            Este (β=45°, α=-90°)
           </button>
           <button type="button" class="btn btn-xs loss-preset-btn" id="loss-preset-west" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-subtle); border-radius: 4px; font-weight: 600; cursor: pointer;">
-            🌇 Oeste (β=45°, α=+90°)
+            Oeste (β=45°, α=+90°)
           </button>
         </div>
       </div>
@@ -506,7 +506,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       <!-- Optional Collapsed Accordion with the discrete 19x25 Table (Avoids the number conglomerate by default) -->
       <details class="loss-map-matrix-details" style="margin-top: 1.25rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: var(--bg-card); padding: 0.4rem 0.75rem;">
         <summary style="cursor: pointer; font-size: 0.78rem; font-weight: 700; color: var(--text-dim); display: flex; align-items: center; justify-content: space-between; user-select: none;">
-          <span>📋 ${isEn ? 'Show discrete matrix numbers (19 × 25 grid, steps of 5° / 7.5°)' : 'Ver matriz numérica discreta (19 × 25 combinaciones, pasos de 5° / 7.5°)'}</span>
+          <span>${isEn ? 'Show discrete matrix numbers (19 × 25 grid, steps of 5° / 7.5°)' : 'Ver matriz numérica discreta (19 × 25 combinaciones, pasos de 5° / 7.5°)'}</span>
           <span class="badge badge-secondary" style="font-size: 0.68rem; font-weight: 600; opacity: 0.85;">${isEn ? 'Optional / Audit view' : 'Opcional / Vista para auditoría'}</span>
         </summary>
         <div class="loss-map-container" style="margin-top: 0.6rem;">
@@ -885,22 +885,22 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       let cteBadge = '';
       let cteDesc = '';
       if (loss <= 10.0) {
-        cteBadge = `<span class="badge badge-success" style="font-size: 0.82rem; padding: 0.35rem 0.65rem;">✅ ${isEn ? 'General CTE Limit (≤ 10% loss)' : 'Límite General CTE (Pérdida ≤ 10%)'}</span>`;
+        cteBadge = `<span class="badge badge-success" style="font-size: 0.82rem; padding: 0.35rem 0.65rem;">✓ ${isEn ? 'General CTE Limit (≤ 10% loss)' : 'Límite General CTE (Pérdida ≤ 10%)'}</span>`;
         cteDesc = isEn
           ? 'Complies with the strictest CTE DB-HE4 limit. Fully eligible for any building orientation and generic subsidies.'
           : 'Cumple con el límite general más exigente del CTE DB-HE4. Válido para cualquier instalación de energía solar.';
       } else if (loss <= 20.0) {
-        cteBadge = `<span class="badge badge-warning" style="font-size: 0.82rem; padding: 0.35rem 0.65rem; background: #d97706; color: #fff;">⚠️ ${isEn ? 'Superposition CTE Limit (≤ 20% loss)' : 'Superposición CTE (Pérdida ≤ 20%)'}</span>`;
+        cteBadge = `<span class="badge badge-warning" style="font-size: 0.82rem; padding: 0.35rem 0.65rem; background: #d97706; color: #fff;">${isEn ? 'Superposition CTE Limit (≤ 20% loss)' : 'Superposición CTE (Pérdida ≤ 20%)'}</span>`;
         cteDesc = isEn
           ? 'Complies with CTE DB-HE4 for superimposed roof or pergola installations.'
           : 'Cumple la exigencia del CTE DB-HE4 para instalaciones superpuestas sobre tejado o pérgola.';
       } else if (loss <= 40.0) {
-        cteBadge = `<span class="badge" style="font-size: 0.82rem; padding: 0.35rem 0.65rem; background: #ea580c; color: #fff;">⚠️ ${isEn ? 'Arch. Integration CTE Limit (≤ 40% loss)' : 'Integración Arquitectónica (Pérdida ≤ 40%)'}</span>`;
+        cteBadge = `<span class="badge" style="font-size: 0.82rem; padding: 0.35rem 0.65rem; background: #ea580c; color: #fff;">${isEn ? 'Arch. Integration CTE Limit (≤ 40% loss)' : 'Integración Arquitectónica (Pérdida ≤ 40%)'}</span>`;
         cteDesc = isEn
           ? 'Complies with CTE DB-HE4 for building architectural integration (facades, vertical envelopes, brise-soleil).'
           : 'Cumple la exigencia del CTE DB-HE4 para integración arquitectónica en fachadas o envolventes complejas.';
       } else {
-        cteBadge = `<span class="badge badge-danger" style="font-size: 0.82rem; padding: 0.35rem 0.65rem; background: #dc2626; color: #fff;">❌ ${isEn ? 'Non-compliant (> 40% loss)' : 'No conforme CTE (Pérdida > 40%)'}</span>`;
+        cteBadge = `<span class="badge badge-danger" style="font-size: 0.82rem; padding: 0.35rem 0.65rem; background: #dc2626; color: #fff;">✗ ${isEn ? 'Non-compliant (> 40% loss)' : 'No conforme CTE (Pérdida > 40%)'}</span>`;
         cteDesc = isEn
           ? 'Exceeds the maximum allowable loss under CTE DB-HE4. Installation not recommended without technical compensation.'
           : 'Supera el límite máximo permitido por el CTE DB-HE4. No admisible según normativa sin medidas técnicas correctoras.';

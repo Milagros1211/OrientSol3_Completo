@@ -346,14 +346,14 @@ export function renderOperationMethodologyCard(
           <!-- Column 1: Input Data Processing -->
           <div class="op-methodology-col-input">
             <div class="op-col-header">
-              <span class="col-icon">📥</span>
+              
               <strong>${isEn ? 'Input Climatology Data Treatment:' : 'Tratamiento de Data Input Climatológica:'}</strong>
             </div>
             <div class="op-input-content">
               ${data.inputDescription}
             </div>
             <div class="op-col-output">
-              <span class="col-icon">🎯</span>
+              
               <span><strong>${isEn ? 'Objective:' : 'Objetivo:'}</strong> ${data.outputSummary}</span>
             </div>
           </div>
@@ -361,7 +361,7 @@ export function renderOperationMethodologyCard(
           <!-- Column 2: Mathematical Formulations with Descriptive LaTeX Variables -->
           ${showMath ? `<div class="op-methodology-col-math">
             <div class="op-col-header">
-              <span class="col-icon">📐</span>
+              
               <strong>${data.mathProcessTitle}</strong>
             </div>
             <div class="op-math-steps-list">

@@ -177,7 +177,7 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
         <div class="opt-study-header">
           <div class="opt-study-title-block">
             <div class="opt-study-badges">
-              <span class="badge badge-primary">📍 ${props.locationName}</span>
+              <span class="badge badge-primary">${props.locationName}</span>
               <span class="badge badge-neutral">Lat: ${formatNum(props.latitude, 2)}°</span>
               <span class="badge badge-success">12 ${isEn ? 'Independent Positions' : 'Posiciones Independientes'}</span>
             </div>

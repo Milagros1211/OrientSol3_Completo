@@ -36,7 +36,7 @@ export function promptDeepLinkActionConfirmation(
             </div>
             <div>
               <h3 class="modal-title" style="font-size: 1.05rem; margin: 0; color: var(--text-main);">
-                ⚠️ ${isEn ? 'Authorize External Link Action' : 'Autorización de Acción por Enlace Externo'}
+                ${isEn ? 'Authorize External Link Action' : 'Autorización de Acción por Enlace Externo'}
               </h3>
               <p class="modal-subtitle" style="font-size: 0.8rem; margin: 0.2rem 0 0 0; color: var(--text-muted);">
                 ${isEn
@@ -72,7 +72,7 @@ export function promptDeepLinkActionConfirmation(
           ` : ''}
 
           <p style="font-size: 0.78rem; color: var(--text-dim); margin: 0; line-height: 1.4;">
-            🛡️ ${isEn
+            ${isEn
               ? 'Security Notice: To protect your data, OrientSol never executes mutations without your explicit consent.'
               : 'Aviso de Seguridad: Para proteger tus datos, OrientSol nunca ejecuta modificaciones sin tu consentimiento expreso.'}
           </p>

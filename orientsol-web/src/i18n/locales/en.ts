@@ -77,7 +77,7 @@ export const en: Translations = {
     prLabel: 'PR (Performance Ratio)',
     albedoLabel: 'Albedo (ρ)',
     toncLabel: 'NOCT / TONC [°C]',
-    runSimulationBtn: '🚀 Run in Python Engine (Pyodide)',
+    runSimulationBtn: 'Run in Python Engine (Pyodide)',
     runningSimulationBtn: 'Computing in Pyodide...',
   },
   results: {

@@ -47,13 +47,13 @@ export function openLegalPoliciesModal(initialTab: LegalTabId = 'privacy'): void
         <!-- Navigation Tabs inside Modal -->
         <div class="legal-tabs-bar">
           <button type="button" class="legal-tab-btn ${activeTab === 'privacy' || activeTab === 'security' ? 'active' : ''}" data-legal-tab="privacy">
-            <span>🛡️ ${isEn ? 'Privacy & Security (GDPR)' : 'Privacidad & Seguridad (RGPD)'}</span>
+            <span>${isEn ? 'Privacy & Security (GDPR)' : 'Privacidad & Seguridad (RGPD)'}</span>
           </button>
           <button type="button" class="legal-tab-btn ${activeTab === 'terms' ? 'active' : ''}" data-legal-tab="terms">
-            <span>📜 ${isEn ? 'Terms & Free Access' : 'Términos & Gratuidad'}</span>
+            <span>${isEn ? 'Terms & Free Access' : 'Términos & Gratuidad'}</span>
           </button>
           <button type="button" class="legal-tab-btn ${activeTab === 'cookies' ? 'active' : ''}" data-legal-tab="cookies">
-            <span>🍪 ${isEn ? 'Cookies & Storage' : 'Cookies & Almacenamiento'}</span>
+            <span>${isEn ? 'Cookies & Storage' : 'Cookies & Almacenamiento'}</span>
           </button>
         </div>
 
@@ -284,7 +284,7 @@ function renderTermsContent(isEn: boolean): string {
           These Terms of Service govern the access, execution, and use of <strong>OrientSol 4.0</strong>, a scientific solar simulation environment developed within the academic framework of the Master's Thesis in Renewable Energy at the <strong>University of Jaén (UJA)</strong>.
         </p>
         <p class="legal-text" style="color: var(--accent-emerald, #10b981); font-weight: 600;">
-          ✔ OrientSol 4.0 is 100% free of charge (Gratuito) and distributed as an Open-Access academic resource. There are NO subscriptions, NO recurring fees, NO hidden purchases, and NO payment transactions.
+          ✓ OrientSol 4.0 is 100% free of charge (Gratuito) and distributed as an Open-Access academic resource. There are NO subscriptions, NO recurring fees, NO hidden purchases, and NO payment transactions.
         </p>
         <p class="legal-text">
           OrientSol 4.0 is delivered to assist renewable energy engineers, researchers, students, and professionals in evaluating photovoltaic surfaces, orientation, tilt, solar tracking, and cell thermal behavior.
@@ -326,7 +326,7 @@ function renderTermsContent(isEn: boolean): string {
         Las presentes Condiciones de Uso y Términos de Servicio regulan el acceso, navegación y uso del software <strong>OrientSol 4.0</strong>, entorno científico de simulación solar y cálculo fotovoltaico desarrollado como Trabajo Fin de Máster (TFM) en el Máster Universitario en Energías Renovables de la <strong>Universidad de Jaén (UJA)</strong>.
       </p>
       <p class="legal-text" style="color: var(--accent-emerald, #10b981); font-weight: 600;">
-        ✔ OrientSol 4.0 es un software 100% gratuito de Acceso Abierto Académico. NO existen cuotas de suscripción, ni tarifas comerciales, ni pasarelas de pago, ni cobros bancarios de ningún tipo.
+        ✓ OrientSol 4.0 es un software 100% gratuito de Acceso Abierto Académico. NO existen cuotas de suscripción, ni tarifas comerciales, ni pasarelas de pago, ni cobros bancarios de ningún tipo.
       </p>
       <p class="legal-text">
         OrientSol 4.0 se ofrece como una herramienta orientada a estudiantes, ingenieros, investigadores y profesionales del sector de la energía solar para la evaluación de superficies colectoras, pérdidas por orientación e inclinación, sistemas de seguimiento y cálculo de producción eléctrica.
@@ -370,7 +370,7 @@ function renderCookiesContent(isEn: boolean): string {
           In accordance with Directive 2002/58/EC of the European Parliament (ePrivacy Directive), Article 5(3) of the GDPR, and Spanish Law 34/2002 (Article 22.2 LSSI-CE), this site details all storage mechanisms utilized.
         </p>
         <p class="legal-text" style="color: var(--accent-emerald, #10b981); font-weight: 600;">
-          ✔ OrientSol 4.0 uses ZERO advertising cookies, ZERO tracking pixels, and ZERO third-party analytics cookies.
+          ✓ OrientSol 4.0 uses ZERO advertising cookies, ZERO tracking pixels, and ZERO third-party analytics cookies.
         </p>
       </div>
 
@@ -446,7 +446,7 @@ function renderCookiesContent(isEn: boolean): string {
         </p>
         <div style="margin-top: 0.75rem;">
           <button type="button" class="btn btn-secondary" id="btn-clear-technical-storage" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4);">
-            🗑️ Clear Local Cache & Reset Preferences
+            Clear Local Cache & Reset Preferences
           </button>
         </div>
       </div>
@@ -460,7 +460,7 @@ function renderCookiesContent(isEn: boolean): string {
         De conformidad con la Directiva 2002/58/CE (Directiva sobre la privacidad y las comunicaciones electrónicas), el artículo 5.3 del RGPD y el artículo 22.2 de la Ley 34/2002 (LSSI-CE), se informa a los usuarios sobre los mecanismos de almacenamiento local empleados por la plataforma.
       </p>
       <p class="legal-text" style="color: var(--accent-emerald, #10b981); font-weight: 600;">
-        ✔ OrientSol 4.0 NO utiliza cookies publicitarias, NO utiliza píxeles de seguimiento ni rastreadores de analítica de terceros.
+        ✓ OrientSol 4.0 NO utiliza cookies publicitarias, NO utiliza píxeles de seguimiento ni rastreadores de analítica de terceros.
       </p>
     </div>
 
@@ -536,7 +536,7 @@ function renderCookiesContent(isEn: boolean): string {
       </p>
       <div style="margin-top: 0.75rem;">
         <button type="button" class="btn btn-secondary" id="btn-clear-technical-storage" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4);">
-          🗑️ Vaciar Caché Local y Restablecer Preferencias
+          Vaciar Caché Local y Restablecer Preferencias
         </button>
       </div>
     </div>

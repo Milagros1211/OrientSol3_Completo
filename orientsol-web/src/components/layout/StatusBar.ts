@@ -28,7 +28,7 @@ export function renderStatusBar(): HTMLElement {
       <span class="status-item" id="footer-exec-time">${t.statusBar.crossPlatform}</span>
       <span class="status-separator">|</span>
       <button type="button" class="status-item status-link-btn" id="footer-legal-btn" title="${isEn ? 'Legal Notice, GDPR Privacy, Terms & Cookie Policy' : 'Aviso Legal, Privacidad RGPD, Términos y Política de Cookies'}">
-        ⚖️ ${isEn ? 'Privacy & Legal (EU/GDPR)' : 'Privacidad & Legal (UE/RGPD)'}
+        ${isEn ? 'Privacy & Legal (EU/GDPR)' : 'Privacidad & Legal (UE/RGPD)'}
       </button>
     </div>
   `;

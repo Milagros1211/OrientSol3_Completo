@@ -364,7 +364,7 @@ export function renderTrackingAzimuthalGraphsWindow(props: TrackingAzimuthalGrap
           <g class="albedo-track-note">
             <rect x="${bPad.left + 10}" y="${bPad.top + 6}" width="${bInnerW - 20}" height="22" fill="${isDark ? 'rgba(245, 158, 11, 0.15)' : '#fffbeb'}" stroke="#f59e0b" stroke-width="0.8" rx="3" />
             <text x="${bPad.left + bInnerW / 2}" y="${bPad.top + 20}" fill="${isDark ? '#fbbf24' : '#92400e'}" font-size="9" font-weight="600" text-anchor="middle">
-              ⚠ Rdm(0º) = 0: ${isEn ? 'Gains vs horizontal plane (0°) cannot be calculated' : 'Las ganancias s/ plano horizontal (0°) no se pueden calcular'}
+              Rdm(0º) = 0: ${isEn ? 'Gains vs horizontal plane (0°) cannot be calculated' : 'Las ganancias s/ plano horizontal (0°) no se pueden calcular'}
             </text>
           </g>
         `;
