@@ -5573,9 +5573,9 @@ body.theme-dark .search-text-input:focus {
 }
 
 .suggestion-pill.badge-cache {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.45);
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.45);
 }
 
 .suggestion-pill.badge-historical {
@@ -5642,9 +5642,9 @@ body.theme-light .suggestion-pill.badge-supabase {
 
 [data-theme="light"] .suggestion-pill.badge-cache,
 body.theme-light .suggestion-pill.badge-cache {
-  background: #fffbeb;
-  color: #92400e;
-  border: 1px solid #f59e0b;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #10b981;
 }
 
 [data-theme="light"] .suggestion-pill.badge-historical,

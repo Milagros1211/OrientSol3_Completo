@@ -311,8 +311,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             ? '<strong>Cloud or Local Storage:</strong> Click <strong>"Upload to Database"</strong> to save the data in the Supabase Cloud Database (online mode) or in secure Local Cache (online or offline mode).' 
             : '<strong>Almacenamiento (Nube DB o Caché Local):</strong> Pulsa el botón <strong>«Cargar a Base de Datos»</strong> para sincronizar los emplazamientos en la nube (Supabase) cuando estés online, o guardarlos en caché local seguro (online u offline).'}</li>
           <li>${isEn 
-            ? '<strong>Available in Tab 1 (Official Catalog):</strong> All uploaded and synchronized stations appear directly in the search dropdown of <strong>Tab 1 (Official Catalog)</strong>, distinguished by their status tags: <code>[DATABASE (CLOUD)]</code> or <code>[LOCAL CACHE]</code>.' 
-            : '<strong>Disponibilidad en Pestaña 1 (Catálogo Oficial):</strong> Todos tus emplazamientos cargados se incorporan de forma automática al buscador y desplegable de la <strong>Pestaña 1 (Catálogo Oficial)</strong>, identificados mediante sus etiquetas: <code>[DATABASE (NUBE)]</code> o <code>[CACHÉ LOCAL]</code>.'}</li>
+            ? '<strong>Available in Tab 1 (Official Catalog):</strong> All uploaded and synchronized stations appear directly in the search dropdown of <strong>Tab 1 (Official Catalog)</strong>, distinguished by their status tags: <code>[ORIENTSOL]</code> or <code>[LOCAL CACHE]</code>.' 
+            : '<strong>Disponibilidad en Pestaña 1 (Catálogo Oficial):</strong> Todos tus emplazamientos cargados se incorporan de forma automática al buscador y desplegable de la <strong>Pestaña 1 (Catálogo Oficial)</strong>, identificados mediante sus etiquetas: <code>[ORIENTSOL]</code> o <code>[CACHÉ LOCAL]</code>.'}</li>
         </ol>
       </div>
       <div id="file-upload-permission-box">${renderSupabaseUploadBannerHtml(isEn)}</div>
@@ -986,39 +986,28 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   }
 
   function getLocationTagInfo(loc: ClimateDataRecord): { badgeClass: string; badgeText: string; statusTag: string } {
-    const isOffline = (loc as any).source === 'offline_cache' || 
-                      (Boolean(loc.id) && loc.id!.startsWith('offline-')) ||
-                      climateDatabaseService.getOfflineQueue().some((q) => q.locationName.trim().toLowerCase() === loc.locationName.trim().toLowerCase());
+    const officialNames = new Set(hybridClimateManager.getHistoricalLocations().map((l) => l.locationName.trim().toLowerCase()));
+    const isCustomUploadOrManual =
+      (loc.source as string) === 'manual_input' ||
+      (loc.source as string) === 'offline_cache' ||
+      Boolean(loc.id && (loc.id.startsWith('custom-') || loc.id.startsWith('offline-')));
 
-    const isDatabase = !isOffline && (
-      loc.source === 'supabase' ||
-      (Boolean(loc.id) && (loc.id!.startsWith('supabase-') || loc.id!.startsWith('server-'))) ||
-      loc.metadata?.sourceTable === 'datos_mensuales'
-    );
+    const isOfficialOrientSol = officialNames.has(loc.locationName.trim().toLowerCase()) && !isCustomUploadOrManual;
 
-    const isLocalCache = isOffline ||
-                         loc.source === 'manual_input' ||
-                         (Boolean(loc.id) && loc.id!.startsWith('custom-'));
-
-    if (isDatabase) {
-      return {
-        badgeClass: 'badge-supabase',
-        badgeText: isEn ? 'DATABASE (CLOUD)' : 'DATABASE (NUBE)',
-        statusTag: isEn ? 'DATABASE (CLOUD)' : 'DATABASE (NUBE)',
-      };
-    } else if (isLocalCache) {
-      return {
-        badgeClass: 'badge-cache',
-        badgeText: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
-        statusTag: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
-      };
-    } else {
+    if (isOfficialOrientSol) {
       return {
         badgeClass: 'badge-historical',
-        badgeText: isEn ? 'OFFICIAL CATALOG' : 'CATÁLOGO OFICIAL',
-        statusTag: isEn ? 'OFFICIAL CATALOG' : 'CATÁLOGO OFICIAL',
+        badgeText: 'ORIENTSOL',
+        statusTag: 'ORIENTSOL',
       };
     }
+
+    // Únicamente CACHÉ LOCAL para cualquier otro registro (sincronizados, nube, archivos subidos o guardados)
+    return {
+      badgeClass: 'badge-cache',
+      badgeText: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
+      statusTag: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
+    };
   }
 
   function selectLocation(loc: ClimateDataRecord) {
@@ -1694,8 +1683,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
                 </p>
                 <p class="success-instruction">
                   ${isEn
-                    ? 'All datasets are now immediately available in the Tab 1 search dropdown, tagged with [DATABASE (CLOUD)] or [LOCAL CACHE].'
-                    : 'Todos los datos están ahora disponibles en el desplegable de búsqueda de la Pestaña 1 identificados con sus etiquetas [DATABASE (NUBE)] o [CACHÉ LOCAL].'
+                    ? 'All datasets are now immediately available in the Tab 1 search dropdown, tagged with [LOCAL CACHE].'
+                    : 'Todos los datos están ahora disponibles en el desplegable de búsqueda de la Pestaña 1 identificados con la etiqueta [CACHÉ LOCAL].'
                   }
                 </p>
               </div>
