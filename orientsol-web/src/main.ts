@@ -86,74 +86,118 @@ function renderAboutView(isEn: boolean): HTMLElement {
       </div>
     </div>
 
-    <!-- Bases de Datos Climáticas, Frecuencia de Actualización y Referencias -->
-    <div class="result-card wide-card" style="margin-top: 1.25rem;">
-      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-cyan, #0284c7);">
-          <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
-          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
-          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
-        </svg>
-        <h4 style="margin: 0; color: var(--text-main);">
-          ${isEn ? 'Meteorological & Radiative Databases: Update Frequency & Scientific References' : 'Bases de Datos Climáticas y Radiativas: Periodicidad de Actualización y Referencias Científicas'}
-        </h4>
+    <!-- Bases de Datos Climáticas, Frecuencia de Actualización, Diferencias y Referencias -->
+    <div id="meteorological-databases-card" class="result-card wide-card" style="margin-top: 1.25rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-cyan, #0284c7);">
+            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+          </svg>
+          <h4 style="margin: 0; color: var(--text-main);">
+            ${isEn ? 'Meteorological & Radiative Databases: Update Frequency, Scientific Differences & Official URLs' : 'Bases de Datos Climáticas y Radiativas: Periodicidad de Actualización, Diferencias Científicas y URLs'}
+          </h4>
+        </div>
+        <span class="badge badge-primary" style="font-size: 0.72rem; padding: 0.25rem 0.6rem;">
+          ${isEn ? 'Scientific Data Providers' : 'Proveedores Científicos Homologados'}
+        </span>
       </div>
       <p style="font-size: 0.82rem; color: var(--text-dim); margin-bottom: 1rem; line-height: 1.5;">
         ${isEn
-          ? 'OrientSol 4.0 connects to official meteorological databases and satellite APIs to extract incident solar radiation Gdm(0) and ambient temperatures. Below is the update cadence and formal bibliography for each provider:'
-          : 'OrientSol 4.0 permite extraer y evaluar radiación solar incidente Gdm(0) y temperaturas ambientales desde bases de datos meteorológicas homologadas y APIs satelitales. A continuación se detalla cada cuánto se actualizan y sus referencias bibliográficas:'}
+          ? 'OrientSol 4.0 connects to international meteorological databases and satellite APIs to extract incident solar radiation Gdm(0) and ambient temperatures. Below is the technical specification, methodological differences, official portal and API URLs for each provider:'
+          : 'OrientSol 4.0 permite extraer y evaluar radiación solar incidente Gdm(0) y temperaturas ambientales desde bases de datos meteorológicas homologadas y APIs satelitales. A continuación se detallan sus diferencias metodológicas, cadencia de actualización, enlaces a sus portales y APIs oficiales:'}
       </p>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
         <!-- BD 1: PVGIS (Comisión Europea JRC) -->
-        <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="background: var(--bg-card); padding: 1.1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between; gap: 0.75rem;">
           <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
-              <strong style="color: var(--text-main); font-size: 0.9rem;">${isEn ? 'PVGIS (European Commission - JRC)' : 'PVGIS (Comisión Europea - JRC)'}</strong>
-              <span class="badge badge-primary" style="font-size: 0.7rem; white-space: nowrap;">${isEn ? 'Monthly / 2-3 yrs (v5.x)' : 'Mensual / 2-3 años (v5.x)'}</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; gap: 0.5rem;">
+              <div>
+                <strong style="color: var(--text-main); font-size: 0.92rem; display: block;">${isEn ? 'PVGIS (European Commission - JRC)' : 'PVGIS (Comisión Europea - JRC)'}</strong>
+                <span style="font-size: 0.72rem; color: #0284c7; font-weight: 600;">SARAH-3 / ERA5 Climatology</span>
+              </div>
+              <span class="badge badge-primary" style="font-size: 0.68rem; white-space: nowrap;">${isEn ? 'Monthly / 2-3 yrs (v5.x)' : 'Mensual / 2-3 años (v5.x)'}</span>
             </div>
-            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
-              <strong>${isEn ? 'Update Frequency:' : 'Frecuencia de Actualización:'}</strong> 
-              • <strong>${isEn ? 'ERA5 / SARAH-3 Reanalysis:' : 'Reanálisis ERA5 / SARAH-3:'}</strong> ${isEn
-                ? 'ECMWF updates solar radiation and weather time series <strong>monthly</strong> (with a 2-3 month consolidation latency lag).'
-                : 'El ECMWF actualiza las series de radiación y meteorología <strong>mensualmente</strong> (con un retardo de latencia de 2 a 3 meses para consolidación).'}<br/>
-              • <strong>${isEn ? 'API & Algorithm Versions:' : 'Versiones de API y Algoritmos:'}</strong> ${isEn
-                ? 'The JRC publishes major updates <strong>every 2 to 3 years</strong> (v5.1 in 2020, v5.2 in 2022, v5.3 in 2024).'
-                : 'El JRC actualiza versiones mayores <strong>cada 2 a 3 años</strong> (v5.1 en 2020, v5.2 en 2022, v5.3 en 2024).'}
+
+            <!-- Direct URLs -->
+            <div style="background: var(--bg-primary); padding: 0.45rem 0.65rem; border-radius: 4px; border: 1px solid var(--border-subtle); margin-bottom: 0.65rem; font-size: 0.72rem; display: flex; flex-direction: column; gap: 0.2rem;">
+              <div>
+                <strong style="color: var(--text-main);">${isEn ? 'Official Portal:' : 'Portal Oficial:'}</strong>
+                <a href="https://re.jrc.ec.europa.eu/pvg_tools/es/" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; margin-left: 0.3rem; word-break: break-all;">
+                  re.jrc.ec.europa.eu/pvg_tools
+                </a>
+              </div>
+              <div>
+                <strong style="color: var(--text-main);">${isEn ? 'API Endpoint:' : 'API Endpoint:'}</strong>
+                <a href="https://re.jrc.ec.europa.eu/api/v5_3/MRcalc" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; margin-left: 0.3rem; word-break: break-all;">
+                  re.jrc.ec.europa.eu/api/v5_3/MRcalc
+                </a>
+              </div>
+            </div>
+
+            <p style="font-size: 0.77rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
+              <strong>${isEn ? 'Key Methodological Differences:' : 'Diferencias Metodológicas Clave:'}</strong><br/>
+              • <strong>${isEn ? 'Multi-Year Climatology:' : 'Climatología multianual:'}</strong> ${isEn
+                ? 'Synthesizes normalized multi-decadal series (2005–2020/2023) from Meteosat satellites. It does not reflect a single isolated year, but the representative normative baseline for European solar engineering.'
+                : 'Sintetiza series multianuales normalizadas (2005–2020/2023) desde satélites Meteosat. No representa un año puntual, sino la base climática normativa representativa para ingeniería solar europea.'}<br/>
+              • <strong>${isEn ? 'Digital Terrain Horizon:' : 'Horizonte y sombreado orográfico:'}</strong> ${isEn
+                ? 'Incorporates automated terrain horizon masking (SRTM 90m DEM) to discount mountain shadows.'
+                : 'Incorpora cálculo automático del perfil de horizonte y sombras orográficas (malla SRTM 90m).'}<br/>
+              • <strong>${isEn ? 'Update Cadence:' : 'Cadencia de actualización:'}</strong> ${isEn
+                ? 'Major algorithm releases every 2–3 years (v5.1, v5.2, v5.3). Underlying ECMWF time series updated monthly.'
+                : 'Versiones mayores cada 2–3 años (v5.1, v5.2, v5.3). Series subyacentes actualizadas mensualmente con 2–3 meses de latencia.'}
             </p>
           </div>
-          <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
+          <div style="font-size: 0.70rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.45rem; font-family: var(--font-mono); line-height: 1.35;">
             <strong>${isEn ? 'References:' : 'Referencias:'}</strong><br/>
-            • Huld, T., et al. (2012). <em>A new solar radiation database for estimating PV performance in Europe and Africa</em>. Solar Energy, 86(6), 1803-1815. DOI: 10.1016/j.solener.2012.03.006.<br/>
-            • Pfeifroth, U., et al. (2023). <em>Surface Radiation Data Set - Heliosat (SARAH) - Edition 3</em>. CM SAF. DOI: 10.5676/EUM_SAF_CM/SARAH/V003.<br/>
-            • JRC (2024). <em>PVGIS API Non-interactive service</em>. European Commission.
+            • Huld, T., et al. (2012). <em>A new solar radiation database for estimating PV performance in Europe and Africa</em>. Solar Energy, 86(6), 1803-1815.<br/>
+            • Pfeifroth, U., et al. (2023). <em>Surface Radiation Data Set - Heliosat (SARAH-3)</em>. CM SAF. DOI: 10.5676/EUM_SAF_CM/SARAH/V003.
           </div>
         </div>
 
         <!-- BD 2: NASA POWER -->
-        <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="background: var(--bg-card); padding: 1.1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between; gap: 0.75rem;">
           <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
-              <strong style="color: var(--text-main); font-size: 0.9rem;">NASA POWER (CERES / MERRA-2)</strong>
-              <span class="badge badge-warning" style="font-size: 0.7rem; white-space: nowrap;">${isEn ? 'Daily (NRT) / Monthly' : 'Diaria (NRT) / Mensual'}</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; gap: 0.5rem;">
+              <div>
+                <strong style="color: var(--text-main); font-size: 0.92rem; display: block;">NASA POWER (CERES / MERRA-2)</strong>
+                <span style="font-size: 0.72rem; color: #d97706; font-weight: 600;">Global Satellite & Assimilated Reanalysis</span>
+              </div>
+              <span class="badge badge-warning" style="font-size: 0.68rem; white-space: nowrap;">${isEn ? 'Daily (NRT) / Monthly' : 'Diaria (NRT) / Mensual'}</span>
             </div>
-            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
-              <strong>${isEn ? 'Update Frequency:' : 'Frecuencia de Actualización:'}</strong>
-              • <strong>${isEn ? 'Near Real-Time (NRT):' : 'Cuasi tiempo real (NRT):'}</strong> ${isEn
-                ? '<strong>Daily</strong> automated updates (2-4 day latency).'
-                : 'Actualización <strong>diaria</strong> (latencia 2-4 días).'}<br/>
-              • <strong>${isEn ? 'MERRA-2 Assimilated Reanalysis:' : 'Reanálisis asimilado MERRA-2:'}</strong> ${isEn
-                ? '<strong>Monthly</strong> consolidation with 1-month lag.'
-                : 'Consolidación <strong>mensual</strong> con 1 mes de desfase.'}<br/>
-              • <strong>${isEn ? 'Satellite Climatologies (POWER v2.x):' : 'Climatologías satelitales (POWER v2.x):'}</strong> ${isEn
-                ? '<strong>Annual</strong> update synthesizing &gt;35 years of observations (1984–present).'
-                : 'Actualización <strong>anual</strong> integrando &gt;35 años (1984–presente).'}<br/>
-              • <strong>${isEn ? 'Retrieved Variables:' : 'Variables extraídas:'}</strong> ${isEn
-                ? 'Daily global horizontal radiation <code>ALLSKY_SFC_SW_DWN</code> (kWh/m²/day) and 2m temperature <code>T2M</code> (°C).'
-                : 'Radiación global horizontal diaria <code>ALLSKY_SFC_SW_DWN</code> (kWh/m²/día) y temperatura a 2m <code>T2M</code> (°C).'}
+
+            <!-- Direct URLs -->
+            <div style="background: var(--bg-primary); padding: 0.45rem 0.65rem; border-radius: 4px; border: 1px solid var(--border-subtle); margin-bottom: 0.65rem; font-size: 0.72rem; display: flex; flex-direction: column; gap: 0.2rem;">
+              <div>
+                <strong style="color: var(--text-main);">${isEn ? 'Official Portal:' : 'Portal Oficial:'}</strong>
+                <a href="https://power.larc.nasa.gov/" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; margin-left: 0.3rem; word-break: break-all;">
+                  power.larc.nasa.gov
+                </a>
+              </div>
+              <div>
+                <strong style="color: var(--text-main);">${isEn ? 'API Endpoint:' : 'API Endpoint:'}</strong>
+                <a href="https://power.larc.nasa.gov/api/temporal/climatology/point" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; margin-left: 0.3rem; word-break: break-all;">
+                  power.larc.nasa.gov/api/temporal/climatology
+                </a>
+              </div>
+            </div>
+
+            <p style="font-size: 0.77rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
+              <strong>${isEn ? 'Key Methodological Differences:' : 'Diferencias Metodológicas Clave:'}</strong><br/>
+              • <strong>${isEn ? 'Worldwide Coverage & Long Period:' : 'Cobertura global y serie muy extensa:'}</strong> ${isEn
+                ? 'Integrates over 35 years of continuous observations (1984–present) based on CERES satellite instruments and Goddard GMAO MERRA-2 models.'
+                : 'Integra más de 35 años de observaciones continuas (1984–presente) basadas en satélites CERES y modelos de asimilación GMAO MERRA-2.'}<br/>
+              • <strong>${isEn ? 'Spatial Resolution:' : 'Resolución espacial:'}</strong> ${isEn
+                ? 'Grid cell of 0.5° latitude x 0.625° longitude (~50 km). Evaluates free-horizon surface irradiance without micro-topography.'
+                : 'Malla de 0,5° latitud x 0,625° longitud (~50 km). Evalúa irradiancia en superficie libre sin micro-relieve orográfico.'}<br/>
+              • <strong>${isEn ? 'CORS Enabled:' : 'Acceso Web Directo:'}</strong> ${isEn
+                ? 'Directly accessible from web clients (CORS enabled worldwide).'
+                : 'Accesible directamente desde clientes web al tener cabeceras CORS habilitadas a nivel global.'}
             </p>
           </div>
-          <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
+          <div style="font-size: 0.70rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.45rem; font-family: var(--font-mono); line-height: 1.35;">
             <strong>${isEn ? 'References:' : 'Referencias:'}</strong><br/>
             • Stackhouse, P. W., et al. (2022). <em>The NASA Prediction of Worldwide Energy Resources (POWER) Project</em>. NASA Technical Reports.<br/>
             • Gelaro, R., et al. (2017). <em>The Modern-Era Retrospective Analysis for Research and Applications, Version 2 (MERRA-2)</em>. J. Climate, 30(14), 5419-5454.
@@ -161,34 +205,130 @@ function renderAboutView(isEn: boolean): HTMLElement {
         </div>
 
         <!-- BD 3: Open-Meteo Historical Archive / ERA5 Reanalysis -->
-        <div style="background: var(--bg-card); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="background: var(--bg-card); padding: 1.1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between; gap: 0.75rem;">
           <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; gap: 0.5rem;">
-              <strong style="color: var(--text-main); font-size: 0.9rem;">${isEn ? 'Open-Meteo / ECMWF ERA5 (Reanalysis)' : 'Open-Meteo / ECMWF ERA5 (Reanálisis)'}</strong>
-              <span class="badge badge-primary" style="font-size: 0.7rem; white-space: nowrap;">${isEn ? 'Daily / ERA5T (5 days)' : 'Diaria / ERA5T (5 días)'}</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; gap: 0.5rem;">
+              <div>
+                <strong style="color: var(--text-main); font-size: 0.92rem; display: block;">${isEn ? 'Open-Meteo / ECMWF ERA5 (Reanalysis)' : 'Open-Meteo / ECMWF ERA5 (Reanálisis)'}</strong>
+                <span style="font-size: 0.72rem; color: #059669; font-weight: 600;">High-Resolution Atmospheric Reanalysis</span>
+              </div>
+              <span class="badge badge-primary" style="font-size: 0.68rem; white-space: nowrap;">${isEn ? 'Daily / ERA5T (5 days)' : 'Diaria / ERA5T (5 días)'}</span>
             </div>
-            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
-              <strong>${isEn ? 'Live API Queried:' : 'API Real Consultada:'}</strong> <code>archive-api.open-meteo.com</code> ${isEn
-                ? '(ECMWF ERA5 / ERA5-Land global reanalysis, 9–25 km resolution).'
-                : '(modelo reanálisis global ECMWF ERA5 / ERA5-Land, resolución espacial 9–25 km).'}<br/>
-              • <strong>${isEn ? 'Update Frequency:' : 'Frecuencia de Actualización:'}</strong> ${isEn
-                ? '<strong>ERA5T</strong> time series updated <strong>daily with 5-day latency</strong>. Final consolidated ERA5 archive updated <strong>monthly</strong> (2-3 months lag).'
-                : 'Serie histórica <strong>ERA5T</strong> actualizada <strong>diariamente con 5 días de latencia</strong>. Archivo consolidado ERA5 definitivo actualizado <strong>mensualmente</strong> (desfase 2 a 3 meses).'}<br/>
-              • <strong>${isEn ? 'Retrieved Variables & Unit Conversion:' : 'Variables extraídas y conversión:'}</strong>
-                ${isEn
-                  ? 'Daily incident solar radiation <code>shortwave_radiation_sum</code> (in MJ/m²/day, converted to kWh/m²/day by dividing by 3,6 and averaged to 12 monthly values for Gdm(0)), 2m temperature <code>temperature_2m_mean</code> (°C), and elevation (m).'
-                  : 'Radiación diaria incidente <code>shortwave_radiation_sum</code> (en MJ/m²/día, convertida a kWh/m²/día dividiendo por 3,6 y promediada a 12 meses para Gdm(0)) y temperatura a 2m <code>temperature_2m_mean</code> (°C), además de altitud (m).'}<br/>
-              • <em>${isEn ? 'Technical Note:' : 'Nota técnica:'}</em> ${isEn
-                ? 'Open-access API with high availability and no restrictive quotas for global PV modeling.'
-                : 'Acceso abierto de alta disponibilidad sin cuotas restrictivas para modelado fotovoltaico mundial.'}
+
+            <!-- Direct URLs -->
+            <div style="background: var(--bg-primary); padding: 0.45rem 0.65rem; border-radius: 4px; border: 1px solid var(--border-subtle); margin-bottom: 0.65rem; font-size: 0.72rem; display: flex; flex-direction: column; gap: 0.2rem;">
+              <div>
+                <strong style="color: var(--text-main);">${isEn ? 'Official Portal:' : 'Portal Oficial:'}</strong>
+                <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; margin-left: 0.3rem; word-break: break-all;">
+                  open-meteo.com
+                </a>
+              </div>
+              <div>
+                <strong style="color: var(--text-main);">${isEn ? 'API Endpoint:' : 'API Endpoint:'}</strong>
+                <a href="https://archive-api.open-meteo.com/v1/archive" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; margin-left: 0.3rem; word-break: break-all;">
+                  archive-api.open-meteo.com/v1/archive
+                </a>
+              </div>
+            </div>
+
+            <p style="font-size: 0.77rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.5rem;">
+              <strong>${isEn ? 'Key Methodological Differences:' : 'Diferencias Metodológicas Clave:'}</strong><br/>
+              • <strong>${isEn ? 'Single-Year Actual Weather:' : 'Meteorología de año específico:'}</strong> ${isEn
+                ? 'Retrieves individual year-by-year reanalysis data (e.g. year 2023), reflecting exact historical cloudy days, Saharan dust haze, and specific heatwaves.'
+                : 'Recupera datos año por año individual (ej. año 2023), reflejando la nubosidad, calimas y anomalías reales ocurridas en ese año concreto.'}<br/>
+              • <strong>${isEn ? 'High Spatial Resolution:' : 'Resolución espacial elevada:'}</strong> ${isEn
+                ? 'Malla global de 9 a 25 km (ERA5-Land), la más densa entre los modelos globales.'
+                : 'Malla global de 9 a 25 km (ERA5-Land), la más densa entre los modelos atmosféricos globales.'}<br/>
+              • <strong>${isEn ? 'Latency & Open Access:' : 'Latencia y acceso:'}</strong> ${isEn
+                ? 'Near-zero latency (ERA5T updated within 5 days), free open-access without keys, fully CORS-compliant.'
+                : 'Latencia muy baja (ERA5T disponible a los 5 días), acceso abierto sin cuotas y compatible con CORS.'}
             </p>
           </div>
-          <div style="font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.4rem; font-family: var(--font-mono); line-height: 1.35;">
+          <div style="font-size: 0.70rem; color: var(--text-dim); border-top: 1px solid var(--border-subtle); padding-top: 0.45rem; font-family: var(--font-mono); line-height: 1.35;">
             <strong>${isEn ? 'References:' : 'Referencias:'}</strong><br/>
-            • Hersbach, H., et al. (2020). <em>The ERA5 global reanalysis</em>. Quarterly Journal of the Royal Meteorological Society, 146(730), 1999-2049. DOI: 10.1002/qj.3803.<br/>
-            • Zippenfenig, P. (2023). <em>Open-Meteo: Open-Source Weather API</em>. DOI: 10.5281/zenodo.7970649.<br/>
-            • Muñoz-Sabater, J., et al. (2021). <em>ERA5-Land: a state-of-the-art global land surface dataset</em>. Earth System Science Data, 13(9), 4349-4383.
+            • Hersbach, H., et al. (2020). <em>The ERA5 global reanalysis</em>. Q. J. R. Meteorol. Soc., 146(730), 1999-2049.<br/>
+            • Zippenfenig, P. (2023). <em>Open-Meteo: Open-Source Weather API</em>. DOI: 10.5281/zenodo.7970649.
           </div>
+        </div>
+      </div>
+
+      <!-- Comparative Matrix Table (PVGIS vs NASA POWER vs Open-Meteo) -->
+      <div style="margin-top: 1.25rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); overflow: hidden; background: var(--bg-card);">
+        <div style="padding: 0.65rem 1rem; background: rgba(2, 132, 199, 0.08); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
+          <strong style="color: var(--text-main); font-size: 0.82rem;">
+            ${isEn ? 'Direct Comparative Matrix: PVGIS vs NASA POWER vs Open-Meteo' : 'Matriz Comparativa Directa: PVGIS vs NASA POWER vs Open-Meteo'}
+          </strong>
+          <span style="font-size: 0.70rem; color: var(--text-muted); font-weight: 600;">
+            ${isEn ? 'Methodological & Data Divergences' : 'Divergencias Metodológicas y de Datos'}
+          </span>
+        </div>
+        <div style="overflow-x: auto; width: 100%;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.74rem; line-height: 1.4; text-align: left;">
+            <thead>
+              <tr style="background: var(--bg-primary); border-bottom: 1px solid var(--border-subtle);">
+                <th style="padding: 0.5rem 0.75rem; width: 22%; color: var(--text-main); font-weight: 700;">${isEn ? 'Parameter / Feature' : 'Parámetro / Característica'}</th>
+                <th style="padding: 0.5rem 0.75rem; width: 26%; color: #0284c7; font-weight: 700;">PVGIS 5.3 (JRC)</th>
+                <th style="padding: 0.5rem 0.75rem; width: 26%; color: #d97706; font-weight: 700;">NASA POWER</th>
+                <th style="padding: 0.5rem 0.75rem; width: 26%; color: #059669; font-weight: 700;">Open-Meteo (ERA5)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-main);">${isEn ? 'Primary Model Type' : 'Tipo de Modelo Principal'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">${isEn ? 'Geostationary Satellite (Meteosat CM SAF) + ERA5' : 'Satélite Geoestacionario (Meteosat CM SAF) + ERA5'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">${isEn ? 'Polar Satellites (CERES) + MERRA-2 Assimilation' : 'Satélites Polares (CERES) + Asimilación MERRA-2'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">${isEn ? 'Numerical Atmospheric Reanalysis (ECMWF ERA5-Land)' : 'Reanálisis Numérico Atmosférico (ECMWF ERA5-Land)'}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle); background: rgba(2, 132, 199, 0.02);">
+                <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-main);">${isEn ? 'Temporal Baseline' : 'Base Temporal'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">${isEn ? 'Multi-year climatological average (2005–2020)' : 'Media climatológica multianual (2005–2020)'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">${isEn ? 'Multi-decade climatology (>35 yrs, 1984–present)' : 'Climatología multidecenal (>35 años, 1984–presente)'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">${isEn ? 'Single-year historical time series (e.g., 2023)' : 'Serie anual específica año a año (ej. 2023)'}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-main);">${isEn ? 'Spatial Resolution' : 'Resolución Espacial'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">~5 km (0.05° x 0.05°)</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">~50 km (0.5° x 0.625°)</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">~9 a 25 km (0.1° x 0.1°)</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle); background: rgba(2, 132, 199, 0.02);">
+                <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-main);">${isEn ? 'Terrain Horizon Shadowing' : 'Sombras de Horizonte / Relieve'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: #059669; font-weight: 600;">✓ ${isEn ? 'Included (SRTM 90m DEM)' : 'Incluido (MDE SRTM 90m)'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-dim);">${isEn ? 'Free horizontal surface' : 'Superficie libre (sin horizonte local)'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-dim);">${isEn ? 'Mean grid elevation (no micro-horizon)' : 'Elevación media de celda (sin micro-horizonte)'}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle);">
+                <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-main);">${isEn ? 'Typical Madrid June Gdm(0)' : 'Radiación Junio (Madrid, Gdm(0))'}</td>
+                <td style="padding: 0.5rem 0.75rem; font-weight: 700; color: #0284c7;">7.46 – 7.56 kWh/m²·d</td>
+                <td style="padding: 0.5rem 0.75rem; font-weight: 700; color: #d97706;">7.65 kWh/m²·d</td>
+                <td style="padding: 0.5rem 0.75rem; font-weight: 700; color: #059669;">6.88 kWh/m²·d (año 2023)</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-subtle); background: rgba(2, 132, 199, 0.02);">
+                <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-main);">${isEn ? 'Web Browser Connectivity (CORS)' : 'Conectividad Web (CORS)'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--text-muted);">${isEn ? 'Direct on Desktop; via proxy / baseline in Web' : 'Directo en Escritorio; vía proxy / base en Web'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: #059669; font-weight: 600;">✓ ${isEn ? 'Direct Web CORS' : 'Directo Web con CORS'}</td>
+                <td style="padding: 0.5rem 0.75rem; color: #059669; font-weight: 600;">✓ ${isEn ? 'Direct Web CORS' : 'Directo Web con CORS'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-main);">${isEn ? 'Direct Portal / API Link' : 'Enlace Oficial Directo'}</td>
+                <td style="padding: 0.5rem 0.75rem;">
+                  <a href="https://re.jrc.ec.europa.eu/pvg_tools/es/" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; font-weight: 600;">
+                    re.jrc.ec.europa.eu
+                  </a>
+                </td>
+                <td style="padding: 0.5rem 0.75rem;">
+                  <a href="https://power.larc.nasa.gov/" target="_blank" rel="noopener noreferrer" style="color: #d97706; text-decoration: underline; font-weight: 600;">
+                    power.larc.nasa.gov
+                  </a>
+                </td>
+                <td style="padding: 0.5rem 0.75rem;">
+                  <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" style="color: #059669; text-decoration: underline; font-weight: 600;">
+                    open-meteo.com
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

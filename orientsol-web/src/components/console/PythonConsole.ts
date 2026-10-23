@@ -1795,6 +1795,21 @@ export function renderPythonConsole(): HTMLElement {
                   ? '<strong>Tribunal Defense Note:</strong> 100% of OrientSol monthly values conform strictly to World Meteorological Organization standards and JRC satellite confidence envelopes, demonstrating rigorous mathematical and physical validity.'
                   : '<strong>Blindaje Metodológico para Tribunal (TFM):</strong> El 100% de los valores mensuales de OrientSol se encuentra estrictamente dentro de los límites de la Organización Meteorológica Mundial y las envolventes de confianza del JRC, demostrando una total validez física y matemática.'}
               </p>
+
+              <!-- Quick Navigation Button to Databases Differences Tab -->
+              <div style="margin-top: 0.65rem; padding-top: 0.55rem; border-top: 1px dashed rgba(37, 99, 235, 0.25); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                <span style="font-size: 0.71rem; color: var(--text-muted); font-weight: 600;">
+                  ${isEn ? 'Scientific database comparison, update cadence & official URLs:' : 'Comparativa de bases de datos científicas, cadencias y URLs oficiales:'}
+                </span>
+                <button type="button" id="btn-goto-db-comparison" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.72rem; padding: 0.3rem 0.75rem; font-weight: 700; border-radius: var(--radius-sm); cursor: pointer; background: #0284c7; color: #ffffff; border: none; box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25);">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                  </svg>
+                  <span>${isEn ? 'View Database Differences (PVGIS vs NASA vs Open-Meteo) →' : 'Ver Diferencias entre Bases de Datos (PVGIS vs NASA vs Open-Meteo) →'}</span>
+                </button>
+              </div>
             </div>
 
             <!-- EXHAUSTIVE MATHEMATICAL FOUNDATION: LIU-JORDAN METHOD & VERIFICATION FORMULATION (LaTeX) -->
@@ -2542,6 +2557,23 @@ export function renderPythonConsole(): HTMLElement {
         showPvgisComparison = true;
         renderView();
       });
+    });
+
+    // Jump to Database Comparison tab and scroll to card
+    container.querySelector('#btn-goto-db-comparison')?.addEventListener('click', () => {
+      const aboutTabBtn = document.querySelector<HTMLButtonElement>('[data-app-tab="about"]');
+      if (aboutTabBtn) {
+        aboutTabBtn.click();
+        setTimeout(() => {
+          const targetCard = document.getElementById('meteorological-databases-card');
+          if (targetCard) {
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            targetCard.style.outline = '2px solid var(--accent-cyan, #0284c7)';
+            targetCard.style.transition = 'outline 0.3s ease';
+            setTimeout(() => { targetCard.style.outline = 'none'; }, 2200);
+          }
+        }, 80);
+      }
     });
 
     // 7. Run Verification in Pyodide WASM (without stdout raw console)
