@@ -103,11 +103,63 @@ function renderAboutView(isEn: boolean): HTMLElement {
           ${isEn ? 'Scientific Data Providers' : 'Proveedores Científicos Homologados'}
         </span>
       </div>
-      <p style="font-size: 0.82rem; color: var(--text-dim); margin-bottom: 1rem; line-height: 1.5;">
+      <p style="font-size: 0.82rem; color: var(--text-dim); margin-bottom: 0.85rem; line-height: 1.5;">
         ${isEn
           ? 'OrientSol 4.0 connects to international meteorological databases and satellite APIs to extract incident solar radiation Gdm(0) and ambient temperatures. Below is the technical specification, methodological differences, official portal and API URLs for each provider:'
           : 'OrientSol 4.0 permite extraer y evaluar radiación solar incidente Gdm(0) y temperaturas ambientales desde bases de datos meteorológicas homologadas y APIs satelitales. A continuación se detallan sus diferencias metodológicas, cadencia de actualización, enlaces a sus portales y APIs oficiales:'}
       </p>
+
+      <!-- Panel Didáctico: ¿Por qué difieren los datos y qué analiza cada módulo? -->
+      <div style="background: rgba(2, 132, 199, 0.05); border: 1px solid rgba(2, 132, 199, 0.25); border-left: 4px solid var(--accent-cyan, #0284c7); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 1.25rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.65rem;">
+          <strong style="color: var(--text-main); font-size: 0.88rem;">
+            ${isEn
+              ? 'Why do values differ between PVGIS, NASA POWER, and Open-Meteo?'
+              : '¿Por qué difieren los datos de radiación entre PVGIS, NASA POWER y Open-Meteo?'}
+          </strong>
+          <span style="font-size: 0.70rem; color: #0284c7; font-weight: 600; background: rgba(2, 132, 199, 0.12); padding: 0.2rem 0.55rem; border-radius: 4px;">
+            ${isEn ? 'Scientific Rigor & Temporal Baselines' : 'Rigor Científico y Bases Temporales'}
+          </span>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.85rem; font-size: 0.76rem; color: var(--text-muted); line-height: 1.45;">
+          <div style="background: var(--bg-card); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+            <div style="font-weight: 700; color: #0284c7; margin-bottom: 0.3rem;">
+              1. ${isEn ? 'Climatology vs. Single-Year Reanalysis' : 'Climatología Multianual vs. Año Puntual'}
+            </div>
+            ${isEn
+              ? '<strong>PVGIS 5.3</strong> computes a multi-year climatological baseline (~19 years, 2005–2023), smoothing out meteorological anomalies to represent long-term design expectations. In contrast, <strong>Open-Meteo</strong> evaluates single-year reanalyses (e.g. 2023). For example, Madrid in April 2023 experienced severe drought and exceptional sunshine (Open-Meteo: <strong>6.52 kWh/m²·d</strong> vs. PVGIS: <strong>5.50 kWh/m²·d</strong>), whereas June 2023 had unusual cloud cover and dust haze (Open-Meteo: <strong>6.88 kWh/m²·d</strong> vs. PVGIS: <strong>7.46 kWh/m²·d</strong>).'
+              : '<strong>PVGIS 5.3</strong> computa una media climatológica multianual normalizada (~19 años, 2005–2023), suavizando extremos climáticos para diseño de ingeniería a 25 años. En cambio, <strong>Open-Meteo</strong> evalúa un reanálisis anual concreto (ej. 2023). Por ejemplo, Madrid en abril de 2023 tuvo una sequía anómala y cielos despejados récord (Open-Meteo: <strong>6,52 kWh/m²·d</strong> vs. PVGIS: <strong>5,50 kWh/m²·d</strong>), mientras que en junio de 2023 hubo calimas y tormentas (Open-Meteo: <strong>6,88 kWh/m²·d</strong> vs. PVGIS: <strong>7,46 kWh/m²·d</strong>).'}
+          </div>
+
+          <div style="background: var(--bg-card); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+            <div style="font-weight: 700; color: #d97706; margin-bottom: 0.3rem;">
+              2. ${isEn ? 'Temporal Coverage Evolution (v5.2 to v5.3)' : 'Evolución Temporal de PVGIS (v5.2 hasta 2020 vs v5.3 hasta 2023)'}
+            </div>
+            ${isEn
+              ? 'Historically, <strong>PVGIS 5.2</strong> series ended in <strong>2020</strong> (SARAH-2). The European Commission JRC released <strong>PVGIS 5.3</strong> in 2024 integrating the new <strong>SARAH-3</strong> dataset from CM SAF, which extends the observation window up to <strong>2023</strong>. OrientSol incorporates these SARAH-3 normals directly.'
+              : 'Históricamente, la serie oficial de <strong>PVGIS 5.2</strong> finalizaba en <strong>2020</strong> (SARAH-2). En 2024, la Comisión Europea (JRC) lanzó <strong>PVGIS 5.3</strong> incorporando la base <strong>SARAH-3</strong> del consorcio CM SAF, ampliando la serie satelital hasta finales de <strong>2023</strong>. OrientSol 4.0 incorpora esta actualización normativa.'}
+          </div>
+
+          <div style="background: var(--bg-card); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+            <div style="font-weight: 700; color: #059669; margin-bottom: 0.3rem;">
+              3. ${isEn ? 'Topography & Spatial Resolution' : 'Resolución Espacial y Sombras de Relieve'}
+            </div>
+            ${isEn
+              ? '<strong>PVGIS</strong> uses ~5 km resolution and integrates an SRTM 90m Digital Elevation Model (DEM) calculating local topographic horizon shading. <strong>NASA POWER</strong> uses 0.5° (~50 km) on a flat horizontal plane. <strong>Open-Meteo (ERA5-Land)</strong> resolves 9–25 km at average cell elevation without micro-horizon masking.'
+              : '<strong>PVGIS</strong> opera a ~5 km de resolución y calcula sombras orográficas de montañas circundantes con malla de elevación SRTM 90m. <strong>NASA POWER</strong> tiene malla de 0,5° (~50 km) en plano horizontal libre. <strong>Open-Meteo (ERA5-Land)</strong> modela a 9–25 km según la cota media sin micro-horizonte topográfico.'}
+          </div>
+
+          <div style="background: var(--bg-card); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+            <div style="font-weight: 700; color: var(--text-main); margin-bottom: 0.3rem;">
+              4. ${isEn ? 'WMO Verification vs. Satellite Ingestion' : 'Verificación WMO vs. Análisis Satelital'}
+            </div>
+            ${isEn
+              ? '• <strong>WMO Verification:</strong> Audits OrientSol\'s analytical solar engine against physical celestial standards and horizontal radiation benchmarks.<br/>• <strong>Satellite Ingestion:</strong> Queries the chosen provider (PVGIS, NASA, or Open-Meteo) to fetch site-specific empirical radiation and temperatures to simulate generation.'
+              : '• <strong>Verificación WMO:</strong> Audita el motor físico-matemático de OrientSol frente a patrones de radiación solar y criterios de la OMM.<br/>• <strong>Análisis Satelital:</strong> Consulta en vivo la API seleccionada (PVGIS, NASA u Open-Meteo) para extraer los datos de radiación y temperatura empíricos del punto del mapa.'}
+          </div>
+        </div>
+      </div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
         <!-- BD 1: PVGIS (Comisión Europea JRC) -->
