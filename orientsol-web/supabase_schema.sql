@@ -53,7 +53,6 @@ CREATE POLICY "Permitir insercion publica de datos_mensuales"
   FOR INSERT 
   TO anon, authenticated 
   WITH CHECK (
-    es_oficial = false AND
     char_length(trim(nombre_emplazamiento)) >= 1 AND
     char_length(nombre_emplazamiento) <= 200 AND
     latitud >= -90.0 AND latitud <= 90.0 AND
