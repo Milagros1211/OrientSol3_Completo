@@ -786,7 +786,18 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       .replace(/[^a-z0-9]/g, '')
       .trim();
 
+  const extractYearFromName = (name: string): string | null => {
+    const match = (name || '').match(/(19\d{2}|20\d{2})/);
+    return match ? match[1] : null;
+  };
+
   const isDuplicateStation = (a: ClimateDataRecord, b: ClimateDataRecord) => {
+    const yearA = extractYearFromName(a.locationName);
+    const yearB = extractYearFromName(b.locationName);
+    // Si tienen años diferentes explícitos en el nombre (ej. Lima 2025 vs Lima 2026), representan series anuales distintas
+    if (yearA && yearB && yearA !== yearB) {
+      return false;
+    }
     const keyA = getCityCoreKey(a.locationName);
     const keyB = getCityCoreKey(b.locationName);
     if (keyA && keyB && keyA === keyB) return true;

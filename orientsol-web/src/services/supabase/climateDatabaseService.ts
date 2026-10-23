@@ -651,33 +651,43 @@ export class ClimateDatabaseService {
     let bestMatch: ClimateDataRecord | undefined = undefined;
 
     for (const existing of allRecords) {
-      // 1. Same geographic coordinates check (tolerance ~0.005° ≈ 500m)
-      const latDiff = Math.abs(target.latitude - existing.latitude);
-      const lonDiff = Math.abs(target.longitude - existing.longitude);
-      if (latDiff < 0.005 && lonDiff < 0.005) {
-        return {
-          isDuplicate: true,
-          duplicateReason: 'coordinates',
-          similarityPct: 100,
-          matchedRecord: existing,
-          message: isEn
-            ? `Cannot register: An emplacement ("${existing.locationName}") is already registered with the exact same geographic coordinates (Lat: ${existing.latitude.toFixed(3)}°, Lon: ${existing.longitude.toFixed(3)}°), even though the name is different.`
-            : `No se puede registrar: Ya existe un emplazamiento registrado ("${existing.locationName}") con las mismas coordenadas geográficas (Lat: ${existing.latitude.toFixed(3)}°, Lon: ${existing.longitude.toFixed(3)}°), aunque el nombre sea diferente.`,
-        };
-      }
+      // Si ambos emplazamientos indican años diferentes explícitos (ej. Lima 2025 vs Lima 2026 o Lima2025 vs Lima2026),
+      // se trata de una serie anual temporal legítima en la misma localidad y no de una colisión errónea.
+      const targetYearMatch = (target.locationName || '').match(/(19\d{2}|20\d{2})/);
+      const existingYearMatch = (existing.locationName || '').match(/(19\d{2}|20\d{2})/);
+      const isDifferentYearSeries = Boolean(
+        targetYearMatch && existingYearMatch && targetYearMatch[1] !== existingYearMatch[1]
+      );
 
-      // 2. Name similarity >= 90% check
-      const nameSim = calculateStringSimilarity(target.locationName, existing.locationName);
-      if (nameSim >= thresholdPct) {
-        return {
-          isDuplicate: true,
-          duplicateReason: 'name',
-          similarityPct: nameSim,
-          matchedRecord: existing,
-          message: isEn
-            ? `Cannot register: The name "${target.locationName}" has a ${nameSim}% similarity (≥ 90%) with existing emplacement "${existing.locationName}".`
-            : `No se puede registrar: El nombre "${target.locationName}" presenta una similitud del ${nameSim}% (≥ 90%) con el emplazamiento existente "${existing.locationName}".`,
-        };
+      if (!isDifferentYearSeries) {
+        // 1. Same geographic coordinates check (tolerance ~0.005° ≈ 500m)
+        const latDiff = Math.abs(target.latitude - existing.latitude);
+        const lonDiff = Math.abs(target.longitude - existing.longitude);
+        if (latDiff < 0.005 && lonDiff < 0.005) {
+          return {
+            isDuplicate: true,
+            duplicateReason: 'coordinates',
+            similarityPct: 100,
+            matchedRecord: existing,
+            message: isEn
+              ? `Cannot register: An emplacement ("${existing.locationName}") is already registered with the exact same geographic coordinates (Lat: ${existing.latitude.toFixed(3)}°, Lon: ${existing.longitude.toFixed(3)}°), even though the name is different.`
+              : `No se puede registrar: Ya existe un emplazamiento registrado ("${existing.locationName}") con las mismas coordenadas geográficas (Lat: ${existing.latitude.toFixed(3)}°, Lon: ${existing.longitude.toFixed(3)}°), aunque el nombre sea diferente.`,
+          };
+        }
+
+        // 2. Name similarity >= 90% check
+        const nameSim = calculateStringSimilarity(target.locationName, existing.locationName);
+        if (nameSim >= thresholdPct) {
+          return {
+            isDuplicate: true,
+            duplicateReason: 'name',
+            similarityPct: nameSim,
+            matchedRecord: existing,
+            message: isEn
+              ? `Cannot register: The name "${target.locationName}" has a ${nameSim}% similarity (≥ 90%) with existing emplacement "${existing.locationName}".`
+              : `No se puede registrar: El nombre "${target.locationName}" presenta una similitud del ${nameSim}% (≥ 90%) con el emplazamiento existente "${existing.locationName}".`,
+          };
+        }
       }
 
       // 3. Numerical data similarity
