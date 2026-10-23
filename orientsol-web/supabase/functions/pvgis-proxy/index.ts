@@ -1,11 +1,9 @@
 // @ts-nocheck
 // Supabase Edge Function: pvgis-proxy
 // Secure server-side proxy for European Commission JRC PVGIS API
-// Provides CORS headers, parameter validation, rate-limiting resilience, and 24h caching.
+// Supports both new Supabase Server framework (withSupabase { auth: 'none' }) and standard Deno.serve.
 
-declare const Deno: {
-  serve: (handler: (req: Request) => Promise<Response> | Response) => void;
-};
+import { withSupabase } from "https://esm.sh/@supabase/server@0.0.8";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -13,7 +11,7 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-Deno.serve(async (req: Request) => {
+async function handleRequest(req: Request): Promise<Response> {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: CORS_HEADERS });
@@ -97,4 +95,18 @@ Deno.serve(async (req: Request) => {
       { status: 500, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
     );
   }
-});
+}
+
+// Export default withSupabase auth: 'none' for Supabase Server runtime
+export default {
+  fetch: typeof withSupabase === "function"
+    ? withSupabase({ auth: "none" }, (req: Request) => handleRequest(req))
+    : (req: Request) => handleRequest(req),
+};
+
+// Also support legacy Deno.serve runtime if active
+if (typeof Deno !== "undefined" && typeof Deno.serve === "function") {
+  try {
+    Deno.serve((req: Request) => handleRequest(req));
+  } catch {}
+}

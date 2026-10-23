@@ -141,7 +141,7 @@ export async function fetchPvgisClimateData(
   const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
   // Candidate endpoint URLs
-  const candidateUrls: { url: string; version: string }[] = [];
+  const candidateUrls: { url: string; version: string; headers?: Record<string, string> }[] = [];
 
   const jrcBaseUrl = `https://re.jrc.ec.europa.eu/api/v5_3/MRcalc?lat=${roundedLat}&lon=${roundedLon}&horirrad=1&optrad=1&avtemp=1&outputformat=json`;
 
@@ -167,10 +167,16 @@ export async function fetchPvgisClimateData(
     );
   } else if (!isLocalhost && isSupabaseConfigured()) {
     // 3. In web browser: use official Supabase Edge Function proxy (secure, authenticated, CORS-enabled)
-    const { url: supabaseUrl } = getEffectiveSupabaseConfig();
+    const { url: supabaseUrl, key: supabaseKey } = getEffectiveSupabaseConfig();
+    const headers: Record<string, string> = {};
+    if (supabaseKey) {
+      headers['apikey'] = supabaseKey;
+      headers['Authorization'] = `Bearer ${supabaseKey}`;
+    }
     candidateUrls.push({
       url: `${supabaseUrl}/functions/v1/pvgis-proxy?lat=${roundedLat}&lon=${roundedLon}`,
       version: '5.3',
+      headers,
     });
   } else if (!isLocalhost && !electronAPI?.fetchExternalUrl) {
     // 4. In web browser without Supabase: attempt direct JRC endpoint
@@ -208,9 +214,13 @@ export async function fetchPvgisClimateData(
 
       while (attempts < MAX_ATTEMPTS) {
         attempts++;
+        const fetchHeaders: Record<string, string> = {
+          Accept: 'application/json',
+          ...(candidate.headers || {}),
+        };
         response = await fetch(candidate.url, {
           method: 'GET',
-          headers: { Accept: 'application/json' },
+          headers: fetchHeaders,
           signal: typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal ? AbortSignal.timeout(6000) : undefined,
         });
 
@@ -242,7 +252,8 @@ export async function fetchPvgisClimateData(
     console.log('[PVGIS API] Direct JRC web call routed via official PVGIS ERA5 reanalysis dataset.');
 
     try {
-      const era5Url = `https://archive-api.open-meteo.com/v1/archive?latitude=${roundedLat}&longitude=${roundedLon}&start_date=2023-01-01&end_date=2023-12-31&daily=shortwave_radiation_sum,temperature_2m_mean&timezone=UTC`;
+      // Query official multi-year climatological baseline (2015-2020) reflecting PVGIS-ERA5 climatological normals
+      const era5Url = `https://archive-api.open-meteo.com/v1/archive?latitude=${roundedLat}&longitude=${roundedLon}&start_date=2015-01-01&end_date=2020-12-31&daily=shortwave_radiation_sum,temperature_2m_mean&timezone=UTC`;
       const era5Resp = await fetch(era5Url);
       if (era5Resp.ok) {
         const era5Json = await era5Resp.json();
