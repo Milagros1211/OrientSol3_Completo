@@ -191,15 +191,15 @@ export function renderComparativeStudyPanel(props: ComparativeStudyProps): HTMLE
             <thead>
               <tr class="tracking-top-th-row">
                 <th class="th-track-month">${isEn ? 'Month' : 'Mes'}</th>
-                <th>${compSym} (0°)</th>
-                <th>${compSym} (${isEn ? 'Annual Optimum' : 'Inclinación óptima anual'})</th>
-                <th>${compSym} (${isEn ? 'Seasonal Optimum' : 'Inclinación óptima estacional'})</th>
-                <th>${compSym} (${isEn ? 'Monthly Optimum (12 pos)' : 'Inclinación óptima mensual'})</th>
-                <th>${compSym} (${isEn ? 'Polar 1-axis' : 'Seguim. a un eje polar'})</th>
-                <th>${compSym} (${isEn ? 'Azimuthal 1-axis' : 'Seguim. a un eje azimutal'})</th>
-                <th>${compSym} (${isEn ? 'Horizontal 1-axis' : 'Seguim. a un eje horizontal'})</th>
-                <th class="th-track-opt">${compSym} (${isEn ? 'Two-axis' : 'Seguim. a dos ejes'})</th>
-                <th class="th-track-temp">${isEn ? 'Mean temperature' : 'Temperatura media'}</th>
+                <th>${compSym}<br/><span style="font-size: 0.72rem;">(0°)</span></th>
+                <th>${compSym}<br/><span style="font-size: 0.70rem;">${isEn ? 'Annual Opt.' : 'Ópt. Anual'}</span></th>
+                <th>${compSym}<br/><span style="font-size: 0.70rem;">${isEn ? 'Seasonal Opt.' : 'Ópt. Estac.'}</span></th>
+                <th>${compSym}<br/><span style="font-size: 0.70rem;">${isEn ? 'Monthly Opt.' : 'Ópt. Mens.'}</span></th>
+                <th>${compSym}<br/><span style="font-size: 0.70rem;">${isEn ? 'Polar 1-ax' : '1 eje polar'}</span></th>
+                <th>${compSym}<br/><span style="font-size: 0.70rem;">${isEn ? 'Azim. 1-ax' : '1 eje azim.'}</span></th>
+                <th>${compSym}<br/><span style="font-size: 0.70rem;">${isEn ? 'Horiz. 1-ax' : '1 eje horiz.'}</span></th>
+                <th class="th-track-opt">${compSym}<br/><span style="font-size: 0.70rem;">${isEn ? 'Two-axis' : '2 ejes'}</span></th>
+                <th class="th-track-temp">${isEn ? 'Mean Temp' : 'Tª media'}<br/><span style="font-size: 0.70rem;">(°C)</span></th>
               </tr>
             </thead>
             <tbody>

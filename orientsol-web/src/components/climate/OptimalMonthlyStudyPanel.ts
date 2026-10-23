@@ -372,19 +372,19 @@ export function renderOptimalMonthlyStudyPanel(props: OptimalMonthlyStudyProps):
             <thead>
               <tr class="table-main-header-row">
                 <th rowspan="2" class="th-month">${isEn ? 'Month' : 'Mes'}</th>
-                <th rowspan="2" class="th-horiz">${compSymbol} (0°)</th>
+                <th rowspan="2" class="th-horiz">${compSymbol}<br/><span style="font-size: 0.72rem;">(0°)</span></th>
                 <th rowspan="2" class="th-optimum">
-                  <div class="th-opt-title">${isEn ? 'Optimal Tilt (β)' : 'Inclinación Óptima (β)'}</div>
+                  <div class="th-opt-title">${isEn ? 'Opt. Tilt (β)' : 'Inclin. Ópt. (β)'}</div>
                   <div class="th-opt-angle-tag">${isEn ? '12 Tilts' : '12 Ángulos'}</div>
                 </th>
                 <th rowspan="2" class="th-optimum">
-                  <div class="th-opt-title">${compSymbol} ${isEn ? 'Monthly Optimum' : 'Óptimo Mensual'}</div>
+                  <div class="th-opt-title">${compSymbol}<br/>${isEn ? 'Monthly Opt.' : 'Ópt. Mensual'}</div>
                   <div class="th-opt-angle-tag">(kWh/m²/d)</div>
                 </th>
                 <th rowspan="2" class="th-temp">${isEn ? 'Mean Temp' : 'Tª media'}<br/><small>(°C)</small></th>
-                <th colspan="2" class="th-gain-horiz">${isEn ? 'Gain vs Horiz (0°)' : 'Ganancia s/ Horiz (0°)'}</th>
+                <th colspan="2" class="th-gain-horiz">${isEn ? 'Gain vs Horiz' : 'Ganancia s/ Horiz'}<br/><small>(0°)</small></th>
                 <th colspan="2" class="th-gain-anglex">
-                  ${isEn ? 'Gain vs Optimal Annual' : 'Ganancia s/ Óptimo Anual'} <small>(${optAnnual.optimalTiltDeg}°)</small>
+                  ${isEn ? 'Gain vs Annual Opt.' : 'Ganancia s/ Ópt. Anual'}<br/><small>(${optAnnual.optimalTiltDeg}°)</small>
                 </th>
               </tr>
               <tr class="table-sub-header-row">

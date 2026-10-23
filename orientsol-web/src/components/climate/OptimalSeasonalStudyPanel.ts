@@ -380,14 +380,14 @@ export function renderOptimalSeasonalStudyPanel(props: OptimalSeasonalStudyProps
             <thead>
               <tr class="seasonal-top-th-row">
                 <th rowspan="2" class="th-season-month">${isEn ? 'Month' : 'Mes'}</th>
-                ${angles.map((ang) => `<th rowspan="2" class="th-ang-col">${compSym} (${ang}°)</th>`).join('')}
-                <th rowspan="2" class="th-opt-angle-col">${isEn ? 'Optimal Angles (°)' : 'Ángulos óptimos (°)'}</th>
-                <th rowspan="2" class="th-opt-rad-col">${compSym} ${isEn ? 'optimal' : 'óptimo'}</th>
+                ${angles.map((ang) => `<th rowspan="2" class="th-ang-col">${compSym}<br/><span style="font-size: 0.74rem;">(${ang}°)</span></th>`).join('')}
+                <th rowspan="2" class="th-opt-angle-col">${isEn ? 'Optimal<br/>Angle (°)' : 'Ángulo<br/>óptimo (°)'}</th>
+                <th rowspan="2" class="th-opt-rad-col">${compSym}<br/>${isEn ? 'optimal' : 'óptimo'}</th>
                 <th colspan="2" class="th-gains-super-col">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</th>
               </tr>
               <tr class="seasonal-sub-th-row">
-                <th class="th-gain-sub">${isEn ? 'Horizontal plane' : 'Plano horizontal'}</th>
-                <th class="th-gain-sub">${isEn ? 'Optimal annual tilt' : 'Inclinación ópt. anual'}</th>
+                <th class="th-gain-sub">${isEn ? 'Horiz.<br/>plane' : 'Plano<br/>horiz.'}</th>
+                <th class="th-gain-sub">${isEn ? 'Opt. annual<br/>tilt' : 'Inclinación<br/>ópt. anual'}</th>
               </tr>
             </thead>
             <tbody>

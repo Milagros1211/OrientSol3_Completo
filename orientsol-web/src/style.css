@@ -6280,10 +6280,36 @@ body.theme-dark .opt-tracking-table-wrap {
 .comparative-results-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
   text-align: center;
+  table-layout: auto;
+}
+
+/* Wrapped Table Headers to Eliminate Horizontal Scroll */
+.opt-annual-matlab-table th,
+.opt-matrix-table th,
+.opt-seasonal-table th,
+.opt-tracking-table th,
+.matlab-results-table th,
+.comparative-results-table th {
+  white-space: normal !important;
+  word-break: normal;
+  overflow-wrap: break-word;
+  line-height: 1.18 !important;
+  vertical-align: middle;
+  padding: 0.38rem 0.28rem !important;
+}
+
+/* Numeric Data Cells */
+.opt-annual-matlab-table td,
+.opt-matrix-table td,
+.opt-seasonal-table td,
+.opt-tracking-table td,
+.matlab-results-table td,
+.comparative-results-table td {
+  padding: 0.35rem 0.25rem !important;
+  font-size: 0.81rem;
 }
 
 /* Unified Table Headers */
@@ -6297,11 +6323,11 @@ body.theme-dark .opt-tracking-table-wrap {
 .opt-tracking-table thead tr:first-child th {
   background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%) !important;
   color: #ffffff !important;
-  padding: 0.55rem 0.65rem;
+  padding: 0.42rem 0.32rem !important;
   font-weight: 700;
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  font-size: 0.85rem;
+  font-size: 0.81rem;
 }
 
 .table-sub-header-row th,
@@ -6314,22 +6340,27 @@ body.theme-dark .opt-tracking-table-wrap {
 .opt-tracking-table thead tr:nth-child(2) th {
   background: #1e3a8a !important;
   color: #bfdbfe !important;
-  padding: 0.45rem 0.55rem;
+  padding: 0.35rem 0.28rem !important;
   font-weight: 600;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Month column in headers */
+/* Compact Month column in headers */
 .th-month,
 .th-season-month,
 .th-track-month {
-  width: 110px;
+  width: 82px !important;
+  min-width: 76px !important;
+  max-width: 95px !important;
   background: #1e3a8a !important;
   color: #ffffff !important;
   text-align: left !important;
-  padding-left: 0.85rem !important;
+  padding-left: 0.55rem !important;
+  padding-right: 0.35rem !important;
+  white-space: nowrap !important;
+  font-size: 0.80rem !important;
 }
 
 /* Optimum header columns */
@@ -6339,7 +6370,8 @@ body.theme-dark .opt-tracking-table-wrap {
   border-left: 2px solid #38bdf8 !important;
   border-right: 2px solid #38bdf8 !important;
   color: #ffffff !important;
-  min-width: 100px;
+  min-width: 60px !important;
+  max-width: 85px !important;
 }
 
 .th-opt-title {
@@ -6771,10 +6803,11 @@ body.theme-dark .seasonal-media-row .highlight-media {
 
 .comp-cell-flex {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  gap: 0.45rem;
-  white-space: nowrap;
+  justify-content: center;
+  gap: 0.12rem;
+  padding: 0.15rem 0.1rem;
 }
 
 .comp-val-main {
@@ -10342,37 +10375,143 @@ svg.plot-svg {
   z-index: 3 !important;
 }
 
-/* Ensure sticky column backgrounds stay opaque when swiping */
+/* Ensure sticky column backgrounds stay opaque and high-contrast */
 [data-theme="light"] .opt-annual-matlab-table tbody td:first-child,
 [data-theme="light"] .opt-tracking-table tbody td:first-child,
-[data-theme="light"] .opt-seasonal-table tbody td:first-child,
 [data-theme="light"] .comparative-results-table tbody td:first-child,
 [data-theme="light"] .opt-energy-table tbody td:first-child,
 [data-theme="light"] .loss-map-matrix-table tbody td:first-child,
 body.theme-light .opt-annual-matlab-table tbody td:first-child,
 body.theme-light .opt-tracking-table tbody td:first-child,
-body.theme-light .opt-seasonal-table tbody td:first-child,
 body.theme-light .comparative-results-table tbody td:first-child,
 body.theme-light .opt-energy-table tbody td:first-child,
 body.theme-light .loss-map-matrix-table tbody td:first-child {
-  background: #ffffff !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.06);
+  border-right: 1.5px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .opt-annual-matlab-table tbody td:first-child strong,
+[data-theme="light"] .opt-tracking-table tbody td:first-child strong,
+[data-theme="light"] .comparative-results-table tbody td:first-child strong,
+body.theme-light .opt-annual-matlab-table tbody td:first-child strong,
+body.theme-light .opt-tracking-table tbody td:first-child strong,
+body.theme-light .comparative-results-table tbody td:first-child strong {
+  color: #0f172a !important;
 }
 
 [data-theme="dark"] .opt-annual-matlab-table tbody td:first-child,
 [data-theme="dark"] .opt-tracking-table tbody td:first-child,
-[data-theme="dark"] .opt-seasonal-table tbody td:first-child,
 [data-theme="dark"] .comparative-results-table tbody td:first-child,
 [data-theme="dark"] .opt-energy-table tbody td:first-child,
 [data-theme="dark"] .loss-map-matrix-table tbody td:first-child,
 body.theme-dark .opt-annual-matlab-table tbody td:first-child,
 body.theme-dark .opt-tracking-table tbody td:first-child,
-body.theme-dark .opt-seasonal-table tbody td:first-child,
 body.theme-dark .comparative-results-table tbody td:first-child,
 body.theme-dark .opt-energy-table tbody td:first-child,
 body.theme-dark .loss-map-matrix-table tbody td:first-child {
-  background: #05151f !important;
+  background: #09202c !important;
+  color: #38bdf8 !important;
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.35);
+  border-right: 1.5px solid #0e3d54 !important;
+}
+
+[data-theme="dark"] .opt-annual-matlab-table tbody td:first-child strong,
+[data-theme="dark"] .opt-tracking-table tbody td:first-child strong,
+[data-theme="dark"] .comparative-results-table tbody td:first-child strong,
+body.theme-dark .opt-annual-matlab-table tbody td:first-child strong,
+body.theme-dark .opt-tracking-table tbody td:first-child strong,
+body.theme-dark .comparative-results-table tbody td:first-child strong {
+  color: #38bdf8 !important;
+}
+
+/* Seasonal Table Badges: Preserving Opaque Colors & High Contrast in Sticky First Column */
+.opt-seasonal-table th:first-child {
+  background: #1e3a8a !important;
+  color: #ffffff !important;
+}
+
+.opt-seasonal-table td.td-month-badge,
+.opt-seasonal-table tbody td.td-month-badge {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.opt-seasonal-table td.td-month-badge strong,
+.opt-seasonal-table tbody td.td-month-badge strong {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .opt-seasonal-table td.badge-winter,
+body.theme-light .opt-seasonal-table td.badge-winter {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  border-right: 2px solid #0369a1 !important;
+}
+
+[data-theme="light"] .opt-seasonal-table td.badge-spring,
+body.theme-light .opt-seasonal-table td.badge-spring {
+  background: #15803d !important;
+  color: #ffffff !important;
+  border-right: 2px solid #14532d !important;
+}
+
+[data-theme="light"] .opt-seasonal-table td.badge-summer,
+body.theme-light .opt-seasonal-table td.badge-summer {
+  background: #b45309 !important;
+  color: #ffffff !important;
+  border-right: 2px solid #78350f !important;
+}
+
+[data-theme="light"] .opt-seasonal-table td.badge-autumn,
+body.theme-light .opt-seasonal-table td.badge-autumn {
+  background: #c2410c !important;
+  color: #ffffff !important;
+  border-right: 2px solid #7c2d12 !important;
+}
+
+[data-theme="light"] .opt-seasonal-table tfoot td.badge-media,
+body.theme-light .opt-seasonal-table tfoot td.badge-media {
+  background: #334155 !important;
+  color: #ffffff !important;
+  border-right: 2px solid #1e293b !important;
+}
+
+[data-theme="dark"] .opt-seasonal-table td.badge-winter,
+body.theme-dark .opt-seasonal-table td.badge-winter {
+  background: #0369a1 !important;
+  color: #f0f9ff !important;
+  border-right: 2px solid #0284c7 !important;
+}
+
+[data-theme="dark"] .opt-seasonal-table td.badge-spring,
+body.theme-dark .opt-seasonal-table td.badge-spring {
+  background: #166534 !important;
+  color: #f0fdf4 !important;
+  border-right: 2px solid #22c55e !important;
+}
+
+[data-theme="dark"] .opt-seasonal-table td.badge-summer,
+body.theme-dark .opt-seasonal-table td.badge-summer {
+  background: #92400e !important;
+  color: #fffbeb !important;
+  border-right: 2px solid #f59e0b !important;
+}
+
+[data-theme="dark"] .opt-seasonal-table td.badge-autumn,
+body.theme-dark .opt-seasonal-table td.badge-autumn {
+  background: #9a3412 !important;
+  color: #fff7ed !important;
+  border-right: 2px solid #f97316 !important;
+}
+
+[data-theme="dark"] .opt-seasonal-table tfoot td.badge-media,
+body.theme-dark .opt-seasonal-table tfoot td.badge-media {
+  background: #0f2735 !important;
+  color: #38bdf8 !important;
+  border-right: 2px solid #0284c7 !important;
 }
 
 /* ==========================================================================

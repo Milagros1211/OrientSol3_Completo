@@ -190,11 +190,11 @@ export function renderTrackingHorizontalStudyPanel(props: TrackingStudyProps): H
                   <th colspan="5" class="th-track-gains-super">${isEn ? 'Gains (%)' : 'Ganancias (%)'}</th>
                 </tr>
                 <tr class="tracking-sub-th-row">
-                  <th class="th-gain-sub">${isEn ? 'Horizontal plane' : 'Plano horizontal'}</th>
-                  <th class="th-gain-sub">${isEn ? 'Annual opt. tilt' : 'Inclinación ópt. anual'}</th>
-                  <th class="th-gain-sub">${isEn ? 'Seasonal opt. tilt' : 'Inclin. ópt. estacional'}</th>
-                  <th class="th-gain-sub">${isEn ? 'Polar 1-axis' : 'Seg. a un eje polar'}</th>
-                  <th class="th-gain-sub">${isEn ? 'Azimuthal 1-axis' : 'Seg. a un eje azimutal'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Horiz.<br/>plane' : 'Plano<br/>horiz.'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Annual opt.<br/>tilt' : 'Inclinación<br/>ópt. anual'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Seasonal opt.<br/>tilt' : 'Inclin. ópt.<br/>estacional'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Polar<br/>1-axis' : '1 eje<br/>polar'}</th>
+                  <th class="th-gain-sub">${isEn ? 'Azimuthal<br/>1-axis' : '1 eje<br/>azimutal'}</th>
                 </tr>
               </thead>
               <tbody>
