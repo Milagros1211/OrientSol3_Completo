@@ -2381,6 +2381,94 @@ export function renderPythonConsole(): HTMLElement {
               </tfoot>
             </table>
           </div>
+
+          <!-- Comparative Mathematical Formulation Panel: Osterwald vs Simplified -->
+          <div style="padding: 1rem 1.15rem; background: var(--bg-primary); border-top: 1px solid var(--border-subtle);">
+            <div style="font-weight: 700; color: var(--text-main); font-size: 0.85rem; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+              <span>${isEn ? 'Mathematical Model Formulation: Simplified Yield vs. Osterwald Thermal Derating' : 'Formulación Matemática Comparativa: Modelo Simplificado vs. Modelo Térmico de Osterwald'}</span>
+              <span class="badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-size: 0.70rem; font-weight: 700;">IEC 61215 / Osterwald (1986)</span>
+            </div>
+
+            <div class="math-modules-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)); gap: 0.85rem;">
+              <!-- Card 1: Modelo Simplificado -->
+              <div class="math-module-card">
+                <div style="font-weight: 700; color: #0284c7; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                  <span>1. ${isEn ? 'Simplified PV Energy Model (Fixed PR)' : 'Modelo FV Simplificado (PR Constante)'}</span>
+                </div>
+                <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                  ${isEn
+                    ? 'Assumes invariant cell efficiency throughout the entire year without temperature penalties:'
+                    : 'Asume un rendimiento de instalación constante durante todo el año, sin considerar la temperatura de trabajo:'}
+                </div>
+                <div class="math-formula-box">
+                  <div style="color: var(--text-main); text-align: center; width: 100%;">
+                    ${renderTex('E_{\\text{simp}} = P_n \\cdot G_{dm}(\\beta) \\cdot N_m \\cdot \\text{PR}', true)}
+                  </div>
+                </div>
+                <div style="color: var(--text-muted); font-size: 0.70rem; line-height: 1.45;">
+                  • ${renderTex('P_n = 5{,}0\\text{ kWp}')}: ${isEn ? 'Nominal peak power at STC' : 'Potencia pico en condiciones estándar (STC)'}.<br/>
+                  • ${renderTex('G_{dm}(\\beta)')}: ${isEn ? 'Daily irradiation on optimal tilt plane (kWh/m²·d)' : 'Irradiación diaria sobre plano óptimo anual (kWh/m²·d)'}.<br/>
+                  • ${renderTex('N_m')}: ${isEn ? 'Number of days in month' : 'Días del mes'}.<br/>
+                  • ${renderTex('\\text{PR} = 0{,}80')}: ${isEn ? 'Annual nominal Performance Ratio' : 'Performance Ratio medio anual nominal'}.
+                </div>
+              </div>
+
+              <!-- Card 2: Modelo Térmico de Osterwald -->
+              <div class="math-module-card">
+                <div style="font-weight: 700; color: #d97706; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                  <span>2. ${isEn ? 'Osterwald Cell Thermal Derating Model' : 'Modelo Térmico de Osterwald (Célula Real)'}</span>
+                </div>
+                <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                  ${isEn
+                    ? 'Computes effective cell temperature Tc via TONC (NOCT) and adjusts yield with silicon power temperature coefficient γ:'
+                    : 'Calcula la temperatura de célula Tc mediante la TONC y penaliza la potencia según el coeficiente de temperatura γ del silicio:'}
+                </div>
+                <div class="math-formula-box">
+                  <div style="color: var(--text-main); text-align: center; width: 100%;">
+                    ${renderTex('T_c = T_{\\text{amb}} + \\left( \\frac{\\text{TONC} - 20^\\circ\\text{C}}{800\\text{ W/m}^2} \\right) \\cdot G_{\\text{eff}}', true)}
+                  </div>
+                  <div style="color: var(--text-muted); text-align: center; width: 100%; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
+                    ${renderTex('E_{\\text{Oster}} = E_{\\text{simp}} \\cdot \\left[ 1 + \\frac{\\gamma}{100} \\cdot (T_c - 25^\\circ\\text{C}) \\right]', true)}
+                  </div>
+                </div>
+                <div style="color: var(--text-muted); font-size: 0.70rem; line-height: 1.45;">
+                  • ${renderTex('\\text{TONC} = 47{,}0^\\circ\\text{C}')}: ${isEn ? 'Nominal Module Operating Temperature' : 'Temperatura de Operación Nominal de Célula'}.<br/>
+                  • ${renderTex('G_{\\text{eff}}')}: ${isEn ? 'Mean daytime irradiance (W/m²)' : 'Irradiancia media diurna efectiva (W/m²)'}.<br/>
+                  • ${renderTex('\\gamma = -0{,}40\\,\\%/^\\circ\\text{C}')}: ${isEn ? 'Crystalline silicon Pmax temperature coefficient' : 'Coeficiente de temperatura de Pmáx para silicio c-Si'}.
+                </div>
+              </div>
+
+              <!-- Card 3: Pérdidas Térmicas y Comparativa Físico-Matemática -->
+              <div class="math-module-card">
+                <div style="font-weight: 700; color: #059669; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                  <span>3. ${isEn ? 'Thermal Impact & Physical Interpretation' : 'Impacto Térmico y Balance Físico Comparado'}</span>
+                </div>
+                <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                  ${isEn
+                    ? 'Relative percentage deviation between Osterwald and Simplified models:'
+                    : 'Desviación porcentual de pérdidas o ganancias térmicas respecto a STC (25 °C):'}
+                </div>
+                <div class="math-formula-box">
+                  <div style="color: var(--text-main); text-align: center; width: 100%;">
+                    ${renderTex('\\Delta_{\\text{térmica}} (\\%) = \\gamma \\cdot (T_c - 25^\\circ\\text{C}) = -0{,}40 \\cdot (T_c - 25)', true)}
+                  </div>
+                </div>
+                <div style="color: var(--text-muted); font-size: 0.70rem; line-height: 1.45;">
+                  • <strong>${isEn ? 'Summer Penalty (e.g. July, Tc = 50.1 °C):' : 'Penalización Estival (ej. Julio, Tc = 50,1 °C):'}</strong> ${renderTex('\\Delta = -10{,}06\\%')}. ${isEn ? 'Thermal losses decrease yield from 742 kWh to 667 kWh.' : 'El calor reduce la tensión Voc y baja la generación de 742 a 667 kWh.'}<br/>
+                  • <strong>${isEn ? 'Winter Gain (e.g. January, Tc = 18.6 °C):' : 'Ganancia Invernal (ej. Enero, Tc = 18,6 °C):'}</strong> ${renderTex('\\Delta = +2{,}58\\%')}. ${isEn ? 'Operating colder than STC boosts efficiency from 334 kWh to 343 kWh.' : 'Al operar más frío que STC (25 °C), el silicio rinde más (343 kWh vs 334 kWh).'}<br/>
+                  • <strong>${isEn ? 'Annual Balance:' : 'Balance Global Anual:'}</strong> ${isEn ? 'Net thermal loss of -3.77% across the entire year.' : 'Pérdida neta media anual de -3,77% frente al modelo ideal plano.'}
+                </div>
+              </div>
+            </div>
+
+            <!-- References -->
+            <div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--border-subtle); font-size: 0.68rem; color: var(--text-dim); line-height: 1.4;">
+              <strong>${isEn ? 'References:' : 'Referencias:'}</strong>
+              • Osterwald, C. R. (1986). <em>Translation of device performance measurements to reference conditions</em>. Solar Cells, 18(3-4), 269–279.
+              • Evans, D. L. (1981). <em>Simplified method for predicting photovoltaic array output</em>. Solar Energy, 27(6), 555–560.
+              • IEC 61215: <em>Terrestrial photovoltaic (PV) modules - Design qualification and type approval</em>.
+            </div>
+          </div>
         </div>
       `;
     }
