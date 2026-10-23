@@ -805,7 +805,7 @@ export class ClimateDatabaseService {
             mes: m,
             radiacion_media: Math.max(0.0, Math.min(450.0, radMensual)),
             temp_media: Math.max(-90.0, Math.min(70.0, tempMedia)),
-            es_oficial: true,
+            es_oficial: false,
           });
         }
 
@@ -821,7 +821,7 @@ export class ClimateDatabaseService {
             source: 'supabase',
             metadata: {
               ...record.metadata,
-              isOfficial: true,
+              isOfficial: false,
             },
           };
 
