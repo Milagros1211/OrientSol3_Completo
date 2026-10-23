@@ -861,6 +861,50 @@ export class ClimateDatabaseService {
   }
 
   // =========================================================================
+  // USER UPLOADED STATIONS LOCAL CACHE
+  // =========================================================================
+
+  public getUploadedCache(): ClimateDataRecord[] {
+    try {
+      const raw = localStorage.getItem('orientsol_user_uploaded_stations_v1');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {}
+    return [];
+  }
+
+  public saveUploadedCache(records: ClimateDataRecord[]): void {
+    try {
+      const existing = this.getUploadedCache();
+      const merged = [...existing];
+      for (const rec of records) {
+        const key = rec.locationName.trim().toLowerCase();
+        const idx = merged.findIndex((e) => e.locationName.trim().toLowerCase() === key);
+        const item: ClimateDataRecord = {
+          ...rec,
+          id: rec.id || `cache-${key.replace(/\s+/g, '-')}`,
+          source: 'offline_cache' as any,
+          metadata: {
+            ...rec.metadata,
+            isOfficial: false,
+          },
+        };
+        if (idx >= 0) {
+          merged[idx] = item;
+        } else {
+          merged.push(item);
+        }
+      }
+      localStorage.setItem('orientsol_user_uploaded_stations_v1', JSON.stringify(merged));
+      this.notify();
+    } catch (err) {
+      console.warn('[Supabase Service] Could not save uploaded stations to local cache:', err);
+    }
+  }
+
+  // =========================================================================
   // OFFLINE QUEUE MANAGEMENT
   // =========================================================================
 
