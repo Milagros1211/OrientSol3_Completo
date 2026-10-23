@@ -145,32 +145,33 @@ Permite subir decenas o cientos de emplazamientos en un solo archivo delimitado 
 ```csv
 # OrientSol 4.0 - Plantilla de Lote Multi-Emplazamiento (Batch)
 # Formato: emplazamiento;latitud;longitud;mes;radiacion_media;temp_media
-# Radiación: en kWh/m²/día (ej: 2.58) o mensual en kWh/m²/mes (se convierte automáticamente)
+# Radiación: en kWh/m²/día (ej: 5.80) o mensual en kWh/m²/mes (se convierte automáticamente)
+# Coordenadas: Latitud Sur (-) y Longitud Oeste (-)
 emplazamiento;latitud;longitud;mes;radiacion_media;temp_media
-Jaén;37.77;-3.78;1;2.45;9.2
-Jaén;37.77;-3.78;2;3.31;10.5
-Jaén;37.77;-3.78;3;4.68;13.8
-Jaén;37.77;-3.78;4;5.82;16.5
-Jaén;37.77;-3.78;5;6.95;20.8
-Jaén;37.77;-3.78;6;7.92;26.1
-Jaén;37.77;-3.78;7;8.10;29.4
-Jaén;37.77;-3.78;8;7.25;28.9
-Jaén;37.77;-3.78;9;5.54;24.5
-Jaén;37.77;-3.78;10;3.95;19.1
-Jaén;37.77;-3.78;11;2.75;13.2
-Jaén;37.77;-3.78;12;2.18;10.0
-Madrid;40.41;-3.70;1;2.14;6.1
-Madrid;40.41;-3.70;2;3.15;7.9
-Madrid;40.41;-3.70;3;4.48;11.2
-Madrid;40.41;-3.70;4;5.51;13.5
-Madrid;40.41;-3.70;5;6.62;17.8
-Madrid;40.41;-3.70;6;7.54;23.3
-Madrid;40.41;-3.70;7;7.78;27.8
-Madrid;40.41;-3.70;8;6.84;26.7
-Madrid;40.41;-3.70;9;5.25;22.0
-Madrid;40.41;-3.70;10;3.52;15.9
-Madrid;40.41;-3.70;11;2.36;10.1
-Madrid;40.41;-3.70;12;1.84;6.9
+Arequipa;-16.40;-71.54;1;6.35;15.2
+Arequipa;-16.40;-71.54;2;5.95;15.1
+Arequipa;-16.40;-71.54;3;6.10;15.0
+Arequipa;-16.40;-71.54;4;6.42;14.6
+Arequipa;-16.40;-71.54;5;6.28;13.8
+Arequipa;-16.40;-71.54;6;6.05;13.1
+Arequipa;-16.40;-71.54;7;6.18;12.9
+Arequipa;-16.40;-71.54;8;6.65;13.4
+Arequipa;-16.40;-71.54;9;7.10;14.2
+Arequipa;-16.40;-71.54;10;7.35;14.8
+Arequipa;-16.40;-71.54;11;7.20;15.0
+Arequipa;-16.40;-71.54;12;6.70;15.3
+Lima;-12.05;-77.04;1;5.82;22.4
+Lima;-12.05;-77.04;2;6.12;23.1
+Lima;-12.05;-77.04;3;5.65;22.6
+Lima;-12.05;-77.04;4;4.78;20.8
+Lima;-12.05;-77.04;5;3.62;18.7
+Lima;-12.05;-77.04;6;2.85;17.2
+Lima;-12.05;-77.04;7;2.60;16.5
+Lima;-12.05;-77.04;8;2.72;16.3
+Lima;-12.05;-77.04;9;3.15;16.8
+Lima;-12.05;-77.04;10;3.95;18.0
+Lima;-12.05;-77.04;11;4.68;19.4
+Lima;-12.05;-77.04;12;5.25;21.1
 ```
 
 ---
@@ -181,18 +182,32 @@ Un arreglo (`[]`) que contiene la lista de emplazamientos con sus 12 valores men
 ```json
 [
   {
-    "locationName": "Jaén",
-    "latitude": 37.7796,
-    "longitude": -3.7849,
-    "monthlyGdm0": [2.45, 3.31, 4.68, 5.82, 6.95, 7.92, 8.10, 7.25, 5.54, 3.95, 2.75, 2.18],
-    "monthlyTemperature": [9.2, 10.5, 13.8, 16.5, 20.8, 26.1, 29.4, 28.9, 24.5, 19.1, 13.2, 10.0]
+    "locationName": "Santiago de Chile",
+    "latitude": -33.4489,
+    "longitude": -70.6693,
+    "monthlyGdm0": [7.85, 7.12, 5.84, 4.15, 2.78, 2.15, 2.42, 3.25, 4.65, 6.10, 7.35, 8.02],
+    "monthlyTemperature": [21.2, 20.4, 18.3, 14.8, 11.5, 9.2, 8.7, 10.1, 12.4, 15.1, 17.8, 20.1]
   },
   {
-    "locationName": "Madrid",
-    "latitude": 40.4168,
-    "longitude": -3.7038,
-    "monthlyGdm0": [2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84],
-    "monthlyTemperature": [6.1, 7.9, 11.2, 13.5, 17.8, 23.3, 27.8, 26.7, 22.0, 15.9, 10.1, 6.9]
+    "locationName": "Buenos Aires",
+    "latitude": -34.6037,
+    "longitude": -58.3816,
+    "monthlyGdm0": [6.75, 5.92, 4.85, 3.55, 2.62, 2.10, 2.28, 2.95, 3.98, 5.12, 6.25, 6.85],
+    "monthlyTemperature": [25.1, 23.9, 21.8, 17.9, 14.5, 11.7, 11.0, 12.8, 15.2, 18.2, 21.1, 23.6]
+  },
+  {
+    "locationName": "Bogotá",
+    "latitude": 4.7110,
+    "longitude": -74.0721,
+    "monthlyGdm0": [4.65, 4.52, 4.35, 4.10, 4.05, 4.20, 4.38, 4.45, 4.50, 4.18, 4.12, 4.40],
+    "monthlyTemperature": [13.5, 13.8, 14.0, 14.2, 14.3, 14.0, 13.7, 13.7, 13.6, 13.6, 13.7, 13.4]
+  },
+  {
+    "locationName": "Brasilia",
+    "latitude": -15.7975,
+    "longitude": -47.8919,
+    "monthlyGdm0": [4.85, 5.10, 4.95, 5.25, 5.48, 5.52, 5.75, 6.15, 5.82, 5.15, 4.65, 4.72],
+    "monthlyTemperature": [21.9, 22.0, 22.0, 21.7, 20.4, 19.3, 19.3, 21.1, 23.0, 23.1, 22.1, 21.9]
   }
 ]
 ```
