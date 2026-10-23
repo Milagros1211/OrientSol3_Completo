@@ -83,7 +83,6 @@ Este formato consta de cabeceras de metadatos precedidas por `#` y 12 filas con 
 # Pais: España
 # Latitud: 37.7796
 # Longitud: -3.7849
-# Altitud: 570
 # Albedo: 0.20
 Mes,Gdm0_kWh_m2_dia,Temperatura_C
 1,2.45,9.2
@@ -127,7 +126,6 @@ Estructura en objeto JSON estándar:
   "country": "España",
   "latitude": 37.7796,
   "longitude": -3.7849,
-  "elevationM": 570,
   "albedo": 0.20,
   "monthlyGdm0": [2.45, 3.31, 4.68, 5.82, 6.95, 7.92, 8.10, 7.25, 5.54, 3.95, 2.75, 2.18],
   "monthlyTemperature": [9.2, 10.5, 13.8, 16.5, 20.8, 26.1, 29.4, 28.9, 24.5, 19.1, 13.2, 10.0],
@@ -182,7 +180,6 @@ Un arreglo (`[]`) que contiene la lista de emplazamientos con sus 12 valores men
     "country": "España",
     "latitude": 37.7796,
     "longitude": -3.7849,
-    "elevationM": 570,
     "monthlyGdm0": [2.45, 3.31, 4.68, 5.82, 6.95, 7.92, 8.10, 7.25, 5.54, 3.95, 2.75, 2.18],
     "monthlyTemperature": [9.2, 10.5, 13.8, 16.5, 20.8, 26.1, 29.4, 28.9, 24.5, 19.1, 13.2, 10.0]
   },
@@ -191,7 +188,6 @@ Un arreglo (`[]`) que contiene la lista de emplazamientos con sus 12 valores men
     "country": "España",
     "latitude": 40.4168,
     "longitude": -3.7038,
-    "elevationM": 667,
     "monthlyGdm0": [2.14, 3.15, 4.48, 5.51, 6.62, 7.54, 7.78, 6.84, 5.25, 3.52, 2.36, 1.84],
     "monthlyTemperature": [6.1, 7.9, 11.2, 13.5, 17.8, 23.3, 27.8, 26.7, 22.0, 15.9, 10.1, 6.9]
   }
