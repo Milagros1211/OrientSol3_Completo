@@ -11875,3 +11875,74 @@ body.theme-dark .tab-instruction-banner {
   border-left-color: #38bdf8;
   color: #94a3b8;
 }
+
+/* ==========================================================================
+   TAB 3 STATION SELECTOR & DETECTED PILLS (Post-Upload Climate Selector)
+   ========================================================================== */
+.tab3-station-selector-box {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-md, 12px);
+  padding: 1.25rem 1.35rem;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.3s ease-out;
+}
+
+[data-theme="dark"] .tab3-station-selector-box,
+body.theme-dark .tab3-station-selector-box {
+  background: rgba(10, 25, 41, 0.65) !important;
+  border-color: rgba(56, 189, 248, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tab3-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  background: var(--bg-card, #ffffff);
+  border: 1.5px solid var(--border-subtle, #cbd5e1);
+  color: var(--text-main, #0f172a);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.tab3-pill-btn:hover {
+  border-color: #f59e0b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.18);
+}
+
+.tab3-pill-btn.active {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: #f59e0b;
+  color: #b45309;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+}
+
+[data-theme="dark"] .tab3-pill-btn,
+body.theme-dark .tab3-pill-btn {
+  background: #09202c !important;
+  border-color: #164e63 !important;
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .tab3-pill-btn:hover,
+body.theme-dark .tab3-pill-btn:hover {
+  border-color: #f59e0b !important;
+  color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .tab3-pill-btn.active,
+body.theme-dark .tab3-pill-btn.active {
+  background: rgba(245, 158, 11, 0.22) !important;
+  border-color: #f59e0b !important;
+  color: #fbbf24 !important;
+}
+

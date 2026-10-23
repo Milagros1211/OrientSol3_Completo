@@ -344,6 +344,57 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
 
       <!-- Post-Upload Success & Redirection Card (redirects to Tab 1 Catalog with dropdown tags) -->
       <div id="upload-success-card" class="upload-success-card hidden"></div>
+
+      <!-- Station Selector in Tab 3 (Search & Select from Database [ORIENTSOL] or Cache [CACHÉ LOCAL]) -->
+      <div id="tab3-station-selector-box" class="tab3-station-selector-box hidden">
+        <div style="margin-bottom: 0.85rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-main); display: flex; align-items: center; gap: 0.45rem;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            ${isEn ? 'Select or Search Station to Calculate' : 'Seleccionar o Buscar Estación para Simular'}
+          </span>
+          <span class="search-hint-sub" style="font-size: 0.78rem;">
+            ${isEn ? '(Reflects Database [ORIENTSOL] and [LOCAL CACHE])' : '(Refleja Base de Datos [ORIENTSOL] y [CACHÉ LOCAL])'}
+          </span>
+        </div>
+
+        <div class="historical-search-row">
+          <div class="form-group flex-1" style="position: relative;">
+            <div class="search-input-box">
+              <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                type="text"
+                id="tab3-search-input"
+                class="form-input search-text-input"
+                placeholder="${isEn ? 'Search or select location (Arequipa, Cusco, Madrid...)' : 'Buscar o seleccionar emplazamiento (Arequipa, Cusco, Madrid...)'}"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+            <!-- Live Suggestions / Similarities Dropdown for Tab 3 -->
+            <div id="tab3-suggestions-dropdown" class="suggestions-dropdown hidden" role="listbox"></div>
+          </div>
+          <button type="button" id="btn-use-tab3-station" class="btn btn-primary" style="align-self: flex-end;">
+            <span>${t.hybridLoader.selectStation}</span>
+          </button>
+        </div>
+
+        <!-- Detected stations from uploaded file as quick pills -->
+        <div id="tab3-detected-pills-container" class="tab3-detected-pills-container hidden" style="margin-top: 1rem; padding-top: 0.85rem; border-top: 1px dashed var(--border-color, rgba(148, 163, 184, 0.25));">
+          <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.45rem; display: block;">
+            ${isEn ? 'Emplacements from uploaded file (click to select & calculate):' : 'Emplazamientos del archivo cargado (haz clic para seleccionar y simular):'}
+          </span>
+          <div id="tab3-detected-pills" class="tab3-detected-pills" style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;"></div>
+        </div>
+
+        <!-- NOT FOUND ALERT BANNER FOR TAB 3 -->
+        <div id="tab3-not-found-banner" class="search-not-found-banner hidden" style="margin-top: 0.75rem;"></div>
+      </div>
     </div>
 
     <!-- TAB 4: SATELLITE CLIMATE APIS -->
@@ -507,6 +558,15 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   const downloadJsonMultiBtn = container.querySelector('#btn-download-json-multi-template') as HTMLButtonElement;
   const uploadStagingCard = container.querySelector('#upload-staging-card') as HTMLDivElement;
   const uploadSuccessCard = container.querySelector('#upload-success-card') as HTMLDivElement;
+
+  // Tab 3: Station Selector & Detected Pills Queries
+  const tab3StationSelectorBox = container.querySelector('#tab3-station-selector-box') as HTMLDivElement;
+  const tab3SearchInput = container.querySelector('#tab3-search-input') as HTMLInputElement;
+  const tab3SuggestionsDropdown = container.querySelector('#tab3-suggestions-dropdown') as HTMLDivElement;
+  const tab3NotFoundBanner = container.querySelector('#tab3-not-found-banner') as HTMLDivElement;
+  const tab3UseStationBtn = container.querySelector('#btn-use-tab3-station') as HTMLButtonElement;
+  const tab3DetectedPillsContainer = container.querySelector('#tab3-detected-pills-container') as HTMLDivElement;
+  const tab3DetectedPills = container.querySelector('#tab3-detected-pills') as HTMLDivElement;
 
   // Tab 4: Satellite Climate APIs Queries
   const apiSourceSelect = container.querySelector('#api-source-select') as HTMLSelectElement;
@@ -1118,12 +1178,11 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     }
   });
 
-  // Input event: case-insensitive only letters in Spanish/English
+  // Input event: case-insensitive letters, numbers, and common punctuation
   histSearchInput.addEventListener('input', (e) => {
     const inp = e.target as HTMLInputElement;
     const raw = inp.value;
-    // Allow only Spanish/English letters (a-z, A-Z, áéíóúüñ ÁÉÍÓÚÜÑ) and whitespace
-    const sanitized = raw.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '');
+    const sanitized = raw.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s\-_()]/g, '');
     if (sanitized !== raw) {
       inp.value = sanitized;
     }
@@ -1169,10 +1228,236 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     handleSaveOrSelectAction();
   });
 
+  // ==========================================================================
+  // TAB 3: STATION SELECTOR, DROP-DOWN & DETECTED PILLS LOGIC
+  // ==========================================================================
+  function showTab3NotFoundBanner(queryText: string) {
+    if (!tab3SuggestionsDropdown || !tab3NotFoundBanner) return;
+    tab3SuggestionsDropdown.classList.add('hidden');
+    tab3NotFoundBanner.innerHTML = `
+      <div class="search-alert-box alert-warning-box">
+        <div class="alert-icon-wrap">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f59e0b" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <div class="alert-content-wrap">
+          <p class="alert-text-msg">
+            ${isEn
+              ? `The location "<strong>${escapeHtml(queryText)}</strong>" is not saved in cache or in the database.`
+              : `El emplazamiento "<strong>${escapeHtml(queryText)}</strong>" no está guardado ni en caché ni en la base de datos.`}
+          </p>
+        </div>
+      </div>
+    `;
+    tab3NotFoundBanner.classList.remove('hidden');
+  }
+
+  function hideTab3NotFoundBanner() {
+    if (!tab3NotFoundBanner) return;
+    tab3NotFoundBanner.classList.add('hidden');
+    tab3NotFoundBanner.innerHTML = '';
+  }
+
+  function selectTab3Location(loc: ClimateDataRecord) {
+    if (tab3SearchInput) tab3SearchInput.value = loc.locationName;
+    if (histSearchInput) histSearchInput.value = loc.locationName;
+    if (tab3SuggestionsDropdown) tab3SuggestionsDropdown.classList.add('hidden');
+    hideTab3NotFoundBanner();
+    renderActiveRecord(loc);
+    updateTab3ActivePill(loc.locationName);
+    const tagInfo = getLocationTagInfo(loc);
+    const displayTitle = formatLocationWithCountry(loc.locationName, loc.country);
+    setStatus(
+      isEn
+        ? `Loaded station: ${displayTitle} [${tagInfo.statusTag}]. Ready to run calculations below.`
+        : `Cargada estación: ${displayTitle} [${tagInfo.statusTag}]. Lista para ejecutar cálculos en la barra inferior.`,
+      'success'
+    );
+  }
+
+  function performTab3Search(queryText: string) {
+    if (!tab3SuggestionsDropdown) return;
+    const q = queryText.trim().toLowerCase();
+
+    const rawMatches = q
+      ? allSearchableStations.filter((s) => {
+          const name = s.locationName.toLowerCase();
+          const country = (s.country || '').toLowerCase();
+          return name.includes(q) || country.includes(q);
+        })
+      : allSearchableStations;
+
+    const matches: ClimateDataRecord[] = [];
+    for (const m of rawMatches) {
+      if (!matches.some((existing) => isDuplicateStation(existing, m))) {
+        matches.push(m);
+      }
+    }
+
+    if (matches.length > 0) {
+      hideTab3NotFoundBanner();
+      tab3SuggestionsDropdown.innerHTML = `
+        <div class="suggestions-header">
+          <span>${isEn ? 'Stations Found' : 'Emplazamientos Hallados'}: <strong>${matches.length}</strong></span>
+          <span class="suggestions-hint">${isEn ? 'Click to select & calculate' : 'Haz clic para seleccionar y simular'}</span>
+        </div>
+        <div class="suggestions-list">
+          ${matches
+            .slice(0, 30)
+            .map((m) => {
+              const tagInfo = getLocationTagInfo(m);
+              const badgeClass = tagInfo.badgeClass;
+              const badgeText = tagInfo.badgeText;
+              const annualG = m.monthlyGdm0.reduce((a, b) => a + b, 0) / 12;
+              const cStr = (m.country || '').trim();
+              const hasParenCountry = /\([^)]+\)$/.test(m.locationName.trim()) || (Boolean(cStr) && m.locationName.toLowerCase().includes(cStr.toLowerCase()));
+              const countryBadge = cStr && !hasParenCountry ? `<span class="suggestion-country">(${escapeHtml(cStr)})</span>` : '';
+              return `
+                <div class="suggestion-item" data-id="${escapeAttr(m.id || m.locationName)}" role="option">
+                  <div class="suggestion-main">
+                    <span class="suggestion-name"><strong>${escapeHtml(m.locationName)}</strong></span>
+                    ${countryBadge}
+                    <span class="suggestion-pill ${badgeClass}">${badgeText}</span>
+                  </div>
+                  <div class="suggestion-meta">
+                    <span>Lat: ${formatNum(m.latitude, 2)}°</span>
+                    <span>Lon: ${formatNum(m.longitude, 2)}°</span>
+                    <span>G<sub>dm</sub>(0): ${formatNum(annualG, 2)} kWh/m²/d</span>
+                  </div>
+                </div>
+              `;
+            })
+            .join('')}
+        </div>
+      `;
+      tab3SuggestionsDropdown.classList.remove('hidden');
+
+      tab3SuggestionsDropdown.querySelectorAll<HTMLElement>('.suggestion-item').forEach((item) => {
+        item.addEventListener('click', () => {
+          const id = item.dataset.id;
+          const found = allSearchableStations.find((s) => s.id === id || s.locationName === id);
+          if (found) {
+            selectTab3Location(found);
+          }
+        });
+      });
+    } else {
+      showTab3NotFoundBanner(queryText.trim());
+    }
+  }
+
+  function renderTab3DetectedPills(records: ClimateDataRecord[]) {
+    if (!tab3DetectedPillsContainer || !tab3DetectedPills) return;
+    if (!records || records.length === 0) {
+      tab3DetectedPillsContainer.classList.add('hidden');
+      return;
+    }
+
+    tab3DetectedPills.innerHTML = records
+      .map((rec) => {
+        const latest = allSearchableStations.find((s) => s.locationName.trim().toLowerCase() === rec.locationName.trim().toLowerCase()) || rec;
+        const tagInfo = getLocationTagInfo(latest);
+        const isActive = currentActiveRecord && currentActiveRecord.locationName.trim().toLowerCase() === rec.locationName.trim().toLowerCase();
+        return `
+          <button type="button" class="tab3-pill-btn ${isActive ? 'active' : ''}" data-name="${escapeAttr(rec.locationName)}">
+            <span>${escapeHtml(rec.locationName)}</span>
+            <span class="suggestion-pill ${tagInfo.badgeClass}" style="margin: 0; font-size: 0.68rem; padding: 0.15rem 0.45rem; font-weight: 700; border-radius: 9999px;">${escapeHtml(tagInfo.statusTag)}</span>
+          </button>
+        `;
+      })
+      .join('');
+
+    tab3DetectedPillsContainer.classList.remove('hidden');
+
+    tab3DetectedPills.querySelectorAll<HTMLButtonElement>('.tab3-pill-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const name = btn.dataset.name;
+        if (!name) return;
+        const found = allSearchableStations.find((s) => s.locationName.trim().toLowerCase() === name.trim().toLowerCase()) || records.find((r) => r.locationName === name);
+        if (found) {
+          selectTab3Location(found);
+        }
+      });
+    });
+  }
+
+  function updateTab3ActivePill(locationName: string) {
+    if (!tab3DetectedPills) return;
+    const target = locationName.trim().toLowerCase();
+    tab3DetectedPills.querySelectorAll<HTMLButtonElement>('.tab3-pill-btn').forEach((btn) => {
+      const btnName = (btn.dataset.name || '').trim().toLowerCase();
+      if (btnName === target) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  const handleTab3SaveOrSelectAction = () => {
+    if (!tab3SearchInput) return;
+    const raw = tab3SearchInput.value.trim();
+    const q = raw.toLowerCase();
+    if (!q) return;
+
+    const exact = allSearchableStations.find((s) => s.locationName.trim().toLowerCase() === q);
+    const partial = !exact && allSearchableStations.find((s) => s.locationName.trim().toLowerCase().startsWith(q));
+    const toSelect = exact || partial;
+
+    if (!toSelect) {
+      showTab3NotFoundBanner(raw);
+      tab3SearchInput.classList.add('input-error-shake');
+      setTimeout(() => tab3SearchInput.classList.remove('input-error-shake'), 600);
+      return;
+    }
+
+    selectTab3Location(toSelect);
+  };
+
+  if (tab3SearchInput) {
+    tab3SearchInput.addEventListener('focus', () => {
+      performTab3Search(tab3SearchInput.value.trim());
+    });
+
+    tab3SearchInput.addEventListener('input', (e) => {
+      const inp = e.target as HTMLInputElement;
+      const raw = inp.value;
+      const sanitized = raw.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s\-_()]/g, '');
+      if (sanitized !== raw) {
+        inp.value = sanitized;
+      }
+      performTab3Search(sanitized);
+    });
+
+    tab3SearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        e.stopPropagation();
+        handleTab3SaveOrSelectAction();
+      }
+    });
+  }
+
+  if (tab3UseStationBtn) {
+    tab3UseStationBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleTab3SaveOrSelectAction();
+    });
+  }
+
   // Close suggestions if user clicks outside
   document.addEventListener('click', (e) => {
-    if (!container.contains(e.target as Node)) {
+    const target = e.target as Node;
+    if (!container.contains(target)) {
       histSuggestionsDropdown.classList.add('hidden');
+      if (tab3SuggestionsDropdown) tab3SuggestionsDropdown.classList.add('hidden');
+    } else {
+      if (tab3SuggestionsDropdown && tab3StationSelectorBox && !tab3StationSelectorBox.contains(target)) {
+        tab3SuggestionsDropdown.classList.add('hidden');
+      }
     }
   });
 
@@ -1556,6 +1841,15 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         // 2. Renderizar el registro activo mostrando únicamente [CACHÉ LOCAL]
         renderActiveRecord(record);
 
+        // Mostrar el selector de estación en Tab 3 y actualizar las píldoras de estaciones detectadas
+        if (tab3StationSelectorBox) {
+          tab3StationSelectorBox.classList.remove('hidden');
+        }
+        if (tab3SearchInput) {
+          tab3SearchInput.value = record.locationName;
+        }
+        renderTab3DetectedPills(listToRegister);
+
         const isOnline = Boolean(typeof navigator !== 'undefined' ? navigator.onLine : true) && climateDatabaseService.isOnline();
         const stationNames = listToRegister.map((r) => r.locationName).join(', ');
 
@@ -1676,6 +1970,15 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           renderActiveRecord(found);
         }
       }
+
+      // Actualizar el selector en la Pestaña 3 y reflejar el estado oficial [ORIENTSOL] en las píldoras
+      if (tab3StationSelectorBox) {
+        tab3StationSelectorBox.classList.remove('hidden');
+      }
+      if (tab3SearchInput && primaryStationName) {
+        tab3SearchInput.value = primaryStationName;
+      }
+      renderTab3DetectedPills(pendingUploadedRecords);
 
       // Hide staging card
       if (uploadStagingCard) {
