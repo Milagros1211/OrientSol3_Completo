@@ -986,27 +986,35 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   }
 
   function getLocationTagInfo(loc: ClimateDataRecord): { badgeClass: string; badgeText: string; statusTag: string } {
-    const officialNames = new Set(hybridClimateManager.getHistoricalLocations().map((l) => l.locationName.trim().toLowerCase()));
-    const isCustomUploadOrManual =
+    // 1. Emplazamientos personalizados o subidos por el usuario en esta sesión
+    const isUserCustom =
       (loc.source as string) === 'manual_input' ||
+      (loc.source as string) === 'file_upload' ||
       (loc.source as string) === 'offline_cache' ||
       Boolean(loc.id && (loc.id.startsWith('custom-') || loc.id.startsWith('offline-')));
 
-    const isOfficialOrientSol = officialNames.has(loc.locationName.trim().toLowerCase()) && !isCustomUploadOrManual;
+    // 2. Emplazamientos en cola de sincronización offline
+    const isPendingQueue = climateDatabaseService
+      .getOfflineQueue()
+      .some((q) => q.locationName.trim().toLowerCase() === loc.locationName.trim().toLowerCase());
 
-    if (isOfficialOrientSol) {
+    // 3. Emplazamientos registrados por usuarios en Supabase (es_oficial === false)
+    const isUserUploadedDatabaseRecord = loc.metadata?.isOfficial === false;
+
+    // Si es personalizado, subido o pendiente de sincronizar -> CACHÉ LOCAL
+    if (isUserCustom || isPendingQueue || isUserUploadedDatabaseRecord) {
       return {
-        badgeClass: 'badge-historical',
-        badgeText: 'ORIENTSOL',
-        statusTag: 'ORIENTSOL',
+        badgeClass: 'badge-cache',
+        badgeText: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
+        statusTag: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
       };
     }
 
-    // Únicamente CACHÉ LOCAL para cualquier otro registro (sincronizados, nube, archivos subidos o guardados)
+    // Todos los emplazamientos oficiales de OrientSol (BBDD.xlsx original, IDAE y base canónica) -> ORIENTSOL
     return {
-      badgeClass: 'badge-cache',
-      badgeText: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
-      statusTag: isEn ? 'LOCAL CACHE' : 'CACHÉ LOCAL',
+      badgeClass: 'badge-historical',
+      badgeText: 'ORIENTSOL',
+      statusTag: 'ORIENTSOL',
     };
   }
 

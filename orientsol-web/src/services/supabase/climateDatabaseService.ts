@@ -573,6 +573,7 @@ export class ClimateDatabaseService {
                 metadata: {
                   sourceTable: 'datos_mensuales',
                   totalMonthsRecorded: rows.length,
+                  isOfficial: first.es_oficial !== false,
                 },
               });
             }
@@ -808,6 +809,10 @@ export class ClimateDatabaseService {
             ...record,
             id: `supabase-${record.locationName.toLowerCase().replace(/\s+/g, '-')}`,
             source: 'supabase',
+            metadata: {
+              ...record.metadata,
+              isOfficial: false,
+            },
           };
 
           // Cache locally
