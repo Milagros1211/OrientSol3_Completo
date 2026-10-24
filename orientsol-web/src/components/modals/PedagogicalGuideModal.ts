@@ -89,26 +89,68 @@ export function openPedagogicalGuideModal(
             {
               heading: isEn ? '2. What is Ground Albedo (ρ_g)?' : '2. ¿Qué es el Albedo del Terreno (ρ_g) y qué valor asignar?',
               content: isEn
-                ? `<p style="margin: 0 0 0.4rem 0;">The ground albedo (&rho;<sub>g</sub>) represents the fraction of global solar radiation reflected by the surrounding ground towards an inclined photovoltaic surface:</p>
-                  <table style="width: 100%; font-size: 0.72rem; border-collapse: collapse; margin-top: 0.35rem;">
-                    <thead><tr style="background: rgba(2, 132, 199, 0.1);"><th style="padding: 0.25rem 0.5rem; text-align: left;">Surface Type</th><th style="padding: 0.25rem 0.5rem; text-align: right;">Typical Albedo (ρ_g)</th></tr></thead>
-                    <tbody>
-                      <tr><td style="padding: 0.2rem 0.5rem; border-bottom: 1px solid var(--border-subtle);">Ordinary grass / soil (OrientSol standard)</td><td style="padding: 0.2rem 0.5rem; text-align: right; font-weight: bold; border-bottom: 1px solid var(--border-subtle);">0.20</td></tr>
-                      <tr><td style="padding: 0.2rem 0.5rem; border-bottom: 1px solid var(--border-subtle);">Asphalt / Dark roofing</td><td style="padding: 0.2rem 0.5rem; text-align: right; font-weight: bold; border-bottom: 1px solid var(--border-subtle);">0.15</td></tr>
-                      <tr><td style="padding: 0.2rem 0.5rem; border-bottom: 1px solid var(--border-subtle);">Light concrete / White gravel</td><td style="padding: 0.2rem 0.5rem; text-align: right; font-weight: bold; border-bottom: 1px solid var(--border-subtle);">0.30 – 0.35</td></tr>
-                      <tr><td style="padding: 0.2rem 0.5rem;">Fresh snow cover</td><td style="padding: 0.2rem 0.5rem; text-align: right; font-weight: bold;">0.60 – 0.80</td></tr>
-                    </tbody>
-                  </table>`
-                : `<p style="margin: 0 0 0.4rem 0;">El albedo del terreno (&rho;<sub>g</sub>) es el coeficiente adimensional que mide la fracción de radiación solar global reflejada por el entorno hacia la superficie inclinada del panel:</p>
-                  <table style="width: 100%; font-size: 0.72rem; border-collapse: collapse; margin-top: 0.35rem;">
-                    <thead><tr style="background: rgba(2, 132, 199, 0.1);"><th style="padding: 0.25rem 0.5rem; text-align: left;">Tipo de Terreno Circundante</th><th style="padding: 0.25rem 0.5rem; text-align: right;">Albedo Recomendado (ρ_g)</th></tr></thead>
-                    <tbody>
-                      <tr><td style="padding: 0.2rem 0.5rem; border-bottom: 1px solid var(--border-subtle);">Suelo común / Vegetación (Estándar OrientSol)</td><td style="padding: 0.2rem 0.5rem; text-align: right; font-weight: bold; border-bottom: 1px solid var(--border-subtle);">0,20</td></tr>
-                      <tr><td style="padding: 0.2rem 0.5rem; border-bottom: 1px solid var(--border-subtle);">Asfalto / Cubierta oscura</td><td style="padding: 0.2rem 0.5rem; text-align: right; font-weight: bold; border-bottom: 1px solid var(--border-subtle);">0,15</td></tr>
-                      <tr><td style="padding: 0.2rem 0.5rem; border-bottom: 1px solid var(--border-subtle);">Hormigón claro / Grava blanca</td><td style="padding: 0.2rem 0.5rem; text-align: right; font-weight: bold; border-bottom: 1px solid var(--border-subtle);">0,30 – 0,35</td></tr>
-                      <tr><td style="padding: 0.2rem 0.5rem;">Nieve fresca persistente</td><td style="padding: 0.2rem 0.5rem; text-align: right; font-weight: bold;">0,60 – 0,80</td></tr>
-                    </tbody>
-                  </table>`,
+                ? `<p style="margin: 0 0 0.5rem 0;">The ground albedo (&rho;<sub>g</sub>) represents the dimensionless fraction of global solar radiation reflected by the surrounding ground towards an inclined photovoltaic surface:</p>
+                  <div style="max-height: 290px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-top: 0.45rem;">
+                    <table class="albedo-solargis-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                      <thead>
+                        <tr>
+                          <th style="padding: 0.35rem 0.65rem; text-align: left;">Surface type</th>
+                          <th style="padding: 0.35rem 0.65rem; text-align: right;">Typical value (&rho;<sub>g</sub>)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Fresh asphalt</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0.03 – 0.04</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Open ocean</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0.06</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Conifer forest (summer)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0.08 – 0.15</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Worn asphalt</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0.12</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Deciduous trees</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0.15 – 0.18</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Sand</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0.15 – 0.45</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Tundra</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0.18 – 0.25</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Agricultural crops</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0.18 – 0.25</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Bare soil</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0.17</td></tr>
+                        <tr style="background: rgba(2, 132, 199, 0.08);"><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);"><strong>Green grass (OrientSol default &rho;<sub>g</sub> = 0.20)</strong></td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: 800; font-family: var(--font-mono); color: #0284c7; border-bottom: 1px solid var(--border-subtle);">0.20 – 0.25</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Desert sand</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0.30 – 0.40</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Snow</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0.40 – 0.90</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Ocean ice</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0.50 – 0.70</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem;">Fresh snow</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono);">0.80 – 0.90</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style="margin-top: 0.55rem; font-size: 0.74rem; display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+                    <span style="opacity: 0.85;">Reference link:</span>
+                    <a href="https://solargis.com/resources/blog/product-updates/surface-albedo-most-frequent-questions" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; font-weight: 700;">Surface Albedo – most frequent questions | Solargis</a>
+                  </div>`
+                : `<p style="margin: 0 0 0.5rem 0;">El albedo del terreno (&rho;<sub>g</sub>) es el coeficiente adimensional que mide la fracción de radiación solar global reflejada por el entorno hacia la superficie inclinada del panel:</p>
+                  <div style="max-height: 290px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-top: 0.45rem;">
+                    <table class="albedo-solargis-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                      <thead>
+                        <tr>
+                          <th style="padding: 0.35rem 0.65rem; text-align: left;">Tipo de superficie / terreno</th>
+                          <th style="padding: 0.35rem 0.65rem; text-align: right;">Valor típico (&rho;<sub>g</sub>)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Asfalto fresco (<em>Fresh asphalt</em>)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0,03 – 0,04</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Océano abierto (<em>Open ocean</em>)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0,06</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Bosque de coníferas en verano (<em>Conifer forest</em>)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0,08 – 0,15</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Asfalto desgastado (<em>Worn asphalt</em>)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0,12</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Árboles caducifolios (<em>Deciduous trees</em>)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0,15 – 0,18</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Arena (<em>Sand</em>)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0,15 – 0,45</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Tundra (<em>Tundra</em>)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0,18 – 0,25</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Cultivos agrícolas (<em>Agricultural crops</em>)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0,18 – 0,25</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Suelo desnudo (<em>Bare soil</em>)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0,17</td></tr>
+                        <tr style="background: rgba(2, 132, 199, 0.08);"><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);"><strong>Césped verde / Hierba (Estándar OrientSol &rho;<sub>g</sub> = 0,20)</strong></td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: 800; font-family: var(--font-mono); color: #0284c7; border-bottom: 1px solid var(--border-subtle);">0,20 – 0,25</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Arena del desierto (<em>Desert sand</em>)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0,30 – 0,40</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Nieve (<em>Snow</em>)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0,40 – 0,90</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem; border-bottom: 1px solid var(--border-subtle);">Hielo oceánico (<em>Ocean ice</em>)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono); border-bottom: 1px solid var(--border-subtle);">0,50 – 0,70</td></tr>
+                        <tr><td style="padding: 0.28rem 0.65rem;">Nieve fresca (<em>Fresh snow</em>)</td><td style="padding: 0.28rem 0.65rem; text-align: right; font-weight: bold; font-family: var(--font-mono);">0,80 – 0,90</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style="margin-top: 0.55rem; font-size: 0.74rem; display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+                    <span style="opacity: 0.85;">Fuente de referencia:</span>
+                    <a href="https://solargis.com/resources/blog/product-updates/surface-albedo-most-frequent-questions" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; font-weight: 700;">Surface Albedo – most frequent questions | Solargis</a>
+                  </div>`,
             },
             {
               heading: isEn ? '3. Physical Plausibility Ranges' : '3. Rangos de Coherencia Física Auditados',

@@ -6571,7 +6571,8 @@ body.theme-dark .opt-tracking-table-wrap {
 .manual-monthly-table th,
 .all-surfaces-table th,
 .verif-data-table th,
-.legal-table th {
+.legal-table th,
+.albedo-solargis-table th {
   border-radius: 0 !important;
   text-shadow: none !important;
   vertical-align: middle !important;
@@ -6996,6 +6997,53 @@ body.theme-dark .th-sub-pct-x {
   color: #e9d5ff !important;
   font-weight: 700 !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Solargis Albedo Reference Table (Pedagogical Guide Modal & Tooltips) */
+.albedo-solargis-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.74rem;
+}
+
+[data-theme="light"] .albedo-solargis-table th,
+body.theme-light .albedo-solargis-table th {
+  background: #1e40af !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  padding: 0.35rem 0.65rem !important;
+  border-bottom: 2px solid #1d4ed8 !important;
+}
+
+[data-theme="dark"] .albedo-solargis-table th,
+body.theme-dark .albedo-solargis-table th {
+  background: #0f2744 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  padding: 0.35rem 0.65rem !important;
+  border-bottom: 2px solid #38bdf8 !important;
+}
+
+[data-theme="light"] .albedo-solargis-table td,
+body.theme-light .albedo-solargis-table td {
+  color: #0f172a;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+[data-theme="dark"] .albedo-solargis-table td,
+body.theme-dark .albedo-solargis-table td {
+  color: #e2e8f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .albedo-solargis-table tr:hover td,
+body.theme-light .albedo-solargis-table tr:hover td {
+  background: #eff6ff !important;
+}
+
+[data-theme="dark"] .albedo-solargis-table tr:hover td,
+body.theme-dark .albedo-solargis-table tr:hover td {
+  background: rgba(56, 189, 248, 0.1) !important;
 }
 
 /* ==========================================================================
