@@ -31,9 +31,9 @@ export function openPedagogicalGuideModal(
             ? 'Pedagogical Guide: Official Catalog & Data Provenance'
             : 'Guía Didáctica: Catálogo Oficial (114 Estaciones) y Origen de Datos',
           subtitle: isEn
-            ? 'Didactic audit, scientific methodology, and physical meaning of official meteorological records'
-            : 'Auditoría didáctica, metodología científica y significado físico de los registros oficiales',
-          badge: isEn ? 'Audit: 100% Didactic & Verified ✓' : 'Auditoría: 100% Didáctico y Verificado ✓',
+            ? 'Scientific methodology, physical meaning, and practical guidance for official meteorological records'
+            : 'Metodología científica, significado físico y guía práctica de los registros oficiales',
+          badge: isEn ? 'Official Benchmark Catalog' : 'Catálogo Oficial de Referencia',
           sections: [
             {
               heading: isEn ? '1. Provenance of Official Climate Records' : '1. Procedencia de los Registros Climáticos Oficiales',
@@ -70,8 +70,8 @@ export function openPedagogicalGuideModal(
             {
               heading: isEn ? '4. Step-by-Step Simulation Flow' : '4. Flujo Didáctico para Simular',
               content: isEn
-                ? 'Type your city name in the search box, click on the dropdown match or press "Select Station". The 12-month table updates instantly below. Then, adjust your system parameters (Peak Power, PR, Albedo) and click <strong>"Execute with Python Motor (Pyodide)"</strong> to compute the optimal tilt and monthly energy yield.'
-                : 'Escribe el nombre de tu ciudad en el buscador asistido, selecciona el resultado en la lista desplegable o pulsa «Seleccionar Estación». La tabla de 12 meses se actualizará de inmediato. Ajusta los parámetros del generador fotovoltaico (Potencia Pico, PR, Albedo) y haz clic en <strong>«Ejecutar en Motor Python (Pyodide)»</strong> para obtener la inclinación óptima y la energía producida.',
+                ? 'Type your city name in the search box, click on the dropdown match or press "Select Station". The 12-month table updates instantly below. Then, adjust your system parameters (Peak Power, PR, Albedo) and click <strong>"Run Calculation Engine"</strong> to compute the optimal tilt and monthly energy yield.'
+                : 'Escribe el nombre de tu ciudad en el buscador asistido, selecciona el resultado en la lista desplegable o pulsa «Seleccionar Estación». La tabla de 12 meses se actualizará de inmediato. Ajusta los parámetros del generador fotovoltaico (Potencia Pico, PR, Albedo) y haz clic en <strong>«Ejecutar Motor de Cálculo»</strong> para obtener la inclinación óptima y la energía producida.',
             },
           ],
         };
@@ -84,7 +84,7 @@ export function openPedagogicalGuideModal(
           subtitle: isEn
             ? 'Understanding custom input parameters, ground reflectance, and physical validation ranges'
             : 'Fundamento teórico de los parámetros introducidos, reflectividad del terreno y límites físicos',
-          badge: isEn ? 'Audit: 100% Didactic & Verified ✓' : 'Auditoría: 100% Didáctico y Verificado ✓',
+          badge: isEn ? 'Solar Geometry & Physics' : 'Física y Geometría Solar',
           sections: [
             {
               heading: isEn ? '1. Why are Coordinates Essential?' : '1. ¿Por qué son indispensables las Coordenadas Geográficas?',
@@ -125,8 +125,8 @@ export function openPedagogicalGuideModal(
             {
               heading: isEn ? '4. Dual Saving Action: Local vs Cloud' : '4. Acciones de Guardado: Aplicar vs Guardar en Supabase',
               content: isEn
-                ? 'Clicking <strong>"Apply Manual Data"</strong> loads the dataset directly into the local motor memory. If you click <strong>"Save to Supabase"</strong>, the station is permanently registered in the official database (datos_mensuales) and will become available in the catalog under [ORIENTSOL].'
-                : 'Al pulsar <strong>«Aplicar Datos Manuales»</strong> los datos se inyectan de inmediato en la tarjeta activa para simular localmente. Si pulsas <strong>«Guardar en Supabase»</strong>, el emplazamiento se registra de forma persistente en la nube (tabla datos_mensuales) y pasará a formar parte del catálogo general bajo la etiqueta [ORIENTSOL].',
+                ? 'Clicking <strong>"Apply Manual Data"</strong> loads the dataset directly into the local calculation engine memory. If you click <strong>"Save to Supabase"</strong>, the station is permanently registered in the official database (datos_mensuales) and will become available in the catalog under [ORIENTSOL].'
+                : 'Al pulsar <strong>«Aplicar Datos Manuales»</strong> los datos se inyectan de inmediato en la tarjeta activa para simular con el motor de cálculo. Si pulsas <strong>«Guardar en Supabase»</strong>, el emplazamiento se registra de forma persistente en la nube (tabla datos_mensuales) y pasará a formar parte del catálogo general bajo la etiqueta [ORIENTSOL].',
             },
           ],
         };
@@ -139,7 +139,7 @@ export function openPedagogicalGuideModal(
           subtitle: isEn
             ? 'File formatting rules, multi-station batch structure, and direct in-tab calculation'
             : 'Estructura de archivos, procesamiento de lotes multi-estación y cálculo directo en pestaña',
-          badge: isEn ? 'Audit: 100% Didactic & Verified ✓' : 'Auditoría: 100% Didáctico y Verificado ✓',
+          badge: isEn ? 'Standard Digital Formats' : 'Formatos Digitales Normalizados',
           sections: [
             {
               heading: isEn ? '1. Supported File Formats (CSV & JSON)' : '1. Formatos Compatibles (CSV y JSON)',
@@ -172,8 +172,8 @@ export function openPedagogicalGuideModal(
             {
               heading: isEn ? '4. Direct In-Tab Calculation' : '4. Selección y Cálculo Directo en esta Misma Pestaña 3',
               content: isEn
-                ? 'You do NOT need to leave Tab 3 to simulate! Right after file upload or cloud saving, the station selector and quick-pills appear directly below the dropzone. Selecting any station updates the active table and allows immediate calculation with the Python motor in the bottom bar.'
-                : '¡No necesitas abandonar la Pestaña 3 para calcular! Inmediatamente tras cargar el archivo o sincronizarlo con la nube, el selector de texto y las píldoras interactivas se muestran aquí mismo. Al elegir cualquier emplazamiento, se actualiza la tarjeta activa y puedes pulsar directamente «Ejecutar en Motor Python (Pyodide)» en la barra inferior.',
+                ? 'You do NOT need to leave Tab 3 to simulate! Right after file upload or cloud saving, the station selector and quick-pills appear directly below the dropzone. Selecting any station updates the active table and allows immediate calculation with the calculation engine in the bottom bar.'
+                : '¡No necesitas abandonar la Pestaña 3 para calcular! Inmediatamente tras cargar el archivo o sincronizarlo con la nube, el selector de texto y las píldoras interactivas se muestran aquí mismo. Al elegir cualquier emplazamiento, se actualiza la tarjeta activa y puedes pulsar directamente «Ejecutar Motor de Cálculo» en la barra inferior.',
             },
           ],
         };

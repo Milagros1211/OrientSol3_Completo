@@ -56,7 +56,7 @@ export const en: Translations = {
   },
   hybridLoader: {
     title: 'Hybrid Architecture & Dual Climate Ingestion',
-    subtitle: 'Query OrientSol 4.0 Historical Database, enter monthly data manually, or upload digital documents (CSV / JSON) to feed the Python calculation engine.',
+    subtitle: 'Query OrientSol 4.0 Historical Database, enter monthly data manually, or upload digital documents (CSV / JSON) to feed the calculation engine.',
     tabHistorical: '1. Official Catalog (114 Stations)',
     tabManual: '2. Manual Entry (Step-by-Step Form)',
     tabUpload: '3. Import File (CSV / JSON)',
@@ -77,11 +77,11 @@ export const en: Translations = {
     prLabel: 'PR (Performance Ratio)',
     albedoLabel: 'Albedo (ρ)',
     toncLabel: 'NOCT / TONC [°C]',
-    runSimulationBtn: 'Run in Python Engine (Pyodide)',
-    runningSimulationBtn: 'Computing in Pyodide...',
+    runSimulationBtn: 'Run Calculation Engine',
+    runningSimulationBtn: 'Computing results...',
   },
   results: {
-    pythonSuccess: '✓ Python Mathematical Engine (NumPy)',
+    pythonSuccess: '✓ Solar Calculation Engine',
     resultsFor: 'OrientSol 4.0 Results: {location} (Lat: {lat}°)',
     // Temperatures
     tempMeanAnnual: 'Annual Mean Temp.',

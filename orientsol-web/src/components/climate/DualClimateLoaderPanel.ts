@@ -153,22 +153,16 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             </svg>
             <span>${isEn ? 'Pedagogical Guide: How to select and explore official catalog stations?' : 'Guía Didáctica: ¿Cómo seleccionar y qué representa una estación del catálogo oficial?'}</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 0.45rem;">
-            <span class="pedagogical-audit-badge">${isEn ? 'Audit: 100% Didactic ✓' : 'Auditoría: 100% Pedagógico ✓'}</span>
-            <button type="button" class="btn-pedagogical-guide" data-pedagogical-tab="historical">
-              <span>${isEn ? 'ℹ View Full Didactic Guide' : 'ℹ Ver Guía Didáctica y Metodología'}</span>
-            </button>
-          </div>
+          <button type="button" class="btn-pedagogical-guide" data-pedagogical-tab="historical">
+            <span>${isEn ? 'ℹ View Full Didactic Guide' : 'ℹ Ver Guía Didáctica y Metodología'}</span>
+          </button>
         </div>
         <ol class="tab-instruction-steps">
           <li>${isEn 
-            ? '<strong>Canonical Meteorological Source:</strong> The catalog gathers 114 benchmark stations derived from the Official Solar Radiation Atlas of Spain (AEMET/CEDEX) and verified ground measurement campaigns.' 
-            : '<strong>Base Meteorológica Normalizada:</strong> El catálogo integra 114 estaciones de referencia obtenidas del Atlas de Radiación Solar oficial (AEMET/CEDEX) y series radiométricas terrestres de alta precisión.'}</li>
-          <li>${isEn 
-            ? '<strong>Assisted Location Search:</strong> Type any city or province name in the search box below (e.g., <em>Jaén</em>, <em>Madrid</em>, <em>Sevilla</em>) to view live matches.' 
+            ? '<strong>Assisted Location Search:</strong> Type any city or province name in the search box below (e.g., <em>Jaén</em>, <em>Madrid</em>, <em>Sevilla</em>) to view live matches and click <strong>"Select Station"</strong>.' 
             : '<strong>Búsqueda Inteligente de Emplazamiento:</strong> Escribe el nombre de tu ciudad o provincia (ej. <em>Jaén</em>, <em>Madrid</em>, <em>Sevilla</em>) en el buscador y selecciona el resultado del desplegable o pulsa <strong>«Seleccionar Estación»</strong>.'}</li>
           <li>${isEn 
-            ? '<strong>Physical Variables Injected:</strong> Loads the 12-month global horizontal irradiation vector G<sub>dm</sub>(0) [kWh/m²·day] and ambient temperature T<sub>amb</sub> [°C] to feed the solar engine.' 
+            ? '<strong>Physical Variables Injected:</strong> Loads the 12-month global horizontal irradiation vector G<sub>dm</sub>(0) [kWh/m²·day] and ambient temperature T<sub>amb</sub> [°C] to feed the calculation engine.' 
             : '<strong>Variables Físicas Inyectadas:</strong> Carga de forma instantánea los 12 meses de irradiación diaria media sobre plano horizontal G<sub>dm</sub>(0) [kWh/m²·día] y temperatura media T<sub>amb</sub> [°C] para simular.'}</li>
           <li>${isEn 
             ? '<strong>Data Origin Identification:</strong> Stations tagged <code>[ORIENTSOL]</code> are verified official cloud records; stations tagged <code>[LOCAL CACHE]</code> are personal user-uploaded files.' 
@@ -181,7 +175,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
               ? 'G<sub>dm</sub>(0) is the monthly mean daily solar energy on horizontal ground. T<sub>amb</sub> governs the thermal loss of photovoltaic modules via the NOCT model.'
               : 'G<sub>dm</sub>(0) es la irradiación solar global diaria en plano horizontal. T<sub>amb</sub> determina las pérdidas por calentamiento de las células fotovoltaicas según el modelo TONC/NOCT.'}
           </span>
-          <span style="font-weight: 700; color: #059669;">${isEn ? 'Direct link to Python motor below' : 'Alimenta directamente el motor Python inferior'}</span>
+          <span style="font-weight: 700; color: #059669;">${isEn ? 'Direct link to calculation engine below' : 'Alimenta directamente el motor de cálculo inferior'}</span>
         </div>
       </div>
       <div class="historical-search-row">
@@ -230,12 +224,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             </svg>
             <span>${isEn ? 'Pedagogical Guide: Custom manual entry, solar geometry & albedo' : 'Guía Didáctica: Entrada Manual, Geometría Solar y Física del Albedo'}</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 0.45rem;">
-            <span class="pedagogical-audit-badge">${isEn ? 'Audit: 100% Didactic ✓' : 'Auditoría: 100% Pedagógico ✓'}</span>
-            <button type="button" class="btn-pedagogical-guide" data-pedagogical-tab="manual">
-              <span>${isEn ? 'ℹ View Full Didactic Guide' : 'ℹ Ver Guía Didáctica: Albedo y Rangos'}</span>
-            </button>
-          </div>
+          <button type="button" class="btn-pedagogical-guide" data-pedagogical-tab="manual">
+            <span>${isEn ? 'ℹ View Full Didactic Guide' : 'ℹ Ver Guía Didáctica: Albedo y Rangos'}</span>
+          </button>
         </div>
         <ol class="tab-instruction-steps">
           <li>${isEn 
@@ -356,12 +347,9 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             </svg>
             <span>${isEn ? 'Pedagogical Guide: Digital file import, formats & direct in-tab calculation' : 'Guía Didáctica: Importación Digital CSV/JSON, Formatos y Cálculo Directo'}</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 0.45rem;">
-            <span class="pedagogical-audit-badge">${isEn ? 'Audit: 100% Didactic ✓' : 'Auditoría: 100% Pedagógico ✓'}</span>
-            <button type="button" class="btn-pedagogical-guide" data-pedagogical-tab="upload">
-              <span>${isEn ? 'ℹ View Full Didactic Guide' : 'ℹ Ver Guía Didáctica: Archivos y Cálculo'}</span>
-            </button>
-          </div>
+          <button type="button" class="btn-pedagogical-guide" data-pedagogical-tab="upload">
+            <span>${isEn ? 'ℹ View Full Didactic Guide' : 'ℹ Ver Guía Didáctica: Archivos y Cálculo'}</span>
+          </button>
         </div>
         <ol class="tab-instruction-steps">
           <li>${isEn 
@@ -374,8 +362,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             ? '<strong>Dual Storage Pipeline:</strong> Uploaded stations are immediately cached locally (offline-ready). Clicking <strong>"Upload to Database"</strong> syncs them securely to Supabase (online mode).' 
             : '<strong>Almacenamiento Dual (Caché Local + Nube DB):</strong> Los datos se guardan inmediatamente en caché local (listos offline). Al pulsar <strong>«Cargar a Base de Datos»</strong>, se sincronizan de forma segura con la nube de Supabase.'}</li>
           <li>${isEn 
-            ? '<strong>Direct In-Tab Selection & Calculation:</strong> No need to leave Tab 3! The station selector and interactive pills appear right below, allowing you to switch stations and simulate with Python (Pyodide) directly.' 
-            : '<strong>Selección y Simulación Directa en esta misma Pestaña 3:</strong> ¡No necesitas salir de esta pestaña! El selector y las píldoras de estaciones aparecen justo abajo para elegir cualquier emplazamiento y ejecutar cálculos con Pyodide de inmediato.'}</li>
+            ? '<strong>Direct In-Tab Selection & Calculation:</strong> No need to leave Tab 3! The station selector and interactive pills appear right below, allowing you to switch stations and calculate directly.' 
+            : '<strong>Selección y Simulación Directa en esta misma Pestaña 3:</strong> ¡No necesitas salir de esta pestaña! El selector y las píldoras de estaciones aparecen justo abajo para elegir cualquier emplazamiento y ejecutar el motor de cálculo de inmediato.'}</li>
         </ol>
         <div class="pedagogical-concept-card">
           <span>

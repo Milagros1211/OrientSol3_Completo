@@ -56,7 +56,7 @@ export const es: Translations = {
   },
   hybridLoader: {
     title: 'Arquitectura Híbrida & Carga Dual de Climatología',
-    subtitle: 'Consulta la Base Histórica OrientSol 4.0, introduce datos manualmente mes a mes, o sube documentos digitales (CSV / JSON) para alimentar el motor de cálculo Python.',
+    subtitle: 'Consulta la Base Histórica OrientSol 4.0, introduce datos manualmente mes a mes, o sube documentos digitales (CSV / JSON) para alimentar el motor de cálculo.',
     tabHistorical: '1. Catálogo Oficial (114 Estaciones)',
     tabManual: '2. Entrada Manual (Formulario Paso a Paso)',
     tabUpload: '3. Importar Archivo (CSV / JSON)',
@@ -77,11 +77,11 @@ export const es: Translations = {
     prLabel: 'PR (Performance Ratio)',
     albedoLabel: 'Albedo (ρ)',
     toncLabel: 'TONC / NOCT [°C]',
-    runSimulationBtn: 'Ejecutar en Motor Python (Pyodide)',
-    runningSimulationBtn: 'Calculando en Pyodide...',
+    runSimulationBtn: 'Ejecutar Motor de Cálculo',
+    runningSimulationBtn: 'Calculando resultados...',
   },
   results: {
-    pythonSuccess: '✓ Motor Matemático Python (NumPy)',
+    pythonSuccess: '✓ Motor de Cálculo Solar',
     resultsFor: 'Resultados OrientSol 4.0: {location} (Lat: {lat}°)',
     // Temperatures
     tempMeanAnnual: 'Temp. Media Anual',
