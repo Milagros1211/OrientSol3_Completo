@@ -1,7 +1,7 @@
 /**
  * OrientSol 4.0 - Pedagogical Guide Modal
- * Provides in-depth, didactic explanations and pedagogical audit verdicts
- * for the 3 climate tabs (Official Catalog, Manual Entry, and File Import).
+ * Provides in-depth, didactic explanations and theoretical guidance
+ * for all 4 climate ingestion tabs (Official Catalog, Manual Entry, File Import, and Satellite APIs).
  */
 
 import { escapeHtml } from '@/utils/security';
@@ -10,7 +10,7 @@ import { themeManager } from '@/services/theme/themeManager';
 let activePedagogicalModalEl: HTMLElement | null = null;
 
 export function openPedagogicalGuideModal(
-  tabKey: 'historical' | 'manual' | 'upload',
+  tabKey: 'historical' | 'manual' | 'upload' | 'api',
   isEn: boolean = false
 ): void {
   if (activePedagogicalModalEl) {
@@ -28,26 +28,20 @@ export function openPedagogicalGuideModal(
       case 'historical':
         return {
           title: isEn
-            ? 'Pedagogical Guide: Official Catalog & Data Provenance'
-            : 'Guía Didáctica: Catálogo Oficial (114 Estaciones) y Origen de Datos',
+            ? 'Pedagogical Guide: Official Catalog & Climate Variables'
+            : 'Guía Didáctica: Catálogo Oficial (114 Estaciones) y Variables Físicas',
           subtitle: isEn
             ? 'Scientific methodology, physical meaning, and practical guidance for official meteorological records'
             : 'Metodología científica, significado físico y guía práctica de los registros oficiales',
           badge: isEn ? 'Official Benchmark Catalog' : 'Catálogo Oficial de Referencia',
           sections: [
             {
-              heading: isEn ? '1. Provenance of Official Climate Records' : '1. Procedencia de los Registros Climáticos Oficiales',
-              content: isEn
-                ? 'The OrientSol official catalog contains 114 reference stations across Spain and regions of Latin America. These records are normalized from the Official Solar Radiation Atlas of Spain (AEMET/CEDEX) and multi-year homogenized ground radiometric campaigns. They represent the official meteorological benchmark for photovoltaic and solar thermal feasibility studies.'
-                : 'El catálogo oficial de OrientSol integra 114 estaciones de referencia distribuidas por la península ibérica, archipiélagos y regiones de Iberoamérica. Proceden de los datos normalizados del Atlas de Radiación Solar de España (AEMET/CEDEX) y series multianuales de estaciones radiométricas terrestres. Constituyen la base oficial de referencia para el cálculo de instalaciones solares según el CTE (Código Técnico de la Edificación).',
-            },
-            {
-              heading: isEn ? '2. Physical Variables Explained' : '2. Variables Físicas Clave en Cada Registro',
+              heading: isEn ? '1. Key Physical Variables in Each Record' : '1. Variables Físicas Clave en Cada Registro',
               content: isEn
                 ? `<ul style="margin: 0; padding-left: 1.15rem; line-height: 1.6;">
                     <li><strong>G<sub>dm</sub>(0) [kWh/m²·day]:</strong> Monthly average daily global solar irradiation received on a horizontal surface. It accounts for both direct sunlight and atmospheric diffuse radiation.</li>
                     <li><strong>T<sub>amb</sub> [°C]:</strong> Monthly average 24-hour ambient dry-bulb temperature, used by the PV temperature derating model (NOCT / TONC).</li>
-                    <li><strong>Latitude & Longitude:</strong> Precise geographic coordinates necessary for extraterrestrial solar geometry (declination &delta;, solar hour angle &omega;<sub>s</sub>, extraterrestrial radiation G<sub>0d</sub>).</li>
+                    <li><strong>Latitude & Longitude [°]:</strong> Precise geographic coordinates necessary for extraterrestrial solar geometry (declination &delta;, solar hour angle &omega;<sub>s</sub>, extraterrestrial radiation G<sub>0d</sub>).</li>
                   </ul>`
                 : `<ul style="margin: 0; padding-left: 1.15rem; line-height: 1.6;">
                     <li><strong>G<sub>dm</sub>(0) [kWh/m²·día]:</strong> Irradiación solar global media diaria sobre superficie horizontal para cada mes del año. Integra la radiación directa del disco solar y la difusa dispersada por la atmósfera.</li>
@@ -56,7 +50,7 @@ export function openPedagogicalGuideModal(
                   </ul>`,
             },
             {
-              heading: isEn ? '3. Understanding Tags: [ORIENTSOL] vs [LOCAL CACHE]' : '3. Significado de las Etiquetas: [ORIENTSOL] vs [CACHÉ LOCAL]',
+              heading: isEn ? '2. Understanding Tags: [ORIENTSOL] vs [LOCAL CACHE]' : '2. Significado de las Etiquetas: [ORIENTSOL] vs [CACHÉ LOCAL]',
               content: isEn
                 ? `<ul style="margin: 0; padding-left: 1.15rem; line-height: 1.6;">
                     <li><strong style="color: #0284c7;">[ORIENTSOL]:</strong> Stations hosted in the official cloud database (Supabase) or compiled in the core canonical catalog. Fully verified and shared.</li>
@@ -68,7 +62,7 @@ export function openPedagogicalGuideModal(
                   </ul>`,
             },
             {
-              heading: isEn ? '4. Step-by-Step Simulation Flow' : '4. Flujo Didáctico para Simular',
+              heading: isEn ? '3. Step-by-Step Simulation Flow' : '3. Flujo Didáctico para Simular',
               content: isEn
                 ? 'Type your city name in the search box, click on the dropdown match or press "Select Station". The 12-month table updates instantly below. Then, adjust your system parameters (Peak Power, PR, Albedo) and click <strong>"Run Calculation Engine"</strong> to compute the optimal tilt and monthly energy yield.'
                 : 'Escribe el nombre de tu ciudad en el buscador asistido, selecciona el resultado en la lista desplegable o pulsa «Seleccionar Estación». La tabla de 12 meses se actualizará de inmediato. Ajusta los parámetros del generador fotovoltaico (Potencia Pico, PR, Albedo) y haz clic en <strong>«Ejecutar Motor de Cálculo»</strong> para obtener la inclinación óptima y la energía producida.',
@@ -137,8 +131,8 @@ export function openPedagogicalGuideModal(
             ? 'Pedagogical Guide: Digital File Import, Formats & Dual Sync'
             : 'Guía Didáctica: Importación Digital CSV/JSON y Sincronización Dual',
           subtitle: isEn
-            ? 'File formatting rules, multi-station batch structure, and direct in-tab calculation'
-            : 'Estructura de archivos, procesamiento de lotes multi-estación y cálculo directo en pestaña',
+            ? 'File formatting rules, multi-station batch structure, and direct in-place calculation'
+            : 'Estructura de archivos, procesamiento de lotes multi-estación y cálculo directo in situ',
           badge: isEn ? 'Standard Digital Formats' : 'Formatos Digitales Normalizados',
           sections: [
             {
@@ -170,10 +164,55 @@ export function openPedagogicalGuideModal(
                 : 'Si tu archivo contiene múltiples emplazamientos en un solo documento (ej. un lote con Arequipa, Cusco y Piura), OrientSol los procesará y validará todos en bloque. Aparecerán botones (pills) de selección rápida para alternar entre estaciones con un solo clic.',
             },
             {
-              heading: isEn ? '4. Direct In-Tab Calculation' : '4. Selección y Cálculo Directo en esta Misma Pestaña 3',
+              heading: isEn ? '4. Instant Direct Selection & Simulation' : '4. Selección Inmediata y Simulación Directa In Situ',
               content: isEn
-                ? 'You do NOT need to leave Tab 3 to simulate! Right after file upload or cloud saving, the station selector and quick-pills appear directly below the dropzone. Selecting any station updates the active table and allows immediate calculation with the calculation engine in the bottom bar.'
-                : '¡No necesitas abandonar la Pestaña 3 para calcular! Inmediatamente tras cargar el archivo o sincronizarlo con la nube, el selector de texto y las píldoras interactivas se muestran aquí mismo. Al elegir cualquier emplazamiento, se actualiza la tarjeta activa y puedes pulsar directamente «Ejecutar Motor de Cálculo» en la barra inferior.',
+                ? 'No need to leave this section to calculate! The station selector and interactive quick-pills appear directly below the dropzone. Selecting any station instantly updates the active dataset, allowing you to run the calculation engine on the spot.'
+                : '¡Puedes calcular directamente sin necesidad de cambiar de sección! Inmediatamente tras cargar o sincronizar tu archivo, el selector de texto y las píldoras interactivas aparecen aquí mismo. Al elegir cualquier emplazamiento, se actualiza la tarjeta activa y puedes pulsar directamente «Ejecutar Motor de Cálculo» en la barra inferior.',
+            },
+          ],
+        };
+
+      case 'api':
+        return {
+          title: isEn
+            ? 'Pedagogical Guide: Satellite Solar Databases (PVGIS, NASA & Open-Meteo)'
+            : 'Guía Didáctica: Redes Satelitales y Reanálisis (PVGIS, NASA y Open-Meteo)',
+          subtitle: isEn
+            ? 'Atmospheric radiative transfer models, orbital sensors, and global solar exploration'
+            : 'Modelos de transferencia radiativa, sensores orbitales y exploración solar global',
+          badge: isEn ? 'Global Satellite Networks' : 'Redes Satelitales Globales',
+          sections: [
+            {
+              heading: isEn ? '1. Understanding Satellite Radiometric Networks' : '1. Fundamento de las Redes Satelitales Disponibles',
+              content: isEn
+                ? `<ul style="margin: 0; padding-left: 1.15rem; line-height: 1.6;">
+                    <li><strong>PVGIS 5.3 (EU Joint Research Centre):</strong> Highly accurate solar radiation database for Europe, Africa, parts of Asia and the Americas, primarily based on geostationary Meteosat SARAH2/SARAH3 and CMSAF sensors.</li>
+                    <li><strong>NASA POWER:</strong> Global coverage from the NASA Langley Research Center, combining satellite observations (CERES, MODIS) with Goddard Earth Observing System (GEOS) models.</li>
+                    <li><strong>Open-Meteo (ECMWF ERA5):</strong> State-of-the-art climate reanalysis combining atmospheric physics with millions of worldwide observations, providing continuous hourly and monthly means.</li>
+                  </ul>`
+                : `<ul style="margin: 0; padding-left: 1.15rem; line-height: 1.6;">
+                    <li><strong>PVGIS 5.3 (Comisión Europea - JRC):</strong> Estándar europeo de referencia para energía solar. Emplea las bases satelitales SARAH/SARAH2 y modelos CMSAF sobre satélites geoestacionarios Meteosat, con altísima fidelidad en Europa, África y América.</li>
+                    <li><strong>NASA POWER (NASA Langley Research Center):</strong> Cobertura global integral basada en sensores orbitales (CERES, MODIS) combinados con modelos de asimilación atmosférica GEOS de la NASA.</li>
+                    <li><strong>Open-Meteo (ECMWF ERA5 Reanálisis):</strong> El reanálisis meteorológico más avanzado del Centro Europeo de Previsiones Meteorológicas, con malla global física continua.</li>
+                  </ul>`,
+            },
+            {
+              heading: isEn ? '2. How Satellites Measure Ground Radiation' : '2. ¿Cómo miden la radiación solar los satélites espaciales?',
+              content: isEn
+                ? 'Geostationary satellites do not carry pyranometers on the ground; instead, optical and infrared radiometers measure the solar reflectance (albedo) of clouds and aerosols. Radiative transfer algorithms compute atmospheric absorption and cloud optical depth to calculate the exact global horizontal irradiance G<sub>dm</sub>(0) reaching ground level. This provides solar data anywhere on Earth, including offshore and remote locations.'
+                : 'Los satélites geoestacionarios no disponen de piranómetros en la superficie; en su lugar, sus radiómetros ópticos e infrarrojos miden la reflectividad de las nubes y aerosoles en el tope de la atmósfera. Mediante modelos matemáticos de transferencia radiativa (como el modelo Heliosat), el sistema deduce la atenuación de la luz y calcula con precisión la radiación global en plano horizontal G<sub>dm</sub>(0) que alcanza el suelo. Esto permite diseñar sistemas fotovoltaicos en islas, desiertos o zonas rurales sin estaciones terrestres.',
+            },
+            {
+              heading: isEn ? '3. Step-by-Step Satellite Query Flow' : '3. Flujo Práctico de Consulta e Ingesta',
+              content: isEn
+                ? 'Select your preferred data source, pick a preset city or enter custom Latitude and Longitude. Press <strong>"Fetch Satellite Climate"</strong> to download the 12-month series through our secure edge proxy. The results immediately feed the active table for calculations. Press <strong>"Save to Supabase"</strong> to store it in the cloud catalog under [ORIENTSOL].'
+                : 'Selecciona el proveedor satelital deseado, elige una ciudad predefinida o introduce las coordenadas exactas de tu proyecto. Pulsa <strong>«Consultar Climatología»</strong> para descargar la serie mensual mediante el proxy seguro. Los datos alimentan de inmediato la tarjeta activa para simular con el motor de cálculo. Pulsa <strong>«Guardar en Supabase»</strong> para conservarlo en la nube bajo la etiqueta [ORIENTSOL].',
+            },
+            {
+              heading: isEn ? '4. Connectivity & Operational Limits' : '4. Conexión a Internet y Seguridad de Acceso',
+              content: isEn
+                ? 'Satellite API queries require an active Internet connection to contact European and American space servers. When working offline, use the Official Catalog, the Manual Form, or previously cached files.'
+                : 'La consulta satelital requiere conexión a Internet para enlazar con los centros de datos de la Comisión Europea y la NASA. Si estás en campo sin cobertura, puedes utilizar el Catálogo Oficial, la Entrada Manual o tus archivos locales previamente guardados.',
             },
           ],
         };
@@ -198,7 +237,7 @@ export function openPedagogicalGuideModal(
               <h3 id="pedagogical-modal-title" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--text-main, #0f172a);">
                 ${escapeHtml(data.title)}
               </h3>
-              <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px;">
+              <span class="badge" style="background: rgba(2, 132, 199, 0.15); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.3); font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 9999px;">
                 ${escapeHtml(data.badge)}
               </span>
             </div>
@@ -231,13 +270,7 @@ export function openPedagogicalGuideModal(
       </div>
 
       <!-- Footer -->
-      <div class="modal-footer" style="padding: 0.85rem 1.4rem; border-top: 1px solid var(--border-subtle, #cbd5e1); background: var(--bg-card, #ffffff); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
-        <span style="font-size: 0.72rem; color: var(--text-muted, #64748b); display: flex; align-items: center; gap: 0.35rem;">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#10b981" stroke-width="2">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          ${isEn ? 'Pedagogical Quality Assured for University Defense (TFM)' : 'Calidad pedagógica auditada para defensa de tribunal de TFM'}
-        </span>
+      <div class="modal-footer" style="padding: 0.85rem 1.4rem; border-top: 1px solid var(--border-subtle, #cbd5e1); background: var(--bg-card, #ffffff); display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; flex-wrap: wrap;">
         <button type="button" class="btn btn-primary btn-close-pedagogical" style="padding: 0.4rem 1.1rem; font-size: 0.82rem; font-weight: 700; border-radius: 8px;">
           ${isEn ? 'Understood' : 'Entendido'}
         </button>

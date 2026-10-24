@@ -362,8 +362,8 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
             ? '<strong>Dual Storage Pipeline:</strong> Uploaded stations are immediately cached locally (offline-ready). Clicking <strong>"Upload to Database"</strong> syncs them securely to Supabase (online mode).' 
             : '<strong>Almacenamiento Dual (Caché Local + Nube DB):</strong> Los datos se guardan inmediatamente en caché local (listos offline). Al pulsar <strong>«Cargar a Base de Datos»</strong>, se sincronizan de forma segura con la nube de Supabase.'}</li>
           <li>${isEn 
-            ? '<strong>Direct In-Tab Selection & Calculation:</strong> No need to leave Tab 3! The station selector and interactive pills appear right below, allowing you to switch stations and calculate directly.' 
-            : '<strong>Selección y Simulación Directa en esta misma Pestaña 3:</strong> ¡No necesitas salir de esta pestaña! El selector y las píldoras de estaciones aparecen justo abajo para elegir cualquier emplazamiento y ejecutar el motor de cálculo de inmediato.'}</li>
+            ? '<strong>Direct In-Place Calculation:</strong> Calculate immediately without changing screens! The station selector and quick-access pills appear right below, allowing you to switch stations and run the calculation engine on the spot.' 
+            : '<strong>Selección y Simulación Directa In Situ:</strong> ¡Calcula de inmediato sin salir de esta sección! El selector y las píldoras de estaciones aparecen justo abajo para elegir cualquier emplazamiento y ejecutar el motor de cálculo en el acto.'}</li>
         </ol>
         <div class="pedagogical-concept-card">
           <span>
@@ -372,7 +372,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
               ? 'Upload a single file containing multiple cities (e.g., Arequipa, Cusco, Piura). Interactive pills let you calculate each station with a single click.'
               : 'Puedes subir un único archivo con varios emplazamientos a la vez (ej. Arequipa, Cusco, Piura). Las píldoras interactivas te permiten simular cada una con un solo clic.'}
           </span>
-          <span style="font-weight: 700; color: #059669;">${isEn ? 'Calculations directly inside Tab 3' : 'Cálculos directos dentro de la Pestaña 3'}</span>
+          <span style="font-weight: 700; color: #059669;">${isEn ? 'Direct in-place calculation' : 'Cálculos y simulación directa in situ'}</span>
         </div>
       </div>
       <div id="file-upload-permission-box">${renderSupabaseUploadBannerHtml(isEn)}</div>
@@ -461,19 +461,42 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
     <div id="tab-content-api" class="dual-tab-content ${cachedActiveTab === 'api' ? '' : 'hidden'}">
       <!-- Pedagogical Guide Banner: Tab 4 -->
       <div class="tab-instruction-banner">
-        <div class="tab-instruction-header">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
-          <span>${isEn ? 'How to query live satellite solar data worldwide?' : '¿Cómo obtener radiación satelital en cualquier lugar del mundo?'}</span>
+        <div class="tab-instruction-header" style="justify-content: space-between; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.45rem;">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>${isEn ? 'Pedagogical Guide: Global Satellite Climate Queries (PVGIS, NASA & Open-Meteo)' : 'Guía Didáctica: Consulta Satelital Global (PVGIS, NASA POWER y Open-Meteo)'}</span>
+          </div>
+          <button type="button" class="btn-pedagogical-guide" data-pedagogical-tab="api">
+            <span>${isEn ? 'ℹ View Full Didactic Guide' : 'ℹ Ver Guía Didáctica: Redes Satelitales'}</span>
+          </button>
         </div>
         <ol class="tab-instruction-steps">
-          <li>${isEn ? 'Choose the satellite source: <strong>PVGIS 5.3</strong> (European Commission JRC) or <strong>NASA POWER</strong> (Global coverage).' : 'Elige el servicio satelital: <strong>PVGIS 5.3</strong> (Comisión Europea JRC) o <strong>NASA POWER</strong> (cobertura global).'}</li>
-          <li>${isEn ? 'Pick a preset city or enter custom geographic coordinates (Latitude / Longitude) anywhere on Earth.' : 'Elige una ciudad de la lista o escribe tus propias coordenadas (Latitud / Longitud) en cualquier parte del planeta.'}</li>
-          <li>${isEn ? 'Click <strong>"Query Satellite Data"</strong>. The satellite API will fetch monthly solar radiation and temperature series in real time.' : 'Pulsa <strong>«Consultar Climatología»</strong> para descargar los datos solares vía satélite en tiempo real.'}</li>
+          <li>${isEn 
+            ? '<strong>Select Radiation Database:</strong> Choose between <strong>PVGIS 5.3</strong> (SARAH2 European Commission benchmark), <strong>NASA POWER</strong> (global satellite climatology), or <strong>Open-Meteo</strong> (ECMWF ERA5 reanalysis).' 
+            : '<strong>Selección de Red Radiométrica:</strong> Elige entre <strong>PVGIS 5.3</strong> (Comisión Europea JRC, base SARAH2 de alta resolución), <strong>NASA POWER</strong> (climatología satelital global) o <strong>Open-Meteo</strong> (reanálisis ECMWF ERA5).'}</li>
+          <li>${isEn 
+            ? '<strong>Geolocation by City or Coordinates:</strong> Choose a preset city or specify the exact Latitude and Longitude of any location worldwide.' 
+            : '<strong>Geolocalización por Ciudad o Coordenadas:</strong> Elige una ciudad predefinida o introduce la Latitud y Longitud exactas de cualquier punto del planeta.'}</li>
+          <li>${isEn 
+            ? '<strong>Automated 12-Month Ingestion:</strong> Click <strong>"Fetch Satellite Climate"</strong> to retrieve horizontal radiation G<sub>dm</sub>(0) and temperature T<sub>amb</sub> via secure edge proxy.' 
+            : '<strong>Descarga e Ingesta Automatizada:</strong> Pulsa <strong>«Consultar Climatología»</strong> para extraer los 12 meses de irradiación solar G<sub>dm</sub>(0) y temperatura T<sub>amb</sub> a través del proxy seguro.'}</li>
+          <li>${isEn 
+            ? '<strong>Direct Simulation & Cloud Backup:</strong> Active dataset updates on the spot to run calculations immediately; click <strong>"Save to Supabase"</strong> to register it in your cloud catalog under <code>[ORIENTSOL]</code>.' 
+            : '<strong>Simulación Inmediata y Guardado:</strong> La tarjeta activa se actualiza al instante para simular con el motor de cálculo; pulsa <strong>«Guardar en Supabase»</strong> para añadirlo a tu catálogo en la nube bajo <code>[ORIENTSOL]</code>.'}</li>
         </ol>
+        <div class="pedagogical-concept-card">
+          <span>
+            <strong style="color: #0284c7;">${isEn ? 'Satellite vs Ground Physics:' : 'Física Satelital vs Terrestre:'}</strong>
+            ${isEn
+              ? 'Satellite models estimate ground solar flux via atmospheric radiative transfer from geostationary orbit sensors. Ideal for locations lacking official ground pyranometers.'
+              : 'Los satélites geoestacionarios estiman la irradiancia terrestre midiendo el albedo de nubes y aerosoles con modelos de transferencia radiativa. Son idóneos para emplazamientos sin estaciones terrestres.'}
+          </span>
+          <span style="font-weight: 700; color: #059669;">${isEn ? 'Global planetary coverage' : 'Cobertura planetaria completa'}</span>
+        </div>
       </div>
       <div id="tab4-offline-alert" class="search-alert-box alert-warning-box ${isOnlineInit ? 'hidden' : ''}" style="margin-bottom: 1rem;">
         <div class="alert-icon-wrap">
