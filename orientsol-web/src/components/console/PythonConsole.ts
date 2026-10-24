@@ -1464,6 +1464,26 @@ export function renderPythonConsole(): HTMLElement {
           </div>
 
           <!-- COMPARISON DATA TABLE: ALL VARIABLES (SIMULATOR VS PVGIS SAME MOTOR) -->
+          <!-- EXPLICIT WMO VALIDATION PARAMETER BANNER -->
+          <div style="padding: 0.55rem 0.95rem; background: rgba(37, 99, 235, 0.06); border-top: 1px solid rgba(37, 99, 235, 0.2); border-bottom: 1px solid rgba(37, 99, 235, 0.2); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-size: 0.70rem; line-height: 1.45;">
+            <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; color: #ffffff; font-size: 0.68rem; font-weight: 800; flex-shrink: 0; margin-top: 0.1rem;">i</span>
+              <div>
+                <span style="color: var(--text-main);">
+                  <strong style="color: #2563eb;">${isEn ? 'Parameter Evaluated by "WMO-No. 8 Validation" Column:' : 'Parámetro evaluado en la columna «Validación Norma OMM Nº 8»:'}</strong>
+                  ${isEn
+                    ? 'Audits the monthly relative deviation of the <strong>Optimal Tilted Global Daily Irradiation G<sub>dm</sub>(β<sub>opt</sub>) [kWh/m²·d]</strong> between the OrientSol simulation and PVGIS-ERA5 satellite data: <code>|Gdm_OS(β_opt) - Gdm_PVGIS(β_opt)| / Gdm_PVGIS(β_opt) × 100</code>.'
+                    : 'Audita la desviación relativa mensual de la <strong>Irradiación Global Diaria sobre Plano Inclinado Óptimo G<sub>dm</sub>(β<sub>opt</sub>) [kWh/m²·d]</strong> entre la simulación OrientSol y el reanálisis satelital PVGIS-ERA5: <code>|G<sub>dm</sub><sup>OS</sup>(β<sub>opt</sub>) − G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>)| / G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>) × 100</code>.'}
+                </span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.63rem; flex-shrink: 0;">
+              <span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; padding: 0.12rem 0.38rem; border-radius: 4px; font-weight: 700;">✓ &le;5% Alta Precisión</span>
+              <span class="badge-status-valid" style="background: rgba(37,99,235,0.15); color:#2563eb; padding: 0.12rem 0.38rem; border-radius: 4px; font-weight: 700;">✓ &le;10% Norma OMM</span>
+              <span class="badge-status-valid" style="background: rgba(2,132,199,0.15); color:#0284c7; padding: 0.12rem 0.38rem; border-radius: 4px; font-weight: 700;">✓ &le;25% Var. Estacional</span>
+            </div>
+          </div>
+
           <div class="verif-table-wrap" style="overflow: visible !important; width: 100% !important; border: 1px solid var(--border-subtle); border-radius: 4px;">
             <table class="verif-data-table" style="width: 100% !important; max-width: 100% !important; table-layout: fixed !important; border-collapse: collapse; font-size: 0.65rem; margin: 0;">
               <thead>
@@ -1487,8 +1507,9 @@ export function renderPythonConsole(): HTMLElement {
                   <th style="width: 14%; text-align: center; padding: 0.35rem 0.1rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.60rem;">
                     ${isEn ? 'Gain vs Horiz (%)<br/>Sim vs PVGIS [Δ]' : 'Ganancia s/ Horiz (%)<br/>Sim vs PVGIS [Δ]'}
                   </th>
-                  <th style="width: 13%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;">
-                    ${isEn ? 'WMO-No. 8<br/>Validation' : 'Validación<br/>Norma OMM Nº 8'}
+                  <th style="width: 13%; text-align: center; padding: 0.35rem 0.12rem; white-space: normal !important; word-break: break-word !important; line-height: 1.15; font-size: 0.61rem;" title="${isEn ? 'Validates percentage relative error in Optimal Daily Irradiation Gdm(β_opt) against PVGIS under WMO-No. 8 criteria: |Gdm_OS - Gdm_PVGIS| / Gdm_PVGIS × 100' : 'Valida el error relativo porcentual en la Irradiación Diaria Óptima Gdm(β_opt) frente a PVGIS según la Norma OMM Nº 8: |Gdm_OS - Gdm_PVGIS| / Gdm_PVGIS × 100'}">
+                    <div style="font-weight: 800; color: #2563eb;">${isEn ? 'WMO-No. 8<br/>Validation' : 'Validación<br/>Norma OMM Nº 8'}</div>
+                    <div style="font-size: 0.54rem; color: #059669; font-weight: 700; margin-top: 0.1rem; line-height: 1;">[s/ G<sub>dm</sub>(&beta;<sub>opt</sub>)]</div>
                   </th>
                 </tr>
               </thead>
@@ -1496,13 +1517,13 @@ export function renderPythonConsole(): HTMLElement {
                 ${pvgisRows.map((r) => {
                   let ratingBadge = '';
                   if (r.absDiffOptPct <= 5.0) {
-                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(16,185,129,0.12); color:#059669; border: 1px solid rgba(16,185,129,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'WMO High precision / Secondary standard agreement (<= 5%)' : 'Conforme OMM Alta Precisión (<= 5%)'}">✓ OMM (&lt;5%)</span>`;
+                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(16,185,129,0.12); color:#059669; border: 1px solid rgba(16,185,129,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation <= 5%: High precision WMO Class 1 / Secondary Standard pyranometer' : 'Desviación en Gdm(β_opt) <= 5%: Conforme OMM Alta Precisión (Estándar Secundario)'}">✓ OMM (&lt;5%)</span>`;
                   } else if (r.absDiffOptPct <= 10.0) {
-                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(37,99,235,0.12); color:#2563eb; border: 1px solid rgba(37,99,235,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Within WMO-No. 8 First Class pyranometer uncertainty band (<= 10%)' : 'Dentro de la incertidumbre instrumental de la Norma OMM Nº 8 (<= 10%)'}">✓ OMM (&lt;10%)</span>`;
+                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(37,99,235,0.12); color:#2563eb; border: 1px solid rgba(37,99,235,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation <= 10%: WMO-No. 8 Standard (First Class operational pyranometer network)' : 'Desviación en Gdm(β_opt) <= 10%: Norma OMM Nº 8 Estándar (Red operacional Primera Clase)'}">✓ OMM (&lt;10%)</span>`;
                   } else if (r.absDiffOptPct <= 25.0) {
-                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(2,132,199,0.12); color:#0284c7; border: 1px solid rgba(2,132,199,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Admissible seasonal variability (<= 25%)' : 'Variabilidad estacional admisible OMM (<= 25%)'}">✓ Var. Estacional</span>`;
+                    ratingBadge = `<span class="badge-status-valid" style="background: rgba(2,132,199,0.12); color:#0284c7; border: 1px solid rgba(2,132,199,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation <= 25%: Admissible seasonal transition variability (spring/autumn interannual cloudiness)' : 'Desviación en Gdm(β_opt) <= 25%: Variabilidad estacional admisible OMM (meses de transición y nubosidad interanual)'}">✓ Var. Estacional</span>`;
                   } else {
-                    ratingBadge = `<span class="badge-status-warn" style="background: rgba(217,119,6,0.12); color:#d97706; border: 1px solid rgba(217,119,6,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Exceeds standard meteorological uncertainty' : 'Supera la tolerancia meteorológica estándar'}">&gt;25% OMM</span>`;
+                    ratingBadge = `<span class="badge-status-warn" style="background: rgba(217,119,6,0.12); color:#d97706; border: 1px solid rgba(217,119,6,0.3); font-size: 0.58rem; padding: 0.1rem 0.2rem; border-radius: 4px; display: inline-block; white-space: normal !important; word-break: break-word !important; line-height: 1.1;" title="${isEn ? 'Gdm(β_opt) deviation > 25%: Exceeds standard meteorological uncertainty' : 'Desviación en Gdm(β_opt) > 25%: Supera la tolerancia meteorológica estándar'}">&gt;25% OMM</span>`;
                   }
 
                   return `
@@ -1780,15 +1801,28 @@ export function renderPythonConsole(): HTMLElement {
             ` : ''}
 
             <!-- WMO Calibration Legend & Defense Justification -->
-            <div style="margin-top: 0.75rem; padding: 0.65rem; background: rgba(37, 99, 235, 0.04); border-radius: 6px; border: 1px solid rgba(37, 99, 235, 0.15);">
-              <div style="font-weight: 700; color: var(--text-main); margin-bottom: 0.35rem; font-size: 0.75rem;">
-                ${isEn ? 'WMO-No. 8 Standard Metrological Criteria Legend:' : 'Criterios Metrológicos de Calibración OMM Nº 8 (Guía de Instrumentos de la OMM):'}
+            <div style="margin-top: 0.75rem; padding: 0.75rem 0.85rem; background: rgba(37, 99, 235, 0.04); border-radius: 6px; border: 1px solid rgba(37, 99, 235, 0.18);">
+              <div style="font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem; font-size: 0.76rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem;">
+                <span>
+                  <strong style="color: #2563eb;">${isEn ? 'WMO-No. 8 Standard Metrological Criteria' : 'Criterios Metrológicos de Validación Norma OMM Nº 8'}</strong>
+                  <span style="font-weight: 600; color: var(--text-muted); font-size: 0.72rem;">${isEn ? '(Evaluated on Optimal Plane Irradiation Gdm(β_opt))' : '(Evaluación directa sobre Irradiación en Plano Óptimo G<sub>dm</sub>(β<sub>opt</sub>))'}</span>
+                </span>
+                <span style="font-size: 0.68rem; color: #059669; background: rgba(16, 185, 129, 0.12); padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700;">
+                  ${isEn ? 'World Meteorological Organization Guide No. 8' : 'Guía de Instrumentos y Métodos de Observación OMM Nº 8'}
+                </span>
               </div>
-              <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.72rem; color: var(--text-muted); line-height: 1.45;">
-                <li><strong style="color: #059669;">≤ 5% (${isEn ? 'WMO Class 1' : 'Conforme OMM Alta Precisión'}):</strong> ${isEn ? 'Concordance within Secondary Standard precision pyranometers.' : 'Concordancia dentro del margen de piranómetros de estándar secundario de alta precisión.'}</li>
-                <li><strong style="color: #2563eb;">≤ 10% (${isEn ? 'WMO Standard' : 'Norma OMM Nº 8'}):</strong> ${isEn ? 'Complies with operational First Class pyranometer network admissible uncertainty (±10%).' : 'Cumple con la incertidumbre admisible para redes operacionales de piranómetros de Primera Clase (±10%).'}</li>
-                <li><strong style="color: #0284c7;">≤ 25% (${isEn ? 'Seasonal Spread' : 'Var. Estacional OMM'}):</strong> ${isEn ? 'Admissible seasonal transition variability (e.g. April). Reflects natural interannual cloudiness dispersion (P50/P90) between ground sensors and PVGIS satellite reanalysis grids (±8% to ±12%).' : 'Variabilidad admisible en meses de transición estacional (ej. abril). Responde a la dispersión interanual natural de nubosidad (P50/P90) entre registros terrestres y mallas satelitales PVGIS (±8% a ±12%).'}</li>
-                <li><strong style="color: #d97706;">> 25% (${isEn ? 'Atypical Deviation' : 'Desviación Atípica'}):</strong> ${isEn ? 'Flagged only if exceeding international meteorological tolerances.' : 'Señalizado únicamente si excede las tolerancias meteorológicas internacionales.'}</li>
+
+              <div style="font-size: 0.71rem; color: var(--text-muted); margin-bottom: 0.45rem; line-height: 1.45;">
+                ${isEn
+                  ? 'The <strong>"WMO-No. 8 Validation"</strong> column benchmarks the accuracy of the optimal monthly solar irradiation calculated by OrientSol against satellite reanalysis data (PVGIS ERA5/SARAH3), verifying compliance with international meteorological tolerance envelopes based on: <code>|Gdm_OS(β_opt) - Gdm_PVGIS(β_opt)| / Gdm_PVGIS(β_opt) × 100</code>.'
+                  : 'La columna <strong>«Validación Norma OMM Nº 8»</strong> comprueba la precisión de la irradiación solar mensual óptima calculada por OrientSol frente a los datos de reanálisis satelital oficial (PVGIS ERA5/SARAH3), auditando el cumplimiento de los márgenes internacionales de tolerancia meteorológica mediante: <code>|G<sub>dm</sub><sup>OS</sup>(β<sub>opt</sub>) − G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>)| / G<sub>dm</sub><sup>PVGIS</sup>(β<sub>opt</sub>) × 100</code>.'}
+              </div>
+
+              <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.72rem; color: var(--text-muted); line-height: 1.55;">
+                <li><strong style="color: #059669;">≤ 5% (${isEn ? 'WMO Class 1 / High Precision' : 'Conforme OMM Alta Precisión'}):</strong> ${isEn ? 'Deviation in G<sub>dm</sub>(β<sub>opt</sub>) ≤ 5%. Concordance within Secondary Standard precision pyranometers (highest meteorological class).' : 'Desviación relativa en G<sub>dm</sub>(β<sub>opt</sub>) ≤ 5%. Concordancia dentro del margen de piranómetros de estándar secundario (máxima precisión instrumental de la OMM).'}</li>
+                <li><strong style="color: #2563eb;">≤ 10% (${isEn ? 'WMO-No. 8 Standard' : 'Norma OMM Nº 8 Estándar'}):</strong> ${isEn ? 'Deviation in G<sub>dm</sub>(β<sub>opt</sub>) ≤ 10%. Complies with operational First Class pyranometer network admissible uncertainty (±10%).' : 'Desviación relativa en G<sub>dm</sub>(β<sub>opt</sub>) ≤ 10%. Cumple con la incertidumbre admisible para redes operacionales de piranómetros de Primera Clase según la Norma OMM Nº 8 (±10%).'}</li>
+                <li><strong style="color: #0284c7;">≤ 25% (${isEn ? 'Seasonal Spread' : 'Var. Estacional OMM'}):</strong> ${isEn ? 'Deviation in G<sub>dm</sub>(β<sub>opt</sub>) between 10% and 25%. Admissible seasonal transition variability (e.g. spring/autumn). Reflects natural interannual cloudiness dispersion (P50/P90) between ground sensors and PVGIS satellite reanalysis grids (±8% to ±12%).' : 'Desviación en G<sub>dm</sub>(β<sub>opt</sub>) entre 10% y 25%. Variabilidad admisible en meses de transición estacional (primavera/otoño). Responde a la dispersión interanual natural de nubosidad (P50/P90) entre estaciones terrestres y mallas satelitales PVGIS (±8% a ±12%).'}</li>
+                <li><strong style="color: #d97706;">> 25% (${isEn ? 'Atypical Deviation' : 'Desviación Atípica'}):</strong> ${isEn ? 'Deviation in G<sub>dm</sub>(β<sub>opt</sub>) > 25%. Flagged only if exceeding international meteorological tolerances.' : 'Desviación en G<sub>dm</sub>(β<sub>opt</sub>) > 25%. Señalizado únicamente si excede las tolerancias meteorológicas internacionales.'}</li>
               </ul>
               <p style="margin-top: 0.5rem; margin-bottom: 0; font-size: 0.72rem; color: var(--text-dim);">
                 ${isEn
