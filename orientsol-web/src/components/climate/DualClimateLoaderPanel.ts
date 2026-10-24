@@ -22,7 +22,6 @@ import {
   attachSolarChartsEventListeners,
 } from '@/components/charts/SolarCharts';
 import { themeManager } from '@/services/theme/themeManager';
-import { copyReportToClipboard } from '@/components/export/reportExporter';
 import { getSurfaceDisplayName, getCategoryBadge } from '@/i18n/surfaceTranslations';
 import { pyodideService } from '@/services/pyodide';
 import {
@@ -2333,15 +2332,6 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
           </div>
           <h3>${escapeHtml(t.results.resultsFor.replace('{location}', res.locationName).replace('{lat}', formatNum(res.latitude, 2)))}</h3>
         </div>
-        <div class="results-export-actions">
-          <button id="btn-copy-summary" class="btn-export btn-export-copy" type="button" title="${t.results.exportCopyBtn}">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            <span id="copy-btn-label">${t.results.exportCopyBtn}</span>
-          </button>
-        </div>
       </div>
 
       <!-- 1. RESUMEN DE TEMPERATURAS AMBIENTE Y DE CÉLULA -->
@@ -2813,25 +2803,6 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       const liveVal = parseFloat(areaInput.value.replace(',', '.'));
       if (!isNaN(liveVal) && liveVal > 0) {
         applyAreaRecalculation(liveVal);
-      }
-    });
-
-    // Event Listeners for Summary Copy
-    const copyBtn = resultsContainer.querySelector<HTMLButtonElement>('#btn-copy-summary');
-    const copyLabel = resultsContainer.querySelector<HTMLSpanElement>('#copy-btn-label');
-
-    copyBtn?.addEventListener('click', async () => {
-      const ok = await copyReportToClipboard(res, {
-        peakPowerKw: parseFloat(simPeakKw.value.replace(',', '.')) || 5.0,
-        performanceRatio: parseFloat(simPr.value.replace(',', '.')) || 0.80,
-        isEn,
-      });
-      if (ok && copyLabel) {
-        const originalText = copyLabel.textContent;
-        copyLabel.textContent = t.results.exportCopied;
-        setTimeout(() => {
-          copyLabel.textContent = originalText;
-        }, 2500);
       }
     });
 

@@ -13,6 +13,16 @@ function renderTex(expr: string, displayMode: boolean = false): string {
   }
 }
 
+/**
+ * Parses inline math like \( \beta \) into rendered KaTeX
+ */
+function renderInlineMath(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/\\\\\((.*?)\\\\\)/g, (_, expr) => renderTex(expr, false))
+    .replace(/\\\((.*?)\\\)/g, (_, expr) => renderTex(expr, false));
+}
+
 export type SolarOperationType =
   | 'annual'
   | 'monthly'
@@ -47,13 +57,13 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           ? `Calculates the single, optimal fixed inclination angle β_optimal that maximizes total solar energy captured over the entire 365-day year at ${locationName} (φ = ${latStr}).`
           : `Calcula el ángulo de inclinación fijo único β_óptimo que maximiza la captación total de radiación solar acumulada a lo largo de los 365 días del año en ${locationName} (φ = ${latStr}).`,
         inputDescription: isEn
-          ? `<div style="display: flex; flex-direction: column; gap: 0.45rem;">
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
               <div><strong>Solar Radiation:</strong> Global horizontal vector ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·day].</div>
               <div><strong>Site Coordinates:</strong> Local latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
               <div><strong>Ground & Solar Day:</strong> Albedo ${renderTex('\\rho_{\\text{albedo}} = 0{,}20')} and Klein characteristic day ${renderTex('n_m')}.</div>
               <div><strong>Search Space:</strong> Discrete sweeping across 91 tilt angles ${renderTex('\\beta \\in [0^\\circ, 90^\\circ]')} (${renderTex('\\Delta\\beta = 1^\\circ')}).</div>
             </div>`
-          : `<div style="display: flex; flex-direction: column; gap: 0.45rem;">
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
               <div><strong>Radiación de Entrada:</strong> Vector mensual sobre horizontal ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·día].</div>
               <div><strong>Emplazamiento:</strong> Latitud geográfica local ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
               <div><strong>Entorno y Geometría:</strong> Albedo del suelo ${renderTex('\\rho_{\\text{albedo}} = 0{,}20')} y día medio de Klein ${renderTex('n_m')}.</div>
@@ -89,8 +99,16 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           }
         ],
         outputSummary: isEn
-          ? `Output: Single optimal fixed tilt ${renderTex('\\beta_{\\text{opt}}')}, 12 transposed monthly values ${renderTex('G_{dm}(\\beta)_m')}, and annual percentage gain balance.`
-          : `Resultado: Inclinación óptima anual fija ${renderTex('\\beta_{\\text{óptimo}}')}, irradiación mensual transpuesta ${renderTex('G_{dm}(\\beta)_m')} y balance de ganancia anual.`
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Optimal Inclination:</strong> Single fixed annual angle ${renderTex('\\beta_{\\text{opt}}')} for physical installation.</div>
+              <div><strong>Transposed Radiation:</strong> 12 monthly values ${renderTex('G_{dm}(\\beta)_m')} [kWh/m²·day].</div>
+              <div><strong>Energy Gain Balance:</strong> Relative percentage improvement over horizontal ground.</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Inclinación Óptima:</strong> Ángulo fijo único ${renderTex('\\beta_{\\text{óptimo}}')} para la fijación física de la estructura.</div>
+              <div><strong>Irradiación Transpuesta:</strong> Vector de 12 meses ${renderTex('G_{dm}(\\beta)_m')} [kWh/m²·día].</div>
+              <div><strong>Balance de Ganancia:</strong> Mejora porcentual relativa obtenida frente al plano horizontal.</div>
+            </div>`
       };
 
     case 'monthly':
@@ -103,8 +121,18 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           ? `Determines 12 distinct optimal tilt angles β_optimal(m), one for each individual month, adapting to seasonal solar elevation changes.`
           : `Determina 12 ángulos de inclinación óptimos independientes β_óptimo(m), uno para cada mes individual, adaptándose a la altura solar estacional.`,
         inputDescription: isEn
-          ? `<strong>Input Climatology Data:</strong> Monthly input radiation ${renderTex('G_{dm}(0)_m')}, latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}, and monthly declination ${renderTex('\\delta_m')}.`
-          : `<strong>Datos Climatológicos de Entrada (Input):</strong> Radiación mensual ${renderTex('G_{dm}(0)_m')}, latitud ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)} y declinación solar mensual ${renderTex('\\delta_m')}.`,
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Solar Radiation:</strong> Monthly horizontal vector ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·day].</div>
+              <div><strong>Site Coordinates:</strong> Geographic latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
+              <div><strong>Astronomical Declination:</strong> 12 monthly solar declination values ${renderTex('\\delta_m')}.</div>
+              <div><strong>Search Process:</strong> 12 independent discrete sweeps across ${renderTex('\\beta \\in [0^\\circ, 90^\\circ]')}.</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Radiación de Entrada:</strong> Vector mensual sobre horizontal ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·día].</div>
+              <div><strong>Coordenadas del Sitio:</strong> Latitud geográfica local ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
+              <div><strong>Declinación Astronómica:</strong> 12 valores de declinación solar mensual ${renderTex('\\delta_m')}.</div>
+              <div><strong>Búsqueda Desacoplada:</strong> 12 barridos independientes de inclinación en ${renderTex('\\beta \\in [0^\\circ, 90^\\circ]')}.</div>
+            </div>`,
         mathProcessTitle: isEn ? 'Mathematical Algorithm & Formulations:' : 'Procedimiento y Algoritmo Matemático:',
         mathSteps: [
           {
@@ -123,12 +151,23 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           },
           {
             label: isEn ? '3. Cumulative Monthly Optimized Annual Energy:' : '3. Energía Anual Acumulada con Ajuste Mensual:',
-            formula: 'E_{\\text{anual, mensual}} = \\sum_{m=1}^{12} G_{dm}(\\beta_{\\text{óptimo}, m})_m \\cdot N_{\\text{días}, m}'
+            formula: 'E_{\\text{anual, mensual}} = \\sum_{m=1}^{12} G_{dm}(\\beta_{\\text{óptimo}, m})_m \\cdot N_{\\text{días}, m}',
+            note: isEn
+              ? 'Annual total achieved with 12 monthly manual adjustments, reaching ~99% of single-axis tracking performance.'
+              : 'Total anual alcanzado con 12 correcciones manuales al año, logrando ~99% del potencial de un seguidor en un eje.'
           }
         ],
         outputSummary: isEn
-          ? 'Output: 12 specific optimal tilt angles and maximized monthly insolation profile.'
-          : 'Resultado: Vector de 12 ángulos óptimos mensuales y máxima captación estacional posible en superficie fija ajustable.'
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Monthly Optimal Tilt Vector:</strong> 12 independent angles ${renderTex('\\beta_{\\text{opt}, m}')} for seasonal structural readjustment.</div>
+              <div><strong>Maximized Monthly Insolation:</strong> Profile yielding peak daily energy in each month.</div>
+              <div><strong>Comparative Gain:</strong> Extra +3% to +6% energy yield over fixed annual tilt.</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Vector de Inclinaciones Óptimas:</strong> 12 ángulos independientes ${renderTex('\\beta_{\\text{óptimo}, m}')} para ajuste periódico.</div>
+              <div><strong>Máxima Captación Estacional:</strong> Perfil optimizado de energía diaria para cada mes del año.</div>
+              <div><strong>Ganancia Adicional:</strong> Entre +3% y +6% de irradiación extra respecto al ángulo fijo anual.</div>
+            </div>`
       };
 
     case 'seasonal':
@@ -141,8 +180,16 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           ? `Groups the 12 input months into seasonal periods S_k and computes the compromise optimal angle for each season.`
           : `Agrupa los 12 meses de entrada en bloques estacionales S_k y calcula la inclinación fija de compromiso óptima para cada periodo.`,
         inputDescription: isEn
-          ? `<strong>Input Climatology Data:</strong> Monthly radiation ${renderTex('G_{dm}(0)_m')}, latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}, and seasonal calendar definition.`
-          : `<strong>Datos Climatológicos de Entrada (Input):</strong> Radiación mensual ${renderTex('G_{dm}(0)_m')}, latitud ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)} y calendario de partición estacional.`,
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Solar Radiation:</strong> Monthly horizontal vector ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·day].</div>
+              <div><strong>Site Coordinates:</strong> Geographic latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
+              <div><strong>Calendar Grouping:</strong> 2 periods (Winter/Summer) or 4 periods (Winter, Spring/Autumn, Summer).</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Radiación de Entrada:</strong> Vector mensual sobre horizontal ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·día].</div>
+              <div><strong>Coordenadas:</strong> Latitud geográfica local ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
+              <div><strong>Partición de Calendario:</strong> 2 periodos (Invierno/Verano) o 4 periodos (Invierno, Equinoccios, Verano).</div>
+            </div>`,
         mathProcessTitle: isEn ? 'Mathematical Algorithm & Formulations:' : 'Procedimiento y Algoritmo Matemático:',
         mathSteps: [
           {
@@ -154,12 +201,21 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           },
           {
             label: isEn ? '2. Bi-Annual & Quad-Annual Rules:' : '2. Reglas Canónicas Semestrales y Trimestrales:',
-            formula: '\\begin{aligned} \\text{2 Posiciones (Inv / Ver):} &\\quad \\beta_{\\text{ver}} \\approx \\phi_{\\text{lat}} - 15^\\circ, \\quad \\beta_{\\text{inv}} \\approx \\phi_{\\text{lat}} + 15^\\circ \\\\[2pt] \\text{4 Posiciones (Estacionales):} &\\quad \\beta_{\\text{ver}} \\approx \\phi_{\\text{lat}} - 23{,}4^\\circ, \\quad \\beta_{\\text{inv}} \\approx \\phi_{\\text{lat}} + 23{,}4^\\circ, \\quad \\beta_{\\text{equinoccios}} \\approx \\phi_{\\text{lat}} \\end{aligned}'
+            formula: '\\begin{aligned} \\text{2 Posiciones (Inv / Ver):} &\\quad \\beta_{\\text{ver}} \\approx \\phi_{\\text{lat}} - 15^\\circ, \\quad \\beta_{\\text{inv}} \\approx \\phi_{\\text{lat}} + 15^\\circ \\\\[2pt] \\text{4 Posiciones (Estacionales):} &\\quad \\beta_{\\text{ver}} \\approx \\phi_{\\text{lat}} - 23{,}4^\\circ, \\quad \\beta_{\\text{inv}} \\approx \\phi_{\\text{lat}} + 23{,}4^\\circ, \\quad \\beta_{\\text{equinoccios}} \\approx \\phi_{\\text{lat}} \\end{aligned}',
+            note: isEn
+              ? 'Provides physical rule-of-thumb comparison against exact numeric optimization.'
+              : 'Permite contrastar la regla clásica empírica frente al óptimo numérico exacto.'
           }
         ],
         outputSummary: isEn
-          ? 'Output: 2 or 4 seasonal compromise angles with near-tracker performance at low maintenance cost.'
-          : 'Resultado: 2 o 4 ángulos estacionales de compromiso que captan ~95% del óptimo mensual sin coste de motorización continua.'
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Compromise Angles:</strong> 2 or 4 seasonal tilt positions capturing ~95% of monthly potential.</div>
+              <div><strong>Maintenance Efficiency:</strong> High yield gains without active motorization expenses.</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Ángulos de Compromiso:</strong> 2 o 4 posiciones estacionales que capturan ~95% del potencial mensual.</div>
+              <div><strong>Eficiencia Operativa:</strong> Incremento notable de generación sin incurrir en costes de motorización activa.</div>
+            </div>`
       };
 
     case 'polar':
@@ -172,8 +228,16 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           ? `Tracks the sun around an axis tilted at an angle equal to the local latitude φ, following the solar hour angle ω from East to West.`
           : `Sigue al sol girando sobre un eje orientado Norte-Sur e inclinado un ángulo igual a la latitud φ, rotando de Este a Oeste con el ángulo horario solar ω.`,
         inputDescription: isEn
-          ? `<strong>Input Climatology Data:</strong> Monthly beam ${renderTex('B_{dm}(0)_m')} and diffuse ${renderTex('D_{dm}(0)_m')} components, latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.`
-          : `<strong>Datos Climatológicos de Entrada (Input):</strong> Componentes directa ${renderTex('B_{dm}(0)_m')} y difusa ${renderTex('D_{dm}(0)_m')}, latitud geográfica ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.`,
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Direct Beam & Diffuse:</strong> Separated horizontal components ${renderTex('B_{dm}(0)_m')} and ${renderTex('D_{dm}(0)_m')}.</div>
+              <div><strong>Axis Geometry:</strong> Tilt aligned with latitude ${renderTex(`\\beta_{\\text{eje}} = \\phi_{\\text{lat}} = ${latStr}`)}.</div>
+              <div><strong>Rotation Law:</strong> Constant diurnal rate ${renderTex('\\omega(t) = 15^\\circ \\cdot (t - 12\\text{h})')}.</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Directa y Difusa:</strong> Componentes separadas ${renderTex('B_{dm}(0)_m')} y ${renderTex('D_{dm}(0)_m')} [kWh/m²·día].</div>
+              <div><strong>Geometría del Eje:</strong> Inclinación paralela al eje terrestre ${renderTex(`\\beta_{\\text{eje}} = \\phi_{\\text{lat}} = ${latStr}`)}.</div>
+              <div><strong>Cinemática de Giro:</strong> Velocidad angular solar ${renderTex('\\omega(t) = 15^\\circ \\cdot (t - 12\\text{h})')}.</div>
+            </div>`,
         mathProcessTitle: isEn ? 'Mathematical Algorithm & Formulations:' : 'Procedimiento y Algoritmo Matemático:',
         mathSteps: [
           {
@@ -193,8 +257,14 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           }
         ],
         outputSummary: isEn
-          ? 'Output: Very high annual energy gain (+25% to +35% over horizontal) with simple single-axis mechanism.'
-          : 'Resultado: Gran incremento de captación anual (+25% a +35% sobre plano horizontal) con un único grado de libertad mecánico.'
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Transposed Solar Yield:</strong> Polar tracked daily and annual energy vectors.</div>
+              <div><strong>Annual Gain:</strong> +25% to +35% boost over fixed horizontal surface with a single motor.</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Captación Transpuesta:</strong> Vector de irradiación diaria y energía anual sobre seguidor polar.</div>
+              <div><strong>Ganancia Anual:</strong> Incremento de +25% a +35% sobre plano horizontal con un solo motor.</div>
+            </div>`
       };
 
     case 'azimuthal':
@@ -207,8 +277,16 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           ? `Rotates around a vertical axis to match the solar azimuth γ_s, maintaining a constant fixed panel slope β.`
           : `Gira alrededor de un eje vertical perpendicular al terreno siguiendo el acimut del sol γ_s, manteniendo el panel a una inclinación fija β.`,
         inputDescription: isEn
-          ? `<strong>Input Climatology Data:</strong> Monthly input radiation ${renderTex('G_{dm}(0)_m')}, latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}, and fixed surface tilt ${renderTex('\\beta_{\\text{fijo}}')}.`
-          : `<strong>Datos Climatológicos de Entrada (Input):</strong> Radiación horizontal ${renderTex('G_{dm}(0)_m')}, latitud ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)} e inclinación fija seleccionada ${renderTex('\\beta_{\\text{fijo}}')}.`,
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Solar Radiation:</strong> Global horizontal vector ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·day].</div>
+              <div><strong>Coordinates & Tilt:</strong> Latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)} and selected fixed slope ${renderTex('\\beta_{\\text{fijo}}')}.</div>
+              <div><strong>Tracking Axis:</strong> Vertical normal to ground ${renderTex('\\gamma_{\\text{panel}}(t) = \\gamma_{\\text{sol}}(t)')}.</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Radiación de Entrada:</strong> Vector mensual sobre horizontal ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·día].</div>
+              <div><strong>Coordenadas e Inclinación:</strong> Latitud ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)} e inclinación seleccionada ${renderTex('\\beta_{\\text{fijo}}')}.</div>
+              <div><strong>Eje de Giro:</strong> Vertical normal al suelo con ${renderTex('\\gamma_{\\text{panel}}(t) = \\gamma_{\\text{sol}}(t)')}.</div>
+            </div>`,
         mathProcessTitle: isEn ? 'Mathematical Algorithm & Formulations:' : 'Procedimiento y Algoritmo Matemático:',
         mathSteps: [
           {
@@ -217,12 +295,21 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           },
           {
             label: isEn ? '2. Beam Incidence Cosine with Elevation α_s:' : '2. Coseno de Incidencia con Altura Solar α_s:',
-            formula: '\\cos\\theta_{\\text{incidencia}}(t) = \\sin\\alpha_s(t) \\cos\\beta_{\\text{panel}} + \\cos\\alpha_s(t) \\sin\\beta_{\\text{panel}}'
+            formula: '\\cos\\theta_{\\text{incidencia}}(t) = \\sin\\alpha_s(t) \\cos\\beta_{\\text{panel}} + \\cos\\alpha_s(t) \\sin\\beta_{\\text{panel}}',
+            note: isEn
+              ? 'Ensures maximum projected area perpendicular to solar azimuth throughout daylight hours.'
+              : 'Garantiza máxima superficie proyectada perpendicularmente al acimut solar a lo largo de todo el día.'
           }
         ],
         outputSummary: isEn
-          ? 'Output: Significantly boosted morning and evening collection, flattening the daily power generation profile.'
-          : 'Resultado: Máxima captación a primeras y últimas horas del día, ensanchando la curva de potencia diurna.'
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Diurnal Profile Flattening:</strong> Significantly boosted early morning and late afternoon generation.</div>
+              <div><strong>Annual Gain:</strong> Substantial energy yield improvement over static south-facing arrays.</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Curva de Generación Ensanchada:</strong> Fuerte incremento de captación en primeras y últimas horas solares.</div>
+              <div><strong>Ganancia Anual:</strong> Incremento notable de energía frente a estructuras orientadas al Sur fijo.</div>
+            </div>`
       };
 
     case 'horizontal':
@@ -235,8 +322,16 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           ? `Rotates around a horizontal ground axis oriented East-West, tilting panels North-South to follow solar meridian altitude.`
           : `Rota sobre un eje tendido horizontalmente en dirección Este-Oeste, inclinando los módulos de Norte a Sur según la elevación meridiana.`,
         inputDescription: isEn
-          ? `<strong>Input Climatology Data:</strong> Input radiation ${renderTex('G_{dm}(0)_m')}, latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}, and solar elevation trajectory ${renderTex('\\alpha_s(t)')}.`
-          : `<strong>Datos Climatológicos de Entrada (Input):</strong> Radiación horizontal ${renderTex('G_{dm}(0)_m')}, latitud ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)} y trayectoria de elevación solar ${renderTex('\\alpha_s(t)')}.`,
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Solar Radiation:</strong> Input vector ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·day].</div>
+              <div><strong>Coordinates & Altitude:</strong> Latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)} and solar elevation ${renderTex('\\alpha_s(t)')}.</div>
+              <div><strong>Axis Orientation:</strong> Axis ${renderTex('\\beta_{\\text{eje}} = 0^\\circ')} aligned along East-West ${renderTex('\\gamma_{\\text{eje}} = 90^\\circ/270^\\circ')}.</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Radiación de Entrada:</strong> Vector mensual sobre horizontal ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} [kWh/m²·día].</div>
+              <div><strong>Coordenadas y Elevación:</strong> Latitud ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)} y altura solar ${renderTex('\\alpha_s(t)')}.</div>
+              <div><strong>Orientación del Eje:</strong> Eje horizontal ${renderTex('\\beta_{\\text{eje}} = 0^\\circ')} tendido Este-Oeste ${renderTex('\\gamma_{\\text{eje}} = 90^\\circ/270^\\circ')}.</div>
+            </div>`,
         mathProcessTitle: isEn ? 'Mathematical Algorithm & Formulations:' : 'Procedimiento y Algoritmo Matemático:',
         mathSteps: [
           {
@@ -245,12 +340,21 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           },
           {
             label: isEn ? '2. Instantaneous Tilt Tracking Law:' : '2. Ley de Basculación Instantánea según Altura Solar:',
-            formula: '\\beta_{\\text{seguidor}}(t) = 90^\\circ - \\alpha_s(t)'
+            formula: '\\beta_{\\text{seguidor}}(t) = 90^\\circ - \\alpha_s(t)',
+            note: isEn
+              ? 'Adapts surface slope to solar meridian altitude; ideal for low latitude tropical sites (φ < 25°).'
+              : 'Adapta la pendiente del panel a la elevación cenital del sol; idóneo para latitudes tropicales (φ < 25°).'
           }
         ],
         outputSummary: isEn
-          ? 'Output: Robust mechanical design especially productive in tropical and equatorial regions (φ < 25°).'
-          : 'Resultado: Arquitectura mecánica de bajo coste con óptimo desempeño en latitudes tropicales y subtropicales (φ < 25°).'
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Low Structural Profile:</strong> High wind resistance and low inter-row self-shading.</div>
+              <div><strong>Optimum Deployment:</strong> Highly cost-effective utility-scale solution in equatorial latitudes.</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Bajo Perfil Mecánico:</strong> Elevada resistencia a vientos y menor sombreado entre filas contiguas.</div>
+              <div><strong>Despliegue Ideal:</strong> Alta rentabilidad en plantas fotovoltaicas a gran escala en regiones intertropicales.</div>
+            </div>`
       };
 
     case 'dual':
@@ -263,8 +367,16 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           ? `Follows the sun continuously in both azimuth and elevation, ensuring rays strike perpendicular to the surface at every moment.`
           : `Sigue al sol de forma continua y simultánea en acimut y elevación, garantizando incidencia perpendicular exacta (θ = 0°) en todo momento.`,
         inputDescription: isEn
-          ? `<strong>Input Climatology Data:</strong> Direct beam vector ${renderTex('B_{dm}(0)_m')} and diffuse vector ${renderTex('D_{dm}(0)_m')} at latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.`
-          : `<strong>Datos Climatológicos de Entrada (Input):</strong> Componente directa ${renderTex('B_{dm}(0)_m')} y difusa ${renderTex('D_{dm}(0)_m')} a latitud ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.`,
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Direct Beam & Diffuse:</strong> Separate vectors ${renderTex('B_{dm}(0)_m')} and ${renderTex('D_{dm}(0)_m')} at latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
+              <div><strong>Degrees of Freedom:</strong> 2 continuous motorized axes (azimuth ${renderTex('\\gamma')} and zenith tilt ${renderTex('\\beta')}).</div>
+              <div><strong>Geometric Condition:</strong> Constant normal incidence angle ${renderTex('\\theta_{\\text{incidencia}} = 0^\\circ')}.</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Componentes Directa y Difusa:</strong> Vectores ${renderTex('B_{dm}(0)_m')} y ${renderTex('D_{dm}(0)_m')} a latitud ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
+              <div><strong>Grados de Libertad:</strong> 2 ejes motorizados continuos (acimut ${renderTex('\\gamma')} y elevación cenital ${renderTex('\\beta')}).</div>
+              <div><strong>Condición Geométrica:</strong> Ángulo de incidencia perpendicular permanente ${renderTex('\\theta_{\\text{incidencia}} = 0^\\circ')}.</div>
+            </div>`,
         mathProcessTitle: isEn ? 'Mathematical Algorithm & Formulations:' : 'Procedimiento y Algoritmo Matemático:',
         mathSteps: [
           {
@@ -273,19 +385,25 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           },
           {
             label: isEn ? '2. Exact Orthogonal Beam Incidence (Cosine Loss Zero):' : '2. Incidencia Ortogonal Perfecta (Pérdidas por Coseno Cero):',
-            formula: '\\theta_{\\text{incidencia}} = 0^\\circ \\implies \\cos\\theta_{\\text{incidencia}} = 1{,}0'
+            formula: '\\theta_{\\text{incidencia}} = 0^\\circ \\implies \\cos\\theta_{\\text{incidencia}} = 1{,}0',
+            note: isEn
+              ? 'Zero projection cosine losses; captures 100% of available direct beam irradiance at all times.'
+              : 'Pérdidas geométricas por coseno nulas; aprovecha el 100% de la radiación directa disponible a cualquier hora.'
           },
           {
             label: isEn ? '3. Maximum Theoretical Physical Limit:' : '3. Límite Físico Superior de Captación Solar:',
-            formula: 'G_{dm,\\text{dos ejes}} = B_{dm}(0)_m \\cdot R_{b,\\text{normal}} + D_{dm,\\text{dos ejes}} + G_{\\text{albedo}}',
-            note: isEn
-              ? 'Captures 100% of available direct radiation without any geometric projection loss.'
-              : 'Aprovecha el 100% de la radiación directa disponible sin penalizaciones trigonométricas de proyección oblicua.'
+            formula: 'G_{dm,\\text{dos ejes}} = B_{dm}(0)_m \\cdot R_{b,\\text{normal}} + D_{dm,\\text{dos ejes}} + G_{\\text{albedo}}'
           }
         ],
         outputSummary: isEn
-          ? 'Output: Absolute upper benchmark limit (+35% to +45% annual gain) representing ideal solar capture.'
-          : 'Resultado: Techo físico ideal de captación (+35% a +45% de ganancia anual sobre el plano horizontal).'
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Benchmark Upper Limit:</strong> Absolute maximum physical solar yield possible on Earth.</div>
+              <div><strong>Annual Gain:</strong> +35% to +45% yield increase over fixed horizontal plane.</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Techo Físico Superior:</strong> Máxima captación de energía solar teóricamente posible sobre la Tierra.</div>
+              <div><strong>Ganancia Anual:</strong> Incremento de +35% a +45% de energía producida frente a superficie horizontal fija.</div>
+            </div>`
       };
 
     case 'comparative':
@@ -299,8 +417,16 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           ? `Evaluates all 8 solar orientation and tracking topologies under identical input climatology data and physics rules.`
           : `Evalúa y contrasta en paralelo las 8 configuraciones de captación bajo las mismas condiciones climatológicas y motor físico de OrientSol.`,
         inputDescription: isEn
-          ? `<strong>Common Input Climatology:</strong> Identical input vector ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} and latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)} applied equally to all 8 technologies.`
-          : `<strong>Datos Climatológicos Comunes de Entrada:</strong> Mismo vector ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} y latitud ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)} inyectados a las 8 tecnologías.`,
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Input Climatology:</strong> Normalized vector ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} and latitude ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
+              <div><strong>Standardized Baseline:</strong> Consistent albedo ${renderTex('\\rho = 0{,}20')} and ambient temperature ${renderTex('T_{\\text{amb}}')}.</div>
+              <div><strong>Topologies Compared:</strong> 8 distinct solar mounting architectures (fixed, seasonal, polar, azimuthal, horizontal, two-axis).</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Datos Climatológicos Comunes:</strong> Vector ${renderTex('G_{dm}(0) \\in \\mathbb{R}^{12}')} y latitud ${renderTex(`\\phi_{\\text{lat}} = ${latStr}`)}.</div>
+              <div><strong>Base Normalizada:</strong> Mismo albedo ${renderTex('\\rho = 0{,}20')} y régimen térmico ${renderTex('T_{\\text{amb}}')} inyectados por igual.</div>
+              <div><strong>Topologías Evaluadas:</strong> Las 8 arquitecturas solares (fija, estacional, polar, azimutal, horizontal, dos ejes).</div>
+            </div>`,
         mathProcessTitle: isEn ? 'Mathematical Algorithm & Formulations:' : 'Procedimiento y Algoritmo Matemático:',
         mathSteps: [
           {
@@ -313,14 +439,21 @@ function getOperationData(op: SolarOperationType, isEn: boolean, latitude: numbe
           }
         ],
         outputSummary: isEn
-          ? 'Output: Complete ranking of all 8 topologies with energy gains, helping choose between fixed tilt and tracking.'
-          : 'Resultado: Clasificación energética completa de las 8 topologías para la toma de decisiones técnico-económicas de diseño.'
+          ? `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Complete Performance Ranking:</strong> All 8 surfaces sorted from highest to lowest energy capture.</div>
+              <div><strong>Engineering Decision Matrix:</strong> Trade-off between structural complexity, maintenance, and energy gains.</div>
+            </div>`
+          : `<div style="display: flex; flex-direction: column; gap: 0.35rem;">
+              <div><strong>Clasificación Energética Completa:</strong> Las 8 superficies ordenadas de mayor a menor captación anual.</div>
+              <div><strong>Matriz de Decisión de Ingeniería:</strong> Evaluación del compromiso entre complejidad mecánica y ganancia solar.</div>
+            </div>`
       };
   }
 }
 
 /**
  * Renders the responsive methodology and input data card for the currently selected solar operation.
+ * Eliminates all empty gaps with a balanced 2-column context bar and full-width mathematical formulations.
  */
 export function renderOperationMethodologyCard(
   op: SolarOperationType,
@@ -329,7 +462,7 @@ export function renderOperationMethodologyCard(
   locationName: string
 ): HTMLElement {
   const data = getOperationData(op, isEn, latitude, locationName);
-  // Operation 8 (comparative) must not display the mathematical foundation
+  // Operation 8 (comparative) displays clean context without individual math breakdown
   const showMath = op !== 'comparative';
   const container = document.createElement('div');
   container.className = 'op-methodology-card-root';
@@ -354,47 +487,73 @@ export function renderOperationMethodologyCard(
           ${data.summary}
         </div>
 
-        <div class="op-methodology-grid" ${showMath ? '' : 'style="grid-template-columns: 1fr;"'}>
-          <!-- Column 1: Input Data Processing -->
-          <div class="op-methodology-col-input">
+        <!-- Row 1: Balanced Context & Objectives (2 equal cards on desktop, stacked on mobile - NO GAPS!) -->
+        <div class="op-context-row">
+          <!-- Card 1: Input Data Processing -->
+          <div class="op-methodology-subcard op-subcard-input">
             <div class="op-col-header">
-              
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0284c7" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
               <strong>${isEn ? 'Input Climatology Data Treatment:' : 'Tratamiento de Data Input Climatológica:'}</strong>
             </div>
             <div class="op-input-content">
               ${data.inputDescription}
             </div>
-            <div class="op-col-output">
-              
-              <span><strong>${isEn ? 'Objective:' : 'Objetivo:'}</strong> ${data.outputSummary}</span>
-            </div>
           </div>
 
-          <!-- Column 2: Mathematical Formulations with Descriptive LaTeX Variables -->
-          ${showMath ? `<div class="op-methodology-col-math">
+          <!-- Card 2: Objective & Target Output -->
+          <div class="op-methodology-subcard op-subcard-output">
             <div class="op-col-header">
-              
-              <strong>${data.mathProcessTitle}</strong>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#10b981" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="12 8 8 12 12 16 12 8"></polygon>
+                <line x1="12" y1="16" x2="16" y2="12"></line>
+              </svg>
+              <strong>${isEn ? 'Physical Objective & Output:' : 'Objetivo Físico y Salida Esperada:'}</strong>
             </div>
-            <div class="op-math-steps-list">
-              ${data.mathSteps
-                .map(
-                  (step) => `
-                <div class="op-math-step-item">
-                  <div class="op-math-step-label">${step.label}</div>
-                  <div class="math-formula-box op-math-box">
-                    <div style="color: var(--text-main); text-align: center; width: 100%;">
-                      ${renderTex(step.formula, true)}
-                    </div>
-                  </div>
-                  ${step.note ? `<div class="op-math-step-note">${step.note}</div>` : ''}
-                </div>
-              `
-                )
-                .join('')}
+            <div class="op-output-content">
+              ${data.outputSummary}
             </div>
-          </div>` : ''}
+          </div>
         </div>
+
+        <!-- Row 2: Mathematical Formulations & Steps (Full Width, Zero Holes!) -->
+        ${showMath ? `
+        <div class="op-methodology-math-card">
+          <div class="op-col-header">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#f59e0b" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <strong>${data.mathProcessTitle}</strong>
+          </div>
+          <div class="op-math-steps-grid">
+            ${data.mathSteps
+              .map(
+                (step) => `
+              <div class="op-math-step-item">
+                <div class="op-math-step-label">
+                  <span class="step-dot" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #0284c7; margin-right: 0.35rem;"></span>
+                  <span>${step.label}</span>
+                </div>
+                <div class="math-formula-box op-math-box">
+                  <div style="color: var(--text-main); text-align: center; width: 100%; overflow-x: auto;">
+                    ${renderTex(step.formula, true)}
+                  </div>
+                </div>
+                ${step.note ? `<div class="op-math-step-note">${renderInlineMath(step.note)}</div>` : ''}
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+        </div>
+        ` : ''}
       </div>
     </div>
   `;
