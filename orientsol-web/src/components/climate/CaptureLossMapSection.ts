@@ -385,19 +385,19 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
 
       <!-- CTE Legend Bar -->
       <div class="cte-legend-bar" style="margin-top: 0.85rem; padding: 0.75rem 1rem; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-        <div class="cte-legend-item" title="Porcentaje del espacio angular evaluado (0° a 90° inc, -90° a +90° ori) con pérdidas ≤ 10%">
+        <div class="cte-legend-item" title="${isEn ? 'Percentage of evaluated angular space (0° to 90° inc, -90° to +90° azim) with loss ≤ 10%' : 'Porcentaje del espacio angular evaluado (0° a 90° inc, -90° a +90° ori) con pérdidas ≤ 10%'}">
           <span class="cte-color-box box-green"></span>
           <span>${isEn ? 'General CTE (loss ≤ 10%):' : 'Límite General CTE (Pérdida ≤ 10%):'} <strong>${formatPercent(currentCteZones.generalPctCompliant, 1)}</strong> <small style="opacity:0.8;">${isEn ? 'of angular space' : 'del espacio angular'}</small></span>
         </div>
-        <div class="cte-legend-item" title="Porcentaje del espacio angular evaluado con pérdidas ≤ 20%">
+        <div class="cte-legend-item" title="${isEn ? 'Percentage of evaluated angular space with loss ≤ 20%' : 'Porcentaje del espacio angular evaluado con pérdidas ≤ 20%'}">
           <span class="cte-color-box box-yellow"></span>
           <span>${isEn ? 'Superposition CTE (loss ≤ 20%):' : 'Superposición CTE (Pérdida ≤ 20%):'} <strong>${formatPercent(currentCteZones.superpositionPctCompliant, 1)}</strong> <small style="opacity:0.8;">${isEn ? 'of angular space' : 'del espacio angular'}</small></span>
         </div>
-        <div class="cte-legend-item" title="Porcentaje del espacio angular evaluado con pérdidas ≤ 40%">
+        <div class="cte-legend-item" title="${isEn ? 'Percentage of evaluated angular space with loss ≤ 40%' : 'Porcentaje del espacio angular evaluado con pérdidas ≤ 40%'}">
           <span class="cte-color-box box-orange"></span>
           <span>${isEn ? 'Arch. Integration (loss ≤ 40%):' : 'Integración Arquitectónica (Pérdida ≤ 40%):'} <strong>${formatPercent(currentCteZones.integrationPctCompliant, 1)}</strong> <small style="opacity:0.8;">${isEn ? 'of angular space' : 'del espacio angular'}</small></span>
         </div>
-        <div class="cte-legend-item" title="Porcentaje del espacio angular evaluado con pérdidas > 40%">
+        <div class="cte-legend-item" title="${isEn ? 'Percentage of evaluated angular space with loss > 40%' : 'Porcentaje del espacio angular evaluado con pérdidas > 40%'}">
           <span class="cte-color-box box-red"></span>
           <span>${isEn ? 'Non-compliant (> 40%):' : 'No conforme (> 40%):'} <strong>${formatPercent(nonCompliantPct, 1)}</strong> <small style="opacity:0.8;">${isEn ? 'outside limits' : 'fuera de norma'}</small></span>
         </div>
@@ -530,7 +530,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
                         ? 'border: 2px solid var(--accent-cyan, #0284c7) !important; box-shadow: inset 0 0 8px rgba(2, 132, 199, 0.4); font-weight: 800; transform: scale(1.08);'
                         : '';
                       const starText = isOptimalCell ? ' ★' : '';
-                      return `<td class="${cls}" style="${optStyle}" title="β=${b}°, α=${a}°: Pérdida ${formatPercent(loss, 1)} (${formatNum(rad, 2)} kWh/m²/d)">${formatPercent(loss, 1)}${starText}</td>`;
+                      return `<td class="${cls}" style="${optStyle}" title="β=${b}°, α=${a}°: ${isEn ? 'Loss' : 'Pérdida'} ${formatPercent(loss, 1)} (${formatNum(rad, 2)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/d'})">${formatPercent(loss, 1)}${starText}</td>`;
                     })
                     .join('');
                   return `<tr><td class="row-header-beta">${b}°</td>${cells}</tr>`;
@@ -786,7 +786,9 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       ctx!.fill();
 
       // Optimal Point badge
-      const optLabel = `★ ÓPTIMO: β=${formatNum(Number(optPoint.betaDeg), 1)}°, α=${formatNum(Number(optPoint.alphaDeg), 1)}°`;
+      const optLabel = isEn
+        ? `★ OPTIMAL: β=${formatNum(Number(optPoint.betaDeg), 1)}°, α=${formatNum(Number(optPoint.alphaDeg), 1)}°`
+        : `★ ÓPTIMO: β=${formatNum(Number(optPoint.betaDeg), 1)}°, α=${formatNum(Number(optPoint.alphaDeg), 1)}°`;
       ctx!.font = 'bold 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       const textMetrics = ctx!.measureText(optLabel);
       const bW = textMetrics.width + 12;
@@ -849,7 +851,7 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       ctx!.fill();
 
       // Floating reticle badge with exact values
-      const reticleLabel = `β = ${evaluatedBeta}°, α = ${evaluatedAlpha > 0 ? '+' : ''}${evaluatedAlpha}° | Pérdida: ${formatPercent(evaluatedLoss, 1)} (${formatNum(evaluatedRad, 2)} kWh/m²/d)`;
+      const reticleLabel = `β = ${evaluatedBeta}°, α = ${evaluatedAlpha > 0 ? '+' : ''}${evaluatedAlpha}° | ${isEn ? 'Loss' : 'Pérdida'}: ${formatPercent(evaluatedLoss, 1)} (${formatNum(evaluatedRad, 2)} ${isEn ? 'kWh/m²/day' : 'kWh/m²/d'})`;
       ctx!.font = 'bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       const reticleMetrics = ctx!.measureText(reticleLabel);
       const rW = reticleMetrics.width + 16;
@@ -907,19 +909,19 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       }
 
       // Orientation textual description
-      let oriText = 'Sur estricto (0°)';
+      let oriText = isEn ? 'True South (0°)' : 'Sur estricto (0°)';
       if (evaluatedAlpha < 0) {
-        oriText = `${Math.abs(evaluatedAlpha)}° al Este (Mañanas)`;
+        oriText = isEn ? `${Math.abs(evaluatedAlpha)}° East (Mornings)` : `${Math.abs(evaluatedAlpha)}° al Este (Mañanas)`;
       } else if (evaluatedAlpha > 0) {
-        oriText = `${evaluatedAlpha}° al Oeste (Tardes)`;
+        oriText = isEn ? `${evaluatedAlpha}° West (Afternoons)` : `${evaluatedAlpha}° al Oeste (Tardes)`;
       }
 
       // Tilt textual description
-      let tiltText = `${evaluatedBeta}° (Inclinación moderada)`;
-      if (evaluatedBeta === 0) tiltText = '0° (Horizontal / En plano de suelo)';
-      else if (evaluatedBeta < 20) tiltText = `${evaluatedBeta}° (Inclinación baja / Típica de verano)`;
-      else if (evaluatedBeta > 60 && evaluatedBeta < 90) tiltText = `${evaluatedBeta}° (Inclinación alta / Típica de invierno)`;
-      else if (evaluatedBeta === 90) tiltText = '90° (Vertical / Fachada de edificio)';
+      let tiltText = isEn ? `${evaluatedBeta}° (Moderate tilt)` : `${evaluatedBeta}° (Inclinación moderada)`;
+      if (evaluatedBeta === 0) tiltText = isEn ? '0° (Horizontal / Ground plane)' : '0° (Horizontal / En plano de suelo)';
+      else if (evaluatedBeta < 20) tiltText = isEn ? `${evaluatedBeta}° (Low tilt / Typical summer)` : `${evaluatedBeta}° (Inclinación baja / Típica de verano)`;
+      else if (evaluatedBeta > 60 && evaluatedBeta < 90) tiltText = isEn ? `${evaluatedBeta}° (High tilt / Typical winter)` : `${evaluatedBeta}° (Inclinación alta / Típica de invierno)`;
+      else if (evaluatedBeta === 90) tiltText = isEn ? '90° (Vertical / Building facade)' : '90° (Vertical / Fachada de edificio)';
 
       // "Cuándo ocurre" (When does it occur?) contextual solar physics explanation
       let whenTitle = '';
@@ -927,7 +929,47 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       const lat = res.latitude ?? 37.0;
 
       if (mode === 'seasonal') {
-        const seasonInfo = [
+        const seasonInfo = isEn ? [
+          {
+            name: 'Winter',
+            months: 'December, January, and February',
+            solstice: 'Winter Solstice (December 21)',
+            declination: 'δ ≈ -23.45° to -12°',
+            noonAlt: Math.round(90 - lat - 23.45),
+            reason: `In winter the Sun travels at its lowest path above the horizon (solar noon elevation ~${Math.round(90 - lat - 23.45)}°). Therefore, a high tilt (~55°) intercepts direct solar beam perpendicularly.`,
+          },
+          {
+            name: 'Spring',
+            months: 'March, April, and May',
+            solstice: 'Spring Equinox (March 20–21)',
+            declination: 'δ ≈ -2° to +21°',
+            noonAlt: Math.round(90 - lat),
+            reason: `In spring solar elevation is intermediate (solar noon elevation ~${Math.round(90 - lat)}°). A tilt of ~25°–30° maximizes seasonal collection.`,
+          },
+          {
+            name: 'Summer',
+            months: 'June, July, and August',
+            solstice: 'Summer Solstice (June 21)',
+            declination: 'δ ≈ +15° to +23.45°',
+            noonAlt: Math.round(90 - lat + 23.45),
+            reason: `In summer the Sun reaches its maximum elevation (solar noon elevation ~${Math.round(90 - lat + 23.45)}°). A near-horizontal surface (~15°–20°) captures peak daily global irradiation.`,
+          },
+          {
+            name: 'Autumn',
+            months: 'September, October, and November',
+            solstice: 'Autumn Equinox (September 22–23)',
+            declination: 'δ ≈ +8° to -21°',
+            noonAlt: Math.round(90 - lat),
+            reason: `In autumn solar paths descend progressively. Optimal tilt is around ~40°–45° to compensate for shortening days.`,
+          },
+        ][selectedSeasonIdx] || {
+          name: 'Season',
+          months: 'Selected quarter',
+          solstice: 'Seasonal period',
+          declination: '',
+          noonAlt: 50,
+          reason: 'Calculated according to mean solar position across the season.',
+        } : [
           {
             name: 'Invierno',
             months: 'Diciembre, Enero y Febrero',
@@ -970,7 +1012,28 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
         };
 
         whenTitle = `${seasonInfo.name} (${seasonInfo.months})`;
-        whenSolarPhysics = `
+        whenSolarPhysics = isEn ? `
+          <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.4rem;">
+            <div>• <strong>Astronomical period:</strong> ${seasonInfo.months}. Includes ${seasonInfo.solstice} with declination ${seasonInfo.declination}.</div>
+            <div>• <strong>Solar physics:</strong> ${seasonInfo.reason}</div>
+            <div>• <strong>Cause of loss at evaluated point (β=${evaluatedBeta}°, α=${evaluatedAlpha}°):</strong>
+              ${
+                Math.abs(evaluatedBeta - optPoint.betaDeg) < 3 && Math.abs(evaluatedAlpha - optPoint.alphaDeg) < 3
+                  ? 'Optimal frontal collection relative to solar rays in this season.'
+                  : evaluatedBeta < optPoint.betaDeg - 8
+                  ? `The collector is too flat (${evaluatedBeta}° vs ${formatNum(Number(optPoint.betaDeg), 1)}° optimal), losing collection against low solar paths in this season.`
+                  : evaluatedBeta > optPoint.betaDeg + 8
+                  ? `The collector is too steep (${evaluatedBeta}° vs ${formatNum(Number(optPoint.betaDeg), 1)}° optimal), suffering oblique incidence during midday hours.`
+                  : ''
+              }
+              ${
+                Math.abs(evaluatedAlpha) > 10
+                  ? ` Azimuth deviation of ${evaluatedAlpha > 0 ? '+' : ''}${evaluatedAlpha}° penalizes collection around solar noon, favoring ${evaluatedAlpha < 0 ? 'mornings' : 'afternoons'}.`
+                  : ''
+              }
+            </div>
+          </div>
+        ` : `
           <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.4rem;">
             <div>• <strong>Periodo astronómico:</strong> ${seasonInfo.months}. Incluye el ${seasonInfo.solstice} con declinación ${seasonInfo.declination}.</div>
             <div>• <strong>Mecánica solar:</strong> ${seasonInfo.reason}</div>
@@ -995,8 +1058,14 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
       } else if (mode === 'monthly') {
         const mNamesList = isEn ? MONTH_NAMES_EN : MONTH_NAMES_ES;
         const mName = mNamesList[selectedMonthIdx];
-        whenTitle = `Mes de ${mName} (Día medio de Klein)`;
-        whenSolarPhysics = `
+        whenTitle = isEn ? `Month of ${mName} (Klein Mean Day)` : `Mes de ${mName} (Día medio de Klein)`;
+        whenSolarPhysics = isEn ? `
+          <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.4rem;">
+            <div>• <strong>Evaluated period:</strong> Full month of ${mName}, evaluated via Klein characteristic day and Liu-Jordan & Klein radiation transposition.</div>
+            <div>• <strong>Angular performance:</strong> Optimal tilt for this month is <strong>Inc = ${formatNum(Number(optPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(optPoint.alphaDeg), 1)}°</strong> (Maximum radiation: ${formatNum(optPoint.maxDailyRadiationKwh, 2)} kWh/m²/day).</div>
+            <div>• <strong>Effect at selected point:</strong> With β=${evaluatedBeta}° and α=${evaluatedAlpha}°, daily collection is <strong>${formatNum(radiation, 2)} kWh/m²/day</strong>, representing a loss of <strong>${formatPercent(loss, 1)}</strong> vs monthly optimum.</div>
+          </div>
+        ` : `
           <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.4rem;">
             <div>• <strong>Periodo evaluado:</strong> Mes completo de ${mName}, evaluado mediante el día característico de Klein y el modelo de irradiación Liu-Jordan & Klein.</div>
             <div>• <strong>Rendimiento angular:</strong> El ángulo óptimo para este mes es <strong>Inc = ${formatNum(Number(optPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(optPoint.alphaDeg), 1)}°</strong> (Radiación máxima: ${formatNum(optPoint.maxDailyRadiationKwh, 2)} kWh/m²/día).</div>
@@ -1004,8 +1073,14 @@ export function renderCaptureLossMapSection(props: CaptureLossMapSectionProps): 
           </div>
         `;
       } else {
-        whenTitle = 'Balance Global Anual (365 días)';
-        whenSolarPhysics = `
+        whenTitle = isEn ? 'Annual Global Balance (365 Days)' : 'Balance Global Anual (365 días)';
+        whenSolarPhysics = isEn ? `
+          <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.4rem;">
+            <div>• <strong>Evaluated period:</strong> Full annual integration (365 days) combining solstices, equinoxes and site horizontal radiation distribution.</div>
+            <div>• <strong>Global annual optimum:</strong> Located at <strong>Inc = ${formatNum(Number(optPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(optPoint.alphaDeg), 1)}°</strong> (${formatNum(optPoint.maxDailyRadiationKwh, 2)} kWh/m²/day annual mean).</div>
+            <div>• <strong>Effect at selected point:</strong> A fixed installation with β=${evaluatedBeta}° and α=${evaluatedAlpha}° produces annually ~${formatInt(Math.round(radiation * 365))} kWh/m²/year vs ${formatInt(Math.round(optPoint.maxDailyRadiationKwh * 365))} kWh/m²/year of the optimum (cumulative annual loss of <strong>${formatPercent(loss, 1)}</strong>).</div>
+          </div>
+        ` : `
           <div style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.4rem;">
             <div>• <strong>Periodo evaluado:</strong> Integración anual completa (365 días) combinando solsticios y equinoccios con la distribución de radiación horizontal de la localidad.</div>
             <div>• <strong>Óptimo anual global:</strong> Situado en <strong>Inc = ${formatNum(Number(optPoint.betaDeg), 1)}°, Ori = ${formatNum(Number(optPoint.alphaDeg), 1)}°</strong> (${formatNum(optPoint.maxDailyRadiationKwh, 2)} kWh/m²/día de media anual).</div>

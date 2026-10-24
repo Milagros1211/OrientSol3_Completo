@@ -90,7 +90,7 @@ export function openPedagogicalGuideModal(
               heading: isEn ? '2. What is Ground Albedo (ρ_g)?' : '2. ¿Qué es el Albedo del Terreno (ρ_g) y qué valor asignar?',
               content: isEn
                 ? `<p style="margin: 0 0 0.5rem 0;">The ground albedo (&rho;<sub>g</sub>) represents the dimensionless fraction of global solar radiation reflected by the surrounding ground towards an inclined photovoltaic surface:</p>
-                  <div style="max-height: 290px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-top: 0.45rem;">
+                  <div style="max-height: 290px; overflow-x: auto; overflow-y: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-top: 0.45rem;">
                     <table class="albedo-solargis-table" style="width: 100%; border-collapse: collapse; text-align: left;">
                       <thead>
                         <tr>
@@ -121,7 +121,7 @@ export function openPedagogicalGuideModal(
                     <a href="https://solargis.com/resources/blog/product-updates/surface-albedo-most-frequent-questions" target="_blank" rel="noopener noreferrer" style="color: #0284c7; text-decoration: underline; font-weight: 700;">Surface Albedo – most frequent questions | Solargis</a>
                   </div>`
                 : `<p style="margin: 0 0 0.5rem 0;">El albedo del terreno (&rho;<sub>g</sub>) es el coeficiente adimensional que mide la fracción de radiación solar global reflejada por el entorno hacia la superficie inclinada del panel:</p>
-                  <div style="max-height: 290px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-top: 0.45rem;">
+                  <div style="max-height: 290px; overflow-x: auto; overflow-y: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-top: 0.45rem;">
                     <table class="albedo-solargis-table" style="width: 100%; border-collapse: collapse; text-align: left;">
                       <thead>
                         <tr>

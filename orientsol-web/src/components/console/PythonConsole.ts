@@ -974,7 +974,7 @@ export function renderPythonConsole(): HTMLElement {
                   ? `12-Month Baseline (Klein Characteristic Days, Lat ${formatAngle(stateLat, 2)}, Active Month: ${months[stateMonth - 1]})`
                   : `Línea Base 12 Meses (Días Intermedios de Klein, Latitud ${formatAngle(stateLat, 2)}, Mes Consultado: ${months[stateMonth - 1]})`}
               </span>
-              <span class="badge-status-valid">✓ Coeficientes de cálculo</span>
+              <span class="badge-status-valid">✓ ${isEn ? 'Calculation coefficients' : 'Coeficientes de cálculo'}</span>
             </div>
             <button type="button" class="btn btn-xs btn-primary btn-goto-pvgis" style="font-size: 0.72rem; padding: 0.2rem 0.6rem; background: #0284c7; color: #fff; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 0.35rem;">
               ${isEn ? 'Go to Tab 3: PVGIS Validation ➔' : 'Ir a Pestaña 3: Validación PVGIS ➔'}
@@ -1478,9 +1478,9 @@ export function renderPythonConsole(): HTMLElement {
               </div>
             </div>
             <div style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.63rem; flex-shrink: 0;">
-              <span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; padding: 0.12rem 0.38rem; border-radius: 4px; font-weight: 700;">✓ &le;5% Alta Precisión</span>
-              <span class="badge-status-valid" style="background: rgba(37,99,235,0.15); color:#2563eb; padding: 0.12rem 0.38rem; border-radius: 4px; font-weight: 700;">✓ &le;10% Norma OMM</span>
-              <span class="badge-status-valid" style="background: rgba(2,132,199,0.15); color:#0284c7; padding: 0.12rem 0.38rem; border-radius: 4px; font-weight: 700;">✓ &le;25% Var. Estacional</span>
+              <span class="badge-status-valid" style="background: rgba(16,185,129,0.15); color:#059669; padding: 0.12rem 0.38rem; border-radius: 4px; font-weight: 700;">✓ &le;5% ${isEn ? 'High Precision' : 'Alta Precisión'}</span>
+              <span class="badge-status-valid" style="background: rgba(37,99,235,0.15); color:#2563eb; padding: 0.12rem 0.38rem; border-radius: 4px; font-weight: 700;">✓ &le;10% ${isEn ? 'WMO Standard' : 'Norma OMM'}</span>
+              <span class="badge-status-valid" style="background: rgba(2,132,199,0.15); color:#0284c7; padding: 0.12rem 0.38rem; border-radius: 4px; font-weight: 700;">✓ &le;25% ${isEn ? 'Seasonal Spread' : 'Var. Estacional'}</span>
             </div>
           </div>
 
@@ -1722,7 +1722,7 @@ export function renderPythonConsole(): HTMLElement {
               <!-- Variable 2: Direct Beam -->
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
                 <div style="font-weight: 700; color: #2563eb; font-size: 0.73rem; margin-bottom: 0.25rem;">
-                  2. Directa Bdm(0)
+                  2. ${isEn ? 'Direct Beam Bdm(0)' : 'Directa Bdm(0)'}
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
                   <div>MAPE: <strong style="color: #059669; font-size: 0.86rem;">${formatPercent(mapeBdm, 2)}</strong></div>
@@ -1734,7 +1734,7 @@ export function renderPythonConsole(): HTMLElement {
               <!-- Variable 3: Diffuse -->
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
                 <div style="font-weight: 700; color: #7c3aed; font-size: 0.73rem; margin-bottom: 0.25rem;">
-                  3. Difusa Ddm(0)
+                  3. ${isEn ? 'Diffuse Ddm(0)' : 'Difusa Ddm(0)'}
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
                   <div>MAPE: <strong style="color: #059669; font-size: 0.86rem;">${formatPercent(mapeDdm, 2)}</strong></div>
@@ -1746,7 +1746,7 @@ export function renderPythonConsole(): HTMLElement {
               <!-- Variable 4: Optimal Plane -->
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
                 <div style="font-weight: 700; color: #059669; font-size: 0.73rem; margin-bottom: 0.25rem;">
-                  4. Óptimo Gdm(β_opt)
+                  4. ${isEn ? 'Optimum Gdm(β_opt)' : 'Óptimo Gdm(β_opt)'}
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
                   <div>MAPE: <strong style="color: #059669; font-size: 0.86rem;">${formatPercent(mapeGOpt, 2)}</strong></div>
@@ -1758,7 +1758,7 @@ export function renderPythonConsole(): HTMLElement {
               <!-- Variable 5: Optimal Tilt -->
               <div style="background: var(--bg-card); padding: 0.6rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-subtle);">
                 <div style="font-weight: 700; color: #d97706; font-size: 0.73rem; margin-bottom: 0.25rem;">
-                  5. Inclinación β_opt
+                  5. ${isEn ? 'Optimal Tilt β_opt' : 'Inclinación β_opt'}
                 </div>
                 <div style="font-size: 0.70rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.15rem;">
                   <div>Simulador: <strong style="color: #059669; font-size: 0.82rem;">${simAnnualOptTilt}°</strong></div>
@@ -2241,7 +2241,7 @@ export function renderPythonConsole(): HTMLElement {
                   ? `Performance Comparison of Tracking & Seasonal Topologies (${activeCityName}, Lat ${formatAngle(stateLat, 2)})`
                   : `Comparativa de Rendimiento de Topologías de Seguimiento y Estacional (${activeCityName}, Latitud ${formatAngle(stateLat, 2)})`}
               </span>
-              <span class="badge badge-success" style="font-size: 0.75rem;">✓ 6 Topologías Validadas</span>
+              <span class="badge badge-success" style="font-size: 0.75rem;">✓ ${isEn ? '6 Validated Topologies' : '6 Topologías Validadas'}</span>
             </div>
 
             <!-- Tracking View Mode Switcher -->

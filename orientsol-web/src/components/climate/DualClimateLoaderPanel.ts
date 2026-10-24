@@ -525,22 +525,22 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
         <div class="form-group">
           <label for="api-city-preset-select" class="form-label">${isEn ? 'City Preset' : 'Preajuste de Ciudad'}</label>
           <select id="api-city-preset-select" class="form-select">
-            <option value="0">Madrid (España)</option>
-            <option value="1">Barcelona (España)</option>
-            <option value="2">Sevilla (España)</option>
-            <option value="3">Valencia (España)</option>
-            <option value="4">Bilbao (España)</option>
-            <option value="5">Santa Cruz de Tenerife (España)</option>
-            <option value="6">Jaén (España)</option>
-            <option value="7">Roma (Italia)</option>
-            <option value="8">Atenas (Grecia)</option>
+            <option value="0">${isEn ? 'Madrid (Spain)' : 'Madrid (España)'}</option>
+            <option value="1">${isEn ? 'Barcelona (Spain)' : 'Barcelona (España)'}</option>
+            <option value="2">${isEn ? 'Seville (Spain)' : 'Sevilla (España)'}</option>
+            <option value="3">${isEn ? 'Valencia (Spain)' : 'Valencia (España)'}</option>
+            <option value="4">${isEn ? 'Bilbao (Spain)' : 'Bilbao (España)'}</option>
+            <option value="5">${isEn ? 'Santa Cruz de Tenerife (Spain)' : 'Santa Cruz de Tenerife (España)'}</option>
+            <option value="6">${isEn ? 'Jaén (Spain)' : 'Jaén (España)'}</option>
+            <option value="7">${isEn ? 'Rome (Italy)' : 'Roma (Italia)'}</option>
+            <option value="8">${isEn ? 'Athens (Greece)' : 'Atenas (Grecia)'}</option>
             <option value="custom">${isEn ? 'Custom Coordinates...' : 'Coordenadas Personalizadas...'}</option>
           </select>
         </div>
 
         <div class="form-group">
           <label for="api-input-name" class="form-label">${isEn ? 'Emplacement Name' : 'Nombre del Emplazamiento'}</label>
-          <input type="text" id="api-input-name" class="form-input" value="Madrid (España)" />
+          <input type="text" id="api-input-name" class="form-input" value="${isEn ? 'Madrid (Spain)' : 'Madrid (España)'}" />
         </div>
 
         <div class="form-group">
@@ -734,26 +734,26 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   };
   window.addEventListener('orientsol:switch-climate-tab', handleSwitchClimateTab);
 
-  // Pedagogical Guide Modal Triggers (Tabs 1, 2, 3)
+  // Pedagogical Guide Modal Triggers (Tabs 1, 2, 3, 4)
   container.querySelectorAll<HTMLButtonElement>('.btn-pedagogical-guide').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      const tabKey = (btn.getAttribute('data-pedagogical-tab') || 'historical') as 'historical' | 'manual' | 'upload';
+      const tabKey = (btn.getAttribute('data-pedagogical-tab') || 'historical') as 'historical' | 'manual' | 'upload' | 'api';
       openPedagogicalGuideModal(tabKey, isEn);
     });
   });
 
   // Satellite API City Presets
   const API_CITY_PRESETS = [
-    { name: 'Madrid (España)', lat: 40.4168, lon: -3.7038 },
-    { name: 'Barcelona (España)', lat: 41.3879, lon: 2.1699 },
-    { name: 'Sevilla (España)', lat: 37.3891, lon: -5.9845 },
-    { name: 'Valencia (España)', lat: 39.4699, lon: -0.3763 },
-    { name: 'Bilbao (España)', lat: 43.263, lon: -2.935 },
-    { name: 'Santa Cruz de Tenerife (España)', lat: 28.4636, lon: -16.2518 },
-    { name: 'Jaén (España)', lat: 37.7796, lon: -3.7849 },
-    { name: 'Roma (Italia)', lat: 41.9028, lon: 12.4964 },
-    { name: 'Atenas (Grecia)', lat: 37.9838, lon: 23.7275 },
+    { name: isEn ? 'Madrid (Spain)' : 'Madrid (España)', lat: 40.4168, lon: -3.7038 },
+    { name: isEn ? 'Barcelona (Spain)' : 'Barcelona (España)', lat: 41.3879, lon: 2.1699 },
+    { name: isEn ? 'Seville (Spain)' : 'Sevilla (España)', lat: 37.3891, lon: -5.9845 },
+    { name: isEn ? 'Valencia (Spain)' : 'Valencia (España)', lat: 39.4699, lon: -0.3763 },
+    { name: isEn ? 'Bilbao (Spain)' : 'Bilbao (España)', lat: 43.263, lon: -2.935 },
+    { name: isEn ? 'Santa Cruz de Tenerife (Spain)' : 'Santa Cruz de Tenerife (España)', lat: 28.4636, lon: -16.2518 },
+    { name: isEn ? 'Jaén (Spain)' : 'Jaén (España)', lat: 37.7796, lon: -3.7849 },
+    { name: isEn ? 'Rome (Italy)' : 'Roma (Italia)', lat: 41.9028, lon: 12.4964 },
+    { name: isEn ? 'Athens (Greece)' : 'Atenas (Grecia)', lat: 37.9838, lon: 23.7275 },
   ];
 
   apiCitySelect?.addEventListener('change', () => {

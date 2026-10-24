@@ -289,7 +289,7 @@ function renderAboutView(isEn: boolean): HTMLElement {
                 ? 'Retrieves individual year-by-year reanalysis data (e.g. year 2023), reflecting exact historical cloudy days, Saharan dust haze, and specific heatwaves.'
                 : 'Recupera datos año por año individual (ej. año 2023), reflejando la nubosidad, calimas y anomalías reales ocurridas en ese año concreto.'}<br/>
               • <strong>${isEn ? 'High Spatial Resolution:' : 'Resolución espacial elevada:'}</strong> ${isEn
-                ? 'Malla global de 9 a 25 km (ERA5-Land), la más densa entre los modelos globales.'
+                ? 'Dense 9 to 25 km global grid (ERA5-Land), the highest resolution among global atmospheric models.'
                 : 'Malla global de 9 a 25 km (ERA5-Land), la más densa entre los modelos atmosféricos globales.'}<br/>
               • <strong>${isEn ? 'Latency & Open Access:' : 'Latencia y acceso:'}</strong> ${isEn
                 ? 'Near-zero latency (ERA5T updated within 5 days), free open-access without keys, fully CORS-compliant.'
@@ -353,7 +353,7 @@ function renderAboutView(isEn: boolean): HTMLElement {
                 <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-main);">${isEn ? 'Typical Madrid June Gdm(0)' : 'Radiación Junio (Madrid, Gdm(0))'}</td>
                 <td style="padding: 0.5rem 0.75rem; font-weight: 700; color: #0284c7;">7.46 – 7.56 kWh/m²·d</td>
                 <td style="padding: 0.5rem 0.75rem; font-weight: 700; color: #d97706;">7.65 kWh/m²·d</td>
-                <td style="padding: 0.5rem 0.75rem; font-weight: 700; color: #059669;">6.88 kWh/m²·d (año 2023)</td>
+                <td style="padding: 0.5rem 0.75rem; font-weight: 700; color: #059669;">6.88 kWh/m²·d ${isEn ? '(year 2023)' : '(año 2023)'}</td>
               </tr>
               <tr style="border-bottom: 1px solid var(--border-subtle); background: rgba(2, 132, 199, 0.02);">
                 <td style="padding: 0.5rem 0.75rem; font-weight: 600; color: var(--text-main);">${isEn ? 'Web Browser Connectivity (CORS)' : 'Conectividad Web (CORS)'}</td>

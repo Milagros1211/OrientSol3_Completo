@@ -12545,4 +12545,92 @@ body.theme-dark .pedagogical-concept-card {
   color: #e2e8f0 !important;
 }
 
+/* ==========================================================================
+   RESPONSIVE OPTIMIZATIONS: LAPTOPS, TABLETS & MOBILE PHONES
+   ========================================================================== */
+@media (max-width: 992px) {
+  .pedagogical-dialog {
+    max-width: 92vw !important;
+    width: 92vw !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .pedagogical-dialog {
+    max-width: 95vw !important;
+    width: 95vw !important;
+    margin: 0.5rem auto !important;
+  }
+
+  .pedagogical-dialog .modal-header {
+    padding: 0.85rem 1rem !important;
+  }
+
+  .pedagogical-dialog .modal-body {
+    padding: 0.85rem 1rem !important;
+    max-height: 72vh !important;
+  }
+
+  .pedagogical-dialog .modal-footer {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .pedagogical-concept-card {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.55rem !important;
+  }
+
+  .btn-pedagogical-guide {
+    width: 100% !important;
+    justify-content: center !important;
+    min-height: 38px !important;
+  }
+
+  .tab3-station-selector-box {
+    padding: 0.95rem 0.85rem !important;
+    margin-top: 1rem !important;
+  }
+
+  .tab3-pill-btn {
+    font-size: 0.8rem !important;
+    padding: 0.35rem 0.7rem !important;
+  }
+
+  .math-formula-box .katex-display {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 0.2rem !important;
+  }
+
+  .loss-map-canvas-wrapper {
+    min-height: 260px !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-instruction-banner {
+    padding: 0.6rem 0.75rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .tab-instruction-steps {
+    padding-left: 1rem !important;
+    gap: 0.3rem !important;
+  }
+
+  .tab3-pill-btn {
+    font-size: 0.75rem !important;
+    padding: 0.3rem 0.6rem !important;
+  }
+
+  .pedagogical-audit-badge {
+    font-size: 0.62rem !important;
+    padding: 0.1rem 0.45rem !important;
+  }
+}
+
+
 
