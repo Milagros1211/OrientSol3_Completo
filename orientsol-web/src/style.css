@@ -1561,12 +1561,23 @@ body.theme-dark #btn-save-api-to-supabase:disabled {
 }
 
 .verif-data-table th {
-  background: var(--bg-secondary);
-  color: var(--text-main);
-  font-weight: 700;
   padding: 0.65rem 0.85rem;
-  border-bottom: 2px solid var(--border-subtle);
+  font-weight: 700;
   white-space: nowrap;
+}
+
+[data-theme="light"] .verif-data-table th,
+body.theme-light .verif-data-table th {
+  background: #1e40af !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #1d4ed8 !important;
+}
+
+[data-theme="dark"] .verif-data-table th,
+body.theme-dark .verif-data-table th {
+  background: #0f2744 !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #38bdf8 !important;
 }
 
 .verif-data-table td {
@@ -2222,9 +2233,9 @@ body.theme-dark .climate-status-bar.status-warning {
 /* Light theme table colors */
 [data-theme="light"] .climate-monthly-table th,
 body.theme-light .climate-monthly-table th {
-  background: #f1f5f9;
-  color: #0f172a;
-  border: 1px solid #cbd5e1;
+  background: #1e40af !important;
+  color: #ffffff !important;
+  border: 1px solid #3b82f6 !important;
   font-weight: 700;
 }
 
@@ -2238,18 +2249,19 @@ body.theme-light .climate-monthly-table td {
 
 [data-theme="light"] .climate-monthly-table .row-label,
 body.theme-light .climate-monthly-table .row-label {
-  background: #f8fafc;
-  color: #0f172a;
+  background: #f1f5f9;
+  color: #1e40af;
   border: 1px solid #cbd5e1;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 /* Dark theme table colors */
 [data-theme="dark"] .climate-monthly-table th,
 body.theme-dark .climate-monthly-table th {
-  background: rgba(255, 255, 255, 0.05);
-  color: #cbd5e1;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0f2744 !important;
+  color: #ffffff !important;
+  border: 1px solid #1e3a5f !important;
+  font-weight: 700;
 }
 
 [data-theme="dark"] .climate-monthly-table td,
@@ -3091,18 +3103,18 @@ body.theme-dark .monthly-inputs-table-wrapper {
 
 [data-theme="light"] .manual-monthly-table th,
 body.theme-light .manual-monthly-table th {
-  background: #f1f5f9;
-  color: #0f172a;
-  border-bottom: 1.5px solid #cbd5e1;
-  border-right: 1px solid #e2e8f0;
+  background: #1e40af !important;
+  color: #ffffff !important;
+  border-bottom: 1.5px solid #1d4ed8;
+  border-right: 1px solid #3b82f6;
 }
 
 [data-theme="dark"] .manual-monthly-table th,
 body.theme-dark .manual-monthly-table th {
-  background: #09202c !important;
-  color: #94a3b8 !important;
-  border-bottom: 1.5px solid #0e3d54 !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  background: #0f2744 !important;
+  color: #ffffff !important;
+  border-bottom: 1.5px solid #1e3a5f !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .manual-monthly-table td {
@@ -3718,16 +3730,18 @@ body.theme-dark .loss-map-container {
 
 [data-theme="light"] .loss-map-matrix-table th,
 body.theme-light .loss-map-matrix-table th {
-  background: #f1f5f9;
-  color: #1e293b;
-  border: 1px solid #cbd5e1;
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid #3b82f6 !important;
 }
 
 [data-theme="dark"] .loss-map-matrix-table th,
 body.theme-dark .loss-map-matrix-table th {
-  background: #0b1329;
-  color: var(--text-muted);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0f2744 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid #1e3a5f !important;
 }
 
 .loss-map-matrix-table th.corner-th {
@@ -3737,14 +3751,18 @@ body.theme-dark .loss-map-matrix-table th {
 
 [data-theme="light"] .loss-map-matrix-table th.corner-th,
 body.theme-light .loss-map-matrix-table th.corner-th {
-  background: #e2e8f0;
-  color: #0284c7;
+  background: #172554 !important;
+  color: #fde047 !important;
+  font-weight: 800 !important;
+  border-right: 2px solid #3b82f6 !important;
 }
 
 [data-theme="dark"] .loss-map-matrix-table th.corner-th,
 body.theme-dark .loss-map-matrix-table th.corner-th {
-  background: #0b1329;
-  color: #38bdf8;
+  background: #091a2e !important;
+  color: #38bdf8 !important;
+  font-weight: 800 !important;
+  border-right: 2px solid #0284c7 !important;
 }
 
 .loss-map-matrix-table td {
@@ -4012,16 +4030,18 @@ body.theme-dark .loss-inspector-hud {
 
 [data-theme="light"] .all-surfaces-table th,
 body.theme-light .all-surfaces-table th {
-  background: #f1f5f9;
-  color: #1e293b;
-  border-bottom: 1.5px solid #cbd5e1;
+  background: #1e3a8a !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #1d4ed8 !important;
+  border: 1px solid #3b82f6 !important;
 }
 
 [data-theme="dark"] .all-surfaces-table th,
 body.theme-dark .all-surfaces-table th {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-muted);
-  border-bottom: 1px solid var(--border-subtle);
+  background: #0f2744 !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #38bdf8 !important;
+  border: 1px solid #1e3a5f !important;
 }
 
 .all-surfaces-table td {
@@ -6534,140 +6554,448 @@ body.theme-dark .opt-tracking-table-wrap {
   font-size: 0.81rem;
 }
 
-/* Unified Table Headers */
-.table-top-header-row th,
-.table-main-header-row th,
-.seasonal-top-th-row th,
-.tracking-top-th-row th,
-.opt-annual-matlab-table thead tr:first-child th,
-.opt-matrix-table thead tr:first-child th,
-.opt-seasonal-table thead tr:first-child th,
-.opt-tracking-table thead tr:first-child th {
-  background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%) !important;
-  color: #ffffff !important;
-  padding: 0.42rem 0.32rem !important;
-  font-weight: 700;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  font-size: 0.81rem;
+/* ==========================================================================
+   HOMOGENIZED HIGH-CONTRAST TABLE HEADERS (LIGHT & DARK THEMES)
+   ========================================================================== */
+
+/* Universal Header Reset: Full Opacity, High Contrast, No Inner Rounding */
+.opt-annual-matlab-table th,
+.opt-matrix-table th,
+.opt-seasonal-table th,
+.opt-tracking-table th,
+.matlab-results-table th,
+.comparative-results-table th,
+.opt-energy-table th,
+.loss-map-matrix-table th,
+.climate-monthly-table th,
+.manual-monthly-table th,
+.all-surfaces-table th,
+.verif-data-table th,
+.legal-table th {
+  border-radius: 0 !important;
+  text-shadow: none !important;
+  vertical-align: middle !important;
+  box-sizing: border-box !important;
 }
 
-.table-sub-header-row th,
-.seasonal-sub-th-row th,
-.tracking-sub-th-row th,
-.tracking-header-sub th,
-.opt-annual-matlab-table thead tr:nth-child(2) th,
-.opt-matrix-table thead tr:nth-child(2) th,
-.opt-seasonal-table thead tr:nth-child(2) th,
-.opt-tracking-table thead tr:nth-child(2) th {
-  background: #1e3a8a !important;
-  color: #bfdbfe !important;
-  padding: 0.35rem 0.28rem !important;
-  font-weight: 600;
-  font-size: 0.74rem;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+/* --------------------------------------------------------------------------
+   1. LIGHT MODE TABLE HEADERS (WCAG AAA High-Contrast, Rich Solid Colors)
+   -------------------------------------------------------------------------- */
+[data-theme="light"] .table-top-header-row th,
+[data-theme="light"] .table-main-header-row th,
+[data-theme="light"] .seasonal-top-th-row th,
+[data-theme="light"] .tracking-top-th-row th,
+[data-theme="light"] .opt-annual-matlab-table thead tr:first-child th,
+[data-theme="light"] .opt-matrix-table thead tr:first-child th,
+[data-theme="light"] .opt-seasonal-table thead tr:first-child th,
+[data-theme="light"] .opt-tracking-table thead tr:first-child th,
+[data-theme="light"] .comparative-results-table thead tr:first-child th,
+body.theme-light .table-top-header-row th,
+body.theme-light .table-main-header-row th,
+body.theme-light .seasonal-top-th-row th,
+body.theme-light .tracking-top-th-row th,
+body.theme-light .opt-annual-matlab-table thead tr:first-child th,
+body.theme-light .opt-matrix-table thead tr:first-child th,
+body.theme-light .opt-seasonal-table thead tr:first-child th,
+body.theme-light .opt-tracking-table thead tr:first-child th,
+body.theme-light .comparative-results-table thead tr:first-child th {
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 0.82rem !important;
+  text-align: center !important;
+  border: 1px solid #2563eb !important;
+  padding: 0.45rem 0.35rem !important;
 }
 
-/* Compact Month column in headers */
-.th-month,
-.th-season-month,
-.th-track-month {
-  width: 82px !important;
-  min-width: 76px !important;
-  max-width: 95px !important;
+[data-theme="light"] .table-sub-header-row th,
+[data-theme="light"] .seasonal-sub-th-row th,
+[data-theme="light"] .tracking-sub-th-row th,
+[data-theme="light"] .tracking-header-sub th,
+[data-theme="light"] .opt-annual-matlab-table thead tr:nth-child(2) th,
+[data-theme="light"] .opt-matrix-table thead tr:nth-child(2) th,
+[data-theme="light"] .opt-seasonal-table thead tr:nth-child(2) th,
+[data-theme="light"] .opt-tracking-table thead tr:nth-child(2) th,
+[data-theme="light"] .comparative-results-table thead tr:nth-child(2) th,
+body.theme-light .table-sub-header-row th,
+body.theme-light .seasonal-sub-th-row th,
+body.theme-light .tracking-sub-th-row th,
+body.theme-light .tracking-header-sub th,
+body.theme-light .opt-annual-matlab-table thead tr:nth-child(2) th,
+body.theme-light .opt-matrix-table thead tr:nth-child(2) th,
+body.theme-light .opt-seasonal-table thead tr:nth-child(2) th,
+body.theme-light .opt-tracking-table thead tr:nth-child(2) th,
+body.theme-light .comparative-results-table thead tr:nth-child(2) th {
   background: #1e3a8a !important;
   color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  text-align: center !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  padding: 0.38rem 0.28rem !important;
+}
+
+/* Light Mode: Month Column in Header */
+[data-theme="light"] .th-month,
+[data-theme="light"] .th-season-month,
+[data-theme="light"] .th-track-month,
+body.theme-light .th-month,
+body.theme-light .th-season-month,
+body.theme-light .th-track-month {
+  background: #1e3a8a !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border-right: 2px solid #3b82f6 !important;
   text-align: left !important;
-  padding-left: 0.55rem !important;
-  padding-right: 0.35rem !important;
+  padding-left: 0.75rem !important;
   white-space: nowrap !important;
-  font-size: 0.80rem !important;
 }
 
-/* Optimum header columns */
-.th-optimum,
-.th-track-opt {
-  background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%) !important;
+/* Light Mode: Inclinaciones Fijas (0°..90°) */
+[data-theme="light"] .th-angles-group,
+body.theme-light .th-angles-group {
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border-bottom: 1.5px solid #60a5fa !important;
+  border-left: 1px solid #2563eb !important;
+  border-right: 1px solid #2563eb !important;
+}
+
+/* Light Mode: Sub-angles */
+[data-theme="light"] .th-sub-angle,
+[data-theme="light"] .table-sub-header-row th:not(.th-sub-factor):not(.th-sub-pct):not(.th-sub-factor-x):not(.th-sub-pct-x):not(.th-gain-sub),
+body.theme-light .th-sub-angle,
+body.theme-light .table-sub-header-row th:not(.th-sub-factor):not(.th-sub-pct):not(.th-sub-factor-x):not(.th-sub-pct-x):not(.th-gain-sub) {
+  background: #1e40af !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Light Mode: Optimum Column */
+[data-theme="light"] .th-optimum,
+[data-theme="light"] .th-track-opt,
+[data-theme="light"] .th-opt-angle-col,
+[data-theme="light"] .th-opt-rad-col,
+body.theme-light .th-optimum,
+body.theme-light .th-track-opt,
+body.theme-light .th-opt-angle-col,
+body.theme-light .th-opt-rad-col {
+  background: #0284c7 !important;
+  color: #ffffff !important;
   border-left: 2px solid #38bdf8 !important;
   border-right: 2px solid #38bdf8 !important;
-  color: #ffffff !important;
-  min-width: 60px !important;
-  max-width: 85px !important;
+  border-top: 1px solid #0284c7 !important;
+  border-bottom: 1px solid #0284c7 !important;
 }
-
-.th-opt-title {
+[data-theme="light"] .th-opt-title,
+body.theme-light .th-opt-title {
   font-size: 0.84rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #ffffff !important;
 }
-
-.th-opt-angle-tag {
+[data-theme="light"] .th-opt-angle-tag,
+body.theme-light .th-opt-angle-tag {
   display: inline-block;
-  background: rgba(0, 0, 0, 0.35);
-  color: #fef08a;
+  background: #fef08a !important;
+  color: #713f12 !important;
   font-size: 0.74rem;
-  font-weight: 800;
-  padding: 0.1rem 0.45rem;
+  font-weight: 900;
+  padding: 0.12rem 0.5rem;
   border-radius: 4px;
   margin-top: 0.2rem;
-  border: 1px solid rgba(254, 240, 138, 0.4);
+  border: 1px solid #facc15 !important;
 }
 
-.th-anglex {
-  background: linear-gradient(180deg, #7e22ce 0%, #6b21a8 100%) !important;
+/* Light Mode: Angle X Column */
+[data-theme="light"] .th-anglex,
+body.theme-light .th-anglex {
+  background: #7c3aed !important;
+  color: #ffffff !important;
   border-left: 2px solid #c084fc !important;
   border-right: 2px solid #c084fc !important;
-  min-width: 100px;
 }
-
-.th-anglex-title {
+[data-theme="light"] .th-anglex-title,
+body.theme-light .th-anglex-title {
   font-size: 0.84rem;
   font-weight: 800;
-  color: #ffffff;
-}
-
-.th-anglex-angle-tag {
-  display: inline-block;
-  background: rgba(0, 0, 0, 0.35);
-  color: #e9d5ff;
-  font-size: 0.74rem;
-  font-weight: 800;
-  padding: 0.1rem 0.45rem;
-  border-radius: 4px;
-  margin-top: 0.2rem;
-  border: 1px solid rgba(233, 213, 255, 0.4);
-}
-
-.th-temp,
-.th-track-temp {
-  background: #0f766e !important;
-  color: #ccfbf1 !important;
-  min-width: 75px;
-}
-
-.th-gain-horiz,
-.th-track-gains-super {
-  background: #1e3a8a !important;
   color: #ffffff !important;
 }
-
-.th-gain-anglex {
-  background: #1e1b4b !important;
-  color: #c084fc !important;
-  border-bottom: 1px solid rgba(192, 132, 252, 0.3) !important;
+[data-theme="light"] .th-anglex-angle-tag,
+body.theme-light .th-anglex-angle-tag {
+  display: inline-block;
+  background: #f3e8ff !important;
+  color: #581c87 !important;
+  font-size: 0.74rem;
+  font-weight: 900;
+  padding: 0.12rem 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.2rem;
+  border: 1px solid #d8b4fe !important;
 }
 
-.th-sub-factor,
-.th-sub-pct {
-  background: #0f172a !important;
-  color: #93c5fd !important;
+/* Light Mode: Temperature Column */
+[data-theme="light"] .th-temp,
+[data-theme="light"] .th-track-temp,
+body.theme-light .th-temp,
+body.theme-light .th-track-temp {
+  background: #0f766e !important;
+  color: #ffffff !important;
+  border-left: 1.5px solid #14b8a6 !important;
+  border-right: 1.5px solid #14b8a6 !important;
 }
 
-.th-sub-factor-x,
-.th-sub-pct-x {
-  background: #1e1b4b !important;
-  color: #d8b4fe !important;
+/* Light Mode: Gains Super Header */
+[data-theme="light"] .th-gain-horiz,
+[data-theme="light"] .th-track-gains-super,
+[data-theme="light"] .th-gains-super-col,
+body.theme-light .th-gain-horiz,
+body.theme-light .th-track-gains-super,
+body.theme-light .th-gains-super-col {
+  background: #166534 !important;
+  color: #ffffff !important;
+  border: 1px solid #22c55e !important;
+  border-bottom: 1.5px solid #4ade80 !important;
+}
+[data-theme="light"] .th-sub-factor,
+[data-theme="light"] .th-sub-pct,
+[data-theme="light"] .th-gain-sub,
+body.theme-light .th-sub-factor,
+body.theme-light .th-sub-pct,
+body.theme-light .th-gain-sub {
+  background: #14532d !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+}
+
+/* Light Mode: Angle X Gains Super Header */
+[data-theme="light"] .th-gain-anglex,
+body.theme-light .th-gain-anglex {
+  background: #6b21a8 !important;
+  color: #ffffff !important;
+  border: 1px solid #a855f7 !important;
+  border-bottom: 1.5px solid #c084fc !important;
+}
+[data-theme="light"] .th-sub-factor-x,
+[data-theme="light"] .th-sub-pct-x,
+body.theme-light .th-sub-factor-x,
+body.theme-light .th-sub-pct-x {
+  background: #581c87 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+}
+
+/* --------------------------------------------------------------------------
+   2. DARK MODE TABLE HEADERS (Deep Midnight Colors, Vivid Borders, High Contrast)
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .table-top-header-row th,
+[data-theme="dark"] .table-main-header-row th,
+[data-theme="dark"] .seasonal-top-th-row th,
+[data-theme="dark"] .tracking-top-th-row th,
+[data-theme="dark"] .opt-annual-matlab-table thead tr:first-child th,
+[data-theme="dark"] .opt-matrix-table thead tr:first-child th,
+[data-theme="dark"] .opt-seasonal-table thead tr:first-child th,
+[data-theme="dark"] .opt-tracking-table thead tr:first-child th,
+[data-theme="dark"] .comparative-results-table thead tr:first-child th,
+body.theme-dark .table-top-header-row th,
+body.theme-dark .table-main-header-row th,
+body.theme-dark .seasonal-top-th-row th,
+body.theme-dark .tracking-top-th-row th,
+body.theme-dark .opt-annual-matlab-table thead tr:first-child th,
+body.theme-dark .opt-matrix-table thead tr:first-child th,
+body.theme-dark .opt-seasonal-table thead tr:first-child th,
+body.theme-dark .opt-tracking-table thead tr:first-child th,
+body.theme-dark .comparative-results-table thead tr:first-child th {
+  background: #0f2744 !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 0.82rem !important;
+  text-align: center !important;
+  border: 1px solid #1e40af !important;
+  padding: 0.45rem 0.35rem !important;
+}
+
+[data-theme="dark"] .table-sub-header-row th,
+[data-theme="dark"] .seasonal-sub-th-row th,
+[data-theme="dark"] .tracking-sub-th-row th,
+[data-theme="dark"] .tracking-header-sub th,
+[data-theme="dark"] .opt-annual-matlab-table thead tr:nth-child(2) th,
+[data-theme="dark"] .opt-matrix-table thead tr:nth-child(2) th,
+[data-theme="dark"] .opt-seasonal-table thead tr:nth-child(2) th,
+[data-theme="dark"] .opt-tracking-table thead tr:nth-child(2) th,
+[data-theme="dark"] .comparative-results-table thead tr:nth-child(2) th,
+body.theme-dark .table-sub-header-row th,
+body.theme-dark .seasonal-sub-th-row th,
+body.theme-dark .tracking-sub-th-row th,
+body.theme-dark .tracking-header-sub th,
+body.theme-dark .opt-annual-matlab-table thead tr:nth-child(2) th,
+body.theme-dark .opt-matrix-table thead tr:nth-child(2) th,
+body.theme-dark .opt-seasonal-table thead tr:nth-child(2) th,
+body.theme-dark .opt-tracking-table thead tr:nth-child(2) th,
+body.theme-dark .comparative-results-table thead tr:nth-child(2) th {
+  background: #091a2e !important;
+  color: #f0f9ff !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  text-align: center !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  padding: 0.38rem 0.28rem !important;
+}
+
+/* Dark Mode: Month Column in Header */
+[data-theme="dark"] .th-month,
+[data-theme="dark"] .th-season-month,
+[data-theme="dark"] .th-track-month,
+body.theme-dark .th-month,
+body.theme-dark .th-season-month,
+body.theme-dark .th-track-month {
+  background: #081526 !important;
+  color: #38bdf8 !important;
+  font-weight: 800 !important;
+  border-right: 2px solid #0284c7 !important;
+  text-align: left !important;
+  padding-left: 0.75rem !important;
+  white-space: nowrap !important;
+}
+
+/* Dark Mode: Inclinaciones Fijas (0°..90°) */
+[data-theme="dark"] .th-angles-group,
+body.theme-dark .th-angles-group {
+  background: #0f2744 !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border-bottom: 1.5px solid #38bdf8 !important;
+  border-left: 1px solid #1e3a5f !important;
+  border-right: 1px solid #1e3a5f !important;
+}
+
+/* Dark Mode: Sub-angles */
+[data-theme="dark"] .th-sub-angle,
+[data-theme="dark"] .table-sub-header-row th:not(.th-sub-factor):not(.th-sub-pct):not(.th-sub-factor-x):not(.th-sub-pct-x):not(.th-gain-sub),
+body.theme-dark .th-sub-angle,
+body.theme-dark .table-sub-header-row th:not(.th-sub-factor):not(.th-sub-pct):not(.th-sub-factor-x):not(.th-sub-pct-x):not(.th-gain-sub) {
+  background: #0b1f36 !important;
+  color: #e0f2fe !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Dark Mode: Optimum Column */
+[data-theme="dark"] .th-optimum,
+[data-theme="dark"] .th-track-opt,
+[data-theme="dark"] .th-opt-angle-col,
+[data-theme="dark"] .th-opt-rad-col,
+body.theme-dark .th-optimum,
+body.theme-dark .th-track-opt,
+body.theme-dark .th-opt-angle-col,
+body.theme-dark .th-opt-rad-col {
+  background: #0369a1 !important;
+  color: #ffffff !important;
+  border-left: 2px solid #38bdf8 !important;
+  border-right: 2px solid #38bdf8 !important;
+  border-top: 1px solid #0284c7 !important;
+  border-bottom: 1px solid #0284c7 !important;
+}
+[data-theme="dark"] .th-opt-title,
+body.theme-dark .th-opt-title {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #ffffff !important;
+}
+[data-theme="dark"] .th-opt-angle-tag,
+body.theme-dark .th-opt-angle-tag {
+  display: inline-block;
+  background: #fef08a !important;
+  color: #713f12 !important;
+  font-size: 0.74rem;
+  font-weight: 900;
+  padding: 0.12rem 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.2rem;
+  border: 1px solid #facc15 !important;
+}
+
+/* Dark Mode: Angle X Column */
+[data-theme="dark"] .th-anglex,
+body.theme-dark .th-anglex {
+  background: #581c87 !important;
+  color: #ffffff !important;
+  border-left: 2px solid #c084fc !important;
+  border-right: 2px solid #c084fc !important;
+}
+[data-theme="dark"] .th-anglex-title,
+body.theme-dark .th-anglex-title {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #ffffff !important;
+}
+[data-theme="dark"] .th-anglex-angle-tag,
+body.theme-dark .th-anglex-angle-tag {
+  display: inline-block;
+  background: #f3e8ff !important;
+  color: #581c87 !important;
+  font-size: 0.74rem;
+  font-weight: 900;
+  padding: 0.12rem 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.2rem;
+  border: 1px solid #d8b4fe !important;
+}
+
+/* Dark Mode: Temperature Column */
+[data-theme="dark"] .th-temp,
+[data-theme="dark"] .th-track-temp,
+body.theme-dark .th-temp,
+body.theme-dark .th-track-temp {
+  background: #115e59 !important;
+  color: #ffffff !important;
+  border-left: 1.5px solid #2dd4bf !important;
+  border-right: 1.5px solid #2dd4bf !important;
+}
+
+/* Dark Mode: Gains Super Header */
+[data-theme="dark"] .th-gain-horiz,
+[data-theme="dark"] .th-track-gains-super,
+[data-theme="dark"] .th-gains-super-col,
+body.theme-dark .th-gain-horiz,
+body.theme-dark .th-track-gains-super,
+body.theme-dark .th-gains-super-col {
+  background: #14532d !important;
+  color: #ffffff !important;
+  border: 1px solid #16a34a !important;
+  border-bottom: 1.5px solid #22c55e !important;
+}
+[data-theme="dark"] .th-sub-factor,
+[data-theme="dark"] .th-sub-pct,
+[data-theme="dark"] .th-gain-sub,
+body.theme-dark .th-sub-factor,
+body.theme-dark .th-sub-pct,
+body.theme-dark .th-gain-sub {
+  background: #052e16 !important;
+  color: #bbf7d0 !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Dark Mode: Angle X Gains Super Header */
+[data-theme="dark"] .th-gain-anglex,
+body.theme-dark .th-gain-anglex {
+  background: #4c1d95 !important;
+  color: #ffffff !important;
+  border: 1px solid #7c3aed !important;
+  border-bottom: 1.5px solid #a855f7 !important;
+}
+[data-theme="dark"] .th-sub-factor-x,
+[data-theme="dark"] .th-sub-pct-x,
+body.theme-dark .th-sub-factor-x,
+body.theme-dark .th-sub-pct-x {
+  background: #2e1065 !important;
+  color: #e9d5ff !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
 /* ==========================================================================
@@ -6705,12 +7033,12 @@ body.theme-light .matlab-results-table tbody tr:nth-child(even) {
 
 [data-theme="light"] .opt-annual-matlab-table tbody tr:hover td,
 [data-theme="light"] .opt-matrix-table tbody tr:hover td,
-[data-theme="light"] .opt-seasonal-table tbody tr:hover td,
+[data-theme="light"] .opt-seasonal-table tbody tr:hover td:not(.td-month-badge):not(.badge-winter):not(.badge-spring):not(.badge-summer):not(.badge-autumn):not(.badge-media),
 [data-theme="light"] .opt-tracking-table tbody tr:hover td,
 [data-theme="light"] .matlab-results-table tbody tr:hover td,
 body.theme-light .opt-annual-matlab-table tbody tr:hover td,
 body.theme-light .opt-matrix-table tbody tr:hover td,
-body.theme-light .opt-seasonal-table tbody tr:hover td,
+body.theme-light .opt-seasonal-table tbody tr:hover td:not(.td-month-badge):not(.badge-winter):not(.badge-spring):not(.badge-summer):not(.badge-autumn):not(.badge-media),
 body.theme-light .opt-tracking-table tbody tr:hover td,
 body.theme-light .matlab-results-table tbody tr:hover td {
   background: #eff6ff !important;
@@ -6833,12 +7161,12 @@ body.theme-dark .matlab-results-table tbody tr:nth-child(even) {
 
 [data-theme="dark"] .opt-annual-matlab-table tbody tr:hover td,
 [data-theme="dark"] .opt-matrix-table tbody tr:hover td,
-[data-theme="dark"] .opt-seasonal-table tbody tr:hover td,
+[data-theme="dark"] .opt-seasonal-table tbody tr:hover td:not(.td-month-badge):not(.badge-winter):not(.badge-spring):not(.badge-summer):not(.badge-autumn):not(.badge-media),
 [data-theme="dark"] .opt-tracking-table tbody tr:hover td,
 [data-theme="dark"] .matlab-results-table tbody tr:hover td,
 body.theme-dark .opt-annual-matlab-table tbody tr:hover td,
 body.theme-dark .opt-matrix-table tbody tr:hover td,
-body.theme-dark .opt-seasonal-table tbody tr:hover td,
+body.theme-dark .opt-seasonal-table tbody tr:hover td:not(.td-month-badge):not(.badge-winter):not(.badge-spring):not(.badge-summer):not(.badge-autumn):not(.badge-media),
 body.theme-dark .opt-tracking-table tbody tr:hover td,
 body.theme-dark .matlab-results-table tbody tr:hover td {
   background: rgba(59, 130, 246, 0.15) !important;
@@ -9099,28 +9427,69 @@ body.theme-dark .energy-table-wrap {
 }
 
 .th-ener-month {
-  text-align: left;
-  background: #15803d;
-  color: #ffffff;
+  text-align: left !important;
+  background: #15803d !important;
+  color: #ffffff !important;
   width: 130px;
+  font-weight: 800;
+}
+
+.th-ener-angle {
+  text-align: center !important;
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  font-weight: 800;
 }
 
 .th-ener-horiz {
-  background: #1d4ed8;
-  color: #ffffff;
-  text-align: right;
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+  text-align: right !important;
+  font-weight: 800;
 }
 
 .th-ener-study {
-  background: #2563eb;
-  color: #ffffff;
-  text-align: right;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  text-align: right !important;
+  font-weight: 800;
 }
 
 .th-ener-gain {
-  background: #b91c1c;
-  color: #ffffff;
-  text-align: right;
+  background: #b91c1c !important;
+  color: #ffffff !important;
+  text-align: right !important;
+  font-weight: 800;
+}
+
+[data-theme="dark"] .th-ener-month,
+body.theme-dark .th-ener-month {
+  background: #14532d !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .th-ener-angle,
+body.theme-dark .th-ener-angle {
+  background: #0369a1 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .th-ener-horiz,
+body.theme-dark .th-ener-horiz {
+  background: #1e3a8a !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .th-ener-study,
+body.theme-dark .th-ener-study {
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .th-ener-gain,
+body.theme-dark .th-ener-gain {
+  background: #991b1b !important;
+  color: #ffffff !important;
 }
 
 /* Light table cells */
@@ -10751,6 +11120,74 @@ body.theme-dark .opt-seasonal-table tfoot td.badge-media {
   border-right: 2px solid #0284c7 !important;
 }
 
+/* Maintain full seasonal badge color and white text on row hover (WCAG AAA High Contrast) */
+.opt-seasonal-table tbody tr:hover td.td-month-badge,
+[data-theme="light"] .opt-seasonal-table tbody tr:hover td.td-month-badge,
+[data-theme="dark"] .opt-seasonal-table tbody tr:hover td.td-month-badge {
+  color: #ffffff !important;
+  filter: brightness(1.12);
+}
+
+[data-theme="light"] .opt-seasonal-table tbody tr:hover td.badge-winter,
+body.theme-light .opt-seasonal-table tbody tr:hover td.badge-winter {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .opt-seasonal-table tbody tr:hover td.badge-spring,
+body.theme-light .opt-seasonal-table tbody tr:hover td.badge-spring {
+  background: #15803d !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .opt-seasonal-table tbody tr:hover td.badge-summer,
+body.theme-light .opt-seasonal-table tbody tr:hover td.badge-summer {
+  background: #b45309 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .opt-seasonal-table tbody tr:hover td.badge-autumn,
+body.theme-light .opt-seasonal-table tbody tr:hover td.badge-autumn {
+  background: #c2410c !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .opt-seasonal-table tbody tr:hover td.badge-media,
+body.theme-light .opt-seasonal-table tbody tr:hover td.badge-media {
+  background: #334155 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .opt-seasonal-table tbody tr:hover td.badge-winter,
+body.theme-dark .opt-seasonal-table tbody tr:hover td.badge-winter {
+  background: #0369a1 !important;
+  color: #f0f9ff !important;
+}
+
+[data-theme="dark"] .opt-seasonal-table tbody tr:hover td.badge-spring,
+body.theme-dark .opt-seasonal-table tbody tr:hover td.badge-spring {
+  background: #166534 !important;
+  color: #f0fdf4 !important;
+}
+
+[data-theme="dark"] .opt-seasonal-table tbody tr:hover td.badge-summer,
+body.theme-dark .opt-seasonal-table tbody tr:hover td.badge-summer {
+  background: #92400e !important;
+  color: #fffbeb !important;
+}
+
+[data-theme="dark"] .opt-seasonal-table tbody tr:hover td.badge-autumn,
+body.theme-dark .opt-seasonal-table tbody tr:hover td.badge-autumn {
+  background: #9a3412 !important;
+  color: #fff7ed !important;
+}
+
+[data-theme="dark"] .opt-seasonal-table tbody tr:hover td.badge-media,
+body.theme-dark .opt-seasonal-table tbody tr:hover td.badge-media {
+  background: #0f2735 !important;
+  color: #38bdf8 !important;
+}
+
 /* ==========================================================================
    BREAKPOINT 1: LAPTOPS & MEDIUM DESKTOPS (<= 1200px)
    ========================================================================== */
@@ -11478,11 +11915,22 @@ body.theme-dark .opt-seasonal-table tfoot td.badge-media {
 }
 
 .legal-table th {
-  background: var(--bg-card);
-  border-bottom: 2px solid var(--border-highlight);
   padding: 0.55rem 0.75rem;
-  color: var(--text-main);
-  font-weight: 600;
+  font-weight: 700;
+}
+
+[data-theme="light"] .legal-table th,
+body.theme-light .legal-table th {
+  background: #1e40af !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #1d4ed8 !important;
+}
+
+[data-theme="dark"] .legal-table th,
+body.theme-dark .legal-table th {
+  background: #0f2744 !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #38bdf8 !important;
 }
 
 .legal-table td {
@@ -11802,7 +12250,7 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="
 [class*="wrap"],
 [class*="dropzone"],
 [class*="section"],
-[class*="group"],
+[class*="group"]:not(th):not(td),
 [class*="block"],
 [class*="summary"],
 [class*="status"],
@@ -11826,10 +12274,31 @@ table {
   border-radius: var(--radius-md);
 }
 
-table thead tr:first-child th:first-child { border-top-left-radius: var(--radius-md); }
-table thead tr:first-child th:last-child { border-top-right-radius: var(--radius-md); }
-table tfoot tr:last-child td:first-child { border-bottom-left-radius: var(--radius-md); }
-table tfoot tr:last-child td:last-child { border-bottom-right-radius: var(--radius-md); }
+/* Internal table cells and sub-headers MUST NEVER have rounded corners */
+table th,
+table td,
+table thead th,
+table tbody td,
+.table-top-header-row th,
+.table-sub-header-row th,
+.seasonal-top-th-row th,
+.seasonal-sub-th-row th,
+.tracking-top-th-row th,
+.tracking-sub-th-row th,
+.th-angles-group,
+.th-month,
+.th-optimum,
+.th-anglex,
+.th-temp,
+.th-gain-horiz,
+.th-gain-anglex {
+  border-radius: 0 !important;
+}
+
+table thead tr:first-child th:first-child { border-top-left-radius: var(--radius-md) !important; }
+table thead tr:first-child th:last-child { border-top-right-radius: var(--radius-md) !important; }
+table tfoot tr:last-child td:first-child { border-bottom-left-radius: var(--radius-md) !important; }
+table tfoot tr:last-child td:last-child { border-bottom-right-radius: var(--radius-md) !important; }
 
 img {
   border-radius: var(--radius-sm);

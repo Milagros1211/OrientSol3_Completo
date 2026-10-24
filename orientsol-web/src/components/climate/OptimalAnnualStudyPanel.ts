@@ -556,13 +556,13 @@ export function renderOptimalAnnualStudyPanel(props: OptimalAnnualStudyProps): H
               </tr>
               <tr class="table-sub-header-row">
                 <!-- 7 standard angles -->
-                <th>${compSymbol}<br/><span style="font-size: 0.72rem;">(0°)</span></th>
-                <th>${compSymbol}<br/><span style="font-size: 0.72rem;">(15°)</span></th>
-                <th>${compSymbol}<br/><span style="font-size: 0.72rem;">(30°)</span></th>
-                <th>${compSymbol}<br/><span style="font-size: 0.72rem;">(45°)</span></th>
-                <th>${compSymbol}<br/><span style="font-size: 0.72rem;">(60°)</span></th>
-                <th>${compSymbol}<br/><span style="font-size: 0.72rem;">(75°)</span></th>
-                <th>${compSymbol}<br/><span style="font-size: 0.72rem;">(90°)</span></th>
+                <th class="th-sub-angle">${compSymbol}<br/><span style="font-size: 0.72rem;">(0°)</span></th>
+                <th class="th-sub-angle">${compSymbol}<br/><span style="font-size: 0.72rem;">(15°)</span></th>
+                <th class="th-sub-angle">${compSymbol}<br/><span style="font-size: 0.72rem;">(30°)</span></th>
+                <th class="th-sub-angle">${compSymbol}<br/><span style="font-size: 0.72rem;">(45°)</span></th>
+                <th class="th-sub-angle">${compSymbol}<br/><span style="font-size: 0.72rem;">(60°)</span></th>
+                <th class="th-sub-angle">${compSymbol}<br/><span style="font-size: 0.72rem;">(75°)</span></th>
+                <th class="th-sub-angle">${compSymbol}<br/><span style="font-size: 0.72rem;">(90°)</span></th>
                 <!-- Gain subheaders -->
                 <th class="th-sub-factor">${t.results.gainFactorSub}</th>
                 <th class="th-sub-pct">${t.results.gainPctSub}</th>
