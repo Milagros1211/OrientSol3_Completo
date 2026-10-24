@@ -13,6 +13,7 @@ import { fetchPvgisClimateData } from '@/services/external/pvgisService';
 import { executeSolarSimulationFromClimateData } from '@/services/bridge/solarCalculationBridge';
 import type { SolarBridgeSimulationResult } from '@/services/bridge/solarCalculationBridge';
 import katex from 'katex';
+import { openPedagogicalGuideModal } from '@/components/modals/PedagogicalGuideModal';
 
 function renderTex(expr: string, displayMode: boolean = false): string {
   try {
@@ -482,7 +483,14 @@ export function renderPythonConsole(): HTMLElement {
               : 'Módulos verificados en tiempo real: <code>matriz_declinacion</code>, <code>AngulosSalida</code>, <code>Angulos</code>, <code>Altura_Solar</code>, <code>Azimut_Solar</code>, <code>Calculo_Beta_2Ejes</code>, <code>Liu-Jordan</code> y <code>Osterwald</code>.'}
           </p>
         </div>
-        <div class="panel-actions">
+        <div class="panel-actions" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+          <button id="btn-verif-guide" class="btn btn-secondary btn-pedagogical-guide" type="button" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.3); font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem; padding: 0.42rem 0.8rem; border-radius: 6px; cursor: pointer;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <span>${isEn ? 'Pedagogical Guide' : 'Guía Didáctica'}</span>
+          </button>
           <button id="run-py-btn" class="btn btn-primary" type="button" style="background: #059669; border-color: #10b981;" ${isExecuting ? 'disabled' : ''}>
             ${isExecuting
               ? `<span class="spinner-sm"></span> ${isEn ? 'Verifying in WASM...' : 'Verificando en WASM...'}`
@@ -731,43 +739,43 @@ export function renderPythonConsole(): HTMLElement {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>${isEn ? 'Solar Declination' : 'Declinación Solar'} (δ)</strong></td>
-                  <td><code>δ = 23,45 · ${isEn ? 'sin' : 'sen'}(2π · (n + 284) / 365)</code></td>
+                  <td><strong>${isEn ? 'Solar Declination' : 'Declinación Solar'} (${renderTex('\\delta')})</strong></td>
+                  <td>${renderTex('\\delta = 23{,}45^\\circ \\cdot \\sin\\left( \\frac{360^\\circ}{365}\\,(n + 284) \\right)')}</td>
                   <td class="td-num">${decDeg > 0 ? `+${formatAngle(decDeg, 2)}` : formatAngle(decDeg, 2)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;">${Math.abs(decDeg) <= 23.5 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
                 <tr>
-                  <td><strong>${isEn ? 'Sunset Hour Angle' : 'Ángulo Horario de Salida / Puesta'} (ωs)</strong></td>
-                  <td><code>cos(ωs) = -tan(φ) · tan(δ)</code></td>
+                  <td><strong>${isEn ? 'Sunset Hour Angle' : 'Ángulo Horario de Salida / Puesta'} (${renderTex('\\omega_s')})</strong></td>
+                  <td>${renderTex('\\cos\\omega_s = -\\tan\\phi \\cdot \\tan\\delta')}</td>
                   <td class="td-num">${formatAngle(sunsetDeg, 2)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;">${sunsetDeg >= 0 && sunsetDeg <= 180 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
                 <tr>
-                  <td><strong>${isEn ? 'Daylight Length' : 'Duración Solar del Día'} (S0)</strong></td>
-                  <td><code>S0 = (2 · ωs) / 15°</code></td>
+                  <td><strong>${isEn ? 'Daylight Length' : 'Duración Solar del Día'} (${renderTex('S_0')})</strong></td>
+                  <td>${renderTex('S_0 = \\frac{2\\,\\omega_s}{15^\\circ}')}</td>
                   <td class="td-num">${formatNum(dayLengthHours, 2)} h</td>
                   <td>${isEn ? 'hours' : 'horas'}</td>
                   <td style="text-align: center;">${dayLengthHours >= 0 && dayLengthHours <= 24 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
                 <tr>
-                  <td><strong>${isEn ? 'Solar Altitude at Noon' : 'Altura Solar al Mediodía (12:00h)'} (γs)</strong></td>
-                  <td><code>γs = 90° - |φ - δ|</code></td>
+                  <td><strong>${isEn ? 'Solar Altitude at Noon' : 'Altura Solar al Mediodía (12:00h)'} (${renderTex('\\gamma_s')})</strong></td>
+                  <td>${renderTex('\\gamma_s = 90^\\circ - |\\phi - \\delta|')}</td>
                   <td class="td-num">${formatAngle(noonAltDeg, 2)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;">${noonAltDeg >= 0 && noonAltDeg <= 90 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
                 </tr>
                 <tr>
-                  <td><strong>${isEn ? 'Solar Azimuth / Orientation at Noon' : 'Orientación / Azimut Solar al Mediodía (12:00h)'}</strong></td>
-                  <td><code>cos(αs) = (${isEn ? 'sin' : 'sen'}(γs) · ${isEn ? 'sin' : 'sen'}(φ) - ${isEn ? 'sin' : 'sen'}(δ)) / (cos(γs) · cos(φ))</code></td>
+                  <td><strong>${isEn ? 'Solar Azimuth / Orientation at Noon' : 'Orientación / Azimut Solar al Mediodía (12:00h)'} (${renderTex('\\alpha_s')})</strong></td>
+                  <td>${renderTex('\\cos\\alpha_s = \\frac{\\sin\\gamma_s \\sin\\phi - \\sin\\delta}{\\cos\\gamma_s \\cos\\phi}')}</td>
                   <td class="td-num">${formatAngle(noonAzimDeg, 1)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;">${!isNaN(noonAzimDeg) ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">NaN</span>`}</td>
                 </tr>
                 <tr>
-                  <td><strong>${isEn ? 'Dual-Axis Tracker Tilt at Noon' : 'Inclinación Colector 2-Ejes al Mediodía'}</strong></td>
-                  <td><code>θz = 90° - γs = |φ - δ|</code></td>
+                  <td><strong>${isEn ? 'Dual-Axis Tracker Tilt at Noon' : 'Inclinación Colector 2-Ejes al Mediodía'} (${renderTex('\\theta_z')})</strong></td>
+                  <td>${renderTex('\\theta_z = 90^\\circ - \\gamma_s = |\\phi - \\delta|')}</td>
                   <td class="td-num">${formatAngle(noonDualTiltDeg, 1)}</td>
                   <td>${isEn ? 'degrees' : 'grados'}</td>
                   <td style="text-align: center;">${noonDualTiltDeg >= 0 && noonDualTiltDeg <= 90 ? `<span class="badge-status-valid">✓ ${isEn ? 'Valid' : 'Verificado'}</span>` : `<span class="badge-status-warn">${isEn ? 'Out of bounds' : 'Desviación'}</span>`}</td>
@@ -931,6 +939,86 @@ export function renderPythonConsole(): HTMLElement {
             `}
           </div>
         </div>
+
+        <!-- Panel Didáctico de Geometría Solar y Simetría Temporal -->
+        <div style="padding: 1rem 1.15rem; background: var(--bg-primary); border-top: 1px solid var(--border-subtle); margin-top: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          <div style="font-weight: 700; color: var(--text-main); font-size: 0.85rem; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <span>${isEn ? 'Mathematical Foundation: Solar Celestial Trigonometry & Temporal Symmetry' : 'Fundamento Matemático Didáctico: Trigonometría Solar y Ley de Simetría'}</span>
+            <span class="badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; font-size: 0.70rem; font-weight: 700;">Cooper (1969) / Spencer (1971) / Duffie & Beckman</span>
+          </div>
+
+          <div class="math-modules-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)); gap: 0.85rem;">
+            <!-- Module 1: Declinación Solar -->
+            <div class="math-module-card">
+              <div style="font-weight: 700; color: #0284c7; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                <span>1. ${isEn ? 'Solar Declination & Day of the Year' : 'Declinación Solar y Día del Año'}</span>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                ${isEn
+                  ? 'Angle between the Earth-Sun line and equatorial plane, bounded within [-23.45°, +23.45°]:'
+                  : 'Ángulo entre la línea Sol-Tierra y el plano ecuatorial terrestre, oscilando en el rango [-23,45°, +23,45°]:'}
+              </div>
+              <div class="math-formula-box">
+                <div style="color: var(--text-main); text-align: center; width: 100%;">
+                  ${renderTex('\\delta = 23{,}45^\\circ \\cdot \\sin\\left( \\frac{360^\\circ}{365}\\,(284 + n) \\right)', true)}
+                </div>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.70rem; line-height: 1.45;">
+                • Solsticio de Verano (${renderTex('n = 172')}, 21 Jun): ${renderTex('\\delta = +23{,}45^\\circ')}.<br/>
+                • Equinoccios (${renderTex('n = 80, 264')}): ${renderTex('\\delta = 0{,}00^\\circ')}.<br/>
+                • Solsticio de Invierno (${renderTex('n = 355')}, 21 Dic): ${renderTex('\\delta = -23{,}45^\\circ')}.
+              </div>
+            </div>
+
+            <!-- Module 2: Altura y Azimut Horarios -->
+            <div class="math-module-card">
+              <div style="font-weight: 700; color: #059669; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                <span>2. ${isEn ? 'Hourly Solar Coordinates' : 'Coordenadas Horarias de Altura y Azimut'}</span>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                ${isEn
+                  ? 'Determines solar position as a function of latitude φ, declination δ, and hour angle ω:'
+                  : 'Determina la posición instantánea del Sol en función de la latitud φ, declinación δ y ángulo horario ω:'}
+              </div>
+              <div class="math-formula-box">
+                <div style="color: var(--text-main); text-align: center; width: 100%;">
+                  ${renderTex('\\sin\\gamma_s = \\sin\\phi\\sin\\delta + \\cos\\phi\\cos\\delta\\cos\\omega', true)}
+                </div>
+                <div style="color: var(--text-main); text-align: center; width: 100%; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
+                  ${renderTex('\\cos\\alpha_s = \\frac{\\sin\\gamma_s\\sin\\phi - \\sin\\delta}{\\cos\\gamma_s\\cos\\phi}', true)}
+                </div>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.70rem; line-height: 1.45;">
+                • ${renderTex('\\omega = (t_{\\text{solar}} - 12) \\times 15^\\circ')}: ${isEn ? 'Hour angle (15°/hour)' : 'Ángulo horario (15° por cada hora solar)'}.<br/>
+                • Al mediodía (${renderTex('t = 12\\text{ h}')}, ${renderTex('\\omega = 0')}): Altura máxima ${renderTex('\\gamma_{s,\\text{max}} = 90^\\circ - |\\phi - \\delta|')}.
+              </div>
+            </div>
+
+            <!-- Module 3: Simetría Solar Universal -->
+            <div class="math-module-card">
+              <div style="font-weight: 700; color: #d97706; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                <span>3. ${isEn ? 'Universal Solar Symmetry Proof' : 'Ley Universal de Simetría Temporal'}</span>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                ${isEn
+                  ? 'Because cos(ω) is an even function (cos(-ω) = cos(+ω)), morning and afternoon trajectories are mirror images:'
+                  : 'Dado que cos(ω) es una función par (cos(-ω) = cos(+ω)), la trayectoria matinal y vespertina son idénticas en espejo:'}
+              </div>
+              <div class="math-formula-box">
+                <div style="color: var(--text-main); text-align: center; width: 100%;">
+                  ${renderTex('\\cos(-\\omega) = \\cos(+\\omega) \\implies \\gamma_s(-\\omega) = \\gamma_s(+\\omega)', true)}
+                </div>
+                <div style="color: var(--text-main); text-align: center; width: 100%; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
+                  ${renderTex('\\beta_{\\text{2Ejes}}(-\\omega) = \\beta_{\\text{2Ejes}}(+\\omega) = 90^\\circ - \\gamma_s(\\omega)', true)}
+                </div>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.70rem; line-height: 1.45;">
+                • A horas simétricas (${renderTex('11:00\\text{ h} \\leftrightarrow 13:00\\text{ h}')}), la altura solar y la inclinación 2-ejes son exactamente iguales.<br/>
+                • El azimut solar tiene signo opuesto: ${renderTex('\\alpha_s(-\\omega) = -\\alpha_s(+\\omega)')} (Este en la mañana, Oeste en la tarde).
+              </div>
+            </div>
+          </div>
+        </div>
       `;
     }
 
@@ -1025,6 +1113,84 @@ export function renderPythonConsole(): HTMLElement {
                 </tr>
               </tfoot>
             </table>
+          </div>
+        </div>
+
+        <!-- Panel Didáctico de Días Medios de Klein y Radiación Extraterrestre -->
+        <div style="padding: 1rem 1.15rem; background: var(--bg-primary); border-top: 1px solid var(--border-subtle); margin-top: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          <div style="font-weight: 700; color: var(--text-main); font-size: 0.85rem; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <span>${isEn ? 'Mathematical Foundation: Klein (1977) Characteristic Intermediate Days & Extraterrestrial Radiation' : 'Fundamento Matemático Didáctico: Días Medios de Klein (1977) e Irradiación Extraterrestre'}</span>
+            <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-size: 0.70rem; font-weight: 700;">Klein (1977) / Duffie & Beckman (2013)</span>
+          </div>
+
+          <div class="math-modules-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)); gap: 0.85rem;">
+            <!-- Module 1: Días Medios de Klein -->
+            <div class="math-module-card">
+              <div style="font-weight: 700; color: #0284c7; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                <span>1. ${isEn ? 'Why 12 Klein Characteristic Days?' : '¿Por qué 12 Días Característicos de Klein?'}</span>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                ${isEn
+                  ? 'Klein proved that calculating solar geometry on a single characteristic day nm per month reproduces the integrated monthly extraterrestrial irradiation with <0.5% error:'
+                  : 'Klein demostró que evaluar la geometría solar en un único día característico nm por mes reproduce la irradiación extraterrestre acumulada mensual con un error < 0,5%:'}
+              </div>
+              <div class="math-formula-box">
+                <div style="color: var(--text-main); text-align: center; width: 100%;">
+                  ${renderTex('G_{0d}(n_m) \\approx \\frac{1}{N_m} \\sum_{d=1}^{N_m} G_{0d}(d) = \\overline{G}_{0d}', true)}
+                </div>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.70rem; line-height: 1.45;">
+                • Ene: ${renderTex('n = 17')} | Feb: ${renderTex('n = 47')} | Mar: ${renderTex('n = 75')} | Abr: ${renderTex('n = 105')}<br/>
+                • May: ${renderTex('n = 135')} | Jun: ${renderTex('n = 162')} | Jul: ${renderTex('n = 198')} | Ago: ${renderTex('n = 228')}<br/>
+                • Sep: ${renderTex('n = 258')} | Oct: ${renderTex('n = 288')} | Nov: ${renderTex('n = 318')} | Dic: ${renderTex('n = 344')}
+              </div>
+            </div>
+
+            <!-- Module 2: Irradiación Extraterrestre G0d -->
+            <div class="math-module-card">
+              <div style="font-weight: 700; color: #059669; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                <span>2. ${isEn ? 'Daily Extraterrestrial Radiation Formula' : 'Fórmula de Irradiación Extraterrestre Diaria'}</span>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                ${isEn
+                  ? 'Total solar radiation on top of the atmosphere over a horizontal plane throughout the daylight hours:'
+                  : 'Radiación solar en el tope de la atmósfera sobre plano horizontal integrada a lo largo del día:'}
+              </div>
+              <div class="math-formula-box">
+                <div style="color: var(--text-main); text-align: center; width: 100%;">
+                  ${renderTex('G_{0d} = \\frac{24}{\\pi}\\,I_{sc}\\,e_0\\left( \\cos\\phi\\cos\\delta\\sin\\omega_s + \\frac{\\pi\\omega_s}{180^\\circ}\\sin\\phi\\sin\\delta \\right)', true)}
+                </div>
+                <div style="color: var(--text-muted); text-align: center; width: 100%; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
+                  ${renderTex('e_0 = 1 + 0{,}033\\cos\\left( \\frac{360^\\circ n}{365} \\right), \\quad I_{sc} = 1{,}367\\text{ kW/m}^2', true)}
+                </div>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.70rem; line-height: 1.45;">
+                • ${renderTex('I_{sc} = 1{,}367\\text{ kW/m}^2')}: Constante solar de la OMM.<br/>
+                • ${renderTex('e_0')}: Corrección por excentricidad de la órbita elíptica terrestre.
+              </div>
+            </div>
+
+            <!-- Module 3: Índice de Claridad Kt -->
+            <div class="math-module-card">
+              <div style="font-weight: 700; color: #d97706; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                <span>3. ${isEn ? 'Atmospheric Clearness Index' : 'Índice de Claridad Atmosférica Kt'}</span>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                ${isEn
+                  ? 'Fraction of extraterrestrial radiation that penetrates the atmosphere and reaches ground level:'
+                  : 'Fracción de radiación extraterrestre que atraviesa la atmósfera y alcanza la superficie terrestre:'}
+              </div>
+              <div class="math-formula-box">
+                <div style="color: var(--text-main); text-align: center; width: 100%;">
+                  ${renderTex('K_t = \\frac{G_{dm}(0)}{G_{0d}}, \\quad 0 < K_t \\le 1{,}0', true)}
+                </div>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.70rem; line-height: 1.45;">
+                • Cielo despejado (muy soleado): ${renderTex('K_t \\approx 0{,}65 - 0{,}75')}.<br/>
+                • Días intermedios / nubosidad parcial: ${renderTex('K_t \\approx 0{,}40 - 0{,}60')}.<br/>
+                • Cielo cubierto / tormentoso: ${renderTex('K_t < 0{,}30')}.
+              </div>
+            </div>
           </div>
         </div>
       `;
@@ -2317,6 +2483,89 @@ export function renderPythonConsole(): HTMLElement {
             </table>
           </div>
         </div>
+
+        <!-- Panel Didáctico de Topologías de Seguimiento Solar -->
+        <div style="padding: 1rem 1.15rem; background: var(--bg-primary); border-top: 1px solid var(--border-subtle); margin-top: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          <div style="font-weight: 700; color: var(--text-main); font-size: 0.85rem; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <span>${isEn ? 'Mathematical Foundation: 6 Solar Capture & Tracking Topologies' : 'Fundamento Matemático Didáctico: 6 Topologías de Captación y Seguimiento Solar'}</span>
+            <span class="badge" style="background: rgba(5, 150, 105, 0.12); color: #059669; font-size: 0.70rem; font-weight: 700;">OrientSol Tracking Engine / IEC 62817</span>
+          </div>
+
+          <div class="math-modules-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr)); gap: 0.85rem;">
+            <!-- Topology 1: Fijo Óptimo vs Estacional -->
+            <div class="math-module-card">
+              <div style="font-weight: 700; color: #0284c7; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                <span>1. ${isEn ? 'Fixed Optimal vs Seasonal (4 Adjustments)' : 'Inclinación Fija Óptima vs Estacional (4 Posiciones)'}</span>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                ${isEn
+                  ? 'Annual fixed tilt maximizes whole-year energy. Seasonal tilt adjusts angle 4 times per year to match solar altitude:'
+                  : 'La inclinación fija anual maximiza la captación integral del año. El ajuste estacional cambia 4 veces al año adaptándose a la altura solar:'}
+              </div>
+              <div class="math-formula-box">
+                <div style="color: var(--text-main); text-align: center; width: 100%;">
+                  ${renderTex('\\beta_{\\text{ópt, anual}} \\approx |\\phi| \\times 0{,}88', true)}
+                </div>
+                <div style="color: var(--text-main); text-align: center; width: 100%; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
+                  ${renderTex('\\beta_{\\text{inv}} \\approx \\phi + 15^\\circ, \\quad \\beta_{\\text{ver}} \\approx \\phi - 15^\\circ, \\quad \\beta_{\\text{pri/oto}} \\approx \\phi', true)}
+                </div>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.70rem; line-height: 1.45;">
+                • Inclinación fija óptima anual: +10% a +15% de ganancia sobre superficie horizontal.<br/>
+                • Ajuste estacional (4 cambios): aporta un +3% a +5% de energía adicional sobre la fija.
+              </div>
+            </div>
+
+            <!-- Topology 2: Seguimiento 1 Eje (Polar, Azimutal, Horizontal) -->
+            <div class="math-module-card">
+              <div style="font-weight: 700; color: #059669; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                <span>2. ${isEn ? 'Single-Axis Tracking (Polar, Azimuthal & Horizontal)' : 'Seguimiento a 1 Eje (Polar, Azimutal y Horizontal)'}</span>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                ${isEn
+                  ? 'Rotating around one rotational axis maintains high direct beam capture throughout the daytime hours:'
+                  : 'El giro alrededor de un único eje mecánico maximiza la captación directa durante el transcurso del día:'}
+              </div>
+              <div class="math-formula-box">
+                <div style="color: var(--text-main); text-align: center; width: 100%;">
+                  ${renderTex('\\text{Eje Polar: } \\beta = |\\phi|, \\quad \\text{Giro hor.: } \\omega(t) = 15^\\circ/\\text{h}', true)}
+                </div>
+                <div style="color: var(--text-main); text-align: center; width: 100%; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
+                  ${renderTex('\\text{Eje Horizontal N-S: } \\tan\\beta(t) = \\frac{|\\sin\\psi_s(t)|}{\\tan\\gamma_s(t)}', true)}
+                </div>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.70rem; line-height: 1.45;">
+                • Eje Polar: Inclinación fija igual a la latitud, rotación polar horaria (+35% a +45% s/ horiz).<br/>
+                • Eje Horizontal N-S: Eje horizontal plano con rotación Este-Oeste (+25% a +35% s/ horiz).
+              </div>
+            </div>
+
+            <!-- Topology 3: Seguimiento Continuo a 2 Ejes -->
+            <div class="math-module-card">
+              <div style="font-weight: 700; color: #d97706; font-size: 0.76rem; display: flex; align-items: center; gap: 0.35rem;">
+                <span>3. ${isEn ? 'Two-Axis Tracking (Maximum Energy Limit)' : 'Seguimiento Continuo a Dos Ejes (Límite Físico)'}</span>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.71rem; margin-top: 0.2rem;">
+                ${isEn
+                  ? 'Collector normal strictly coincides with the instantaneous solar vector (incidence angle θ = 0°):'
+                  : 'La normal del módulo fotovoltaico coincide estrictamente con el vector solar instantáneo (ángulo de incidencia θ = 0°):'}
+              </div>
+              <div class="math-formula-box">
+                <div style="color: var(--text-main); text-align: center; width: 100%;">
+                  ${renderTex('\\theta(t) = 0^\\circ \\implies B_p(t) = B_n(t) = \\frac{B_{dm}(0)}{\\sin\\gamma_s(t)}', true)}
+                </div>
+                <div style="color: var(--text-main); text-align: center; width: 100%; border-top: 1px dashed var(--border-subtle); padding-top: 0.35rem;">
+                  ${renderTex('\\beta_{\\text{seg}}(t) = 90^\\circ - \\gamma_s(t), \\quad \\gamma_{p,\\text{seg}}(t) = \\alpha_s(t)', true)}
+                </div>
+              </div>
+              <div style="color: var(--text-muted); font-size: 0.70rem; line-height: 1.45;">
+                • Inclinación instantánea: Cenit solar ${renderTex('\\theta_z = 90^\\circ - \\gamma_s')}.<br/>
+                • Orientación instantánea: Azimut solar ${renderTex('\\alpha_s')}.<br/>
+                • Máxima ganancia física teórica: hasta +45% a +50% sobre plano horizontal.
+              </div>
+            </div>
+          </div>
+        </div>
       `;
     }
 
@@ -2511,6 +2760,11 @@ export function renderPythonConsole(): HTMLElement {
   }
 
   function attachEventListeners() {
+    // Pedagogical Guide Modal Trigger
+    container.querySelector('#btn-verif-guide')?.addEventListener('click', () => {
+      openPedagogicalGuideModal('verification', isEn);
+    });
+
     // 1. Slider & Input Sync: Latitude
     const sliderLat = container.querySelector('#slider-lat') as HTMLInputElement;
     const inputLat = container.querySelector('#input-lat') as HTMLInputElement;
