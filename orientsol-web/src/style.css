@@ -11946,3 +11946,71 @@ body.theme-dark .tab3-pill-btn.active {
   color: #fbbf24 !important;
 }
 
+/* ==========================================================================
+   PEDAGOGICAL AUDIT BADGES & ROUNDED CONCEPT CARDS
+   ========================================================================== */
+.pedagogical-audit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #059669;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.btn-pedagogical-guide {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25);
+  white-space: nowrap;
+}
+
+.btn-pedagogical-guide:hover {
+  background: #0369a1;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(2, 132, 199, 0.35);
+}
+
+.pedagogical-concept-card {
+  margin-top: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  background: rgba(2, 132, 199, 0.05);
+  border: 1px dashed rgba(2, 132, 199, 0.25);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+[data-theme="dark"] .pedagogical-concept-card,
+body.theme-dark .pedagogical-concept-card {
+  background: rgba(14, 61, 84, 0.3) !important;
+  border-color: rgba(56, 189, 248, 0.25) !important;
+}
+
+[data-theme="dark"] .pedagogical-section-card {
+  background: #0a1f2e !important;
+  border-color: #1e3a5f !important;
+  color: #e2e8f0 !important;
+}
+
+
