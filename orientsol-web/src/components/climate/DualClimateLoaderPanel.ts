@@ -829,12 +829,26 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
   apiSaveBtn?.addEventListener('click', async () => {
     if (!currentActiveRecord) return;
 
-    const chosenName = apiNameInput ? apiNameInput.value.trim() : '';
-    const targetName = chosenName || currentActiveRecord.locationName;
+    // Obtener identificador normalizado de la fuente satelital
+    const sourceKey = apiSourceSelect ? apiSourceSelect.value : currentActiveRecord.source;
+    let sourceTag = 'PVGIS';
+    if (sourceKey === 'nasa' || sourceKey === 'nasa_power') {
+      sourceTag = 'NASA_POWER';
+    } else if (sourceKey === 'meteonorm') {
+      sourceTag = 'OPEN_METEO';
+    } else if (currentActiveRecord.source) {
+      sourceTag = currentActiveRecord.source.toUpperCase();
+    }
+
+    // Timestamp solo de fecha en formato YYYY-MM-DD
+    const dateStamp = new Date().toISOString().split('T')[0];
+
+    // Formato requerido: _(NOMBREDESOURCE_TIMESTAMPSOLODEFECHA), ej: _(PVGIS_2026-10-24)
+    const formattedApiEmplacementName = `_(${sourceTag}_${dateStamp})`;
 
     const recordToSave: ClimateDataRecord = {
       ...currentActiveRecord,
-      locationName: targetName,
+      locationName: formattedApiEmplacementName,
     };
 
     // Pre-validation: Stop upload and show error if empty or invalid
@@ -852,6 +866,7 @@ export function renderDualClimateLoaderPanel(): HTMLElement {
       if (reg.isDuplicate) {
         setStatus(reg.message, 'warning');
       } else {
+        if (apiNameInput) apiNameInput.value = formattedApiEmplacementName;
         renderActiveRecord(recordToSave);
         await updateSearchableStations();
         const uploadPermissionStatus = reg.isOffline
